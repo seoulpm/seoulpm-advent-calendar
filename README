@@ -1,0 +1,68 @@
+Seoul Perl Mongers Advent Calendar 2011년
+=========================================
+
+기사 형식은 어떻게 하나요?
+-----------------
+
+'자기소개-서론-본론-마무리' 형식을 지키면 됩니다.
+파일 포맷은 이메일로 전달할 수만 있다면 어떠한 것으로도 괜찮습니다.
+이미지를 포함할 수 있습니다. 작년의 기사를 참고하세요.
+
+어떻게 전달하나요?
+-----------------
+
+11월 말까지 여기로(amoc.yn@gmail.com) 보내주세요.
+
+무슨 주제에 대해 써야 하나요?
+----------------------------
+
+Advent Calendar 기사는 Perl에 관련된 어떤 주제에 대해서든지
+다루어도 좋습니다. 그 중에서도 다음 분류에 해당하는 주제이면
+좋습니다.
+
+작년의 Advent Caledendar 사이트를 참고합시다. (http://advent.perl.kr/)
+
+유입률이 높은(buzz) 기사로 Perl을 널리 알리고자 하는 주제도 좋습니다.
+작년의 유입 키워드를 참고해봅시다. 
+
+- http://live.feedjit.com/live/advent.perl.kr/0/
+- 나만의 E-Book으로 따뜻한 크리스마스를! (http://advent.perl.kr/2010-12-06.html)
+- 매일매일 네이버 카페 출석 체크하기! (http://advent.perl.kr/2010-12-07.html)
+
+한국에서 Perl을 사용하면서 발생할 만한 기본적인 이슈들에 대해 다루는 것도 좋습니다.
+오래된 Perl 정보를 버리고 개과천선할 수 있도록 돕는 주제나
+많은 사람들이 거치게 되는 CPAN 환경을 설정하는 방법과 같은 기사들이 이에 해당합니다.
+
+- MS Windows에서 Perl 활용하기 (http://advent.perl.kr/2010-12-01.html)
+- Moose로 OOP하기 (http://advent.perl.kr/2010-12-20.html)
+- HTTP 패킷을 까보자 (http://advent.perl.kr/2010-12-17.html)
+
+Perl에 대한 최신 기술이나 트랜드 및 소식에 관련한 주제도 좋습니다.
+
+- 나의 Catalyst 답사기 (http://advent.perl.kr/2010-12-12.html)
+- Plack on SL4A (http://advent.perl.kr/2010-12-21.html)
+
+요즘 트랜드인 새로운 이슈에 Perl이 사용되거나
+또는 다른 학문에서 Perl이 사용되는 주제도 (또는 부수적으로 사용되는 경우라고 하더라도
+Perl을 설명하는 좋은 척도가 된다면) 좋은 주제입니다.
+
+- Perl과 생명정보학 (http://advent.perl.kr/2010-12-18.html)
+- XML-RPC 프록시 서버 (http://advent.perl.kr/2010-12-15.html)
+- Perl과 해킹 그리고 MS07-017 (http://advent.perl.kr/2010-12-19.html)
+
+시스템 관리나 정보화 시대 문화인(?)으로서 작업을 자동화하거나 단순화하는데
+Perl이 효율적으로 활용될 수 있다는 일련의 스크립트를 작성하는 주제도 좋습니다.
+
+- File::Map을 이용한 메모리맵 파일 접근 (http://advent.perl.kr/2010-12-03.html)
+- 중복된 MP3 파일 찾아서 정리하기 (http://advent.perl.kr/2010-12-23.html)
+- 북마크 사이트를 소장용 EPUB으로 만들기 (http://advent.perl.kr/2010-12-22.html)
+
+주제를 추천해 주세요
+-------------------
+
+이 레포지토리의 위키를 참고하세요.
+
+기타 이슈
+---------
+
+이 레포지토리의 위키를 참고하세요.
