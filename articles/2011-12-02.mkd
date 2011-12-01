@@ -13,12 +13,18 @@ Author:   pung96
 훈훈한 외모로 인해 유부남임에도 불구하고 *훈중년*이라는 별칭을 획득.
 
 
-Perl one-liner로  따라하는 Octopress
-==========
-필요한 알고리즘을 한 줄의 perl 코드로 작성하는 Perl one-liner는 간단한 코드가 필요할 때나 쉘과 결합하여 쓸때 매우 유용한 방법입니다.
-이미 많은 oneliner 문서가 있고 이를 반복하는 것은 지루한 작업이 될것이 분명합니다.
-저는  Ruby로 만든 유명한 [GitHub](http://github.com)용 블로그 툴인 [Octropress](http://octopress.org/) 를
-perl one-liner로 살짝 흉내내보며 perl one-liner 가 어떻게 쓰일 수 있나 살펴 보도록 하겠습니다.
+
+시작하며
+---------
+
+한 줄의 Perl 코드로 필요한 알고리즘을 작성하는 Perl 원라이너(one-liner)는 매우 유용합니다.
+간단한 코드를 작성할 때라던가, 쉘과 결합해서 사용해야 할 때라면 더더욱 그러하지요.
+이미 세상에는 훌륭한 원라이너 문서가 많은데 이를 반복한다면 무척 지루한 일이겠죠.
+대신 Ruby로 만든 [GitHub](http://github.com) 블로그 툴인
+[Octropress](http://octopress.org/)를 Perl 원라이너로 살짝 흉내어
+Perl 원라이너를 어떻게 쓸 수 있는지 살펴보겠습니다.
+
+
 
 ## one-liner의 철학
 * one-liner 는 "간단하게" 쓰기 위한 도구이므로 최적화나 미학은 소나 줘버리고 마음 가는 대로 쓰며 되겠습니다.
