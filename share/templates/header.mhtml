@@ -1,6 +1,3 @@
-<%args>
-  $global
-</%args>
 <!doctype html>
 <html>
 <head>
@@ -13,28 +10,18 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar 2011" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
-  <link rel="stylesheet" type="text/css" href="<% $global->{css} %>" />
-
-  <!-- Syntax Highlighter -->
-  <script type="text/javascript" src="shCore.js"></script>
-  <script type="text/javascript" src="shBrushBash.js"></script>
-  <script type="text/javascript" src="shBrushPerl.js"></script>
-  <script type="text/javascript" src="shBrushJScript.js"></script>
-  <script type="text/javascript" src="shBrushPlain.js"></script>
-  <script type="text/javascript" src="shBrushXml.js"></script>
-  <script type="text/javascript" src="shBrushSql.js"></script>
-  <script type="text/javascript" src="shBrushDiff.js"></script>
-  <script type="text/javascript" src="shBrushJava.js"></script>
-  <script type="text/javascript" src="shBrushCpp.js"></script>
-  <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-  <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
-  <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css"></script>
-  <link type="text/css" rel="stylesheet" href="shCore.css">
-  <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">
+  <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+% unless ( $global->{location} ) {
   <script type="text/javascript">
-      SyntaxHighlighter.all();
+    function perl_scroll(id){
+      $('html,body').animate({scrollTop: $("#"+id).offset().top},'fast');
+    }
+    $(document).ready(function() {
+      $('.scroller').attr('href', 'javascript:void(0)');
+    });
   </script>
-
+% }
   <!-- Google Analytics -->
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -48,18 +35,7 @@
     })();
   </script>
 </head>
-<body>
-% if ( $global->{location} ) {
-<div id="wrapper" class="flu">
-% }
-% else {
-<div id="wrapper" class="fix">
-% }
-  <div id="header">
-    <p><% "$global->{title} | $global->{title_en}" %></p>
-    <img src="title.gif" />
-    <div style="font-weight: bold; position: absolute; top: 10px; left: 10px;">
-      <a href="http://advent.perl.kr/2010/" target="_blank">← 작년 펄 크리스마스 달력으로</a>
-    </div>
-  </div>
 
+<%args>
+  $global
+</%args>

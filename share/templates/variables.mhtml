@@ -2,7 +2,8 @@
 return {
     title          => '2011 Seoul.pm 펄 크리스마스 달력',
     title_en       => 'Seoul.pm Perl Advent Calendar 2011',
-    css            => 'style.css',
+    css_article    => 'article.css'
+    css_calendar   => 'calendar.css',
     articles_total => 24,
     base_uri       => 'http://advent.perl.kr/2011/',
     copyright      => 'Articles by Seoul Perl Mongers<br />Illustrated by Hyunsu Park, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim',
