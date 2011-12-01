@@ -3,7 +3,6 @@
   $article
 </%args>
 
-<& permalink.mhtml, article => $article &>
 <& sns.mhtml, global => $global, article => $article &>
 
 <& book.mhtml,    global => $global &>
