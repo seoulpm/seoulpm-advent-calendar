@@ -74,12 +74,37 @@ return {
         );
         return $table{$day};
     },
+    advent_links => [
+        {
+            title => 'Perl Advent Calendar',
+            url   => 'http://perladvent.org/2011/',
+        },
+        {
+            title => 'Perl 6 Advent Calendar',
+            url   => 'http://perl6advent.wordpress.com/',
+        },
+        {
+            title => 'Dancer Advent Calendar',
+            url   => 'http://advent.perldancer.org/2011',
+        },
+        {
+            title => 'Catalyst Advent Calendar',
+            url   => 'http://www.catalystframework.org/calendar/2011',
+        },
+        {
+            title => 'Japan Perl Advent Calendar',
+            url   => 'http://perl-users.jp/articles/advent-calendar/2011/',
+        },
+        {
+            title => '일본 펄 크리스마스 달력(번역)',
+            url   => 'http://j2k.naver.com/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2011/',
+        },
+    ],
     links => [
         {
             title => 'perl.kr',
             url   => 'http://perl.kr/',
         },
-
         #{
         #  title => 'Seoul.pm',
         #  url   => 'http://seoul.pm.org',
@@ -95,26 +120,6 @@ return {
         {
             title => '한국펄워크샵 2008',
             url   => 'http://event.perl.kr/kpw2008/',
-        },
-        {
-            title => 'Perl Advent Calendar 2011',
-            url   => 'http://perladvent.org/2011/',
-        },
-        {
-            title => 'Japan Perl Advent Calendar 2011',
-            url   => 'http://perl-users.jp/articles/advent-calendar/2011/',
-        },
-        {
-            title => '2011 일본 펄 크리스마스 달력(번역)',
-            url   => 'http://j2k.naver.com/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2011/',
-        },
-        {
-            title => 'Dancer Advent Calendar 2011',
-            url   => 'http://advent.perldancer.org/2011',
-        },
-        {
-            title => 'Catalyst Advent Calendar 2011',
-            url   => 'http://www.catalystframework.org/calendar/2011',
         },
     ],
     trees => [

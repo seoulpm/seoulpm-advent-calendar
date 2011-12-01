@@ -3,9 +3,6 @@
 </%args>
 <div id="link">
   <ul>
-% for my $link ( @{ $global->{links} } ) {
-    <li><a href="<% $link->{url} %>" target="_blank"><% $link->{title} %></a></li>
-% }
 % for my $link ( @{ $global->{advent_links} } ) {
     <li><a href="<% $link->{url} %>" target="_blank"><% $link->{title} %></a></li>
 % }

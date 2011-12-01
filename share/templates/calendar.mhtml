@@ -10,12 +10,7 @@
     <menu id="menu">
       <li class="nook"><a href="http://advent.perl.kr/2010/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
       <li class="bold large"><a href="#openbook" class="scroller" onClick="perl_scroll('openbook')">&raquo; 펄 크리스마스 달력이란?</a></li>
-      <li class="margin"><a href="http://perladvent.org/2011/" target="_blank">Perl Advent Calendar 2011</a></li>
-      <li><a href="http://perl-users.jp/articles/advent-calendar/2011/" target="_blank">Perl Advent Calendar Japan 2011</a></li>
-      <li class="margin"><a href="http://perlmania.or.kr/" target="_blank">펄마니아</a></li>
-      <li><a href="http://perl.or.kr/" target="_blank">한국 펄 사용자 모임</a></li>
-      <li><a href="http://cafe.naver.com/perlstudy.cafe" target="_blank">네이버 펄 카페</a></li>
-      <li><a href="http://webchat.freenode.net/?channels=perl-kr" target="_blank">IRC #perl-kr 채팅방</a></li>
+      <& link.mhtml, global => $global &>
       <li class="margin"><p class="disc">우측의 크리스마스 화환에 하루에 하나씩 날짜가 적힌 장식구가 달립니다.</p></li>
     </menu>
     <ul id="tree">
@@ -65,10 +60,7 @@
           <img class="right" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Adventkalender_andrea.JPG/320px-Adventkalender_andrea.JPG" />
           보통 <em>펄에 대한 재미있고 유익한 글을 선물</em>합니다. 서울 펄 몽거스는 작년 겨울을 처음으로 시작해서 올해 두번째로 달력으로 달리고 있습니다! 이 곳 외에도 올해 세계의 펄 커뮤니티 재림절 달력 목록은 이렇게나 많이 있으니 놀러가봅시다!
         </p>
-        <ul>
-          <li><a href="http://perladvent.org/2011/" target="_blank">Perl Advent Calendar 2011</a></li>
-          <li><a href="http://perl-users.jp/articles/advent-calendar/2011/" target="_blank">Perl Advent Calendar Japan 2011</a></li>
-        </ul>
+        <& advent_link.mhtml, global => $global &>
       </div>
       <div class="part">
         <h2><img src="titl_2.gif" alt="커뮤니티에 참여할 수 있나요?" /></h2>
