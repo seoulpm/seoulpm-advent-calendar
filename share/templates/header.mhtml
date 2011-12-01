@@ -11,7 +11,27 @@
   <meta name="description" content="Seoul.pm Perl Advent Calendar 2011" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
   <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+  <!-- Syntax Highlighter -->
+  <script type="text/javascript" src="shCore.js"></script>
+  <script type="text/javascript" src="shBrushBash.js"></script>
+  <script type="text/javascript" src="shBrushPerl.js"></script>
+  <script type="text/javascript" src="shBrushJScript.js"></script>
+  <script type="text/javascript" src="shBrushPlain.js"></script>
+  <script type="text/javascript" src="shBrushXml.js"></script>
+  <script type="text/javascript" src="shBrushSql.js"></script>
+  <script type="text/javascript" src="shBrushDiff.js"></script>
+  <script type="text/javascript" src="shBrushJava.js"></script>
+  <script type="text/javascript" src="shBrushCpp.js"></script>
+  <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
+  <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css"></script>
+  <link type="text/css" rel="stylesheet" href="shCore.css">
+  <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">
+  <script type="text/javascript">
+      SyntaxHighlighter.all();
+  </script>
+
 % unless ( $global->{location} ) {
   <script type="text/javascript">
     function perl_scroll(id){
