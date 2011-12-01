@@ -1,5 +1,5 @@
 <& header.mhtml, global => $global &>
-<body>
+<body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
     <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
@@ -91,10 +91,11 @@
           자, 그럼 어서 "좋아요"를 누르고 트위터와 페이스북으로 공유합시다.
         </p>
       </div>
+      <& disqus.mhtml, article => undef, year => $year &>
+      <& fb_comment.mhtml, url => $global->{base_uri} &>
     </div>
   </div>
 <& footer.mhtml, global => $global &>
-
 <%init>
   my $global = $m->comp('variables.mhtml');
   $global->{location} = '';

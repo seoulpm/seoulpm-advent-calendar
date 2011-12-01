@@ -1,5 +1,5 @@
 <& header.mhtml, global => $global &>
-<body>
+<body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
     <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
@@ -15,6 +15,8 @@
       </div>
       <div style="clear:both;"></div>
     </div>
+    <& disqus.mhtml, article => $article, year => undef &>
+    <& fb_comment.mhtml, url => $article->atom_id &>
   </div>
 <& footer.mhtml, global => $global &>
 

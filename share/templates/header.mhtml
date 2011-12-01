@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 % if ( $global->{location} ) {
   <title><% "$global->{location} | $global->{title}" %></title>
