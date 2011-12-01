@@ -1,0 +1,112 @@
+<%init>
+return {
+    title          => '2011 Seoul.pm 펄 크리스마스 달력',
+    title_en       => 'Seoul.pm Perl Advent Calendar 2011',
+    css            => 'style.css',
+    articles_total => 24,
+    base_uri       => 'http://advent.perl.kr/2011/',
+    copyright      => 'Articles by Seoul Perl Mongers<br />Illustrated by Hyunsu Park, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim',
+    korean_day => sub {
+        my $day   = shift;
+        my %table = (
+            1  => '첫째',
+            2  => '둘째',
+            3  => '셋째',
+            4  => '넷째',
+            5  => '다섯째',
+            6  => '여섯째',
+            7  => '일곱째',
+            8  => '여덟째',
+            9  => '아홉째',
+            10 => '열번째',
+            11 => '열한번째',
+            12 => '열두번째',
+            13 => '열세번째',
+            14 => '열네번째',
+            15 => '열다섯번째',
+            16 => '열여섯번째',
+            17 => '열일곱번째',
+            18 => '열여덟번째',
+            19 => '열아홉번째',
+            20 => '스무번째',
+            21 => '스물한번째',
+            22 => '스물두번째',
+            23 => '스물세번째',
+            24 => '스물네번째',
+            25 => '스물다섯번째',
+            26 => '스물여섯번째',
+            27 => '스물일곱번째',
+            28 => '스물여덟번째',
+            29 => '스물아홉번째',
+            30 => '서른번째',
+            31 => '서른한번째',
+        );
+        return $table{$day};
+    },
+    links => [
+        {
+            title => 'perl.kr',
+            url   => 'http://perl.kr/',
+        },
+
+        #{
+        #  title => 'Seoul.pm',
+        #  url   => 'http://seoul.pm.org',
+        #},
+        {
+            title => '네이버 펄 카페',
+            url   => 'http://cafe.naver.com/perlstudy.cafe',
+        },
+        {
+            title => 'IRC #perl-kr 채팅',
+            url   => 'http://webchat.freenode.net/?channels=perl-kr',
+        },
+        {
+            title => '한국펄워크샵 2008',
+            url   => 'http://event.perl.kr/kpw2008/',
+        },
+        {
+            title => 'Perl Advent Calendar 2011',
+            url   => 'http://perladvent.org/2011/',
+        },
+        {
+            title => 'Japan Perl Advent Calendar 2011',
+            url   => 'http://perl-users.jp/articles/advent-calendar/2011/',
+        },
+        {
+            title => '2011 일본 펄 크리스마스 달력(번역)',
+            url   => 'http://j2k.naver.com/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2011/',
+        },
+        {
+            title => 'Catalyst Advent Calendar 2011',
+            url   => 'http://www.catalystframework.org/calendar/2011',
+        },
+    ],
+    trees => [
+        { style => 'top: 194px; left: 478px;', src => 'ball/5c5094824b.png', },
+        { style => 'top: 131px; left: 474px;', src => 'ball/99c7ee9639.png', },
+        { style => 'top: 294px; left:  57px;', src => 'ball/905c263923.png', },
+        { style => 'top: 150px; left:  78px;', src => 'ball/3a3413e431.png', },
+        { style => 'top: 172px; left: 424px;', src => 'ball/c718e0c1c6.png', },
+        { style => 'top: 184px; left: 162px;', src => 'ball/6f55c83be6.png', },
+        { style => 'top: 525px; left: 193px;', src => 'ball/b007d77580.png', },
+        { style => 'top: 482px; left: 319px;', src => 'ball/1b6cfc582a.png', },
+        { style => 'top: 236px; left:  52px;', src => 'ball/dfe50d0eff.png', },
+        { style => 'top: 478px; left: 235px;', src => 'ball/b1620da9ce.png', },
+        { style => 'top: 309px; left: 443px;', src => 'ball/c5608bfc6b.png', },
+        { style => 'top: 226px; left: 530px;', src => 'ball/1d7255c335.png', },
+        { style => 'top: 268px; left: 140px;', src => 'ball/c021d80871.png', },
+        { style => 'top: 531px; left: 278px;', src => 'ball/d12a1b7273.png', },
+        { style => 'top: 319px; left: 116px;', src => 'ball/a33630b924.png', },
+        { style => 'top: 480px; left: 138px;', src => 'ball/ff05ff84db.png', },
+        { style => 'top: 479px; left: 415px;', src => 'ball/b335c1fdef.png', },
+        { style => 'top: 250px; left: 445px;', src => 'ball/e30a28eeef.png', },
+        { style => 'top: 356px; left:  61px;', src => 'ball/d4f9c682be.png', },
+        { style => 'top: 521px; left: 368px;', src => 'ball/6eb00d4554.png', },
+        { style => 'top: 126px; left: 130px;', src => 'ball/5220a14b1d.png', },
+        { style => 'top: 272px; left: 500px;', src => 'ball/845f7cf125.png', },
+        { style => 'top: 328px; left: 507px;', src => 'ball/220a9d927a.png', },
+        { style => 'top: 211px; left: 106px;', src => 'ball/683ec2d54d.png', },
+    ],
+};
+</%init>
