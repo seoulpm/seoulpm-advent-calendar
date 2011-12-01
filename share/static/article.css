@@ -181,9 +181,12 @@ body {
     margin-bottom: 6px;
     font-size: 18px;
 }
-#cont-main p {
+#cont-main p, #cont-main ul {
     line-height: 180%;
     margin-bottom: 20px;
+}
+#cont-main ul {
+    margin-left: 30px;
 }
 #foot {
     margin-top: 120px;
