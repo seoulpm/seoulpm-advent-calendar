@@ -3,6 +3,7 @@
 <div id="wrap">
   <div id="head">
     <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <a class="back" href="<% $global->{base_uri} %>">↑달력으로 돌아가기</a>
   </div>
   <div id="cont-wrap">
     <h1><% $title %></h1>

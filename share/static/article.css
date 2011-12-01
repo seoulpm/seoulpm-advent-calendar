@@ -16,11 +16,21 @@ body {
     width: 992px;
 }
 #head {
+    position: relative;
     background: url('adventcal.png') no-repeat scroll 185px 0;
     height: 160px;
 }
 #head p {
     display: none;
+}
+#head a.back {
+    position: absolute;
+    top: 132px;
+    left: 28px;
+    font-size: 14px;
+}
+#head a.back:hover {
+    text-decoration: none;
 }
 #title {
     display: block;
