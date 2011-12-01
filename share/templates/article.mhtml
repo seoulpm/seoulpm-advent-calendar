@@ -1,0 +1,36 @@
+<& header.mhtml, global => $global &>
+
+<div id="content-wrapper">
+  <div id="content" class="flu">
+    <& nav.mhtml, next => $next, prev => $prev &>
+    <div id="doc">
+      <h1><% $title %></h1>
+      <div>
+	<% $article->body_html %>
+      </div>
+    </div>
+    <& nav.mhtml, next => $next, prev => $prev &>
+    <& disqus.mhtml, article => $article &>
+    <& nav.mhtml, next => $next, prev => $prev &>
+    <& sidebar.mhtml, global => $global, type => "flu", article => $article &>      
+  </div>
+</div>
+<div style="clear:both;"></div>
+
+<& footer.mhtml, global => $global &>
+
+
+<%init>
+  my $global = $m->comp('variables.mhtml');
+
+  my $title = $global->{korean_day}->($article->date->day) . " 날: " . $article->title;
+  $global->{location} = $title;
+</%init>
+
+<%args>
+  $date
+  $year
+  $next
+  $prev
+  $article
+</%args>
