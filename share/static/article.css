@@ -166,7 +166,7 @@ body {
 }
 #cont-wrap h1 {
     display: block;
-    font-size: 28px;
+    font-size: 36px;
     font-weight: bold;
     padding-bottom: 10px;
     border-bottom: 1px solid #0f0f0f;
@@ -174,12 +174,12 @@ body {
 #cont h2 {
     display: table;
     background-color: #345f53;
-    padding: 3px 5px 5px 5px;
-    border-bottom: 2px solid #244139;
-    border-right: 1px solid #1b322c;
+    padding: 6px 10px 10px 10px;
+    border-bottom: 3px solid #244139;
+    border-right: 2px solid #1b322c;
     margin-top: 40px;
     margin-bottom: 6px;
-    font-size: 18px;
+    font-size: 24px;
 }
 #cont-main p, #cont-main ul {
     line-height: 180%;
