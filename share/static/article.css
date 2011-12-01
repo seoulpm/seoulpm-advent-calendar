@@ -188,6 +188,15 @@ body {
 #cont-main ul {
     margin-left: 30px;
 }
+#cont-main a {
+    text-decoration: none;
+    font-weight: bold;
+    color: orange;
+}
+#cont-main a:hover {
+    color: yellow;
+    text-decoration: underline;
+}
 #foot {
     margin-top: 120px;
     margin-bottom: 40px;
