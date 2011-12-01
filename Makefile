@@ -37,5 +37,6 @@ upload: build
 	tar cvzf $(ADVCAL_OUT).tgz $(ADVCAL_OUT)
 	scp $(ADVCAL_OUT).tgz $(UPLOAD_USER)@$(UPLOAD_SERVER):/tmp/
 	ssh -t $(UPLOAD_USER)@$(UPLOAD_SERVER) '$(UPLOAD_COMMAND)'
+	ssh -t $(UPLOAD_USER)@$(UPLOAD_SERVER) rm -rf '/tmp/$(ADVCAL_OUT).tgz'
 
 .PHONY: all build clean install-depends upload
