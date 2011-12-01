@@ -109,6 +109,10 @@ return {
             url   => 'http://j2k.naver.com/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2011/',
         },
         {
+            title => 'Dancer Advent Calendar 2011',
+            url   => 'http://advent.perldancer.org/2011',
+        },
+        {
             title => 'Catalyst Advent Calendar 2011',
             url   => 'http://www.catalystframework.org/calendar/2011',
         },
