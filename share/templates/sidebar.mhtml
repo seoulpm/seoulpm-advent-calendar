@@ -1,13 +1,7 @@
 <%args>
   $global
-  $type
   $article
 </%args>
-<div id="sidebar" class="<% $type %>">
 
-  <& sns.mhtml, global => $global, article => $article &>
-  <& book.mhtml,    global => $global &>
-  <& link.mhtml,    global => $global &>
-  <& sponsor.mhtml, global => $global &>
-  <& traffic.mhtml, global => $global &>
-</div>
+<& permalink.mhtml, article => $article &>
+<& sns.mhtml, global => $global, article => $article &>
