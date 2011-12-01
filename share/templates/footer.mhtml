@@ -2,8 +2,11 @@
   $global
 </%args>
 
-  <div id="footer">
-    <% $global->{copyright} %>
+  <div id="foot">
+    <p>
+      <% $global->{copyright} %>
+    </p>
+    <img src="bn_seoulpm.gif" />
   </div>
 </div>
 </body>
