@@ -1,0 +1,68 @@
+숨겨진 text
+==========
+
+perl code를 실행할 수 있다면 소스코드를 볼 수도 있습니다.
+하지만 몇 줄 안되는 코드로 자신의 코드를 숨길 수도 있습니다.
+
+
+어떻게?
+------
+
+숨기고자 하는 문자열을 '0'과 '1'로 바꾸고, 이를 다시 ' '(공백)과
+"\t"(탭) 문자열로 바꿉니다. 예를들어,
+
+    안녕하세요
+
+는 다음과 같이 변형된 후에,
+
+    00110111101010010001000111010111101000011010100110110111101010010001100100110111001000010001110100110111010110010010100101010000
+
+보이진 않지만 아래처럼 바뀝니다.
+
+```
+  		 				 	 	  	   	   			 	 				 	    		 	 	  		 		 				 	 	  	   		  	  		 			  	    	   			 	  		 			 	 		  	  	 	  	 	 	    
+```
+
+
+변형과정
+-------
+
+1. perl내부에서 읽어들인 문자열을 '0'과 '1'의 바이트 시퀀스로 변형
+
+```perl
+# 파일의 내용을 읽어들여서 `$text`에 저장
+my $sequence = unpack "b*", $text;
+```
+
+2. '0'은 ' '로, '1'은 "\t" 로 변형
+
+```perl
+$text =~ tr/01/ \t/;
+```
+
+끝입니다.
+
+역순으로 실행하면 ' '와 "\t"로 이루어진 텍스트를 원상태로 복구 할 수
+있습니다. [s3cr3t][gist] 에서 전체 소스코드를 확인 할 수 있습니다.
+
+
+See also
+========
+
+- [Acme::Bleach][Acme::Bleach]
+- [s3cr3t gist][gist]
+
+Author
+======
+
+홍형석 - [@aanoaa][aanoaa]
+
+
+
+
+[Acme::Bleach]:  http://search.cpan.org/~dconway/Acme-Bleach-1.13/lib/Acme/Bleach.pm
+[pack]:          http://perldoc.perl.org/functions/pack.html
+[unpack]:        http://perldoc.perl.org/functions/unpack.html
+[gypark-pack-b]: http://gypark.pe.kr/wiki/Perl/Pack#H_1_7_2
+[gist]:          https://gist.github.com/1408846
+[aanoaa]:        http://aanoaa.github.com/
