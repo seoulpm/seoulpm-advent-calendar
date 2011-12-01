@@ -4,6 +4,15 @@ Category: perl
 Category: Seoul.pm
 Author:   pung96
 
+저자
+-----
+
+[@pung96][twitter-keedi] - Perl 원라이너의 귀재, 블랙홀이 있을 것으로 추정되는
+스위스 제네바와 핀란드를 오가며 중이온 연구에 매진 중인 물리학자,
+하지만 Perl과 C++, 심지어 Python까지 자유자재로 구사하는 물리학자를 가장한 프로그래머,
+훈훈한 외모로 인해 유부남임에도 불구하고 *훈중년*이라는 별칭을 획득.
+
+
 Perl one-liner로  따라하는 Octopress
 ==========
 필요한 알고리즘을 한 줄의 perl 코드로 작성하는 Perl one-liner는 간단한 코드가 필요할 때나 쉘과 결합하여 쓸때 매우 유용한 방법입니다.
