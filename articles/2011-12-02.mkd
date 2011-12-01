@@ -1,0 +1,229 @@
+Perl one-liner로  따라하는 Octopress
+==========
+필요한 알고리즘을 한 줄의 perl 코드로 작성하는 Perl one-liner는 간단한 코드가 필요할 때나 쉘과 결합하여 쓸때 매우 유용한 방법입니다.
+이미 많은 oneliner 문서가 있고 이를 반복하는 것은 지루한 작업이 될것이 분명합니다.
+저는  Ruby로 만든 유명한 [GitHub](http://github.com)용 블로그 툴인 [Octropress](http://octopress.org/) 를
+perl one-liner로 살짝 흉내내보며 perl one-liner 가 어떻게 쓰일 수 있나 살펴 보도록 하겠습니다.
+
+## one-liner의 철학
+* one-liner 는 "간단하게" 쓰기 위한 도구이므로 최적화나 미학은 소나 줘버리고 마음 가는 대로 쓰며 되겠습니다.
+ 이 문서의 코드들도 이 생각대로 "마구" 쓰여졌습니다.
+* 코드의 안팎에서 쉘의 기능을 충실히 이용합니다. system, back-quote, while loop, 환경변수,, 가리지 않습니다.
+
+
+## 필요한 것
+1. [GitHub](http://github.com) 계정과 블로그용 repository : GitHub에서 blog (혹은 마음껏) 저장소를 만들어봅시다.
+1. 이미 만들어놓은 예제 : https://github.com/pung96/blog
+1. 몇 가지 모듈
+
+```
+YAML
+Text::Xslate
+Text::MarkDown
+```
+## 미리 둘러보기
+http://pung96.github.com/blog 를 방문하시면, Octopress 에서 훔쳐온 테마를 기반으로 한 아주 간단한 블로그를 보실 수 있습니다.
+물론  Octropress 에 비해서 아주 사소한 기능만이 구현된 상태이지만, 이 이상의 것을 구현하려 한다면 사실 perl one-liner는 좋은 툴이 아닙니다.
+제대로된 스크립트나 모듈을 만드는 것이 좋겠지요.
+
+![스크린샷](https://lh4.googleusercontent.com/-W0Etth2J_7s/TtbxqbKkeoI/AAAAAAABEho/FZyv18bhhSM/s640/perl-octopress.png)
+
+gOctropress는  github 블로그를 만들기 위해 ph-pages와 source 두개의 브랜치를 사용합니다.
+ph-pages html 파일을 발행하기 위한 브랜치이고 source 는 실제 블로그 컨텐츠와 기타 여러 파일이 저장됩니다.
+
+## 디렉토리 구조와 파일들 
+```
+-- blog : source 브랜치
+  |-- _scratch    : 작업용 임시 디렉토리
+  |-- _deploy     : html 디렉토리. ph-graphs 브렌치 
+  |-- .gitignore 
+  |-- init.sh        : 초기화 스크립트 
+  |-- build.sh     : 빌드 스크립트
+  `-- source
+      |-- _post     : 블로그 포스트 디렉토리
+      |  |-- 2011-11-30-3rd-post.markdown
+      |  |-- 2011-11-30-4th-post.markdown
+      |  `-- 2011-11-30-first-post.markdown   
+      |-- _layout
+      |  |-- default.html   : 기본 템플릿
+      |  |-- index.html     : 첫페이지용 블로그 포스트 템플릿 ( default.html 에 include  됨) 
+      |  `-- post.html      : 각 페이지를 위한 블로그 포스트 템플릿( default.html 에 include 됨)
+      `-- favicon.png, stylesheets, javascrripts  : 잘 모름
+ 
+```
+*  .gitignore 를 보면  _scratch, _deploy 폴더는 source 브랜치에 추가되지 않습니다.
+* Octropress 의 구현을 보기전에 _deploy 폴더와 같은 publish용 디렉토리를 관리하는 방법에 대해 많은 고민을 했었는데, 이 방법은 생각도 못했네요. 단순히 소스용 브랜치와 발행용 브랜치 두개를 만들어 다른 디렉토리에 관리하면 끝입니다. 천재..
+
+## 준비!!
+* 제가 만든 예제 저장소를 이용하는 방법을 기준으로 설명하겠습니다.
+* https://github.com/pung96/blog 를 방문해 가볍게 "Fork" 해줍니다.
+* 리파지토리를 로컬 디렉토리로 가져옵니다.
+
+```
+git clone git@git@github.com:유저네임/blog.git -b source
+cd blog
+./init.sh
+```
+
+## init.sh
+
+```
+git clone -b gh-pages git@github.com:유저이름/blog.git _deploy
+mkdir -p _scratch
+```
+
+_deploy 디렉토리와 _scratch 디렉토리를 만들어주는 간단한 스크립트입니다. "유저네임"은 당연히 바꾸어 주어야 겠지요?
+
+
+## build.sh
+* 작성된 Markdown 문서들을 이용해 html  파일을 만들고 다시 github로 밀어넣는 perl one-liner들의 집합입니다. 
+* 먼저 _deploy, _scratch 디렉토리를 깨끗하게 비우고 작업할 파일들을 _scratch 디렉토리로 복사합니다.
+
+```
+rm -rf _deploy/* _scratch/*
+cp -a source/_posts/* _scratch/
+```
+
+### 블로그 포스트 파일을 메타정보와 컨탠츠로 분리
+자 이제 Markdown 파일들을 살펴봅시다.
+파일의 형식은 Octopress 의 블로그 포스트 형식을 그대로 가지고 왔습니다.
+
+```
+---
+layout: post
+title: "4th-post"
+date: 2011-11-30 18:19
+comments: true
+categories: 
+---
+
+# 4th post
+이곳이 블로그 내용을 적는 곳이죠.
+
+```
+
+안타깝게도 이 형식은 완전한 YAML 형식이 아니라서 약간의 지저분한 코드가 필요합니다.
+먼저 제목 등의 정보가 저장된 부분을 추출해서 YAML 파일로 저장하고 나머지 부분을 남겨보겠습니다.
+
+```
+perl -i -0 -mYAML=Load -ne'BEGIN{open$y, ">_scratch/posts.yml"}/^---\s*$(.*?)^---\s*$(.*)/sm;print$y "---\nfile: $ARGV", $1;print $2' _scratch/*.markdown
+
+```
+추출된 정보들은 file 정보가 추가되어서 바로 통합된 하나 YAML 파일에 저장됩니다.
+추출된 정보들을 버클리 DB같은 본격적인 데이터 베이스에 저장하고 사용하는 것도 좋은 방법이지만 
+YAML 역시  거의 완전한 텍스트 기반 데이터 베이스로 사용될 수 있고 게다가 파일 자체가 읽기 좋다는 장점을 가지고 있습니다.
+
+### 추출된 메타정보를 가공하기
+* 날짜에 따라 정렬합시다.
+* DumpFile 처럼 `LoadFile("posts.yml")`을 쓸 수도 있지만 앞에서 무심코 -0을 적어버렸기 때문에 그냥 파일을 읽어들여서 Load 에 파일 내용을 통째로 넣었습니다.
+* DateTimeX::Easy 같은 모듈을 사용해 날짜.시간 정보(2011-11-30 18:19) 를 파싱해서 정확한 값을 사용할 수 도 있겠지만 여기서는 그냥 문자열 비교를 사용하여 정렬하는 것으로 충분했습니다. 
+
+```
+perl -0 -MYAML=Load,Dump -ne'print Dump(sort{$b->{date}cmp$a->{date}}Load($_))' _scratch/posts.yml > _scratch/posts2.yml
+```
+
+* 순서에 따른 id와 포스트의 url( 예: /blog/blog/2011/11/30/4th-post ) 을 YAML DB 에 추가합니다.
+* /blog/blog 이렇게 중복이 생겼네요. 그냥 넘어갑시다.
+
+
+```
+perl -0 -MYAML=Load,Dump -ne'print Dump(map {$_->{file}=~/(\d+)-(\d+)-(\d+)-(.*?)\./;$_->{url}="blog/$1/$2/$3/$4";$_->{iid}=$id++;$_}Load($_))' _scratch/posts2.yml > _scratch/posts.yml
+```
+
+* 잘 추출되어 정렬되고 필요한 정보가 추가되고 있는 지 Data::Dumper 을 이용해 출력해 봅시다. Data::Dumper은 one-liner에서 가장 많이 사용되는 모듈 중의 하나입니다.
+
+```
+#perl -0 -MYAML=Load -MData::Dumper -ne'print Dumper Load($_);' posts.yml
+```
+
+* 두개의 YAML 파일을 관리하는 것은 귀찮으니 앞으로 쓰일 YAML 파일들을 하나로 통합해 버립니다. cat으로 합치면 끝입니다.  
+
+```
+cat _config.yml _scratch/posts.yml > _scratch/all.yml
+```
+
+* Markdown 으로 저장된 페이지를 html 로 바꿉니다. Text::Markdown 이 알아서 다 해 줍니다. `-i` 옵션으로 한방에 파일들을 변환해 버렸습니다.
+* `-i` 는 굉장히 위험한 옵션입니다. 사용하기 전에 파일을 백업하거나 `-i.bak` 같은 방법을 쓰는 등 각별한 관리가 필요합니다. 저도 파일들을 날리고 여러번 울었답니다. 특히 `-p` 옵션대신 무심코 `-n` 옵션을 쓰면 깨끗해진 파일들을 보시게 됩니다.
+
+```
+perl -i -0 -mText::Markdown=markdown -ne'print markdown($_)' _scratch/*.markdown
+```
+
+* Text::Xslate를 이용해 미리 작성된 템플릿에 위에서 만들어진 html 파일들을 집어넣어서 실제 보여줄 페이지를 만듭니다. 제목이나 앞뒤 페이지 네비게이션을 위해서 메타정보도 함께 전달해야 합니다.
+
+```
+perl -mYAML=LoadFile -MText::Xslate -e'($s,@p)=LoadFile("_scratch/all.yml");map{open$f,">$_->{file}";print$f Text::Xslate->new->render("source/_layouts/default.html",  { site=>$s,  page=>$_, type=>"post.html", posts=>\@p})}@p'
+```
+
+* 최종 작성된 파일들을 _deploy 폴더의 blog/년도/월/날짜/제목/index.html 로 보내줍니다.
+
+```
+ls _scratch/*.html | perl -nle'/(\d+)-(\d+)-(\d+)-(.*?)\./;$d="_deploy/blog/$1/$2/$3/$4";system("mkdir -p $d && cp $_ $d/index.html");'
+```
+
+* 이제 메인 페이지를 만들겠습니다. 첫 페이지에 보여줄 포스트의 개수를 정하고 페이지 네비게이션을 만들면 좋겠지만, 귀찮아서 그냥 모든 포스트를 한화면에 넣었습니다. 똑같은 템플릿을 사용하면서 템플릿 내에서 for 루프를 이용해 모든 포스트를 출력했습니다. 
+
+```
+perl -mYAML=LoadFile -MText::Xslate -e'($s,@p)=LoadFile("_scratch/all.yml");open$f,">_deploy/index.html";print$f Text::Xslate->new->render("source/_layouts/default.html",  { site=>$s,  pages=>\@p,  type=>"index.html", posts=>\@p})'
+```
+
+* 이제 다 끝났습니다. Octopress 에서 훔쳐온 정체를 알 수 없는 각종 css 와 javascript  파일 들을 _deploy 폴더로 복사해주고
+
+```
+rsync -a source/favicon.png source/images source/javascripts source/stylesheets _deploy/
+```
+
+* _deploy 폴더로 이동해 추가, 변경, 삭제된 파일들을 업데이트 한 후에 원격 저장소의 ph-pages 브랜치로 밀어넣어줍니다. 
+
+```
+cd _deploy
+git add .
+git add -u
+git commit -m "Site updated at `date`"
+git push origin gh-pages --force
+```
+
+## 끝
+* source 브랜치 push 하는 것 잊지 마시고
+
+```
+git add .
+git commit -a -m '로그'
+git push origin source
+```
+
+* https://유저네임.github.com/blog
+* 참 쉽죠잉~
+
+## 보너스~
+* 처음 계획할때 생각했던 것처럼 유용하고 다양한 코드가 나오지 않은 것 같아, 아쉬움을 줄이기 위해 간단한 one-liner 두가지 팁을 소개합니다.
+* perl 코드내에서 쉘 환경변수를 넣는 방법. `$ENV{VarName}`을 사용할수도 있겠으나, 쉘의 문자열 병합 기능을 이용하면
+
+```
+perl -e'print "Current Term is '$TERM'\n"'
+```
+
+* 속도에 아주 민감한 코드가 아니라면, 여러 파일을 처리할때 코드내에서 파일을 open 하는 대신 쉘의 while 루프를 사용. 당연한 거죠? 그런데 perl 안에서 더블 루프를 돌리는 저를 발견할 때가 많답니다.
+
+```
+ls *.root | while read x;do perl -nle'do something' $x > $x.new ;done
+```
+* 여기까지. 더 이상은 무리!
+
+## 더 생각해 볼만 한 것들
+* 이 문서에서는 Markdown 문서만 다루었지만 POD 등의 다른 형식을 추가하는 것도 어렵지 않겠죠. 이미 모든 것은 CPAN님께서 알고 계십니다.
+* 비슷한 방식으로 ikiwiki를 github에서 서비스 하는 것도 간단하고 재밌겠네요
+* _deploy 디렉토리는 단순한 정적 파일들만을 가지고 있기 때문에  github로 밀어넣는 것 뿐만 아니라, 다른 웹서버, dotcloud, Amazon S3 를 이용할 수도 있겠죠
+* Octopress 도 매우 훌륭하고 펄유저는 펄도구만 써야한다는 강박을 가진건 아니지만 펄로 된것이 아니면, 건드릴 수가 없어서 재미가 적고 답답한 느낌이 들어요. 누가 Perl로 Octopress 에 버금가는 도구를 만들어주면 좋겠는데 :)
+
+## Perl one-liner 참고문서
+* perldoc perlrun
+* http://www.unixguide.net/unix/perl_oneliners.shtml
+* http://en.wikipedia.org/wiki/One-liner_program
+* http://www.ibm.com/developerworks/linux/library/l-p101/
+* http://perlog.pung96.net
+
+________________
+
+
+
