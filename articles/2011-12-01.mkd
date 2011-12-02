@@ -466,12 +466,12 @@ Enjoy Your Perl! ;-)
 
 
 
-[img-01]:               2011-12-01-1.png width=680
-[img-02]:               2011-12-01-2.png width=680
-[img-03]:               2011-12-01-3.png width=680
-[img-04]:               2011-12-01-4.png width=680
-[img-05]:               2011-12-01-5.png width=680
-[img-06]:               2011-12-01-6.png width=680
+[img-01]:               2011-12-01-1.png width=700
+[img-02]:               2011-12-01-2.png width=700
+[img-03]:               2011-12-01-3.png width=700
+[img-04]:               2011-12-01-4.png width=700
+[img-05]:               2011-12-01-5.png width=700
+[img-06]:               2011-12-01-6.png width=700
 
 [img-01-original]:      2011-12-01-1.png
 [img-02-original]:      2011-12-01-2.png
