@@ -53,6 +53,27 @@ Perl 원라이너를 어떻게 쓸 수 있는지 살펴보겠습니다.
 
 
 
+미리 둘러보기
+--------------
+
+[이미 만들어놓은 예제 블로그][github-pung96]를 방문해보면,
+Octopress에서 훔쳐온 테마를 기반으로 한 아주 간단한 블로그를 볼 수 있습니다.
+물론 Octropress에 비하면 아주 사소한 기능만을 구현했지만,
+이 이상의 것을 구현하려 한다면 Perl 원라이너는를 사용하는 것은 적절하지 않습니다.
+편집기를 열어서 모듈을 만드는 것이 좋겠지요. :-)
+
+[![Octopress 뺨치는 Perl 원라이너 블로그][img-01]][img-01-original]
+
+Octropress는 GitHub 저장소를 블로그로 만들기 위해
+`gh-pages`와 `source` 두 개의 가지를 사용합니다.
+`gh-pages` 가지에서는 HTML 파일을 발행하며,
+`source` 가지는 실제 블로그 컨텐츠와 기타 여러 파일을 저장합니다.
+
+
+
+[img-01]:               2011-12-02-1.png width=680
+[img-01]:               2011-12-02-1.png
+
 [cpan-text-markdown]:   https://metacpan.org/module/Text::Markdown
 [cpan-text-xslate]:     https://metacpan.org/module/Text::Xslate
 [cpan-yaml]:            https://metacpan.org/module/YAML
