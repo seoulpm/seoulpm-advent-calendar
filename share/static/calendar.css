@@ -136,6 +136,17 @@ body {
     float: right;
     margin: 10px 0 10px 20px;
 }
+#comment {
+    position: relative;
+    width: 618px;
+}
+#traffic {
+    position: absolute;
+    float: right;
+    width: 198px;
+    top: 0;
+    left: 624px;
+}
 #foot {
     margin-top: 120px;
     margin-bottom: 40px;
