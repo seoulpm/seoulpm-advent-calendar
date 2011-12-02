@@ -325,26 +325,30 @@ Perl 원라이너 참고문서
 ------------------------
 
 * [perldoc perlrun][perldoc-perlrun]
-* http://www.unixguide.net/unix/perl_oneliners.shtml
-* http://en.wikipedia.org/wiki/One-liner_program
-* http://www.ibm.com/developerworks/linux/library/l-p101/
-* http://perlog.pung96.net
+* [HOT PERL ONE LINERS][hot-perl-oneliners]
+* [One-liner Program][wiki-one-liner-program]
+* [Cultured Perl: One-liners 101][ibm-perl-one-liners]
+* [pung96's perlog][pung96-home]
 
 
 
 [img-01]:               2011-12-02-1.png width=680
 [img-01-original]:      2011-12-02-1.png
 
-[amazon-s3]:            http://aws.amazon.com/s3
-[cpan-data-dumper]:     https://metacpan.org/module/Data::Dumper
-[cpan-datetimex-easy]:  https://metacpan.org/module/DateTimeX::Easy
-[cpan-text-markdown]:   https://metacpan.org/module/Text::Markdown
-[cpan-text-xslate]:     https://metacpan.org/module/Text::Xslate
-[cpan-yaml]:            https://metacpan.org/module/YAML
-[dotcloud]:             http://dotcloud.com
-[github]:               http://github.com
-[github-pung96]:        https://github.com/pung96/blog
-[ikiwiki]:              http://ikiwiki.info
-[octopress]:            http://octopress.org
-[perldoc-perlrun]:      http://perldoc.perl.org/perlrun.html
-[twitter-pung96]:       http://twitter.com/#!/pung96
+[amazon-s3]:                http://aws.amazon.com/s3
+[cpan-data-dumper]:         https://metacpan.org/module/Data::Dumper
+[cpan-datetimex-easy]:      https://metacpan.org/module/DateTimeX::Easy
+[cpan-text-markdown]:       https://metacpan.org/module/Text::Markdown
+[cpan-text-xslate]:         https://metacpan.org/module/Text::Xslate
+[cpan-yaml]:                https://metacpan.org/module/YAML
+[dotcloud]:                 http://dotcloud.com
+[github]:                   http://github.com
+[github-pung96]:            https://github.com/pung96/blog
+[hot-perl-oneliners]:       http://www.unixguide.net/unix/perl_oneliners.shtml
+[ibm-perl-one-liners]:      http://www.ibm.com/developerworks/linux/library/l-p101/
+[ikiwiki]:                  http://ikiwiki.info
+[octopress]:                http://octopress.org
+[perldoc-perlrun]:          http://perldoc.perl.org/perlrun.html
+[pung96-home]:              http://perlog.pung96.net
+[twitter-pung96]:           http://twitter.com/#!/pung96
+[wiki-one-liner-program]:   http://en.wikipedia.org/wiki/One-liner_program
