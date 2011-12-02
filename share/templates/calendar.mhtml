@@ -83,8 +83,11 @@
           자, 그럼 어서 "좋아요"를 누르고 트위터와 페이스북으로 공유합시다.
         </p>
       </div>
-      <& disqus.mhtml, article => undef, year => $year &>
-      <& fb_comment.mhtml, url => $global->{base_uri} &>
+      <div id="comment">
+        <& disqus.mhtml, article => undef, year => $year &>
+        <& fb_comment.mhtml, url => $global->{base_uri}, global => $global &>
+        <& traffic.mhtml, global => $global &>
+      </div>
     </div>
   </div>
 <& footer.mhtml, global => $global &>
