@@ -204,6 +204,9 @@ body {
     color: yellow;
     text-decoration: underline;
 }
+#cont-main img {
+    margin: 15px;
+}
 #foot {
     margin-top: 120px;
     margin-bottom: 40px;
