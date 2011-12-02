@@ -9,6 +9,7 @@ DEPEND_CPAN_MODULES := Text::MultiMarkdown \
 ADVCAL := $(PATCH_LIB) advcal
 ADVCAL_CONFIG  := advent.ini
 ADVCAL_OUT     := 2011
+ADVCAL_OUT_TGZ := 2011.tgz
 ADVCAL_SHARE   := share
 ADVCAL_ARTICLE := articles
 
@@ -31,18 +32,16 @@ build:
 	$(ADVCAL) $(ADVCAL_FLAGS)
 
 clean:
-	rm -rf $(ADVCAL_OUT) $(ADVCAL_OUT).tgz
+	rm -rf $(ADVCAL_OUT) $(ADVCAL_OUT_TGZ)
 	perl -E 'unlink "$(ADVCAL_CONFIG)" if readlink("$(ADVCAL_CONFIG)") eq "$(DEFAULT_CONFIG)";'
 
 install-depends:
 	cpan $(DEPEND_CPAN_MODULES)
 
 upload: build
-	tar cvzf $(ADVCAL_OUT).tgz $(ADVCAL_OUT)
-	scp $(ADVCAL_OUT).tgz $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER):/tmp/
-	ssh -t $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER) '$(ADV_UPLOAD_COMMAND)'
-	ssh -t $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER) rm -rf '/tmp/$(ADVCAL_OUT).tgz'
-
+	tar cvzf $(ADVCAL_OUT_TGZ) $(ADVCAL_OUT)
+	scp $(ADVCAL_OUT_TGZ) $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER):/tmp/
+	ssh -t $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER) '$(ADV_UPLOAD_COMMAND); rm -rf /tmp/$(ADVCAL_OUT_TGZ)' 
 run: build
 	ifconfig | perl -nlE 'do { say $$1 } if /inet addr:(\d{1,3}(?:\.\d{1,3}){3})/'
 	http_this $(ADVCAL_OUT)
