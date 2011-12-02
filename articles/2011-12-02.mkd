@@ -46,7 +46,7 @@ Perl 원라이너를 어떻게 쓸 수 있는지 살펴보겠습니다.
 
 - GitHub 계정
 - 블로그용으로 사용할 GitHub의 저장소
-- [이미 만들어놓은 예제 블로그][github-pung96]
+- [이미 만들어 놓은 예제 블로그][github-pung96]
 - [CPAN의 YAML 모듈][cpan-yaml]
 - [CPAN의 Text::Xslate 모듈][cpan-text-xslate]
 - [CPAN의 Text::Markdown 모듈][cpan-text-markdown]
