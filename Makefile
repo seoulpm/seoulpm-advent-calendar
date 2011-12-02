@@ -1,6 +1,6 @@
 DEFAULT_CONFIG := advent-2011.ini
 
-PATCH_LIB := PERL5LIB=./patch/lib/
+PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
 DEPEND_CPAN_MODULES := Text::MultiMarkdown \
 		       WWW::AdventCalendar
@@ -16,9 +16,12 @@ ADVCAL_FLAGS  += --output-dir $(ADVCAL_OUT)
 ADVCAL_FLAGS  += --article-dir $(ADVCAL_ARTICLE)
 ADVCAL_FLAGS  += --share-dir $(ADVCAL_SHARE)
 
-UPLOAD_USER    :=
-UPLOAD_SERVER  :=
-UPLOAD_COMMAND :=
+#
+# Please set your environment variable for release
+#
+ADV_UPLOAD_USER    ?=
+ADV_UPLOAD_SERVER  ?=
+ADV_UPLOAD_COMMAND ?=
 
 all: build
 
@@ -35,7 +38,8 @@ install-depends:
 
 upload: build
 	tar cvzf $(ADVCAL_OUT).tgz $(ADVCAL_OUT)
-	scp $(ADVCAL_OUT).tgz $(UPLOAD_USER)@$(UPLOAD_SERVER):/tmp/
-	ssh -t $(UPLOAD_USER)@$(UPLOAD_SERVER) '$(UPLOAD_COMMAND)'
+	scp $(ADVCAL_OUT).tgz $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER):/tmp/
+	ssh -t $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER) '$(ADV_UPLOAD_COMMAND)'
+	ssh -t $(ADV_UPLOAD_USER)@$(ADV_UPLOAD_SERVER) rm -rf '/tmp/$(ADVCAL_OUT).tgz'
 
 .PHONY: all build clean install-depends upload

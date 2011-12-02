@@ -1,23 +1,20 @@
-<%args>
-  $global
-</%args>
+% use URI::Escape;
 <!doctype html>
-<html>
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
-% if ( $global->{location} ) {
-  <title><% "$global->{location} | $global->{title}" %></title>
-% }
-% else {
-  <title><% "$global->{title} | $global->{title_en}" %></title>
-% }
+  <title><% $title %></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar 2011" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
-  <link rel="stylesheet" type="text/css" href="<% $global->{css} %>" />
+  <meta property="og:title" content="<% $title %>" />
+  <meta property="og:url" content="<% $page_uri %>" />
+  <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
+  <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
 
   <!-- Syntax Highlighter -->
   <script type="text/javascript" src="shCore.js"></script>
   <script type="text/javascript" src="shBrushBash.js"></script>
+  <script type="text/javascript" src="shBrushYaml.js"></script>
   <script type="text/javascript" src="shBrushPerl.js"></script>
   <script type="text/javascript" src="shBrushJScript.js"></script>
   <script type="text/javascript" src="shBrushPlain.js"></script>
@@ -26,7 +23,7 @@
   <script type="text/javascript" src="shBrushDiff.js"></script>
   <script type="text/javascript" src="shBrushJava.js"></script>
   <script type="text/javascript" src="shBrushCpp.js"></script>
-  <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
   <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css"></script>
   <link type="text/css" rel="stylesheet" href="shCore.css">
@@ -35,6 +32,16 @@
       SyntaxHighlighter.all();
   </script>
 
+% unless ( $global->{location} ) {
+  <script type="text/javascript">
+    function perl_scroll(id){
+      $('html,body').animate({scrollTop: $("#"+id).offset().top},'fast');
+    }
+    $(document).ready(function() {
+      $('.scroller').attr('href', 'javascript:void(0)');
+    });
+  </script>
+% }
   <!-- Google Analytics -->
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -48,18 +55,13 @@
     })();
   </script>
 </head>
-<body>
-% if ( $global->{location} ) {
-<div id="wrapper" class="flu">
-% }
-% else {
-<div id="wrapper" class="fix">
-% }
-  <div id="header">
-    <p><% "$global->{title} | $global->{title_en}" %></p>
-    <img src="title.gif" />
-    <div style="font-weight: bold; position: absolute; top: 10px; left: 10px;">
-      <a href="http://advent.perl.kr/2010/" target="_blank">← 작년 펄 크리스마스 달력으로</a>
-    </div>
-  </div>
 
+<%init>
+  my $title = $global->{location} ? "$global->{location} | $global->{title}" : "$global->{title} | $global->{title_en}";
+  my $page_uri = defined($article) ? $article->atom_id : $global->{base_uri};
+</%init>
+
+<%args>
+  $article
+  $global
+</%args>

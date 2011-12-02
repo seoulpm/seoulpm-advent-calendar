@@ -38,15 +38,16 @@ sub _DoCodeBlocks {
 
         my $brush;
         given ($codeblock) {
-            when ( /^\s*#!perl$/ism       ) { $brush = 'perl'    }
-            when ( /^\s*#!javascript$/ism ) { $brush = 'jscript' }
             when ( /^\s*#!bash$/ism       ) { $brush = 'bash'    }
+            when ( /^\s*#!cpp$/ism        ) { $brush = 'cpp'     }
+            when ( /^\s*#!diff$/ism       ) { $brush = 'diff'    }
+            when ( /^\s*#!java$/ism       ) { $brush = 'java'    }
+            when ( /^\s*#!javascript$/ism ) { $brush = 'jscript' }
+            when ( /^\s*#!perl$/ism       ) { $brush = 'perl'    }
             when ( /^\s*#!plain$/ism      ) { $brush = 'plain'   }
             when ( /^\s*#!sql$/ism        ) { $brush = 'sql'     }
             when ( /^\s*#!xml$/ism        ) { $brush = 'xml'     }
-            when ( /^\s*#!diff$/ism       ) { $brush = 'diff'    }
-            when ( /^\s*#!java$/ism       ) { $brush = 'java'    }
-            when ( /^\s*#!cpp$/ism        ) { $brush = 'cpp'     }
+            when ( /^\s*#!yaml$/ism       ) { $brush = 'yaml'    }
         }
 
         if ($brush) {
