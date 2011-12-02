@@ -332,7 +332,7 @@ Perl 원라이너 참고문서
 
 
 
-[img-01]:               2011-12-02-1.png width=680
+[img-01]:               2011-12-02-1.png width=700
 [img-01-original]:      2011-12-02-1.png
 
 [amazon-s3]:                http://aws.amazon.com/s3
