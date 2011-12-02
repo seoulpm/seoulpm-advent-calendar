@@ -188,6 +188,13 @@ body {
 #cont-main ul {
     margin-left: 30px;
 }
+#cont-main code {
+    color: yellow;
+}
+#cont-main em {
+    font-weight: bold;
+    text-decoration: underline;
+}
 #cont-main a {
     text-decoration: none;
     font-weight: bold;
