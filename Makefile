@@ -1,6 +1,6 @@
 DEFAULT_CONFIG := advent-2011.ini
 
-PATCH_LIB := PERL5LIB=./patch/lib/
+PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
 DEPEND_CPAN_MODULES := Text::MultiMarkdown \
 		       WWW::AdventCalendar
