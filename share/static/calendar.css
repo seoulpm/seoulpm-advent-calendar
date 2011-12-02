@@ -140,6 +140,9 @@ body {
     position: relative;
     width: 618px;
 }
+#disqus_thread {
+    font-size: 14px;
+}
 #traffic {
     position: absolute;
     float: right;
