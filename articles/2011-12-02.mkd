@@ -292,7 +292,7 @@ Octopress 에서 *훔쳐온* 정체를 알 수 없는
     ls *.root | while read x;do perl -nle'do something' $x > $x.new ;done
 
 생각해보면 당연한 거죠?
-하지만 Perl 원라이너 안에서 이중 반복문을 사용하는 저를 발견할 때가 더 많답니다. :-)
+하지만 저는 Perl 원라이너 안에서 이중 반복문을 사용할 때가 더 많답니다. :-)
 
 
 
@@ -307,7 +307,7 @@ Perl 원라이너는 정말 강력합니다.
 오히려 이 편이 더 멋있지 않나요?
 
 이 문서에서는 마크다운 문서만 다루었지만 POD 등의 다른 형식을 추가하는 것도 어렵지 않겠죠.
-이미 모든 것은 *CPAN님*께서 알고 계십니다.
+이미 모든 것은 [CPAN님][cpan]께서 알고 계십니다.
 비슷한 방식으로 [ikiwiki][ikiwiki]를 GitHub에서 서비스 하는 것도 간단하고 재밌겠네요.
 `_deploy` 디렉토리는 단순한 정적 파일들만을 가지고 있기 때문에 GitHub로 밀어넣는 것 뿐만 아니라,
 다른 웹서버나 [dotcloud][dotcloud], [Amazon S3][amazon-s3] 같은 클라우드 서비스를 이용할 수도 있겠죠.
@@ -315,8 +315,8 @@ Perl 원라이너는 정말 강력합니다.
 
 Octopress도 매우 훌륭한 도구입니다.
 Perl 사용자는 Perl 도구만 써야한다는 강박을 가진 것은 아니지만
-펄로 만들어진 것이 아니면 수정할 수가 없어서 재미가 없고 답답한 느낌이 들어요.
-누가 Perl로 Octopress 에 버금가는 도구를 만들어주면 좋겠는데 :)
+Perl로 만들어진 것이 아니면 수정할 수가 없어서 재미가 없고 답답한 느낌이 들어요.
+누가 Perl로 Octopress 에 버금가는 도구를 만들어주면 좋겠는데...
 
 여기까지. 더 이상은 무리! ;-)
 
@@ -341,6 +341,7 @@ Perl 원라이너 참고문서
 [cpan-text-markdown]:       https://metacpan.org/module/Text::Markdown
 [cpan-text-xslate]:         https://metacpan.org/module/Text::Xslate
 [cpan-yaml]:                https://metacpan.org/module/YAML
+[cpan]:                     http://www.cpan.org/
 [dotcloud]:                 http://dotcloud.com
 [github]:                   http://github.com
 [github-pung96]:            https://github.com/pung96/blog
