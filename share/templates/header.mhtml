@@ -6,7 +6,7 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar 2011" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
-  <meta property="og:title" content="<% URI::Escape::uri_escape($title) %>" />
+  <meta property="og:title" content="<% $title %>" />
   <meta property="og:url" content="<% $page_uri %>" />
   <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
   <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
