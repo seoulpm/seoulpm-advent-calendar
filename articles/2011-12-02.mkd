@@ -53,6 +53,14 @@ Perl 원라이너를 어떻게 쓸 수 있는지 살펴보겠습니다.
 
 
 
+[cpan-text-markdown]:   https://metacpan.org/module/Text::Markdown
+[cpan-text-xslate]:     https://metacpan.org/module/Text::Xslate
+[cpan-yaml]:            https://metacpan.org/module/YAML
+[github]:               http://github.com
+[github-pung96]:        https://github.com/pung96/blog
+[octopress]:            http://octopress.org
+[twitter-keedi]:        http://twitter.com/#!/pung96
+
 
 ## 미리 둘러보기
 http://pung96.github.com/blog 를 방문하시면, Octopress 에서 훔쳐온 테마를 기반으로 한 아주 간단한 블로그를 보실 수 있습니다.
