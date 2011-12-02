@@ -1,4 +1,4 @@
-<& header.mhtml, global => $global &>
+<& header.mhtml, global => $global, article => $article &>
 <body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
@@ -17,7 +17,7 @@
       <div style="clear:both;"></div>
     </div>
     <& disqus.mhtml, article => $article, year => undef &>
-    <& fb_comment.mhtml, url => $article->atom_id &>
+    <& fb_comment.mhtml, url => $article->atom_id, global => $global &>
   </div>
 <& footer.mhtml, global => $global &>
 

@@ -1,4 +1,5 @@
 <%args>
   $url
+  $global
 </%args>
-<fb:comments href="<% $url %>" num_posts="6" width="743" colorscheme="dark"></fb:comments>
+<fb:comments href="<% $url %>" num_posts="6" width="<% $global->{location} ? 743 : 618 %>" colorscheme="dark"></fb:comments>
