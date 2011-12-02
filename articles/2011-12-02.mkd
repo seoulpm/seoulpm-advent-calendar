@@ -99,6 +99,30 @@ Octropress의 구현을 살펴보기 전 까지는 `_deploy` 폴더처럼 발행
 
 
 
+출발!!
+-------
+
+
+를 방문해보면,
+
+[이미 만들어놓은 예제 블로그][github-pung96]를 이용하는 방법을 기준으로 설명하겠습니다.
+예제 블로그를 방문해 가벼운 마음으로 *Fork*한 후 저장소를 클론합니다.
+
+    git clone git@git@github.com:유저네임/blog.git -b source
+    cd blog
+    ./init.sh
+
+`init.sh` 파일의 내용은 다음과 같습니다.
+
+    git clone -b gh-pages git@github.com:<username>/blog.git _deploy
+    mkdir -p _scratch
+
+`_deploy` 디렉토리와 `_scratch` 디렉토리를 만들어주는 간단한 스크립트입니다.
+`<username>`은 당연히 바꾸어 주어야 겠지요?
+
+
+
+[][]
 
 [img-01]:               2011-12-02-1.png width=680
 [img-01]:               2011-12-02-1.png
@@ -111,27 +135,6 @@ Octropress의 구현을 살펴보기 전 까지는 `_deploy` 폴더처럼 발행
 [octopress]:            http://octopress.org
 [twitter-pung96]:        http://twitter.com/#!/pung96
 
-
-
-## 준비!!
-* 제가 만든 예제 저장소를 이용하는 방법을 기준으로 설명하겠습니다.
-* https://github.com/pung96/blog 를 방문해 가볍게 "Fork" 해줍니다.
-* 리파지토리를 로컬 디렉토리로 가져옵니다.
-
-```
-git clone git@git@github.com:유저네임/blog.git -b source
-cd blog
-./init.sh
-```
-
-## init.sh
-
-```
-git clone -b gh-pages git@github.com:유저이름/blog.git _deploy
-mkdir -p _scratch
-```
-
-_deploy 디렉토리와 _scratch 디렉토리를 만들어주는 간단한 스크립트입니다. "유저네임"은 당연히 바꾸어 주어야 겠지요?
 
 
 ## build.sh
