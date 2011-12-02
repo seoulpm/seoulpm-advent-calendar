@@ -107,14 +107,14 @@ Octropress의 구현을 살펴보기 전 까지는 `_deploy` 폴더처럼 발행
 예제 블로그를 방문해 가벼운 마음으로 *Fork*한 후 저장소를 클론합니다.
 
     #!bash
-    git clone git@git@github.com:유저네임/blog.git -b source
+    git clone git@git.github.com:<username>/blog.git -b source
     cd blog
     ./init.sh
 
 `init.sh` 파일의 내용은 다음과 같습니다.
 
     #!bash
-    git clone -b gh-pages git@github.com:<username>/blog.git _deploy
+    git clone -b gh-pages git@git.github.com:<username>/blog.git _deploy
     mkdir -p _scratch
 
 `_deploy` 디렉토리와 `_scratch` 디렉토리를 만들어주는 간단한 스크립트입니다.
