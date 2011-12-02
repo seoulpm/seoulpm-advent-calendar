@@ -71,6 +71,35 @@ Octropress는 GitHub 저장소를 블로그로 만들기 위해
 
 
 
+디렉토리 구조
+--------------
+
+    -- blog                     # source 브랜치
+      |-- _scratch              # 작업용 임시 디렉토리
+      |-- _deploy               # html 디렉토리. ph-graphs 브렌치
+      |-- .gitignore
+      |-- init.sh               # 초기화 스크립트
+      |-- build.sh              # 빌드 스크립트
+      `-- source
+          |-- _post             # 블로그 포스트 디렉토리
+          |  |-- 2011-11-30-3rd-post.markdown
+          |  |-- 2011-11-30-4th-post.markdown
+          |  `-- 2011-11-30-first-post.markdown
+          |-- _layout
+          |  |-- default.html   # 기본 템플릿
+          |  |-- index.html     # 첫 페이지용 블로그 포스트 템플릿(default.html에 include 됨)
+          |  `-- post.html      # 각 페이지를 위한 블로그 포스트 템플릿(default.html 에 include 됨)
+          `-- favicon.png, stylesheets, javascripts
+
+`.gitignore`를 보면  `_scratch`, `_deploy` 폴더는 `source` 가지에 추가되지 않습니다.
+Octropress의 구현을 살펴보기 전 까지는 `_deploy` 폴더처럼 발행을 위한 디렉토리를
+어떻게 관리할지에 대해 많은 고민을 했었는데, 이 방법은 생각도 못했네요.
+단순히 소스용 가지와 발행용 가지 두 개를 만들어 다른 디렉토리로 관리하면 끝입니다.
+천재...
+
+
+
+
 [img-01]:               2011-12-02-1.png width=680
 [img-01]:               2011-12-02-1.png
 
@@ -80,41 +109,9 @@ Octropress는 GitHub 저장소를 블로그로 만들기 위해
 [github]:               http://github.com
 [github-pung96]:        https://github.com/pung96/blog
 [octopress]:            http://octopress.org
-[twitter-keedi]:        http://twitter.com/#!/pung96
+[twitter-pung96]:        http://twitter.com/#!/pung96
 
 
-## 미리 둘러보기
-http://pung96.github.com/blog 를 방문하시면, Octopress 에서 훔쳐온 테마를 기반으로 한 아주 간단한 블로그를 보실 수 있습니다.
-물론  Octropress 에 비해서 아주 사소한 기능만이 구현된 상태이지만, 이 이상의 것을 구현하려 한다면 사실 perl one-liner는 좋은 툴이 아닙니다.
-제대로된 스크립트나 모듈을 만드는 것이 좋겠지요.
-
-![스크린샷](https://lh4.googleusercontent.com/-W0Etth2J_7s/TtbxqbKkeoI/AAAAAAABEho/FZyv18bhhSM/s640/perl-octopress.png)
-
-gOctropress는  github 블로그를 만들기 위해 ph-pages와 source 두개의 브랜치를 사용합니다.
-ph-pages html 파일을 발행하기 위한 브랜치이고 source 는 실제 블로그 컨텐츠와 기타 여러 파일이 저장됩니다.
-
-## 디렉토리 구조와 파일들 
-```
--- blog : source 브랜치
-  |-- _scratch    : 작업용 임시 디렉토리
-  |-- _deploy     : html 디렉토리. ph-graphs 브렌치 
-  |-- .gitignore 
-  |-- init.sh        : 초기화 스크립트 
-  |-- build.sh     : 빌드 스크립트
-  `-- source
-      |-- _post     : 블로그 포스트 디렉토리
-      |  |-- 2011-11-30-3rd-post.markdown
-      |  |-- 2011-11-30-4th-post.markdown
-      |  `-- 2011-11-30-first-post.markdown   
-      |-- _layout
-      |  |-- default.html   : 기본 템플릿
-      |  |-- index.html     : 첫페이지용 블로그 포스트 템플릿 ( default.html 에 include  됨) 
-      |  `-- post.html      : 각 페이지를 위한 블로그 포스트 템플릿( default.html 에 include 됨)
-      `-- favicon.png, stylesheets, javascrripts  : 잘 모름
- 
-```
-*  .gitignore 를 보면  _scratch, _deploy 폴더는 source 브랜치에 추가되지 않습니다.
-* Octropress 의 구현을 보기전에 _deploy 폴더와 같은 publish용 디렉토리를 관리하는 방법에 대해 많은 고민을 했었는데, 이 방법은 생각도 못했네요. 단순히 소스용 브랜치와 발행용 브랜치 두개를 만들어 다른 디렉토리에 관리하면 끝입니다. 천재..
 
 ## 준비!!
 * 제가 만든 예제 저장소를 이용하는 방법을 기준으로 설명하겠습니다.
