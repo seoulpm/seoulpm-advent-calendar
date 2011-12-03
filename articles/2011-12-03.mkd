@@ -4,15 +4,24 @@ Category: perl
 Category: Seoul.pm
 Author:   am0c
 
-숨겨진 text
-==========
+
+저자
+-----
+
+[@aanoaa][aanoaa] - Perl, 야구, 자전거, 낙타, 돌고래, 포청천 마니아. 최신 휴대폰에 관심은 없지만 요일별로 스마트 폰을 바꿔가며 들고다닌다. YAPC::Asia를 다녀온 후 현재 넥서스 원과 갤럭시 탭, 노트북의 바탕화면은 Larry Wall. 현재 안드로이드 앱 개발에 매진 중이다.
+
+
+
+시작하며
+-------
 
 perl code를 실행할 수 있다면 소스코드를 볼 수도 있습니다.
 하지만 몇 줄 안되는 코드로 자신의 코드를 숨길 수도 있습니다.
 
 
+
 어떻게?
-------
+--------
 
 숨기고자 하는 문자열을 '0'과 '1'로 바꾸고, 이를 다시 ' '(공백)과
 "\t"(탭) 문자열로 바꿉니다. 예를들어,
@@ -31,7 +40,7 @@ perl code를 실행할 수 있다면 소스코드를 볼 수도 있습니다.
 
 
 변형과정
--------
+---------
 
 1. perl내부에서 읽어들인 문자열을 '0'과 '1'의 바이트 시퀀스로 변형
 
@@ -52,18 +61,12 @@ $text =~ tr/01/ \t/;
 있습니다. [s3cr3t][gist] 에서 전체 소스코드를 확인 할 수 있습니다.
 
 
-See also
-========
+
+참고문서
+---------
 
 - [Acme::Bleach][Acme::Bleach]
 - [s3cr3t gist][gist]
-
-Author
-======
-
-홍형석 - [@aanoaa][aanoaa]
-
-
 
 
 [Acme::Bleach]:  http://search.cpan.org/~dconway/Acme-Bleach-1.13/lib/Acme/Bleach.pm
