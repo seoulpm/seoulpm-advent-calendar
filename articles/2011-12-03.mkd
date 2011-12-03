@@ -93,7 +93,7 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
 - [Acme::Bleach][Acme::Bleach]
 - [펄독 문서: pack][pack]
 - [펄독 문서: unpack][unpack]
-- [gypark님의 위키][http://gypark.pe.kr/wiki/Perl/Pack#H_1_7_2]
+- [gypark님의 위키][gypark-pack-b]
 
 
 [img-01]:        http://advent.perl.kr/2011/2011-12-03-1.png
