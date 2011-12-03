@@ -98,8 +98,8 @@ Perl을 사용하면 이렇게 간단하게 문자열을 조작할 수 있습니
 - [CPAN의 Acme::Bleach 모듈][cpan-acme-bleach]
 - [s3cr3t gist][gist-s3cr3t]
 - [gypark님의 위키][gypark-wiki-pack]
-- [perldoc pack][pack]
-- [perldoc unpack][unpack]
+- [perldoc pack][perldoc-pack]
+- [perldoc unpack][perldoc-unpack]
 
 
 
