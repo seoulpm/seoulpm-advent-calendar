@@ -1,3 +1,9 @@
+Title:    소스코드 감쪽같이 숨기기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   am0c
+
 숨겨진 text
 ==========
 
