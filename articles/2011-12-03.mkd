@@ -2,13 +2,17 @@ Title:    소스코드 감쪽같이 숨기기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   am0c
+Author:   aanoaa
 
 
 저자
 -----
 
-[@aanoaa][aanoaa] - Perl, 야구, 자전거, 낙타, 돌고래, 포청천 마니아. 최신 휴대폰에 관심은 없지만 요일별로 스마트 폰을 바꿔가며 들고다닌다. YAPC::Asia를 다녀온 후 현재 넥서스 원과 갤럭시 탭, 노트북의 바탕화면은 Larry Wall. 현재 안드로이드 앱 개발에 매진 중이다.
+[@aanoaa][twitter-aanoaa] - Perl, 콧수염, 야구, 자전거, 낙타, 돌고래, 포청천 마니아.
+아이유 열혈 삼촌팬. Perl과 Javascript, 안드로이드 어플리케이션 개발에 능하다.
+Perl 코드 사용시 탭 문자 대신 4칸 공백을 사용한다.
+일신 상의 이유로 vim을 버리고 emacs로 투신.
+현재 [콧수염 블로그][aanoaa-blog]를 운영하고 있다.
 
 
 
@@ -96,10 +100,11 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
 - [gypark님의 위키][gypark-pack-b]
 
 
-[img-01]:        http://advent.perl.kr/2011/2011-12-03-1.png
-[Acme::Bleach]:  http://search.cpan.org/~dconway/Acme-Bleach-1.13/lib/Acme/Bleach.pm
-[pack]:          http://perldoc.perl.org/functions/pack.html
-[unpack]:        http://perldoc.perl.org/functions/unpack.html
-[gypark-pack-b]: http://gypark.pe.kr/wiki/Perl/Pack#H_1_7_2
-[gist]:          https://gist.github.com/1408846
-[aanoaa]:        http://aanoaa.github.com/
+[img-01]:           http://advent.perl.kr/2011/2011-12-03-1.png
+[Acme::Bleach]:     http://search.cpan.org/~dconway/Acme-Bleach-1.13/lib/Acme/Bleach.pm
+[pack]:             http://perldoc.perl.org/functions/pack.html
+[unpack]:           http://perldoc.perl.org/functions/unpack.html
+[gypark-pack-b]:    http://gypark.pe.kr/wiki/Perl/Pack#H_1_7_2
+[gist]:             https://gist.github.com/1408846
+[twitter-aanoaa]:   http://twitter.com/#!/aanoaa
+[aanoaa-blog]:      http://aanoaa.github.com/
