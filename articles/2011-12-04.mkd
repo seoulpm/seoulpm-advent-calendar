@@ -127,19 +127,23 @@ Thrift가 준비가 되면 개별 언어용 라이브러리를 만들어야 합�
 
 다시 `tutorial.thrift`로 돌아와 아직 모르는 부분들을 찾아봅시다.
 
+    #!plain
     php_namespace tutorial
 
 `php`의 경우 별도의 `namespace`인 `php_namespace`를 사용하는 것을 볼 수 있습니다. (구체적인 차이점은 모르겠습니다. `php`에 대해 잘 아시는 분이 설명해주셨으면 좋겠네요 :)
 
+    #!plain
     typedef i32 MyInteger
 
 `C` 언어에서 익숙하게 볼 수 있는 `typedef` 구문입니다.
 
+    #!plain
     const i32 INT32CONSTANT = 9853
     const map<string,string> MAPCONSTANT = {'hello':'world', 'goodnight':'moon'}
 
 상수 리터럴은 위와 같이 사용합니다.
 
+    #!plain
     enum Operation {
       ADD = 1,
       SUBTRACT = 2,
@@ -149,6 +153,7 @@ Thrift가 준비가 되면 개별 언어용 라이브러리를 만들어야 합�
 
 열거형입니다.
 
+    #!plain
     exception InvalidOperation {
       1: i32 what,
       2: string why
@@ -156,10 +161,12 @@ Thrift가 준비가 되면 개별 언어용 라이브러리를 만들어야 합�
 
 아래와 같이 예외를 정의할 수도 있습니다.
 
+    #!plain
     i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),
 
 뒤에 throws를 붙여서 예외를 던질 수 있게 되어 있습니다. 마지막에 `,`가 붙어있는 점을 주의하세요. `service` 내에 여러 함수들이 위치하고 `,`로 구분됩니다. 펄에서와는 달리 마지막 항목인 경우에는 뒤에는 `,`를 붙이지 않습니다.
 
+    #!plain
     oneway void zip(),
 
 `oneway`는 호출을 수행하되 클라이언트가 응답을 기다리지 않겠다는 의미입니다. I/O가 많은 작업들에서 더 효과적인 처리를 기대할 수 있습니다.
