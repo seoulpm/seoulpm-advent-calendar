@@ -41,7 +41,7 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
     #!plain
     "  		 				 	 	  	   	   			 	 				 	    		 	 	  		 		 				 	 	  	   		  	  		 			  	    	   			 	  		 			 	 		  	  	 	  	 	 	    "
 
-보이지 않게 된 문자열을 쌍따옴표로 묶은 모습입니다.
+보이지 않게 된 문자열을 큰따옴표로 묶은 모습입니다.
 
 
 
@@ -49,7 +49,7 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
 --------------
 
 먼저 Perl 내부로 읽어들인 문자열을 
-[unpack][unpack] 함수를 사용하여 '0'과 '1'의 바이트 시퀀스로 변형합시다.
+[unpack][unpack] 함수를 사용하여 '0'과 '1'의 비트 나열로 변형합시다.
 
     #!perl
     my $text = <STDIN>;
@@ -69,7 +69,8 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
     $text =~ tr/01/ \t/;
     print $text;
 
-아래는 스크린샷입니다.
+아래는 스크린샷입니다. "Hello Susan!"을 입력하면 빨간 박스에
+표시한 부분만큼 공백이 출력된 것을 볼 수 있습니다.
 
 ![결과][img-01]
 
@@ -88,9 +89,11 @@ Perl 코드를 실행할 수 있다는 것은 소스 코드도 읽을 수 있다
 참고문서
 ---------
 
-- [Acme::Bleach][Acme::Bleach]
 - [s3cr3t gist][gist]
-
+- [Acme::Bleach][Acme::Bleach]
+- [펄독 문서: pack][pack]
+- [펄독 문서: unpack][unpack]
+- [gypark님의 위키][http://gypark.pe.kr/wiki/Perl/Pack#H_1_7_2]
 
 
 [img-01]:        http://advent.perl.kr/2011/2011-12-03-1.png
