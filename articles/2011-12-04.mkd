@@ -1,3 +1,10 @@
+Title:    임시
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   dalinaum
+
+
 저자
 ----
 
