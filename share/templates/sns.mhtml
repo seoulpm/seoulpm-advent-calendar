@@ -8,6 +8,6 @@
     <iframe src="http://www.facebook.com/plugins/like.php?href=<% $global->{location} ? URI::Escape::uri_escape($article->atom_id) : URI::Escape::uri_escape($global->{base_uri}) %>&amp;send=false&amp;layout=box_count&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font&amp;height=90" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:62px;" allowTransparency="true"></iframe>
   </li>
   <li>
-    <a href="https://twitter.com/share" class="twitter-share-button" data-text="<% $global->{title}." ".$global->{location}." - ".$article->atom_id %>" data-url="<% $article->atom_id %>" data-via="seoulpm" data-count="vertical">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="<% $global->{title}." ".$global->{location} %>" data-url="<% $article->atom_id %>" data-via="seoulpm" data-count="vertical">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
   </li>
 </ul>
