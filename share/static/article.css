@@ -117,7 +117,7 @@ body {
     position: absolute;
     width: 194px;
     float: right;
-    top: -40px;
+    top: -10px;
     right: 0;
     padding-top: 10px;
     padding-left: 10px;
@@ -188,6 +188,13 @@ body {
 #cont-main ul {
     margin-left: 30px;
 }
+#cont-main code {
+    color: yellow;
+}
+#cont-main em {
+    font-weight: bold;
+    text-decoration: underline;
+}
 #cont-main a {
     text-decoration: none;
     font-weight: bold;
@@ -196,6 +203,9 @@ body {
 #cont-main a:hover {
     color: yellow;
     text-decoration: underline;
+}
+#cont-main img {
+    margin: 15px;
 }
 #foot {
     margin-top: 120px;
