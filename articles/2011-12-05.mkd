@@ -1,0 +1,109 @@
+Title:    NCBI pubmed & perl
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   ascendo
+
+시작하며
+---------
+
+NCBI (National Center for Biotechnology Information) 이라 불리우는 이 사이트는 생명과학 및 의학 관련 포탈(?)사이트이다. NCBI 는 미국 보건성 산하의 국립의학 도서관의 운영 분야중 하나로, 생명정보학 전담부서로 컴퓨터를 이용하여 DB를 구축하고 분석도구를 개발하는 것이 주요 임무이다. 흔히 BLAST 로 알려져 있는 이 사이트는 의학 생명과학 논문 인덱스 데이터 베이스, 유전체 서열 데이터베이스 등 각종 생명공학 정보들을 담고 있으며 이와 관련되어 있는 분석도구들을 보유 하고 있다. 또한  생물학적으로 중요한 분자의 구조와 기능을 분석하기 위한 컴퓨터 정보 처리 기술 연구, 수학적, 전산학적 방법을 사용한 생물학 및 의학적 문제의 분자 수준에서의 연구, 분자생물학, 생화학, 유전학에 대한 지식을 저장, 분석하기 위한 자동화 시스템 개발, DB와 S/W 개발, 생명공학 기술 정보 수집, 연구소, 학회, 산업체, 정부 기관 등과의 협력, 과학적 정보교환 강화, 전산생물학의 기초 및 응용 연구 훈련 지원, 다양한 DB와 S/W의 사용 지원, DB, 데이타 축적 및 교환, 생물학적 명명법의 표준 개발 등의 활동을 하고 있다. 이 모든 정보들은 Entrez 라는 포탈 검색엔진을 이용하여 검색할 수 있다.
+
+![NCBI 홈페이지][img-01]
+
+
+
+그런데
+------
+
+흔히 대학원생의 삶이나 노예의 삶을 살다 보면 “내일 까지 뭐 해놔~” 라는 지극히 인간적인 상황에 직면하게 된다. 이 글은 대학원생이 직면할 수 있는 혹은 당하고 있는 아름다운 상황에 대한 글이다. 
+
+첫번째 예시:
+
+> 교수님이 내일 까지 특정 키워드에 대한 논문을 찾아 놓으라고 한다.  하지만 이럴 경우는 짬밥에 따라 차이가 있지만 보통 거인의 어께에서 불편한 검색을 제공하는 google scholar 나  google 등을 사용한다. 구글 & 구글 scholar는 편리한 키워드 검색을 제공하지만 그 링크 일일이 다 찍어서 언제 abstract를 확인할 것인가?
+
+두번째 예시:
+
+> 논문 주제를 선정하려고 한다. 보통 석사 이상의 경우는 자신이 연구한 분야를 집중적으로 혹은 연계하여 논문 주제 혹은 연구 주제를 선정하는 것이 보통이나... 나 처럼 가방끈이 짧고 학식이 부족한 경우엔 다른 분들의 논문을 보고 정하는 경우가 대부분이다. 제목,키워드 가지고 pubmed & google 찾다가 시간은 가고 여자친구는 떠나간다 아니 떠나 갔다.
+
+자 이제 언제 까지 이렇게 살 것 인가,  획기적인 방법에 대한 것에 대한 의문을 가지게 될 것이다. 정확하게 답변을 한다면 없다. 하지만 좀 더 편한 방법을 이용하여 논문을 검색 정리 할 수 있다면 어떨까...perl을 이용해서 말이다.
+
+
+
+그렇다면
+--------
+
+NCBI에서는 E-utility (http://www.ncbi.nlm.nih.gov/books/NBK25500/)를 제공하고 있다. 이는 NCBI의 검색엔진인 entrez의 programmatic access 를 사용 가능하게 하는 것이다 (API?). E-utillity내 의  E-search를 이용하여 결과에 대한 검색을 실시하고 E-fetch를 이용해서 결과 값을 출력한다. 이것은 NCBI의 모든 DB를 대상으로 가능하다.
+
+그럼 앞서 말한 상황1&2에서 어떻게 하는 것이 옳을까? 논문 전체를 보는 것은 시간 상 무리가 있고 우리는 인생을 그렇게 꼼꼼하게 살지 않았기 때문에 abstract만 보는 경우가 대부분이다.  그런데 앞서 말한 것처럼 키워드를 넣고 검색을 한다면 저자, 날짜, 제목을 뱉아 낸다
+
+NCBI pubmed (논문DB) 에서 특정 키워드 (rice)로 찾았을 때:
+
+![NCBI pubmed (논문DB) 에서 특정 키워드 (rice)로 찾았을 때][img-02]
+
+그림2의 결과는 ncbi 사이트 -> 키워드 검색 -> entrez 검색결과에서 pubmed 카테고리 선택 -> 그림2 등장 이다. 이렇게 나온 링크들을 일일이 찍어서 abstract 를 확인하고 정리하고 하면 좋겠다. 하지만 시간이 많이 걸리니깐 perl을 이용하면 인생을 좀 쉽게 살 수 있다.
+
+먼저 E-utillity 의 E-search는 사용법은 다음과 같다.
+Pubmed 에서 science 저널에 2008년에 나온 유방암 논문을 찾으려면 다음과 같이 링크를 작성하여 실행 하면 된다.
+
+Example: Get the PubMed IDs (PMIDs) for articles about breast cancer published in Science in 2008
+
+http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=science[journal]+AND+breast+cancer+AND+2008[pdat]
+
+결과 값은 XML로 나오지만 이것을 이용하여 E-fetch를 이용하면 우리가 원하는 pubmed 데이터를 좀 더 보기 쉽게 정리 할 수 있다.
+
+Example: 
+
+Input: List of UIDs (&id); Entrez database (&db); Retrieval type (&rettype); Retrieval mode (&retmode)
+
+Output: Formatted data records as specified
+
+http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=<database>&id=<uid_list>&rettype=<retrieval_type>&retmode=<retrieval_mode>
+
+아래의 링크는 NCBI에서 제공하는 E-utility 의 예제이다. 역시 바이오는 Perl이 갑임을 다시 한번 확인 할 수 있는 아주 좋은 Perl 예제이다.
+
+http://eutils.ncbi.nlm.nih.gov/entrez/query/static/eutils_example.pl
+
+http://eutils.ncbi.nlm.nih.gov/entrez/query/static/epost.pl
+
+또한 NCBI 는 E-utility의 pipeline 을 perl 로 만들수 있도록 Ebot (http://www.ncbi.nlm.nih.gov/Class/PowerTools/eutils/ebot/ebot.cgi) 이라는 사이트를 제공한다. 위의 E-fetch, E-search, XML 뭐 이런 거 알고 싶지도 않을 때 위의 사이트를 이용한다면 15초 만에 perl script를 자동으로 작성해 준다. 뱀(python)이나 빨간돌(ruby)은 이런거 없다.
+
+
+
+하여튼 간에
+------------
+
+E-search -> E-fetch 를 이용하여 나온결과를 Perl 로 재구성....하는코드는 다음과 같다...
+http://codepad.org/hCGYlN5S
+
+--help 와 같은 고급 기술을 이용하면 설명도 볼 수 있으며 저자별, 저널별, 년도, 키워드 등도 나타낼수 있고 놀랍게도 이것은 생명정보학의 친구(?) 엑셀에서 아주 잘보인다....
+간단한 사용법은
+
+$perl script.pl -a ‘Cheol Seong Jang’ -tab > result 
+
+라고 하면 장철성 (교수님, 강원대학교, 평소 존경하는...) 님의 논문이 result 파일로 저장되며 두명을 검색하고 싶을때는
+ 
+$perl script.pl -a ‘Cheol Seong Jang AND Andrew Paterson’ -tab > result
+
+이라고 하면 된다. (다른 옵션들은 -help 참고..)
+
+Pubmed 검색결과 txt (TSV형식) 파일 (Pubmed ID, 제목, 저자, 년도, 저널, abstract)
+
+![Pubmed 검색결과 txt (TSV형식) 파일 (Pubmed ID, 제목, 저자, 년도, 저널, abstract)][img-03]
+
+
+마치며
+-------
+
+이 스크립트가 얼마나 많은 도움을 줄지는 모르겠다. 하지만 앞서 열거한 상황1&2의 경우나 급히 많은 abstract를 봐야 될 경우는 아주 유용할 것이다. 물론 E-utility 같은 경우는 GEO (Gene Expression Omnibus; http://www.ncbi.nlm.nih.gov/geo/), SRA (Short Read Archive; http://www.ncbi.nlm.nih.gov/sra) 같은 곳에서도 사용하여 대량의 데이터를 다운 받을 수 있다 (난 사실 GEO 의 microarray 데이터 받을때 사용함). 또한 위의 결과 값으로 나오는 년도를 잘 활용하면 특정 키워드의 논문 trend 를 볼 때도 아주 유용할 것이다 (보고서나 RFP 작성시). 
+netBLAST나 뭐 다른 것들을 하면 더 좋았겠지만 Ebot과 생명정보학 DB 갑님이신 NCBI에서 사용한는 perl 등을 소개할 좋은 기회라서 특별히 NCBI E-utility를 선정하였다. Perl Advent Calender 에 글을 쓸 수 있게 기회를 주신 am0c님과 다트에서 놀라운 실력으로 빠져나가지 못하게 한 Keedi님 께 감사드리며 스크립트를 봐주신 미쿡에 계시는 사랑하는 윤희킴, 사랑하는 형석님, 나만 괴롭히는 진사마에게 감사드립니다.
+
+
+[img-01]: 2011-12-05-1.png
+[img-02]: 2011-12-05-2.png
+[img-03]: 2011-12-05-3.png
+
+
+
+
+
