@@ -12,7 +12,7 @@ Author:   am0c
 올해 크리스마스 달력의 주편집자. 하지만 웹디자인에 더 열중했다는 비하인드 스토리.
 결국 [@keedi][twitter-keedi]님의 도움을 받고 있다.
 최근 안드로이드와 리눅스 커널에 관심을 돌리고 있으나
-페이스북의 재미에 빠져 허우적대고 있다.
+[페이스북][facebook-am0c]의 재미에 빠져 허우적대고 있다.
 
 
 시작하며
@@ -575,6 +575,7 @@ Let's Dance!
 
 [twitter-am0c]: http://twitter.com/am0c
 [twitter-keedi]: http://twitter.com/keedi
+[facebook-am0c]: http://facebook.com/am0c.yn
 
 [img-01]:  2011-12-06-1.png
 [img-02]:  2011-12-06-2.png
