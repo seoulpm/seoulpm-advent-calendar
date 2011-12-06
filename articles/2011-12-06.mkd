@@ -12,7 +12,7 @@ Author:   am0c
 올해 크리스마스 달력의 주편집자. 하지만 웹디자인에 더 열중했다는 비하인드 스토리.
 결국 [@keedi][twitter-keedi]님의 도움을 받고 있다.
 최근 안드로이드와 리눅스 커널에 관심을 돌리고 있으나
-페이스북의 재미에 빠져 허우적대고 있다.
+[페이스북][facebook-am0c]의 재미에 빠져 허우적대고 있다.
 
 
 시작하며
@@ -434,7 +434,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 ------------
 
 래퍼 파일(`/views/layouts/main.tt`)을 적절하게 수정합니다.
-컨테이너 부분이 `<% content %>`로 되어 있습니다. 각 링크를 클릭하면
+컨테이너 부분이 `[% content %]`로 되어 있습니다. 각 링크를 클릭하면
 선택한 분류에 따라 컨테이너 안에 이미지가 다르게 출력되도록 할 것입니다.
 색상 목록을 전역 변수로 빼놓는 것이 더 좋겠습니다.
 지금은 그대로 두겠습니다.
@@ -461,7 +461,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
       </ul>
     </div>
     <div id="cont">
-      <% content %>
+      [% content %]
     </div>
 
 로직 작성하기
@@ -499,10 +499,10 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
       <a href="/img/[% file %]"><img src="/img/thumb/[% file %]" /></a>
     [% END %]
 
-지금은 탬플릿 언어로 *Template Toolkit*을 사용하고 있습니다. Dancer의 기본
-탬플릿 언어는 *Dancer::Template::Simple*입니다. 
+지금은 탬플릿 언어로 [Template Toolkit][template-toolkit]을 사용하고 있습니다. Dancer의 기본
+탬플릿 언어는 [Dancer::Template::Simple][dancer-template-simple]입니다. 
 탬플릿 언어를 바꾸려면 `config.yml`을 수정하면 됩니다.
-개인적으로 *Xslate*이 짱입니다. 
+개인적으로 [Xslate][xslate]이 짱입니다. 
 
 여기까지 완성하면 아래와 같이 사진이 잔뜩 올라옵니다.
 
@@ -531,19 +531,27 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 이것으로 완성입니다.
 색상에 따라 필터링도 할 수 있게 되었습니다.
 
+- 빨간색:
+
 ![빨강][img-05]
+
+- 파란색:
+
 ![파랑][img-06]
 
+조금만 고치면 살색 사진만 모을 수도 있겠네요!
+(라고 Y님이 뒤에서 조언해주셨습니다.)
 
 정리하며
 --------
 
-간단하게 만들어보았습니다.
-배치 스크립트의 탓으로 예제가 조금 길어졌습니다.
+배치 스크립트 탓에 예제가 조금 길어졌지만, 이렇게 간단한 서비스를 완성해 보았습니다.
 
-다양한 데이터베이스와 인증 모듈을 CPAN에서 얻을 수 있습니다.
+물론 이것이 전부는 아닙니다.
+*다양한 데이터베이스와 세션 및 인증 모듈*을 CPAN에서 얻을 수 있습니다.
 [Task::Dancer][task-dancer]를 설치하거나 이것의 펄독 문서를 참고하면 
 좋은 모듈을 찾는데 수월합니다.
+Dancer의 *플러그인들은 모두 초간단 설정을 통해 동작하며 간단한 신택스를 통해 접근*할 수 있습니다.
 
 Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer와 서버 사이에 
 통합적인 게이트웨이를 둘 수 있습니다. 이것이 있기 때문에 [DotCloud][dotcloud]나 [Stakato][stakato]와 같은
@@ -554,7 +562,12 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 오늘 예제를 만들면서 댄서에서는 카탈리스트와 같이 라우트 핸들러를 체인으로 구성하는 것이
 쉽지 않다는 것을 느꼈습니다. 이 부분에 대해 논의하면 좋겠습니다.
 
+아래 첨부한 참고 링크에서 슬라이드는 꼭 읽어보세요. Dancer를 쉽게 이해하는데 도움이 됩니다.
+마지막으로 필요하신 분들을 위해 이번 기사의 코드도 올려놓았습니다.
+Let's Dance!
+
 - [PSGI/Plack][plackperl]
+- [perldancer.org][perldancer]
 - [Nice Slides][slides]
 - [Cool Dancers][dancers]
 - [YouPerl at github][youperl]
@@ -562,6 +575,7 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 
 [twitter-am0c]: http://twitter.com/am0c
 [twitter-keedi]: http://twitter.com/keedi
+[facebook-am0c]: http://facebook.com/am0c.yn
 
 [img-01]:  2011-12-06-1.png
 [img-02]:  2011-12-06-2.png
@@ -580,7 +594,12 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 [dancer-plugin-redis]: https://metacpan.org/module/Dancer::Plugin::Redis
 [gd-thumbnail]: http://metacpan.org/module/GD::Thumbnail
 
+[template-toolkit]: http://template-toolkit.org/
+[dancer-template-simple]: http://metacpan.org/module/Dancer::Template::Simple
+[xslate]: http://xslate.org/
+
 [task-dancer]: http://metacpan.org/module/Task::Dancer
+[perldancer]: http://perldancer.org/
 [plackperl]: http://plackperl.org/
 [dotcloud]: http://dotcloud.com/
 [stakato]: http://www.activestate.com/cloud
@@ -593,4 +612,3 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 [slides]: http://perldancer.org/dancefloor
 
 [youperl]: https://github.com/am0c/seoulpm-advent-calendar-youperl
-
