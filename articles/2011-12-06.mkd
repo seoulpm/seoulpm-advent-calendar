@@ -434,7 +434,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 ------------
 
 래퍼 파일(`/views/layouts/main.tt`)을 적절하게 수정합니다.
-컨테이너 부분이 `<% content %>`로 되어 있습니다. 각 링크를 클릭하면
+컨테이너 부분이 `[% content %]`로 되어 있습니다. 각 링크를 클릭하면
 선택한 분류에 따라 컨테이너 안에 이미지가 다르게 출력되도록 할 것입니다.
 색상 목록을 전역 변수로 빼놓는 것이 더 좋겠습니다.
 지금은 그대로 두겠습니다.
@@ -461,7 +461,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
       </ul>
     </div>
     <div id="cont">
-      <% content %>
+      [% content %]
     </div>
 
 로직 작성하기
@@ -499,10 +499,10 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
       <a href="/img/[% file %]"><img src="/img/thumb/[% file %]" /></a>
     [% END %]
 
-지금은 탬플릿 언어로 *Template Toolkit*을 사용하고 있습니다. Dancer의 기본
-탬플릿 언어는 *Dancer::Template::Simple*입니다. 
+지금은 탬플릿 언어로 [Template Toolkit][template-toolkit]을 사용하고 있습니다. Dancer의 기본
+탬플릿 언어는 [Dancer::Template::Simple][dancer-template-simple]입니다. 
 탬플릿 언어를 바꾸려면 `config.yml`을 수정하면 됩니다.
-개인적으로 *Xslate*이 짱입니다. 
+개인적으로 [Xslate][xslate]이 짱입니다. 
 
 여기까지 완성하면 아래와 같이 사진이 잔뜩 올라옵니다.
 
@@ -579,6 +579,10 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 [redis]: http://redis.io/
 [dancer-plugin-redis]: https://metacpan.org/module/Dancer::Plugin::Redis
 [gd-thumbnail]: http://metacpan.org/module/GD::Thumbnail
+
+[template-toolkit]: http://template-toolkit.org/
+[dancer-template-simple]: http://metacpan.org/module/Dancer::Template::Simple
+[xslate]: http://xslate.org/
 
 [task-dancer]: http://metacpan.org/module/Task::Dancer
 [plackperl]: http://plackperl.org/
