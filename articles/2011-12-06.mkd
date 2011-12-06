@@ -2,7 +2,7 @@ Title:    초소형 프레임워크와 함께 춤을
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   ascendo
+Author:   am0c
 
 저자
 -----
