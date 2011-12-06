@@ -1,0 +1,438 @@
+윈도우 환경에서 화면 캡쳐 후 자동 저장 기능의 구현
+- 부제 : 한 Win32::GUI 사용자의 삽질의 기록 -
+
+
+자기소개: [트위터 없음] Perl과는 그다지 어울리지 않아보이는, 법학을 전공한 고시 준비생. 10여년 전 개인 홈페이지를 Perl 로 구축한 이래, 슬럼프가 올 때마다 하라는 공부는 안 하고 Perl 코딩을 한 결과, 어느 새 스스로도 내 정체성이 무엇인지 혼란을 일으키고 있다. (물론 실력과는 전혀 관계가 없다.) [ email: webmaster@dormouse.pe.kr / blog: http://www.dormouse.pe.kr/ ]
+
+
+1. Intro
+
+이것저것 스크린샷이 포함된 글을 쓰실 때, 대개 어떻게 하시나요? PrintScreen[PrtScr] 키를 이용하면 현재 화면을 쉽게 클립보드에 저장할 수 있습니다. 이렇게 클립보드로 저장된 이미지는 어디서든 Ctrl-V 로 붙여쓰기 할 수 있죠.
+
+그러나, 스크린샷이 파일 형태로 필요하다면 어떨까요? 무언가 이미지 관련 프로그램을 켜고, 붙여넣기를 한 후, 저장을 해야 합니다. 한두 장이면 이렇게 할 겁니다. 그런데 몇 십 장에서 몇 백 장의 화면을 잡아야 한다면 이렇게 일일이 저장을 해 주는 것도 귀찮습니다. 그냥 스크린샷을 찍으면 자동으로 알아서 파일로 저장까지 해 주면 딱 좋을 것 같습니다. 그래서 시도해봤습니다.
+
+
+2. 어떻게 할까?
+
+대충 그림은 그려집니다. 일단 현재 화면을 스크린샷으로 만들어서, 그것을 특정한 파일로 저장하면 됩니다. 구체적으로는,
+
+(1) 전화면 스크린샷을 찍는 것은 우리가 이미 알고 있는, 클립보드를 이용한 [Shift]-[PrintScreen] 키 입력으로 해결하면 될 것 같습니다. 따라서 문제는, 
+
+* 어떤 방법으로 스크린샷을 찍으라는 명령을 줄 것인가, 그리고
+* 이 명령이 떨어졌을 때 어떻게 컴퓨터가 자동으로 [Shift]-[PrintScreen] 이 눌린 것처럼 인식하도록 하는가가 됩니다.
+
+(2) 일단 화면이 클립보드에 들어가면, 클립보드의 내용을 그대로 읽어서 저장하면 끝입니다. 클립보드의 이미지 내용을 읽어올 수만 있으면 큰 문제가 없겠네요.
+
+
+3. (1) 의 문제의 해결: 인터페이스 디자인 & 키보드 입력 구현
+
+우선, 어떤 식으로 컴퓨터에게 명령을 줄 지를 정해야 합니다. 스크린샷을 찍을 때마다 사람이 직접 스크립트를 실행하는 건 별로 좋은 생각이 아니고, 언뜻 머리를 스치는 건 단축 키를 쓰는 방법인데, 여기서는 시스템 트레이에 아이콘을 하나 밀어넣고, 이 아이콘을 클릭할 때마다 스크린샷을 찍는 것으로 해 볼까 합니다. (순전히 제 능력의 문제이기도 하고, 시스템 트레이의 활용이 이렇게 간단하다는 것을 어필하려는 의도이기도 합니다.) 
+
+일단 윈도우 GUI 환경은 Win32::GUI 를 이용하여 구현하도록 하겠습니다. 제가 주로 쓰는 모듈이 이 녀석이기 때문일 뿐, 별 다른 이유는 없습니다. 윈도우의 시스템 트레이에 아이콘을 밀어넣는 것은 Win32::GUI 를 사용하는 이상 Win32::GUI->AddNotifyIcon 을 사용하면 간단히 해결됩니다. 
+
+* Win32::GUI :
+  http://search.cpan.org/~robertmay/Win32-GUI-1.06/
+
+(주) ActivePerl 을 사용하시는 경우 PPM 을 이용하여 쉽게 Win32::GUI 를 설치 가능합니다만, 딸기 펄 등의 경우에는 잘 모르겠습니다. Win32::GUI 의 일부 모듈의 경우 gcc 만으로는 컴파일이 안 되는 종류가 있는 것으로 알고 있습니다. (VC가 필요) 저는 ActivePerl 이용자입니다. (만약 딸기 펄 이용자이고, Win32::GUI 을 CPAN을 통해 설치가 안 되는 경우, 다음의 링크를 참조하십시오: http://gypark.pe.kr/wiki/Perl/%EB%AA%A8%EB%93%88%EC%84%A4%EC%B9%98#H_7 )
+
+=------------------------------------------------=
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Win32::GUI();
+
+# 사용할 아이콘을 정의해주고...
+
+my $ICON = Win32::GUI::Icon->new( "icon.ico" );
+
+# 기타 미리 정의할 개체들을 정의해줍니다.
+
+my $TRAY_ICON;
+my $MAIN_WIN;
+
+# 적당히 기본으로 사용할 창 하나를 정의한 후...
+
+$MAIN_WIN = Win32::GUI::Window->new(
+    -name   => "MAIN_WIN",
+    -size    => [1, 1],
+);
+
+# 시스템 트레이 아이콘을 정의합니다.
+
+$TRAY_ICON = $MAIN_WIN->AddNotifyIcon(
+    -name => "TrayIcon",
+    -icon => $ICON,
+    -tip  => "Click to Screenshot!",
+    -balloon => 0,
+    -onClick => sub{
+
+        # 마우스 클릭: 스크린 샷을 찍을 겁니다.
+
+	SAVE_SCREEN();
+
+	return 0;
+    },
+    -onRightClick => sub{
+
+        # 마우스 우클릭: 프로그램 종료
+
+        $TRAY_ICON->Remove(); # 이걸 안 해주면 트레이에 좀비 아이콘이 그냥 남아있을 수도...
+
+	return -1;
+    },
+);
+
+# 창은 숨기고...
+
+$MAIN_WIN->Hide();
+
+# 사용자의 명령을 기다립니다. (이게 빠지면...)
+
+Win32::GUI::Dialog();
+
+
+sub SAVE_SCREEN {
+
+    # 여기에 스크린샷을 찍는 명령이 들어갈 예정이예요.
+
+    return 0;
+}
+
+=------------------------------------------------=
+
+이걸로 뼈대는 완성이네요. 같은 폴더에 아무 아이콘 파일이나 icon.ico 로 이름을 바꿔서 저장하신 후 실행해 보시면, 시스템 트레이에 그 아이콘이 나타나는 것을 보실 수 있습니다. 출력된 아이콘에 마우스를 갖다 대면 "Click to Screenshot!" 이라는 메시지를 보실 수 있습니다. 아이콘에 마우스 클릭을 하시면 SAVE_SCREEN 서브루틴이 실행될 것이고(아직 아무런 내용이 없습니다), 마우스 우클릭을 하시면 프로그램이 종료될 것입니다.
+
+[[이미지 1. 실행 화면: 시스템 트레이]]
+
+이제 뼈대는 됐고, SAVE_SCREEN 서브루틴 내에 내용을 채워 넣어야죠.
+
+일단 Shift-PrintScreen 명령을 주는 것은 Win32::GuiTest 모듈의 SendKeys 함수를 이용하면 너무 간단합니다. SendKeys 는 문자 그대로 특정한 키 입력을 컴퓨터에 던져주는 역할을 하는데, 그냥 간단히 이걸로 끝입니다. 물론 Win32::GuiTest 모듈이 설치되어 있어야 합니다.
+
+* Win32::GuiTest :
+  http://search.cpan.org/~karasik/Win32-GuiTest-1.58/lib/Win32/GuiTest.pm
+
+=------------------------------------------------=
+sub SAVE_SCREEN {
+
+    use Win32::GuiTest qw(SendKeys);
+
+    SendKeys( "+{PRTSCR}" );
+}
+=------------------------------------------------=
+
+SAVE_SCREEN 서브루틴 안에 이렇게 두 줄을 입력해 넣습니다. {PRTSCR} 앞의 +는 Shift 를 같이 입력한다는 의미입니다. (참고로 ^은 Ctrl, %는 Alt를 의미합니다.) 여러 키 조합과 딜레이 타임을 옵션으로 지정할 수도 있기 때문에, SendKeys 와 Win32::GUI 의 타이머 기능이 결합되면 상당히 여러 가지로 활용이 가능합니다. 예를 들면, 특정한 온라인 게임에 대응되는 자작 매크로를 제작하실 수도 있겠네요. (아하하...)
+
+
+
+4. (2) 의 문제의 해결 : 클립보드에 저장된 이미지의 파일 저장
+
+이제 클립보드로 들어간 이미지를 저장을 해야 되네요? 클립보드의 내용을 어떻게 가져와야 하나 머리를 싸맬 지경이었는데, Win32::Clipboard 라는, 클립보드 이미지를 불러오는 아주 편리한 모듈이 있더군요! 그냥 간단히, 이렇게 쓰면 됩니다. 
+
+* Win32::Clipboard :
+
+  http://search.cpan.org/~jdb/Win32-Clipboard-0.56/Clipboard.pm
+
+=------------------------------------------------=
+
+use Win32::Clipboard;
+my $bitmap = Win32::Clipboard::GetBitmap();
+
+=------------------------------------------------=
+
+스크린샷 이미지를 저장하는 것이므로, 현재 저장되어 있는 것이 이미지인지 텍스트인지 확인할 필요도 없습니다. 그냥 당연히 비트맵이겠거니 하고 가져옵니다. $bitmap 스칼라 변수로 이미지가 고스란히 들어오기 때문에, 이렇게 읽어온 걸 그대로 .BMP 로 저장하면 상황 종료입니다. 파일명을 사용자가 정하도록 하는 것도 사실 귀찮은 일이니까, 그냥 현재 날짜/시간을 바로 사용하도록 합시다. 완성된 SAVE_SCREEN 서브루틴은 이렇게 되네요.
+
+=------------------------------------------------=
+
+sub SAVE_SCREEN {
+
+    use Win32::GuiTest qw(SendKeys);
+    SendKeys( "+{PRTSCR}" );
+
+    use Win32::Clipboard;
+    my $bitmap = Win32::Clipboard::GetBitmap();
+
+    my $filename = time;   # 현재 Unix시간으로 파일명을 만듭니다.
+
+    open my $fHandle, ">:raw", "$filename.bmp" or die $!;
+    print $fHandle $bitmap;
+    close $fHandle;
+
+    undef $filename;
+    undef $bitmap;
+
+    return 0;
+}
+
+=------------------------------------------------=
+
+
+5. 문제 발생! 저장된 이미지가 이상하다!
+
+
+일단 1차적으로 프로그램 작성은 끝났습니다. 완성되었으니 실행을 해 봐야죠. 그런데... 어라? 프로그램이 저장한 BMP 파일을 확인해 보면, 뭔가 이상한 모양이 보입니다. 이미지 전체적으로 투명 픽셀들이 막 보이네요?
+
+[[이미지 2. 스크린샷 저장된 BMP 파일: 투명 픽셀이 섞인 깨진 스크린 샷]]
+
+이 문제는 클립보드에 저장된 비트맵이 저장되면서, 그 depth가 32bit bitmap 으로 지정되는 데서 생기는 문제입니다. 따라서 클립보드로부터 가져온 비트맵을 24bit bitmap 으로 다운그레이드한 후 저장을 해야만 하는데, 굳이 GD 라이브러리까지 동원하는 수고는 하지 않겠습니다. Win32::GUI 의 가족들 중 하나를 더 불러오도록 하죠. Win32::GUI::DIBitmap 을 소개합니다.
+
+=------------------------------------------------=
+
+sub SAVE_SCREEN {
+
+    use Win32::GuiTest qw(SendKeys);
+    SendKeys( "+{PRTSCR}" );
+
+    use Win32::Clipboard;
+    my $bitmap = Win32::Clipboard::GetBitmap();
+
+    my $filename = time;   # 현재 Unix시간으로 파일명을 만듭니다.
+
+    use Win32::GUI::DIBitmap;
+
+    my $dib = newFromData Win32::GUI::DIBitmap ($bitmap);  # 비트맵 이미지를 DIBitmap 객체로 읽어옵니다.
+    undef $bitmap;
+
+    $bitmap = $dib->ConvertTo24Bits();  # 로드된 DIBitmap 비트맵 객체를 24비트로 다운그레이드 합니다.
+
+    $bitmap->SaveToFile( "$filename.bmp" );
+    undef $bitmap;
+
+    return 0;
+}
+
+=------------------------------------------------=
+
+이왕 DIBitmap 모듈을 쓰는 이상, 저장도 이를 통해서 하는 게 편하겠습니다. SaveToFile 함수를 사용하면 됩니다. SaveToFile 함수는 지원하는 파일 형식에 대해서는 별도로 정해주지 않아도 확장자를 통해 판별하고 알아서 저장을 합니다. 만약 확장자를 png 로 저장하고 싶다면, $filename.png 로 해 주면 알아서 png 파일 형식으로 변환하여 저장해준다는 말입니다. 파일의 용량을 줄이기 위해서라도 png 파일 형식으로 저장이 좋지 않을까 합니다.
+
+[[이미지 3. 다운그레이드 후 정상적으로 나오는 스크린샷]]
+
+
+6. 보기 싫은 콘솔 창을 없애자
+
+일단 윈도우 환경에서 Perl 스크립트를 실행하면, 까만 콘솔 화면이 부담스럽습니다. 이제 이 녀석을 없애 보도록 합시다. 사실 PAR::Packer 같은 툴로 실행 바이너리를 만든다면 옵션을 주어서 콘솔 창을 없앨 수 있지만, 스크립트 상태로 실행한다면 스크립트 차원에서 이걸 없애야 합니다. Win32::Console 을 이용해도 되지만, Win32::HideConsole 모듈을 설치한 후 다음과 같은 줄을 소스의 위쪽에 넣어 주세요.
+
+* Win32::HideConsole :
+  http://search.cpan.org/~phatwares/Win32-HideConsole-1.00/lib/Win32/HideConsole.pm
+
+=------------------------------------------------=
+
+use Win32::HideConsole;
+hide_console;
+
+=------------------------------------------------=
+
+실행해 보시면, 항상 보이던 시꺼먼 화면이 잠깐 떴다가 사라지는 것을 보실 수 있습니다.
+
+
+여기까지 완성된 스크립트의 전체 소스입니다. 저장되는 파일 형식은 PNG 로 바꾼 상태입니다.
+
+=------------------------------------------------=
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Win32::GUI();
+
+use Win32::HideConsole;
+hide_console;
+
+# 사용할 아이콘을 정의해주고...
+
+my $ICON = Win32::GUI::Icon->new( "icon.ico" );
+
+# 기타 미리 정의할 개체들을 정의해줍니다.
+
+my $TRAY_ICON;
+my $MAIN_WIN;
+
+# 적당히 기본으로 사용할 창 하나를 정의한 후...
+
+$MAIN_WIN = Win32::GUI::Window->new(
+    -name   => "MAIN_WIN",
+    -size    => [1, 1],
+);
+
+# 시스템 트레이 아이콘을 정의합니다.
+
+$TRAY_ICON = $MAIN_WIN->AddNotifyIcon(
+    -name => "TrayIcon",
+    -icon => $ICON,
+    -tip  => "Click to Screenshot!",
+    -balloon => 0,
+    -onClick => sub{
+
+        # 마우스 클릭: 스크린 샷을 찍을 겁니다.
+
+	SAVE_SCREEN();
+
+	return 0;
+    },
+    -onRightClick => sub{
+
+        # 마우스 우클릭: 프로그램 종료
+
+        $TRAY_ICON->Remove(); # 이걸 안 해주면 트레이에 좀비 아이콘이 그냥 남아있을 수도...
+
+	return -1;
+    },
+);
+
+# 창은 숨기고...
+
+$MAIN_WIN->Hide();
+
+# 사용자의 명령을 기다립니다. (이게 빠지면...)
+
+Win32::GUI::Dialog();
+
+
+sub SAVE_SCREEN {
+
+    use Win32::GuiTest qw(SendKeys);
+    SendKeys( "+{PRTSCR}" );
+
+    use Win32::Clipboard;
+    my $bitmap = Win32::Clipboard::GetBitmap();
+
+    my $filename = time;   # 현재 Unix시간으로 파일명을 만듭니다.
+
+    use Win32::GUI::DIBitmap;
+
+    my $dib = newFromData Win32::GUI::DIBitmap ($bitmap);  # 비트맵 이미지를 DIBitmap 객체로 읽어옵니다.
+    undef $bitmap;
+
+    $bitmap = $dib->ConvertTo24Bits();  # 로드된 DIBitmap 비트맵 객체를 24비트로 다운그레이드 합니다.
+
+    $bitmap->SaveToFile( "$filename.png" );
+    undef $bitmap;
+
+    return 0;
+}
+
+
+=------------------------------------------------=
+
+
+
+7. 번외편. 트레이 아이콘을 프로그램 안에 내장하고 싶어요
+
+
+만약 icon.ico 파일이 항상 같이 붙어다녀야 되는 것이 부담스러우시다면, 아예 icon.ico 파일을 코드 안에 때려박을 수도 있습니다. 어떻게? Win32::GUI::BitmapInline 이라는 모듈을 사용하면 됩니다. 역시 Win32::GUI 가 설치되어 있다면 그냥 사용이 가능합니다.
+
+=------------------------------------------------=
+
+sub GET_ICON {
+
+    use Win32::GUI::BitmapInline();
+
+    return newIcon Win32::GUI::BitmapInline( q(
+        *** base64로 인코딩한 아이콘 파일 ***
+    ) );
+}
+
+=------------------------------------------------=
+
+사용할 아이콘 파일을 base64로 인코딩하여 텍스트 형태로 만드신 후에, 그 내용을 저기 q() 안에 밀어넣어주시면 됩니다. 파일을 base64로 인코딩하는 것은 Perl 을 설치하면 기본적으로 설치되는 모듈인 MIME::Base64 모듈을 이용하면 처리 가능합니다. 아래 스크립트는 이를 이용한 간단한 명령행 스크립트입니다. 명령행에서 인자로 Base64로 인코딩할 파일을 정해 주면, Base64 로 인코딩한 파일을 (원래 파일명.확장자).b64 로 저장해 줍니다. 두 번째 인자로 저장할 파일명을 지정한 경우 지정한 파일명으로 저장합니다.
+
+=------------------------------------------------=
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+## 명령행 옵션 처리
+
+if ( !$ARGV[0] ) {
+    print "\n";
+    print "Error: No source file!\n";
+    exit;
+}
+unless ( -e $ARGV[0] ) {
+    print "\n";
+    print "Error: Source file $ARGV[0] not exist!\n";
+    exit;
+}
+
+my $SOURCE_FILENAME = $ARGV[0];
+my $SRCFILE_SIZE = ( -s $SOURCE_FILENAME );
+
+# 타겟 파일을 인자로 주지 않았다면 소스 파일 뒤에 .b64를 붙여서 저장.
+
+if ( !$ARGV[1] ) {
+    $ARGV[1] = "$SOURCE_FILENAME.b64";
+}
+
+my $TARGET_FILENAME = $ARGV[1];
+
+# 화면 표시
+
+print "\n";
+print "Source Filename: $SOURCE_FILENAME ($SRCFILE_SIZE byte)\n";
+print "Target Filename: $TARGET_FILENAME\n\n";
+
+# 파일을 통으로 읽는다.
+
+my $TEMP;
+
+open my $fHandle, "<", "$SOURCE_FILENAME";
+binmode $fHandle;
+
+while(<$fHandle>){
+    $TEMP .= $_;
+}
+close $fHandle;
+undef $fHandle;
+
+# 파일 내용을 변환
+
+use MIME::Base64;
+my $ENCODED = encode_base64( $TEMP );
+undef $TEMP;
+
+# 변환된 내용을 기록
+
+open my $fHandle2, ">", "$TARGET_FILENAME";
+print $fHandle2 $ENCODED;
+close $fHandle2;
+undef $fHandle2;
+
+undef $ENCODED;
+
+# 종료 표시
+
+print "Process completed.\n";
+
+undef $SOURCE_FILENAME;
+undef $TARGET_FILENAME;
+undef $SRCFILE_SIZE;
+undef @ARGV;
+
+exit;
+=------------------------------------------------=
+
+이렇게 아이콘을 넘겨주는 서브루틴을 만들었다면, 트레이 아이콘을 생성한 AddNotifyIcon의 아이콘 정의 부분을 -icon => GET_ICON(), 과 같이 해당 아이콘을 정의한 서브루틴을 호출하도록 바꿔줍니다. 물론, 이렇게 한다면 my $ICON 줄은 필요가 없어지므로 삭제하셔야 겠죠. 
+
+이 팁은 스크립트로 이 프로그램을 실행할 때는 큰 의미가 없습니다만, Win32::GUI 를 이용하여 프로그램을 작성한 후 PP (PAR::Packer) 를 이용하여 실행 바이너리로 빌드해 보시면, 왜 이런 꼼수가 필요한지 아실 수 있습니다. 아이콘 파일을 소스 안에 때려박지 않으면, 분명히 아이콘 파일이 정위치에 존재함에도 불구하고 아이콘이 지정된 아이콘 대신 Perl 기본 아이콘 (낙타 아이콘) 으로 출력되는 불상사를 보게 됩니다. PP 를 사용하면서 이런 불상사를 방지하기 위해서는 사용되는 외부 아이콘의 경우 소스 안에 때려박는 편법이 필요합니다.
+
+
+
+8. 마무리
+
+글을 다 써놓고 생각해 보니, 이게 과연 Advent Calendar 의 취지에 맞는 글인지 조금 의심스러워지는군요. 요즘은 그다지 쓰이지 않는 Win32::GUI 관련 내용이기도 하고, 더구나 윈도우에서의 Perl 은 상당히 마이너한 툴인데다, 이 글을 읽으실 분들이 보통은 Perl 에 관한 한 저보다 더 많은 것을 알고 계실 분들일 가능성이 상당히 높기 때문입니다. 애초에 글을 시작하면서 제가 상정한 타겟 독자층과는 대략 백만 광년쯤 떨어져 있네요. (^^)
+
+윈도우 환경에서도, 어느 정도의 Perl 지식만 있다면, 깊은 지식 없이도 Perl 을 이용하여 자신이 필요로 하는 기능을 직접 디자인하여 사용할 수 있다는 사실을 보여드리고 싶었습니다. 아마 자기 소개에서 보셨을지 모르지만, 전 전산/컴퓨터와는 전혀 관계 없는 법학 전공자거든요. (^^) 자신이 컴퓨터에 대해서 평균적인 수준의 지식을 가지고 있고, Perl 이라는 도구를 어느 정도 알고 있다면, 윈도우 환경에서도 어느 정도까지는 - 이미 다른 사람들이 만들어 놓은 수많은 CPAN 모듈들을 활용하여 - 자신이 필요로 하는 간단한 기능들을 빠른 시간에 스스로 구현해볼 수 있다는 것입니다. 어떤가요? 매력적이지 않나요? 이미 Perl을 훌륭하게 사용하고 계신 많은 분들이 있지만, 저와 비슷한 정도의 일반적인 지식만을 가진 "잠재적 Perl 이용자"들에게 한번 어필을 해보고 싶었습니다.
+
+
+9. 사족
+
++ 만약 이 프로그램에 단축 키 기능을 추가한다면 어떨까요? 이를테면 윈도우 환경 어디서나 CTRL-F12 를 클릭하면 이 기능이 동작하도록 하는 것입니다. 윈도우용 Perl은 Win32::API 모듈을 이용하여 웬만한 윈도우 기본 API 를 임포트하여 직접 사용할 수 있기 때문에, user32.dll 의 RegisterHotKey/UnregisterHotKey 를 임포트하여 적당한 키 조합을 등록하고 키보드 입력을 전역으로 모니터링[후킹]하면, 단축 키를 이용하여 스크린샷 저장의 조작을 할 수도 있게 됩니다. 
+
+덧붙이자면, 단축 키 방식을 도입할 경우 위에서 Shift-PrintScreen 스크린 캡쳐 외에도, Alt-PrintScreen 을 사용하여 현재 활성화된(포커스가 있는) 창만을 스크린샷 할 수 있게 되어(현재 방식에서는 Alt-PrintScreen 을 사용하는 기능을 넣으면 아이콘을 클릭하는 순간 활성창이 작업 표시줄로 바뀌는지라, 항상 작업 표시줄만 달랑 스크린샷됩니다.), 더욱 유용한 툴이 됩니다.
+
+네이버 카페에 단축 키를 구현하는 소스가 등록되어 있으므로 관심 있으신 분께서는 참조하시기 바랍니다.
+
+http://cafe.naver.com/ArticleRead.nhn?clubid=18062050&articleid=557
+
++ 이 프로그램에 포함된 모든 스크린샷은 위 단축 키 기능까지를 포함하여 완성된 스크립트를 이용하여 찍은 것입니다. PAR::Packer 로 빌드한 실행 바이너리 및 모든 기능이 구현된 전체 소스를 공개해 두었습니다. 아래의 주소에서 프로그램 및 전체 소스를 다운로드 받으실 수 있습니다.
+
+http://www.nightowl.pe.kr/software/prtscrsave
