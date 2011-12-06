@@ -2,7 +2,7 @@ Title:    초소형 프레임워크와 함께 춤을
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   ascendo
+Author:   am0c
 
 저자
 -----
@@ -424,8 +424,8 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 색상을 대표하는 값은 GD의 `copyResampled` 함수를 사용하면 됩니다. "Perl Hacks" 책의 44번 항목을 참고했습니다.
 색상별로 분류하는 방법은 다음의 문서를 참고했습니다.
 
-  - [Wikipedia for Color Difference][wikipedia-color-difference]
-  - [Color Difference Algorithm][color-difference-algorithm]
+- [Wikipedia for Color Difference][wikipedia-color-difference]
+- [Color Difference Algorithm][color-difference-algorithm]
 
     
 래퍼 만들기
@@ -540,17 +540,20 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 배치 스크립트의 탓으로 예제가 조금 길어졌습니다.
 
 다양한 데이터베이스와 인증 모듈을 CPAN에서 얻을 수 있습니다.
-*Task::Dancer*를 설치하거나 이것의 펄독 문서를 참고하면 
+[Task::Dancer][task-dancer]를 설치하거나 이것의 펄독 문서를 참고하면 
 좋은 모듈을 찾는데 수월합니다.
 
 Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer와 서버 사이에 
-통합적인 게이트웨이를 둘 수 있습니다. 이것이 있기 때문에 *DotCloud*나 *Stakato*와 같은
+통합적인 게이트웨이를 둘 수 있습니다. 이것이 있기 때문에 [DotCloud][dotcloud]나 [Stakato][stakato]와 같은
 클라우드 플랫폼 서비스에 Dancer 어플리케이션을 쉽게 deploy할 수 있습니다.
 다른 환경으로 쉽게 이주할 수도 있을 것입니다.
 
+댄서도 올해 [크리스마스 달력][dancer-advent]을 진행하고 있습니다.
 오늘 예제를 만들면서 댄서에서는 카탈리스트와 같이 라우트 핸들러를 체인으로 구성하는 것이
 쉽지 않다는 것을 느꼈습니다. 이 부분에 대해 논의하면 좋겠습니다.
 
+- [PSGI/Plack][plackperl]
+ 
 
 [twitter-am0c]: http://twitter.com/am0c
 [twitter-keedi]: http://twitter.com/keedi
@@ -571,3 +574,9 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 [redis]: http://redis.io/
 [dancer-plugin-redis]: https://metacpan.org/module/Dancer::Plugin::Redis
 [gd-thumbnail]: https://metacpan.org/module/GD::Thumbnail
+
+[task-dancer]: https://metacpan.org/module/Task::Dancer
+[plackperl]: http://plackperl.org/
+[dotcloud]: http://dotcloud.com/
+[stakato]: http://www.activestate.com/cloud
+[dancer-advent]: http://advent.perldancer.org/2011
