@@ -563,7 +563,9 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 쉽지 않다는 것을 느꼈습니다. 이 부분에 대해 논의하면 좋겠습니다.
 
 아래 첨부한 참고 링크에서 슬라이드는 꼭 읽어보세요. Dancer를 쉽게 이해하는데 도움이 됩니다.
+또 [Mojolicious][mojolicious]라는 매력적인 웹 프레임워크도 있으니 한 번 둘러보세요.
 마지막으로 필요하신 분들을 위해 이번 기사의 코드도 올려놓았습니다.
+
 Let's Dance!
 
 - [PSGI/Plack][plackperl]
@@ -598,6 +600,7 @@ Let's Dance!
 [dancer-template-simple]: http://metacpan.org/module/Dancer::Template::Simple
 [xslate]: http://xslate.org/
 
+[mojolicious]: http://mojolicio.us/
 [task-dancer]: http://metacpan.org/module/Task::Dancer
 [perldancer]: http://perldancer.org/
 [plackperl]: http://plackperl.org/
