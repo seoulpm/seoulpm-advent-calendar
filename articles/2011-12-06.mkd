@@ -174,7 +174,9 @@ YouPerl이라는 웹 어플리케이션을 위한 파일 뼈대들이 생성됩�
 -----------------
 
 먼저 웹을 통해 지스타 이미지를 긁어 데이터베이스에 기록합니다.
-데이터베이스는 [Redis][redis]를 사용하겠습니다. [Dancer::Plugin::Redis][dancer-plugin-redis]를 받습니다.
+데이터베이스는 [Redis][redis]를 사용하겠습니다. 
+[Dancer::Plugin::Redis][dancer-plugin-redis]를 받습니다.
+
 
     #!bash
     $ cpanm Dancer::Plugin::Redis
@@ -200,8 +202,10 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
         debug:  0
 
 아래 구글을 통해 검색해보니 지스타 이미지를 모은 24개의 게시물이 보입니다.
-24개의 게시물의 경로를 구하기 위한 정규표현식 한 개와 각 게시물에서 이미지를 긁어올 정규표현식 한 개만 있으면
-모든 이미지를 긁어올 수 있겠습니다.
+[Web::Scraper][web-scraper]나 [Web::Query][web-query]를 사용해도 되지만,
+24개의 게시물의 경로를 구하기 위한 정규표현식
+한 개와 각 게시물에서 이미지를 긁어올 정규표현식 한 개만 있으면 
+모든 이미지를 간단히 긁어올 수 있겠습니다.
 
 ![발견][img-02]
 
@@ -210,8 +214,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
     my $grep_imglist = qr|http://p.playforum.net/[^"]+|si;
 
 긁은 이미지의 파일명을 서로 겹치지 않게 하기 위해 MD5 알고리즘을 이용하고, 이것을 데이터베이스에서 각 파일의
-식별자로 사용하겠습니다. [GD::Thumbnail][gd-thumbnail]을 사용하면 쉽게 썸네일을 생성할 수도 있습니다.
-`bin/grep_gstar.pl`으로 저장했습니다.
+식별자로 사용하겠습니다. [GD::Thumbnail][gd-thumbnail]을 사용하면 쉽게 썸네일을 생성할 수도 있습니다. `bin/grep_gstar.pl`으로 저장합니다..
 
     #!perl
     #!/usr/bin/env perl
@@ -297,8 +300,7 @@ Redis 플러그인은 설정 몇줄만 넣으면 아래와 같이 redis 키워�
 
 ![잔뜩][img-03]
 
-심심하지 않은 웹서비스를 만들기 위해 각 이미지를 색상별로 분류해 봅니다. 역시 데이터베이스에 기록합니다.
-`bin/calc_gstar.pl`으로 저장했습니다.
+심심하지 않은 웹서비스를 만들기 위해 각 이미지를 색상별로 분류해 봅니다. 역시 데이터베이스에 기록합니다. `bin/calc_gstar.pl`으로 저장합니다.
 
     #!perl
     #!/usr/bin/env perl
@@ -553,6 +555,9 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 쉽지 않다는 것을 느꼈습니다. 이 부분에 대해 논의하면 좋겠습니다.
 
 - [PSGI/Plack][plackperl]
+- [Nice Slides][slides]
+- [Cool Dancers][dancers]
+- [YouPerl at github][youperl]
  
 
 [twitter-am0c]: http://twitter.com/am0c
@@ -573,10 +578,19 @@ Dancer는 *PSGI*와 *Plack*을 지원합니다. 이것으로 여러분은 Dancer
 
 [redis]: http://redis.io/
 [dancer-plugin-redis]: https://metacpan.org/module/Dancer::Plugin::Redis
-[gd-thumbnail]: https://metacpan.org/module/GD::Thumbnail
+[gd-thumbnail]: http://metacpan.org/module/GD::Thumbnail
 
-[task-dancer]: https://metacpan.org/module/Task::Dancer
+[task-dancer]: http://metacpan.org/module/Task::Dancer
 [plackperl]: http://plackperl.org/
 [dotcloud]: http://dotcloud.com/
 [stakato]: http://www.activestate.com/cloud
 [dancer-advent]: http://advent.perldancer.org/2011
+
+[web-scraper]: http://metacpan.org/module/Web::Scraper
+[web-query]: http://metacpan.org/module/Web::Query
+
+[dancers]: http://perldancer.org/slides
+[slides]: http://perldancer.org/dancefloor
+
+[youperl]: https://github.com/am0c/seoulpm-advent-calendar-youperl
+
