@@ -1,0 +1,77 @@
+Youtube에서 원하는 동영상 내려받기
+
+시작하며!!
+일상에 부딪히는 많은 문제들을 빠르게 해결할 수 있는 스크립트 언어를 한가지 쯤 알고 있다면
+그것은 굉장한 행운 일 것입니다.
+저는 이제부터 최근에 제가 겪은 문제를 Perl과 CPAN을 이용해서 어떻게 빠르고 간단하게
+해결 해 나가는지 보여 드리도록 하겠습니다.
+
+문제!!
+아이유 관련 동영상을 가지고 싶다!(될수 있는 한 쉽고 간단하게....)
+
+해결 방안!!
+Youtube에 있는 아이유 관련 동영상을 자동으로 내려 받을 수 는 없을까?
+
+준비물!!
+
+WebService::GData::YouTube
+WWW::YouTube::Download
+
+준비!!
+
+1.Youtube 검색을 위해서 다음 모듈을 CPAN으로 부터 설치 합니다.
+sudo cpan install WebService::GData::YouTube
+2.검색된 결과를 다운로드 받기 위해 다음 모듈을 CPAN으로 부터 설치 합니다.
+sudo cpan install WWW::YouTube::Download
+
+출발!!
+
+간단하게 다음과 같은 스크립트를 작성 하여 실행을 합니다.
+"소스코드"
+
+실행!!
+
+위에서 만든 스크립트를 실행하여 동영상을 다운로드 받아 보겠습니다.
+첫번째 인자는 검색 명령어 두번째인자는 Limit 되겠습니다.
+
+perl main.pl "아이유" 10
+"스크린샷1"
+
+다운받고 있는 중
+"스크린샷2"
+
+해보면 좋을 것들!!
+위의 스크립트를 이용해서 다른 아이돌 그룹의 영상을 받아 봅시다. :)
+
+정리하며!!
+제가 만약 Perl이란 언어와 CPAN을 몰랐다면
+이렇게 간단하게 문제를 해결할 수는 없었을 겁니다.
+많은 도움을 주신 여러 한국 Perl Monger분 들과 아이유양 감사합니다.
+
+
+    use strict;
+    use warnings;
+    use 5.010;
+    use WWW::YouTube::Download;
+    use WebService::GData::YouTube;
+    
+    # 아듀먼트로 검색 값
+    my ($search, $limit) = (@ARGV);
+    $limit //= 10;
+    
+    # 검색 값으로 유투브 검색
+    my $search_youtube = new WebService::GData::YouTube;
+    
+    # 쿼리 값 설정
+    $search_youtube->query()->q($search)->limit($limit, 0);
+    
+    # 검색
+    my $results = $search_youtube->search_video();
+    
+    # 다운로드
+    my $client = WWW::YouTube::Download->new;
+    foreach my $ret (@$results) {
+    	say "Starting Download : " . $ret->title;
+    	$client->download($ret->video_id);
+    	sleep 10;
+    }
