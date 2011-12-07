@@ -5,6 +5,10 @@ Category: Seoul.pm
 Author:   eeyees
 
 
+저자
+-----
+
+[@eeyees][eeyees-twitter] 인쇄기기 업계의 기린아, TAFKA_HoliK라는 닉을 사용하기도 한다.
 
 
 시작하며!!
@@ -96,3 +100,6 @@ perl main.pl "아이유" 10
     	$client->download($ret->video_id);
     	sleep 10;
     }
+
+[eeyees-twitter]: http://twitter.com/eeyees
+
