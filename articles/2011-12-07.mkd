@@ -413,8 +413,124 @@ bmp2png를 다운로드 받아서 압축을 푼 다음에 `BMP2PNG.EXE` 파일�
 지금까지 작성한 스크립트의 전체 코드는 다음과 같습니다.
 화면 갈무리 후 저장하는 파일 형식은 PNG입니다.
 
-
-
+    #!perl
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    
+    use Win32::GUI ();
+    use Win32::GUI::BitmapInline;
+    use Win32::GuiTest qw(SendKeys);
+    use Win32::Clipboard;
+    use Win32::HideConsole;
+    use DateTime;
+    use File::Slurp;
+    
+    # 콘솔을 보이지 않게 합니다.
+    hide_console;
+    
+    # 사용할 아이콘을 정의합니다.
+    my $icon = Win32::GUI::BitmapInline->newIcon( q(
+    AAABAAMAEBAQAAEABAAoAQAANgAAABAQAAABAAgAaAUAAF4BAAAQEAAAAQAgAGgEAADGBgAAKAAA
+    ABAAAAAgAAAAAQAEAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAP///wB7AAAAAHsAAHt7AAAAAHsA
+    ewB7AAB7ewC9vb0Ae3t7AP8AAAAA/wAA//8AAAAA/wD/AP8AAP//AAAAAAD////////////////3
+    /4////////+P/////////3//////////j/////////+P/////////49///////////h/////////
+    //////j////4/////4//////////+P//f///j/j/j//////////4////////////////////////
+    ////nlz7t3Qg/Zt4Zf2bIHT9W3Mg/VtuIP0TdXPwAXBy4ANsZeADIHfkB24g5gdld8MPZyD/n2Ug
+    //9vbv//biAoAAAAEAAAACAAAAABAAgAAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAA////AP7+/gDW
+    1tYAqqqqAP39/QB5eXkAAAAAAHp6egD8/PwAQUFBAHV1dQCEhIQAHh4eAMvLywC3t7cAAwMDAIiI
+    iAACAgIAgYGBAPb29gAgICAAtra2AIqKigAEBAQAGhoaAOfn5wAODg4AODg4AGtrawAYGBgAsrKy
+    AMHBwQAVFRYAFxcXAAsLCwABAQEAHx8fAAoKCgBwcHAAm5ubAOnp6AB4eHgAERERACMjIwBEREQA
+    4uLiAKampgBlZWUAampqALS0tACvr68Az8/PAAgICABsbGwAj4+PALGxsQC/v78A8fHxAFhYWACa
+    mpoA////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+    /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+    AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+    ////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+    //8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+    /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+    AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+    ////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+    //8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+    /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+    AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+    ////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+    //8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+    /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAYGBgYGBgYGBgYG
+    BgYGBgYGBgYGBgYGBgYNBgY6BgYGBgYGBgYGBgYGBhwGBgYGBgYGBgYGBgYGBgYDBgYGBgYGBgYG
+    BgYGBgYGHAYGBgYGBgYGBgYGBgYGBhwGBgYGBgYGBgYGBgYGDBQJBgUGBgYGBgYGDAwGBgYGBhQG
+    BScGBgYGBgYGBgYGBgYGBgwGBgYGBgYGGwYGBgYGBgYcBgYGBgYGFAYLBgYGBgYMBgYGBgYGBgYG
+    BgsGBgYGCwYGBgYGCQYGBQYGCwYGDAYGBgYGBgYGBgYGBgYFBgYGBgYGBgYGBgYGBgYGBgYGBgYG
+    BgYGBgYGBgYGBgYGBgYGBgb//55c+7d0IP2beGX9myB0/VtzIP1bbiD9E3Vz8AFwcuADbGXgAyB3
+    5AduIOYHZXfDD2cg/59lIP//b27//24gKAAAABAAAAAgAAAAAQAgAAAAAABABAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAABwAAAAAQAAAE6/v79AAAAA
+    DgAAAABYWFinAAAAZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAA/wAAAAEAAAAB
+    CAgI92xsbJMAAAAAAAAAAQAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAP8A
+    AAABAAAASwAAAP+vr69QAAAAAAAAAAEAAAD/AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAEAAAD/AAAAAQAAAP8AAAAAampqlQAAAAEAAAABAAAA/wAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAABAAAA/wAAAAEAAAD/AAAAWWVlZZoAAAABAAAAAQAAAP8AAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAFwAAAP8AAACHERER7iMjI9xERES7AAAAAXp6eoUAAAD/AAAAHQAAAAAA
+    AAAAAAAAAAAAAAEAAAA+FRUW6hcXF+gCAgL9CwsL9AEBAf4AAAD/AgIC/R8fH+AKCgr1cHBwj5ub
+    m2QAAAAAAAAAAAAAAAAAAAABAAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA
+    /xgYGOcAAABNAAAAAAAAAAAAAAAAAAAAAQAAAP8ODg7xODg4xwAAAP8AAAD/AAAA/wAAAP8AAAD/
+    AAAA/wAAAP9ra2uUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/ICAg3wAAAEmKiop1BAQE+wAAAP8A
+    AAD/AAAA/wAAAP8aGhrlAAAAGAAAAAAAAAAAAAAAAAAAAAAAAABIAAAA/wMDA/wAAACKAAAAAYiI
+    iHcCAgL9AAAA/wAAAP8AAAD/gYGBfgAAAAkAAAAAAAAAAAAAAAAAAAAAQUFBvgAAAP8AAAD/dXV1
+    igAAAAAAAAAAhISEewAAAP8AAAD/Hh4e4QAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAp
+    AAAAVQAAAAEAAAAAAAAAAAAAAAJ5eXmGAAAA/wAAAIUAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAD//55c+7d0IP2beGX9myB0/VtzIP1bbiD9E3Vz8AFwcuADbGXgAyB35AduIOYHZXfDD2cg
+    /59lIP//b27//24g
+    ) );
+    
+    # 기본으로 사용할 창을 정의합니다.
+    my $main = Win32::GUI::Window->new(
+        -name => 'Main',
+        -size => [ 1, 1 ],
+    );
+    
+    # 시스템 트레이 아이콘을 정의합니다.
+    $main->AddNotifyIcon(
+        -name    => "NI",
+        -icon    => $icon,
+        -tip     => "Click to Screenshot!",
+        -balloon => 0,
+        -onClick => sub {
+            # 스크린샷을 찍습니다.
+            SendKeys( "+{PRTSCR}" );
+    
+            # 스크린샷을 저장합니다.
+            my $dt       = DateTime->now( time_zone => 'Asia/Seoul' );
+            my $bitmap   = Win32::Clipboard::GetBitmap;
+            my $filename = sprintf(
+                '%4d%02d%02d-%02d%02d%02d.bmp',
+                $dt->year, $dt->month,  $dt->day,
+                $dt->hour, $dt->minute, $dt->second,
+            );
+            write_file($filename, { binmode => ':raw' }, $bitmap);
+    
+            # BMP 형식을 PNG로 변환합니다.
+            system('BMP2PNG.EXE', $filename);
+            unlink($filename);
+    
+            return 0;
+        },
+        -onRightClick => sub {
+            # 트레이에 좀비 아이콘이 그냥 남아있는 것을 방지합니다.
+            $main->NI->Remove;
+    
+            # 프로그램 종료
+            return -1;
+        },
+    );
+    
+    # 창을 숨깁니다.
+    $main->Hide;
+    
+    # GUI 메인 루프에 진입합니다.
+    Win32::GUI::Dialog;
 
 
 
@@ -453,8 +569,6 @@ MS 윈도우 환경에서 약간의 Perl 지식만 있다면 Perl을 이용해 �
 `Alt + PrtSc`를 사용해 현재 활성화 된 창만을 갈무리 할 수 있습니다.
 지금처럼 아이콘을 클릭하는 방식이라면 아이콘을 클릭하는 순간 활성창이
 작업표시줄로 바뀌기 때문에, 항상 작업 표시줄만 갈무리 될 것입니다.
-[네이버 Perl 카페][naver-perl-cafe]에 [단축 키를 구현하는 소스][article-shortcut]를
-등록했으므로 한 번쯤 참고하면 도움이 될 것 같습니다.
 기사에서 사용한 모든 화면은 단축키까지 구현한 완전한 스크립트를 이용해서 갈무리한 것입니다.
 `PAR::Packer`로 빌드한 [실행 바이너리와 전체 소스][capture-source]도
 꼭 다운로드 받아서 확인해보세요. ;-)
@@ -470,7 +584,6 @@ MS 윈도우 환경에서 약간의 Perl 지식만 있다면 Perl을 이용해 �
 [img-03-original]:          2011-12-07-3.png
 
 [activeperl]:               http://www.activestate.com/activeperl
-[article-shortcut]:         http://cafe.naver.com/ArticleRead.nhn?clubid=18062050&articleid=557
 [blog-owl0908]:             http://www.dormouse.pe.kr
 [capture-source]:           http://www.nightowl.pe.kr/software/prtscrsave
 [cpan-gd]:                  https://metacpan.org/module/GD
@@ -488,6 +601,5 @@ MS 윈도우 환경에서 약간의 Perl 지식만 있다면 Perl을 이용해 �
 [cpan-win32-hideconsole]:   https://metacpan.org/module/Win32::HideConsole
 [home-bmp2png]:             http://cetus.sakura.ne.jp/softlab/b2p-home/
 [home-png]:                 http://www.libpng.org/pub/png/pngcode.html
-[naver-perl-cafe]:          http://cafe.naver.com/perlstudy.cafe
 [strawberry-perl-514]:      http://strawberryperl.com/beta/index.html
 [strawberry-perl]:          http://strawberryperl.com
