@@ -283,6 +283,12 @@ ODT 뿐만 아니라 일반적인 오픈도큐먼트포맷(ODF)의 파일 구성
 - [Catalyst 공식 위키][catalyst-wiki]
 - [Catalyst 크리스마스 달력][catalyst-advent]
 
+잠깐! Catalyst가 최근 남미에서 [W3C][w3c-home] 주최로 열린
+[공공정보 웹서비스화 경연대회][perl-rocks-latin-america]에서
+*당당하게 우승*했다고 합니다.
+개발의 신속 정확성을 다투는 대회에서 Rails, Django, CodeIgniter
+등의 프레임워크를 제치고 우승했다면 인정해줘야겠죠? :)
+
 지금부터 진행하는 작업은 작업 순서와 상관없지만,
 컨트롤러와 뷰, ODT 템플릿 처리 세 부분 모두 완성되어야
 FormNa는 서식 파일을 받아볼 수 있습니다.
@@ -486,10 +492,10 @@ Don't forget [fork me on GitHub][github-formna]!! ;-)
 [catalyst-advent]:              http://www.catalystframework.org/calendar
 [catalyst-wiki]:                http://wiki.catalystframework.org/wiki/
 [catalyst]:                     http://www.catalystframework.org
+[cpan-catalyst-manual]:         https://metacpan.org/module/Catalyst::Manual
 [cpan-catalyst]:                https://metacpan.org/module/Catalyst
 [cpan-opendocument-template]:   https://metacpan.org/module/OpenDocument::Template
 [cpan-template]:                https://metacpan.org/module/Template
-[cpan-catalyst-manual]:         https://metacpan.org/module/Catalyst::Manual
 [cpan-xml-tidy]:                https://metacpan.org/module/XML::Tidy
 [cpan]:                         http://www.cpan.org/
 [formna-home]:                  http://formna.silex.kr
@@ -498,11 +504,13 @@ Don't forget [fork me on GitHub][github-formna]!! ;-)
 [jeen-catalyst]:                http://jeen.tistory.com/93
 [koffice]:                      http://www.koffice.org
 [libreoffice]:                  http://www.libreoffice.org
+[msoffice]:                     http://office.microsoft.com/ko-kr/
 [oasis]:                        http://www.oasis-open.org
 [openoffice]:                   http://www.openoffice.org
-[yesform]:                      http://www.yesform.co.kr
-[twitter-keedi]:                http://twitter.com/#!/keedi
-[twitter-y0ngbin]:              http://twitter.com/#!/y0ngbin
-[twitter-mintegrals]:           http://twitter.com/#!/mintegrals
+[perl-rocks-latin-america]:     http://mdk.per.ly/2011/12/06/perl-rocks-latin-america/
 [twitter-am0c]:                 http://twitter.com/#!/am0c
-[msoffice]:                     http://office.microsoft.com/ko-kr/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[twitter-mintegrals]:           http://twitter.com/#!/mintegrals
+[twitter-y0ngbin]:              http://twitter.com/#!/y0ngbin
+[w3c-home]:                     http://www.w3.org/
+[yesform]:                      http://www.yesform.co.kr
