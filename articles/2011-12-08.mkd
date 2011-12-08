@@ -17,16 +17,10 @@ Perl에 입문한 첫 해에 크리스마스 달력을 쓰지만 정작 자신�
 눈을 뜨기 위해 공양미 150석이 필요하다는 후문.
 
 
-
-부제 : 가변데이터에 대해 문서 자동으로 생성하기
-======================
-
-
-
-
-
 시작하며
 ---------
+
+*부제 : 가변데이터에 대해 문서 자동으로 생성하기*
 
 생활하다보면 특정한 문서 틀이 필요할 때가 있습니다.
 그럴 때 우리는 *'서식 파일'*, *'보고서 양식'*을 검색하곤 합니다.
@@ -88,7 +82,7 @@ ODF포맷을 사용한 대표적인 응용 프로그램 및 오피스 제품은 
 - [AbiWord][abiword]
 - [KOffice][koffice]
 - [Google Docs][google-docs]
-- [MS Office 2010/2007 SP2]
+- [MS Office 2010/2007 SP2][msoffice]
 
 
 ### ODT: OpenDocumentText
@@ -157,7 +151,9 @@ ODT 뿐만 아니라 일반적인 오픈도큐먼트포맷(ODF)의 파일 구성
 문서를 계속 *우려서* 자동 생성하되, 필요한 부분의 데이터만 받아서 이용하자구요!
 그렇다면 가변 데이터에 해당하는 부분을 `xxxx`라고 표시합니다.
 
- ![xxxx표시][basic]
+![xxxx 표시][img-01]
+<br />
+*그림 1.* xxxx 표시 [(원본)][img-01-original]
 
 사실 여기까지(틀을 만드는 것) 진행했으면 벌써 절반 이상 된 것입니다.
 이젠 `unzip` 유틸리티를 사용해 `xmas-card.odt` 파일의 압축을 풉니다.
@@ -175,19 +171,23 @@ ODT 뿐만 아니라 일반적인 오픈도큐먼트포맷(ODF)의 파일 구성
 읽을 수는 있지만 용량을 줄이기 위해 불필요한 빈 칸이 모두 제거되어
 알아보기가 너무 힘들어 어떻게 수정해야 할지 막막합니다.
 이럴 땐, [CPAN의 XML::Tidy 모듈][cpan-xml-tidy]을 설치하고
-다음 명령 실행하면 들여쓰기가 잘되어 가독성이 높은 XML 파일로 바뀝니다.
+다음 명령을 실행하면 들여쓰기가 잘되어 가독성이 높은 XML 파일로 바뀝니다.
 
     #!bash
     $ xmltidy content.xml
 
 다시 `xxxx`가 씌여있는 곳을 찾아봅니다.
 
-![xxxx표시-xml][before-xxxx]
+![XML에서 xxxx가 있는 위치][img-02]
+<br />
+*그림 2.* XML에서 xxxx가 있는 위치
 
 네, 있습니다. 그럼 이부분의 값만 바꿔주면, 이 안에 넣고 싶은 데로 넣을 수 있겠죠?
 이 부분을 템플릿 툴킷 형식인 `[% name %]`, `[% date.y %]`, ... 등으로 바꿔줍니다.
 
- ![xxxx표시-xml-a][after-date]
+![xxxx 부분을 변환][img-03]
+<br />
+*그림 3.* xxxx 부분을 변환
 
 거의 다왔습니다. 이제는 Perl이 나설 차례입니다.
 우선 템플릿을 이용해 ODT를 생성해줄 핵심 모듈인
@@ -249,7 +249,9 @@ ODT 뿐만 아니라 일반적인 오픈도큐먼트포맷(ODF)의 파일 구성
 
 완성입니다!
 
- ![크리스마스카드][xmas-card.png]
+![크리스마스카드][img-04]
+<br />
+*그림 4.* 완성된 크리스마스 카드 [(원본)][img-04-original]
 
 이 코드를 조금 더 발전시키면 표준입력이나 명령행 인자로 변경될 값인
 이름과 시간 정보를 받을 수 있도록 수정하면 훨씬 더 수월하게 ODT를
@@ -267,7 +269,9 @@ ODT 뿐만 아니라 일반적인 오픈도큐먼트포맷(ODF)의 파일 구성
 
 그럼 FormNa게 한 번 만들어볼까요?
 
-![Catalyst 로고][img-catalyst]
+![Catalyst 로고][img-05]
+<br />
+*그림 5.* Catalyst 로고
 
 [Catalyst][catalyst]는 Perl의 대표적인 웹프레임워크입니다.
 워낙 방대한 관계로 여기서 Catalyst의 자세한 부분을 다루지는 않습니다.
@@ -380,7 +384,8 @@ FormNa는 서식 파일을 받아볼 수 있습니다.
 
 드디어 완성되었습니다! [폼나는 FormNa][formna]!
 
-![폼나는 FormNa][formna]
+![폼나는 FormNa][img-06]
+*그림 6.* 폼나는 FormNa [(원본)][img-06-original]
 
 
 몇 가지 팁!
@@ -455,13 +460,19 @@ ODT를 만들 때의 가장 큰 장점은 *일관된 예쁜* 보고서를 만들
 Don't forget [fork me on GitHub][github-formna]!! ;-)
 
 
+[img-01]:               2011-12-08-1.png width=700
+[img-02]:               2011-12-08-2.png
+[img-03]:               2011-12-08-3.png
+[img-04]:               2011-12-08-4.png width=700
+[img-05]:               2011-12-08-5.png
+[img-06]:               2011-12-08-6.png width=700
 
-[basic]:                        basic.png
-[before-xxxx]:                  before-xxxx.png
-[after-date]:                   after-date.png
-[xmas-card]:                    xmas-card.png
-[img-catalyst]:                 catalyst.png
-[formna]:                       formna.png
+[img-01-original]:      2011-12-08-1.png
+[img-02-original]:      2011-12-08-2.png
+[img-03-original]:      2011-12-08-3.png
+[img-04-original]:      2011-12-08-4.png
+[img-05-original]:      2011-12-08-5.png
+[img-06-original]:      2011-12-08-6.png
 
 [abiword]:                      http://www.abisource.com
 [advent-2010-12-12]:            http://advent.perl.kr/2010/2010-12-12.html
@@ -484,3 +495,8 @@ Don't forget [fork me on GitHub][github-formna]!! ;-)
 [oasis]:                        http://www.oasis-open.org
 [openoffice]:                   http://www.openoffice.org
 [yesform]:                      http://www.yesform.co.kr
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[twitter-y0ngbin]:              http://twitter.com/#!/y0ngbin
+[twitter-mintegrals]:           http://twitter.com/#!/mintegrals
+[twitter-am0c]:                 http://twitter.com/#!/am0c
+[msoffice]:                     http://office.microsoft.com/ko-kr/
