@@ -350,7 +350,7 @@ FormNa는 서식 파일을 받아볼 수 있습니다.
 
 값을 넘겨 줄 부분을 다음과 같이 폼을 이용해 사용자의 입력을 받습니다.
 
-    #!html
+    #!xml
     [% meta.title = '전단지 생성' -%]
     <form  action="[% c.uri_for('form_create_do') %]"  method="post" enctype="multipart/form-data">
       <div>
@@ -382,7 +382,7 @@ FormNa는 서식 파일을 받아볼 수 있습니다.
 - 문어발 전단지
 - FTA 국회의원 상장 만들기
 
-드디어 완성되었습니다! [폼나는 FormNa][formna]!
+드디어 완성되었습니다! [폼나는 FormNa][formna-home]!
 
 ![폼나는 FormNa][img-06]
 *그림 6.* 폼나는 FormNa [(원본)][img-06-original]
@@ -454,7 +454,7 @@ ODT를 만들 때의 가장 큰 장점은 *일관된 예쁜* 보고서를 만들
 [@y0ngbin][twitter-y0ngbin]님께 감사드립니다.
 또 막판에, 비루한 웹 UI에 희망을 불어넣어 준
 [@am0c][twitter-am0c]군에게도 고마운 마음을 전합니다.
-[폼나는 FormNa][formna] 사이트는 proof-of-concept 단계의 예제에 가깝지만,
+[폼나는 FormNa][formna-home] 사이트는 proof-of-concept 단계의 예제에 가깝지만,
 사용하시는 분들과 Perl 및 Catalyst를 공부하시려는 분들께 도움이 되길 바래봅니다.
 
 Don't forget [fork me on GitHub][github-formna]!! ;-)
@@ -483,10 +483,10 @@ Don't forget [fork me on GitHub][github-formna]!! ;-)
 [cpan-catalyst]:                https://metacpan.org/module/Catalyst
 [cpan-opendocument-template]:   https://metacpan.org/module/OpenDocument::Template
 [cpan-template]:                https://metacpan.org/module/Template
-[cpan-xml-catalyst-manual]:     https://metacpan.org/module/Catalyst::Manual
+[cpan-catalyst-manual]:         https://metacpan.org/module/Catalyst::Manual
 [cpan-xml-tidy]:                https://metacpan.org/module/XML::Tidy
 [cpan]:                         http://www.cpan.org/
-[formna]:                       http://formna.silex.kr
+[formna-home]:                  http://formna.silex.kr
 [github-formna]:                https://github.com/mintegrals/FormNa
 [google-docs]:                  https://docs.google.com/
 [jeen-catalyst]:                http://jeen.tistory.com/93
