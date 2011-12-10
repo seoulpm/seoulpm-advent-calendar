@@ -25,12 +25,18 @@
 %               && $today->day   == $day ) {
 %           my $tb = $global->{tree_ball}->($day);
             <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-            <a href="<% $article->atom_id %>"><img src="ball_<% $tb->{fn} %>.png" alt="<% $day %>일" /></a></li>
+              <a href="<% $article->atom_id %>" title="<% $day %>일">
+                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+              </a>
+            </li>
 %         }
 %         else {
 %           my $tb = $global->{tree_ball}->($day);
             <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-            <a href="<% $article->atom_id %>"><img src="ball_<% $tb->{fn} %>.png" alt="<% $day %>일" /></a></li>
+              <a href="<% $article->atom_id %>" title="<% $day %>일">
+                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+              </a>
+            </li>
 %         }
 %       }
 %     }
