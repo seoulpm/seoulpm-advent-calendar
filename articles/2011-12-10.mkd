@@ -2,7 +2,7 @@ Title:    GuiTest를 활용한 네이트온 원격제어 자동 수락기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   h0ney
+Author:   perlstudy
 
 
 
