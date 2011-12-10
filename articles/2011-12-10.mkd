@@ -209,10 +209,10 @@ CPAN의 GuiTest는 총 26개의 예제를 제공합니다.
 예시를 통해 GuiTest 모듈에 대해 단편적으로 설명했으나 실제로는 다방면으로 활용할 수 있을 것입니다.
 직접 다른 모듈과 조합하여 활용한 내용들을 아래에 정리해 보았습니다.
 
-- Win32::Process::Memory 활용 예제
-- 한글 문자열을 키보드 자판의 영문자로 변환
-- 네이트온 쪽지 자동 답장 프로그램 (지금은 버전이 바뀌어 작동하지 않습니다.)
-- 플래시 게임을 즐기자.
+- [Win32::Process::Memory 활용 예제][perlstudy-post-1]
+- [한글 문자열을 키보드 자판의 영문자로 변환][perlstudy-post-2]
+- [네이트온 쪽지 자동 답장 프로그램][perlstudy-post-3] (지금은 버전이 바뀌어 작동하지 않습니다.)
+- [플래시 게임을 즐기자.][perlstudy-post-4]
 
 
 
@@ -246,6 +246,11 @@ Advent Calender의 기고를 부탁받은 뒤
 [twitter-h0ney]: http://twitter.com/perlstudy
 [naver-perlstudy]: http://cafe.naver.com/perlstudy
 [blog-h0ney]: http://honeyperl.tistory.com/
+
+[perlstudy-post-1]: http://honeyperl.tistory.com/entry/Win32ProcessMemory
+[perlstudy-post-2]: http://honeyperl.tistory.com/entry/%ED%95%9C%EA%B8%80-%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%84-%EC%9E%90%ED%8C%90%EC%97%90-%EC%9E%85%EB%A0%A5%EB%90%98%EB%8A%94-%EC%98%81%EB%AC%B8%EB%A1%9C-%EB%B0%94%EA%BE%B8%EB%8A%94-%EB%B0%A9%EB%B2%95
+[perlstudy-post-3]: http://honeyperl.tistory.com/entry/%EB%84%A4%EC%9D%B4%ED%8A%B8%EC%98%A8-%EC%AA%BD%EC%A7%80-%EC%9E%90%EB%8F%99%EB%8B%B5%EC%9E%A5-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8
+[perlstudy-post-4]: http://honeyperl.tistory.com/entry/%ED%94%8C%EB%9E%98%EC%8B%9C-%EA%B2%8C%EC%9E%84%EC%9D%84-%EC%A6%90%EA%B8%B0%EC%9E%90
 
 [article-last-year]: http://advent.perl.kr/2010/2010-12-07.html
 [cpan-www-mechanize]: http://p3rl.org/WWW::Mechanize
