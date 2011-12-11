@@ -8,9 +8,9 @@ Author:   ascendo
 -----
 
 [@ascendox][twitter-ascendox] - 
-서울시 중구를 지역 기반으로 하는 생명 정보 학자.
+서울시 중구를 지역 기반으로 하는 유전학 전공자.
 현재 동국대학교 식물생명공학과 박사 과정으로 분자유전학실험실 유전육종학을 전공하고 있다.
-벼 심기, 옥수수 심기의 달인. 출중한 외모로 인해 *중구 얼짱*이라는 별칭을 획득.
+출중한 외모로 인해 *중구 얼짱*이라는 별칭을 획득.
 [@keedi][twitter-keedi]와 기고 여부를 걸고 다트 내기를 했으나 현실은 기고.
 [프로필][profile-ascendo]
 
@@ -28,9 +28,8 @@ NCBI는 미국 보건성 산하의 국립 의학 도서관의 운영 분야중 �
 의학 생명 과학 논문 인덱스 데이터 베이스와 유전체 서열 데이터베이스 등
 각종 생명 공학 정보들을 담고 있으며 이와 관련있는 분석도구를 보유하고 있습니다.
 
-*그림 1.* NCBI 홈페이지 [(원본)][img-01-original]
 ![NCBI 홈페이지][img-01]
-
+*그림 1.* NCBI 홈페이지 [(원본)][img-01-original]
 
 또한 생물학적으로 중요한 분자의 구조와 기능을 분석하기 위한
 컴퓨터 정보 처리 기술 연구와 수학적, 전산학적 방법을 사용한
@@ -100,8 +99,8 @@ E-fetch를 이용해서 결과를 출력합니다.
 Entrez 검색 결과에서 PubMed 카테고리를 선택했을 때
 결과 화면은 다음과 같습니다.
 
-*그림 2.* NCBI PubMed에서 키워드 rice로 검색한 결과 [(원본)][img-02-original]
 ![NCBI PubMed에서 키워드 rice로 검색한 결과][img-02]
+*그림 2.* NCBI PubMed에서 키워드 rice로 검색한 결과 [(원본)][img-02-original]
 
 
 
@@ -484,8 +483,8 @@ E-search에서 E-fetch를 거쳐서 나온 결과를 재구성하는
 놀랍게도 생명 정보학의 친구(?) 엑셀에서 아주 잘 보입니다!
 200여줄 남짓한 코드인만큼 코드 분석은 여러분에게 맡기겠습니다. :-)
 
-*그림 3.* 검색 결과를 엑셀에서 열람한 화면 [(원본)][img-03-original]
 ![검색 결과를 엑셀에서 열람한 화면][img-03]
+*그림 3.* 검색 결과를 엑셀에서 열람한 화면(PMID, 제목, 저자, 날짜 저널, 초록) [(원본)][img-03-original]
 
 
 
@@ -523,7 +522,7 @@ Perl을 소개할 좋은 기회라서 특별히 [NCBI E-utility][ncbi-eutility]�
 
 [img-01-original]:      2011-12-05-1.png
 [img-02-original]:      2011-12-05-2.png
-[img-03-original]:      3011-13-05-3.png
+[img-03-original]:      2011-13-05-3.png
 
 [blast]:                http://blast.ncbi.nlm.nih.gov/Blast.cgi
 [google-scholar]:       http://scholar.google.com

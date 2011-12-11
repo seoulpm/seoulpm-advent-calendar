@@ -25,6 +25,9 @@
   <script type="text/javascript" src="shBrushCpp.js"></script>
   <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
+% unless ( $global->{location} ) {
+  <script type="text/javascript" src="calendar.js"></script>
+% }
   <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css"></script>
   <link type="text/css" rel="stylesheet" href="shCore.css">
   <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">

@@ -181,6 +181,12 @@ body {
     margin-bottom: 6px;
     font-size: 24px;
 }
+#cont h3 {
+    padding: 6px 10px 10px 10px;
+    margin-top: 20px;
+    margin-bottom: 6px;
+    font-size: 20px;
+}
 #cont-main p, #cont-main ul {
     line-height: 180%;
     margin-bottom: 20px;
