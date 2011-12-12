@@ -1,0 +1,304 @@
+Title:   웹툰을 한 눈에 내 만화 프로젝트 Manaba
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   rumidier
+
+저자
+-----
+
+[@rumidier][twitter-rumidier] -
+충남 서산 출신의 야생마 @keedi님에 품에 스스로 안겨 펄 채찍을 맞고 있다.
+silex내에서 밥과 음료를 흡입하며 사막화에 앞장서고 있다....
+
+
+시작하며
+---------
+
+바쁜 일상 속에 즐겨 보던 웹툰은 어디까지 보았는지 기억도 나지 않고 사장님 눈치는 보이고
+웹툰이 나왔나 오매 불망 각종 사이트를 뒤적 거려 보지만 돌아오는건 사나운 눈초리........
+누구보다 빠르게 남들과는 다르게 웹툰을 보고 싶다는 마음을 가지고 내만화만 따로 만들어
+보겠습니다.
+
+
+내 만화의 시작을 알리는 설정 파일 찾아 보기
+-------------------
+
+- [CPAN의 Web::Scraper 모듈][cpan-web-scraper]
+- [CPAN의 YAML::Tiny 모듈][cpan-yaml-tiny]
+- [CPAN의 URI 모듈][cpan-uri]
+
+`manada.yml`을 만드는 작업이 필요 합니다.
+각 웹툰의 경로는 포탈 사이트 마다 다르기 때문에 직접 수집 할수 밖에 없었습니다.
+
+[Daum웹툰][daum-web]은 특정 한회의 경로만 잡아 주어도 웹툰의 모든 정보를 가져 올수 있습니다.
+
+    #!perl
+    daum => scraper {
+        process(
+            'div.episode_list > div.inner_wrap > div.scroll_wrap > ul > li', 'items[]',
+            scraper {
+                process 'a.img', link  => '@href';
+                process 'a.img', title => '@title';
+    	    }
+       );
+    },
+
+
+[nate웹툰][nate-web]네이트의 웹툰 들은 select box로 각 회차를 구분하기 때문에
+특정 회차의 주소만 있다면 모두 읽어 올수 있었습니다. 다만 daum 과 틀린점은 
+http://comics.nate.com/webtoon/detail.php?btno=31337 고유ID(31337 구두 웹툰을 의미함)
+가 존재 하지만 회차간 번호는 무작위라는 것입니다.
+
+    #!perl
+    nate => scraper {
+        process(
+            'div.wrap_carousel div.thumbPage div.thumbSet dd', 'items[]',
+            scraper {
+                process 'a',   link  => '@href';
+                process 'img', title => '@alt';
+            }
+       );
+    },
+
+[naver][naver-web] 생각 했던것과는 다르게 가장 힘들었던것 같습니다 다른 사이트와는
+다르게 장편도 많았고 , 장편이 많은 만큼 신경 써야 할 부분도 더 많았습니다. 10페이지가 넘어가면
+다음 페이지로 잘 안넘어 가는 현상 탓에 초기 페이지에 최신만 읽어 들이기로 결정했습니다. 친절하게
+고유 아이디와 신작 아이디만 알고 있다면 긁어 오지 않아도 작성이 가능하다는것 입니다. for ( 1 .. 최신 )
+(대형 포털 답게 많은 웹툰량과 많은 제한 사항이 있다는걸 알았습니다.)
+
+    #!perl
+    naver => scraper {
+        process(
+            'table.viewList tr td.title', 'items[]',
+            scraper {
+                process 'a', link => '@href';
+            }
+        );
+    },
+
+정보들을 읽어 들이기 위해 설정 파일을 읽어 주게 됩니다.
+
+    #!perl
+    sub load_manaba {
+        my $yaml = YAML::Tiny->read( config->{manaba} );
+        $CONFIG  = $yaml->[0];
+    }
+
+ NAVER는 괴로워..
+-------------
+
+거의다 작업이 끝나갈 무렵 네이버에 사진이 안뜨기 시작 했습니다
+네이버가 정책 적으로 막아 놨다는걸 알게 되었습니다. 그래서 메인 사진을
+링크가 아닌 다운하기로 변경 하였습니다.
+
+- [CPAN의 File::Path 모듈][cpan-file-path]
+- [CPAN의 File::Slurp 모듈][cpan-file-slurp]
+- [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
+
+아름답지는 않지만 사진을 저장한후 사용 합니다.
+뜻하지 않은  네이버의 폐해.....
+
+    #!perl
+    sub fetch_webtoon_image {
+       my $ua = Web::Scraper::user_agent;
+       return unless $ua;
+
+       return unless $CONFIG;
+
+       my $webtoons = $CONFIG->{webtoon};
+       return unless $webtoons;
+
+       make_path('public/images/webtoon');
+       for my $id ( keys %$webtoons ) {
+           my $file = "public/images/webtoon/$id";
+           next if -f $file;
+
+          my $response = $ua->get( $webtoons->{$id}{image} );
+          if ($response->is_success) {
+              write_file( $file, $response->content );
+        }
+    }
+
+Web::Scraper에 필요한 정보
+start_url은 준비가 되었으니 원하는 url값을 쭉쭉 가져온후 순서를 확인 하도록 합니다.
+
+    #!perl
+    sub update_nate_link {
+        my ( $id, @links ) = @_;
+    ...
+        my @chapters = sort {
+            my $page_no_a = 0;
+            my $page_no_b = 0;
+
+            $page_no_a = $1 if $a =~ m/^(\d+)$/;
+            $page_no_b = $1 if $b =~ m/^(\d+)$/;
+
+            $page_no_a <=> $page_no_b;
+        } map {
+            m{viewer/(\d+)$};
+        } @links;
+    ....
+    }
+
+    sub update_naver_link {
+        my ( $id, @links ) = @_;
+    ...
+        my @chapters = sort {
+            my $page_no_a = 0;
+            my $page_no_b = 0;
+
+            $page_no_a = $1 if $a =~ m/^(\d+)$/;
+            $page_no_b = $1 if $b =~ m/^(\d+)$/;
+
+            $page_no_a <=> $page_no_b;
+        } map {
+            m{no=(\d+)};
+        } @links;
+    }
+
+    sub update_daum_link {
+    my ( $id, @links ) = @_;
+    ....
+    my @chapters = sort {
+        my $page_no_a = 0;
+        my $page_no_b = 0;
+
+        $page_no_a = $1 if $a =~ m/^(\d+)$/;
+        $page_no_b = $1 if $b =~ m/^(\d+)$/;
+
+        $page_no_a <=> $page_no_b;
+    } map {
+        m{bsno=(\d+)$};
+    } @links;
+    .....
+    }
+
+
+    ($webtoon->{$id}{first} = sprintf( $webtoon_url, $webtoon->{$id}{code}, 1 );)
+    네이버 예외.....
+    $webtoon->{$id}{first} = sprintf( $webtoon_url, $webtoon->{$id}{code}, $chapters[0] );
+    $webtoon->{$id}{last}  = sprintf( $webtoon_url, $webtoon->{$id}{code}, $chapters[-1] );
+
+
+내가 원하는 웹툰의 첫주소도 알고 마지막 주소도 알며 사진도 있다!!1 이제 눈에
+보이게만 하면 내 만화들을 쉽게 모아 볼수 있게 됩니다~!
+
+- [Dancer By amoc][amoc-2011-12-06]
+- [CPAN의 Dancer 모듈][cpan-dancer]
+
+`Web::Scraper`를 사용 하기 때문에 sleep 을 적절하게 배치해 주지 않는다면 아이피가 블럭 당할수도 있습니다.
+새로운 창을 뛰우거나 리다이렉트가 반복 되는 경우가 생길 수도 있으므로 update_all 함수와 update 함수를 따로
+만들도록 하고 all함수는 시작전 한번과 선택 할때만 할수 있도록 합니다.
+
+
+    #!perl
+    sub update_all {
+        my $webtoons = $CONFIG->{webtoon};
+
+        for my $id ( keys %$webtoons ) {
+            update($id);
+        }
+    }
+
+웹툰의 양이 많으면 많을 수록 시간이 많이 걸리기 때문에 update_all 함수를 자주 호출 할수는 없는 노릇입니다.
+그렇게 해서 만들어진 선택적 갱신 버튼을 추가 합니다.
+
+    #!perl
+    get '/update/:id?' => sub {
+        my $id = param('id');
+
+        if ($id) {
+            update($id);
+        }
+        else {
+            update_all();
+        }
+
+        redirect '/';
+    };
+
+    sub update {
+        my $id = shift;
+
+        return unless $id;
+
+        my $webtoon = $CONFIG->{webtoon};
+        return unless $webtoon;
+
+        my $site_name = $webtoon->{$id}{site};
+        return unless $site_name;
+
+        my $scraper = $SCRAPERS->{ $site_name };
+        return unless $scraper;
+
+        my $site = $CONFIG->{site};
+        return unless $site;
+
+        my $start_url = sprintf(
+            $site->{ $site_name }{ 'start_url' },
+            $webtoon->{$id}{ 'code' },
+        );
+
+        my $items = $scraper->scrape( URI->new( $start_url ) )->{items};
+        my @links = map { $_->{link} } @$items;
+
+        given ( $site_name ) {
+            update_daum_link($id, @links)  when 'daum';
+            update_naver_link($id, @links) when 'naver';
+            update_nate_link($id, @links)  when 'nate';
+        }
+    }
+
+준비는 이제 끝났습니다 dancer에 올려 주기만 하면 되지만 특징 없는 나열은
+나열은 아름 답지 않으므로 정렬을 하겠습니다
+`Manaba.pm`
+
+    #!perl
+    get '/' => sub {
+        my $webtoon = $CONFIG->{webtoon};
+
+        my @items = map {
+            my $item = $webtoon->{$_};
+
+            $item->{id}    = $_;
+            $item->{first} = q{} unless $item->{first};
+            $item->{last}  = q{} unless $item->{last};
+
+            $item;
+        } sort keys %$webtoon;
+
+        my $ptr = 0;
+        my @rows;
+        while ( $items[$ptr] ) {
+            my @cols;
+            for my $i ( 0 .. 9 ) {
+                last unless $items[$ptr];
+                push @cols, $items[$ptr];
+                ++$ptr;
+            }
+            push @rows, \@cols;
+        }
+
+        template 'index' => {
+            rows => \@rows,
+        };
+    };
+
+
+
+[cpan-web-scraper]:    https://metacpan.org/module/Web::Scraper
+[cpan-yaml-tiny]:   https://metacpan.org/module/YAML::Tiny
+[cpan-uri]:    https://metacpan.org/module/URI
+[cpan-file-path]:   https://metacpan.org/module/File::Path
+[cpan-file-slurp]:  https://metacpan.org/module/File::Slurp
+[cpan-lwp-useragent]:    http://search.cpan.org/~gaas/libwww-perl-6.03/lib/LWP/UserAgent.pm
+[amoc-2011-12-06]:        http://advent.perl.kr/2011/2011-12-06.html
+[cpan-dancer]: https://metacpan.org/module/Dancer
+[daum-web]:    http://cartoon.media.daum.net/webtoon/
+[nate-web]:    http://comics.nate.com/webtoon/index.php?category=1
+[naver-web]:   http://comic.naver.com/webtoon/weekday.nhn
+
+
+[cpan]:                 http://www.cpan.org/
+[twitter-rumidier]:        http://twitter.com/#!/rumidier
