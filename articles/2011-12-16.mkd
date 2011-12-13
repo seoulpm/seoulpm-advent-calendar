@@ -225,7 +225,7 @@ smartcd
 [local_lib_home]: http://search.cpan.org/~apeiron/local-lib-1.008004/lib/local/lib.pm
 [smartcd_home]: https://github.com/cxreg/smartcd
 
-[perlbrewinstall]: perlbrewinstall.png
-[check_perl_install]: check_perl_install.png
-[init_local_lib]: init_local_lib.png
-[switch_perl_version]: switch_perl_version.png
+[perlbrewinstall]: 2011-12-16-1.png
+[check_perl_install]: 2011-12-16-2.png
+[init_local_lib]: 2011-12-16-3.png
+[switch_perl_version]: 2011-12-16-4.png
