@@ -1,7 +1,14 @@
-How to Use CPAN, Actually
-==========================
+Title:    How to Use CPAN, Actually
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   y0ngbin
 
- - Wed Feb 10 17:24:13 KST 2010 : 최초 작성 by [@y0ngbin](http://twitter.com/y0ngbin)
+저자
+-----
+
+[@y0ngbin](twitter-y0ngbin)
+
 
 시작하며
 --------
@@ -292,6 +299,8 @@ We Want You!
 
 감사합니다.
 
+
+[twitter-y0ngbin]: http://twitter.com/y0ngbin
 [cpan]:http://search.cpan.org/
 [perltester]:http://www.cpantesters.org/
 [file-map]:http://www.cpantesters.org/distro/F/File-Map.html
