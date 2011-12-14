@@ -1,4 +1,4 @@
-Title:    미정
+Title:    크리스마스 애인 만들기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
