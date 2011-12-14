@@ -26,7 +26,11 @@
 %           my $tb = $global->{tree_ball}->($day);
             <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
               <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')">
+                  <span>
+                  <% $global->{korean_day}->($day) %> 날: <a href="<% $article->atom_id %>"><% $article->title . " - by " . $article->author %></a>
+                  </span>
+                </div>
               </a>
             </li>
 %         }
@@ -34,7 +38,11 @@
 %           my $tb = $global->{tree_ball}->($day);
             <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
               <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')">
+                  <span>
+                  <% $global->{korean_day}->($day) %> 날: <a href="<% $article->atom_id %>"><% $article->title . " - by " . $article->author %></a>
+                  </span>
+                </div>
               </a>
             </li>
 %         }
