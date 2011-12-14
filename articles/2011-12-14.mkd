@@ -82,29 +82,28 @@ _네, 그렇습니다._ 이제는 혼자서도 잘 노는 아이가 되어야 �
 고스트(Shiolink Perl)의 구성
 ---------------------------
 
-### 파일 구성
+Shiolink는 C:\\...\\ghost\\Shiolink\_Perl\_Simple\\ghost 이하에 구성된 파일을 통해 구동됩니다.
+먼저, 각 펄 스크립트들이 어떤 역할을 하는지 설치된 파일의 구성을 알아봅시다.
 
-우선 각 perl 스크립트들이 어떤 역할을 하는지 알아봅시다.
+    #!plain
+    C:\...\ghost\Shiolink_Perl_Simple\ghost 
+      licenses      --> StrawberryPerl 재배포 라이센스
+      perl/         --> perl 본체와 Perl 라이브러리
+      scripts/      --> 책갈피를 구성하는 스크립트
+         | init.pl   -> SHIOLINK에서 시작되는 스크립트
+         | shiori.pl -> SHIORI 응답 간단한 구현
+         | events.pl -> 각 이벤트 처리의 정의
+         | (kis_lesser.txt) -> events.pl 구현 예제의 테스트 데이터
+      descript.txt 
+      SHIOLINK.dll  --> shiori.dll 대체
+      SHIOLINK.INI  --> SHIOLINK 설정 파일
+      test.bat      --> 디버깅용
+      test_req.txt  --> 디버깅용
 
-ghost / master 안에있는 파일
+이중에서 우리의 입맛대로 고치기 위해 필요한 것은 **events.pl**뿐입니다.
 
-     licenses / StrawberryPerl 재배포 라이센스
-     perl/perl 본체와 Perl 라이브러리
-     scripts / + 책갈피를 구성하는 스크립트
-             | init.pl SHIOLINK에서 시작되는 스크립트
-             | shiori.pl SHIORI 응답 간단한 구현
-             | events.pl 각 이벤트 처리의 정의
-             | (kis_lesser.txt) events.pl 구현 예제의 테스트 데이터
-     descript.txt 
-     SHIOLINK.dll shiori.dll 대체
-     SHIOLINK.INI SHIOLINK 설정 파일
-     test.bat 디버깅용
-     test_req.txt 디버깅용
-
-이중에서 유저의 입맛대로 고치기 위해 필요한 것은 **events.pl**뿐입니다.
-
-events.pl에서 불려지는 이벤트중 가장 대표적인건 OnSecondChange인데 이것은 초마다 호출되는 함수입니다.
-ShioriPerl의 경우 이 함수가 60번(즉, 60초) 호출될때 OnAITalk를 불러 저장된 문장을 랜덤하게 출력하는 방식입니다.
+events.pl에서 불려지는 이벤트중 가장 대표적인 것은 `OnSecondChange`인데 이것은 초마다 호출되는 함수입니다.
+ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 호출해 저장된 문장을 무작위로 출력하는 방식으로 구동됩니다.
 
 
 
