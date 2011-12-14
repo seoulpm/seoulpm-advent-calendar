@@ -182,14 +182,16 @@ init.pl를 열어 맨 위에 있는
 * [SSP - Nanika Wiki][11]
 
 
-  [1]: 1.jpg
-  [2]: 2.jpg
-  [3]: http://narazaka.net/c/ukagaka
-  [4]: 3.jpg
-  [5]: 4.jpg
-  [6]: 5.jpg
-  [7]: http://cafe.naver.com/naniko.cafe
-  [8]: http://moonmelody.com/tt/363
-  [9]: http://abilral.egloos.com/5383781125
-  [10]: http://moonmelody.com/tt/entry/SSP-%EC%8B%9C%EC%9E%91-%EB%A7%A4%EB%89%B4%EC%96%BC?category=35
-  [11]: http://www.sanori.net/nanika/wiki/SSP92125125
+[twitter-nving]: http://twitter.com/nving
+[ssp]: http://ssp.shillest.net/
+[img-01]: 2011-12-14-1.jpg
+[img-02]: 2011-12-14-2.jpg
+[img-03]: 2011-12-14-3.jpg
+[img-04]: 2011-12-14-4.jpg
+[img-05]: 2011-12-14-5.jpg
+[3]: http://narazaka.net/c/ukagaka
+[7]: http://cafe.naver.com/naniko.cafe
+[8]: http://moonmelody.com/tt/363
+[9]: http://abilral.egloos.com/5383781125
+[10]: http://moonmelody.com/tt/entry/SSP-%EC%8B%9C%EC%9E%91-%EB%A7%A4%EB%89%B4%EC%96%BC?category=35
+[11]: http://www.sanori.net/nanika/wiki/SSP92125125
