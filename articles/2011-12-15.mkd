@@ -86,9 +86,8 @@ Prima 모듈은 단순히 이미지 파일을 다루는 모듈이 아니라, 멀
 되었는데, Prima 모듈은 자체적으로 라이브러리를 제공하여 윈도우에서도 cpan 을
 통해 아주 간단히 컴파일 및 설치가 되었기 때문입니다.
 
-<code>
-c:\> cpan Prima
-</code>
+    #!plain
+    c:\> cpan Prima
 
 위와 같이 하면 Prima 모듈과, Prima에서 외부 이미지 처리를 위해 사용되는
 Prima::codecs::win32 또는 Prima::codecs::win64 모듈이 설치됩니다.
@@ -105,9 +104,10 @@ Prima::codecs::win32 또는 Prima::codecs::win64 모듈이 설치됩니다.
 * Prima 자체는 Prima 홈페이지에서 바이너리 배포를 하고 있으니 
 http://prima.eu.org/download/bindist.html 여기서 자신의 환경에 맞는 압축파일을
 다운로드한 후 압축을 풀고 압축을 푼 디렉토리에 들어가서
-<code>
-perl ms_install.pl
-</code>
+
+    #!plain
+    c:\> perl ms_install.pl
+
 명령으로 설치합니다.
 
 
@@ -118,31 +118,30 @@ Prima 코드 예제
 여기서 사용된 코드는 Prima::Image 문서에 주로 나와 있습니다. 아래에 몇가지
 함수의 예를 정리하였습니다.
 
-<code>
-use Prima;
-
-# "0.bmp"를 읽음
-my $image = Prima::Image->load('0.bmp');
-die "$@" unless $image;
-
-# 이미지의 가로와 세로 길이를 얻어냄
-# 만일 width(10) 처럼 setter 로 사용할 경우 그림이 확대 또는 축소된다.
-print "Width : ", $image->width(), "\n";
-print "Height: ", $image->height(), "\n";
-
-# 가로10, 세로5 좌표 픽셀의 컬러값을 얻음
-# 이 때 그림의 좌측 하단이 (0,0)이다.
-printf "%06x", $image->pixel(10, 5);
-
-# 5,0 자리 픽셀의 컬러를 지정
-$image->pixel(5, 0, 0x00ff00);
-
-# 일부 추출 (x오프셋, y오프셋, 폭, 높이)
-my $newimage = $image->extract(5, 0, 12, 2);
-
-# 저장
-$newimage->save('01.bmp');
-</code>
+    #!perl
+    use Prima;
+    
+    # "0.bmp"를 읽음
+    my $image = Prima::Image->load('0.bmp');
+    die "$@" unless $image;
+    
+    # 이미지의 가로와 세로 길이를 얻어냄
+    # 만일 width(10) 처럼 setter 로 사용할 경우 그림이 확대 또는 축소된다.
+    print "Width : ", $image->width(), "\n";
+    print "Height: ", $image->height(), "\n";
+    
+    # 가로10, 세로5 좌표 픽셀의 컬러값을 얻음
+    # 이 때 그림의 좌측 하단이 (0,0)이다.
+    printf "%06x", $image->pixel(10, 5);
+    
+    # 5,0 자리 픽셀의 컬러를 지정
+    $image->pixel(5, 0, 0x00ff00);
+    
+    # 일부 추출 (x오프셋, y오프셋, 폭, 높이)
+    my $newimage = $image->extract(5, 0, 12, 2);
+    
+    # 저장
+    $newimage->save('01.bmp');
 
 
 
@@ -153,111 +152,109 @@ $newimage->save('01.bmp');
 실제로 완성된 코드입니다. 위 아이디어를 그대로 코드로 옮긴 형태라서, 개선의 여지가 많을 것 같습니다.
 자세한 설명은 코드에 있는 주석을 참고하시면 될 것 같습니다.
 
-<code>
-#!perl
-#
-# 실행:
-# extract_photo.pl 파일명
-#
-# 파일을 열어서 내부에 포함된 사진들을 추출하여 개별 파일로 저장함
-#
-# Raymundo ( twitter: @gypark )
-# 2011.12.11
-#
-use strict;
-use warnings;
-use Prima;
-
-# 파일명을 명령행 인자로 받고 이름과 확장자 분리
-my $filename = $ARGV[0];
-my ( $basename, $suffix ) = $filename =~ /(.+)\.([^.]*)$/;
-
-# 파일을 로드
-my $image = Prima::Image->load( $filename );
-die "can't load [$filename]: $@" unless $image;
-
-# 제일 귀퉁이의 색상이 배경색이라고 가정
-my $background = $image->pixel(0, 0);
-
-
-# 먼저 세로방향으로 진행하며 사진 조각 추출
-
-my @pieces;         # 추출되는 이미지 조각의 배열
-my $outside = 1;    # 현재 스캔하는 가로 라인이 배경인지 아닌지 체크
-my $y1;             # 사진이 시작되는 y좌표를 저장하기 위한 임시 변수
-foreach my $y ( 0 .. $image->height() - 1 ) {
-    if ( not same_color_horizon( $image, $y, $background ) ) {
-        if ( $outside ) {
-            # 배경에서 배경이 아닌 라인으로 처음 진입할 때 y좌표 기록
-            $y1 = $y;
-            $outside = 0;
-        }
-    }
-    else {
-        if ( not $outside ) {
-            # 배경이 아닌 라인에서 배경 라인으로 나가는 시점에서 이미지 조각 추출
-            push @pieces, $image->extract( 0, $y1, $image->width(), $y - $y1 );
-            $outside = 1;
-        }
-    }
-}
-
-
-# 이 시점에서, @pieces 에는 사진 조각들이 저장되어 있음
-# 각 조각에 대해서, 이번에는 가로 방향으로 진행하면서 좌우의 배경을 떼어낸다
-
-my $count = 1;  # 저장할 때 파일이름에 번호를 붙이기 위한 카운터
-foreach my $piece ( @pieces ) {
-    my $outside = 1;
-    my $x1;             # 사진이 시작되는 x좌표를 저장하기 위한 임시 변수
-    foreach my $x ( 0 .. $piece->width() - 1 ) {
-        if ( not same_color_vertical( $piece, $x, $background ) ) {
+    #!perl
+    #
+    # 실행:
+    # extract_photo.pl 파일명
+    #
+    # 파일을 열어서 내부에 포함된 사진들을 추출하여 개별 파일로 저장함
+    #
+    # Raymundo ( twitter: @gypark )
+    # 2011.12.11
+    #
+    use strict;
+    use warnings;
+    use Prima;
+    
+    # 파일명을 명령행 인자로 받고 이름과 확장자 분리
+    my $filename = $ARGV[0];
+    my ( $basename, $suffix ) = $filename =~ /(.+)\.([^.]*)$/;
+    
+    # 파일을 로드
+    my $image = Prima::Image->load( $filename );
+    die "can't load [$filename]: $@" unless $image;
+    
+    # 제일 귀퉁이의 색상이 배경색이라고 가정
+    my $background = $image->pixel(0, 0);
+    
+    
+    # 먼저 세로방향으로 진행하며 사진 조각 추출
+    
+    my @pieces;         # 추출되는 이미지 조각의 배열
+    my $outside = 1;    # 현재 스캔하는 가로 라인이 배경인지 아닌지 체크
+    my $y1;             # 사진이 시작되는 y좌표를 저장하기 위한 임시 변수
+    foreach my $y ( 0 .. $image->height() - 1 ) {
+        if ( not same_color_horizon( $image, $y, $background ) ) {
             if ( $outside ) {
-                # 배경에서 배경이 아닌 라인으로 처음 진입할 때 x좌표 기록
-                $x1 = $x;
+                # 배경에서 배경이 아닌 라인으로 처음 진입할 때 y좌표 기록
+                $y1 = $y;
                 $outside = 0;
             }
         }
         else {
             if ( not $outside ) {
                 # 배경이 아닌 라인에서 배경 라인으로 나가는 시점에서 이미지 조각 추출
-                my $photo = $piece->extract( $x1, 0, $x - $x1, $piece->height() );
+                push @pieces, $image->extract( 0, $y1, $image->width(), $y - $y1 );
                 $outside = 1;
-                # 추출한 조각을 파일로 저장
-                # 저장하는 이름은 "원본사진이름_두자리숫자.원본사진확장자"
-                my $photoname = sprintf( "%s_%02d.%s", $basename, $count++, $suffix );
-                $photo->save($photoname) or die "$@";
-                print "* [$photoname] saved\n";
             }
         }
     }
-}
-
-
-# 그림 객체 $img 와 세로좌표 $y 를 인자로 받아서
-# 세로좌표 $y에 해당하는 가로선이 전부 동일한 색상 $color인지 여부를 반환
-sub same_color_horizon {
-    my ( $img, $y, $color ) = @_;
-
-    foreach my $x ( 0 .. $img->width() - 1 ) {
-        return 0 if ( $img->pixel($x, $y) != $color );
+    
+    
+    # 이 시점에서, @pieces 에는 사진 조각들이 저장되어 있음
+    # 각 조각에 대해서, 이번에는 가로 방향으로 진행하면서 좌우의 배경을 떼어낸다
+    
+    my $count = 1;  # 저장할 때 파일이름에 번호를 붙이기 위한 카운터
+    foreach my $piece ( @pieces ) {
+        my $outside = 1;
+        my $x1;             # 사진이 시작되는 x좌표를 저장하기 위한 임시 변수
+        foreach my $x ( 0 .. $piece->width() - 1 ) {
+            if ( not same_color_vertical( $piece, $x, $background ) ) {
+                if ( $outside ) {
+                    # 배경에서 배경이 아닌 라인으로 처음 진입할 때 x좌표 기록
+                    $x1 = $x;
+                    $outside = 0;
+                }
+            }
+            else {
+                if ( not $outside ) {
+                    # 배경이 아닌 라인에서 배경 라인으로 나가는 시점에서 이미지 조각 추출
+                    my $photo = $piece->extract( $x1, 0, $x - $x1, $piece->height() );
+                    $outside = 1;
+                    # 추출한 조각을 파일로 저장
+                    # 저장하는 이름은 "원본사진이름_두자리숫자.원본사진확장자"
+                    my $photoname = sprintf( "%s_%02d.%s", $basename, $count++, $suffix );
+                    $photo->save($photoname) or die "$@";
+                    print "* [$photoname] saved\n";
+                }
+            }
+        }
     }
-
-    return 1;
-}
-
-# 그림 객체 $img 와 가로좌표 $x 를 인자로 받아서
-# 가로좌표 $x에 해당하는 세로선이 전부 동일한 색상 $color인지 여부를 반환
-sub same_color_vertical {
-    my ( $img, $x, $color ) = @_;
-
-    foreach my $y ( 0 .. $img->height() - 1 ) {
-        return 0 if ( $img->pixel($x, $y) != $color );
+    
+    
+    # 그림 객체 $img 와 세로좌표 $y 를 인자로 받아서
+    # 세로좌표 $y에 해당하는 가로선이 전부 동일한 색상 $color인지 여부를 반환
+    sub same_color_horizon {
+        my ( $img, $y, $color ) = @_;
+    
+        foreach my $x ( 0 .. $img->width() - 1 ) {
+            return 0 if ( $img->pixel($x, $y) != $color );
+        }
+    
+        return 1;
     }
-
-    return 1;
-}
-</code>
+    
+    # 그림 객체 $img 와 가로좌표 $x 를 인자로 받아서
+    # 가로좌표 $x에 해당하는 세로선이 전부 동일한 색상 $color인지 여부를 반환
+    sub same_color_vertical {
+        my ( $img, $x, $color ) = @_;
+    
+        foreach my $y ( 0 .. $img->height() - 1 ) {
+            return 0 if ( $img->pixel($x, $y) != $color );
+        }
+    
+        return 1;
+    }
 
 
 
