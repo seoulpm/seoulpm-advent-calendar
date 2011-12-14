@@ -1,6 +1,10 @@
-제목:
+Title:    한 이미지 안에 들어있는 사진들 추출하기 - Prima 모듈
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
 
-한 이미지 안에 들어있는 여러 사진들 추출하기 - Prima 모듈
+
 
 
 저자:
