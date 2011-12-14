@@ -107,20 +107,17 @@ ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 �
 
 
 
-입맛대로 고쳐보자.
+입맛대로 고쳐보자
 ------------------
 
-나니카는 저장된 문자열만 말하는 좀 <s>덜떨어진</s>똑똑하지 못한 프로그램입니다.
-
-조금 똑똑하게 보이기 위해 특정 사이트의 리플을 긁어와서 매번 다른 말을 할수있도록 해봅시다.
-
-윈도우용 펄 패키지인 StrawberryPerl은 이미 설치되어 있다고 가정합니다.
-
-우선 CPAN 모듈을 사용하기 위한 준비를 합니다. 
+나니카는 저장된 문자열만 말하는 조금 <s>덜떨어진</s>똑똑하지 못한 프로그램입니다.
+조금 똑똑하게 보이기 위해 특정 사이트의 리플을 긁어와서 매번 다른 말을 할 수 있도록 해 봅시다.
+윈도우용 펄 패키지인 딸기 펄(Strawberry Perl)은 이미 설치되어 있다고 가정하겠습니다.
 
 ### lib 디렉토리 변경
 
-init.pl를 열어 맨 위에 있는 
+먼저 CPAN 모듈을 사용하기 위한 준비를 합니다. 
+`init.pl`를 열어 가장 윗 줄에 있는 
 
     #!perl
     our @INC = ('./perl/lib');
@@ -132,55 +129,48 @@ init.pl를 열어 맨 위에 있는
                 'C:\\strawberry\\perl\\site\\lib', 
                 'C:\\strawberry\\perl\\vendor\\lib');
 
-이렇게 고침으로 library 참조 디렉토리를 cpan이 설치된 곳으로 변경이 가능합니다.
+이렇게 고치면 모듈 참조 디렉터리를 CPAN 모듈이 설치된 곳으로 변경됩니다.
+이제 CPAN 모듈을 사용할 수 있게 되었으니 모듈을 이용해 댓글을 가져와 봅시다.
 
-이제 CPAN 모듈 사용이 가능해졌으니 모듈을 이용해 리플을 얻어와 봅니다.
+### 댓글 가져오기
 
-### 리플 따오기
+여기서는 최근 싱크빅 돋는 댓글이 자주 달리는 [오유][todayhumor]의 댓글을 가져올 것입니다.
+우선 웹사이트를 긁어오기 위해 [Web::Query][cpan-webquery] CPAN 모듈을 설치합니다.
 
-여기서는 최근 싱크빅 돋는 리플이 자주 달리는 오유의 리플을 가져올 것입니다.
-
-우선 웹사이트를 긁어오기위해 cpan 모듈인 Web::Query를 설치합니다.
-
-    #!perl
+    #!bash
     cpan Web::Query
 
-설치 후 event.pl의 첫부분에 모듈을 추가합니다.
+설치 후, event.pl의 윗 줄에 다음 두 모듈을 추가합니다.
 
     #!perl
     use Web::Query;
+    use List::Util qw(shuffle);
 
-그리고 event.pl 에 다음 함수를 추가합니다.
+그리고 event.pl에 다음 함수를 추가합시다.
 
     #!perl
     sub getTodayHumorReply {
-        my $URL = 'http://todayhumor.co.kr/board/view.php?kind=&ask_time=&search_table_name=&table=bestofbest&no='.int\
-    (rand(60000));
-
+        my $URL = 'http://todayhumor.co.kr/board/view.php'.
+                  '?kind=&ask_time=&search_table_name=&table=bestofbest&no='.int(rand(60000));
         my @replys;
+        
         # 해당 URL에 있는 리플 추출
-        wq($URL)
-            ->find('div[class="memo_content"]')
-            ->each( sub {
+        wq($URL)->find('div[class="memo_content"]')
+                ->each( sub {
                         my $i = shift;
-
                         push @replys, $_->text;
                     }
                 );
 
-
         # 추출한 리플중 무작위로 선택
-        my $sel_reply = $replys[int(rand($#replys))];
+        my ($sel_reply) = shuffle @replys;
         chomp $sel_reply;
         return $sel_reply;
     }
 
-이제 기존 AI 대화를 추출한 리플로 나오게 바꿔야됩니다.
-
-기존 구조는 OnAITalk 에서 speak 함수 호출 후 반환되는 값을 출력해줍니다.
-
-즉 speak를 getGaedripReply로 대체하면 됩니다.
-
+이제 기존 AI 대화 로직을 오늘의유머에서 추출한 댓글을 말하도록 바꾸어야합니다.
+기존 구조는 OnAITalk 함수에서 speak 함수를 호출 후 반환되는 값을 출력했습니다.
+따라서, 단순히 speak 함수를 getGaedripReply 함수로 대체하면 됩니다.
 아래와 같은 원본을
 
     #!perl
@@ -196,7 +186,6 @@ init.pl를 열어 맨 위에 있는
         $aitalkcount = 0;
         return getTodayHumorReply();
     }
-
 
 
 결과를 보자
