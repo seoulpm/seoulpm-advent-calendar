@@ -1,3 +1,8 @@
+Title:    미정
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   nving
 
 
 # 개요
