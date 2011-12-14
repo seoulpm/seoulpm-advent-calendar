@@ -8,7 +8,7 @@ Author:   nving
 저자
 -----
 
-[@nving][twitter-nving] - 
+[@nving][twitter-nving] - 치킨과 맥주를 사랑하는 솔로 덕후. 흑법사의 길을 걷고 있다. C++ 굇수.
 
 
 
