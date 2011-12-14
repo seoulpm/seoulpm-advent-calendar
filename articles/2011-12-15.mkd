@@ -9,9 +9,9 @@ Author:   gypark
 저자
 ----
 
-트위터 @gypark
-홈페이지 http://gypark.pe.kr/wiki/Perl
-네이버 Perl 카페 회원
+[@gypark][twitter-gypark] - 
+개인 자료라고 믿기 어려울 정도의 방대한 Perl 자료를
+제공하고 있는 [gypark.pe.kr][wiki-gypark]의 주인장, Raymundo라는 닉을 사용하기도 한다. 네이버 Perl 카페 회원
 
 
 
@@ -305,6 +305,9 @@ Prima 코드 예제
 다른 분들의 글들에 비하면 참신한 내용도 깊이 있는 내용도 아니어서
 부끄럽습니다만, 도움이 되면 좋겠습니다. 감사합니다.
 
+
+[twitter-gypark]: http://twitter.com/gypark
+[wiki-gypark]: http://gypark.pe.kr/wiki/Perl
 
 [img-01]: 2011-12-15-1.png
 [img-02]: 2011-12-15-2.png
