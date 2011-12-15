@@ -10,6 +10,7 @@
   <meta property="og:url" content="<% $page_uri %>" />
   <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
   <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
+  <link rel="alternate" type="application/atom+xml" title="2011 Seoul.pm 펄 크리스마스 달력 - Atom" href="http://advent.perl.kr/2011/atom.xml" />
 
   <!-- Syntax Highlighter -->
   <script type="text/javascript" src="shCore.js"></script>
