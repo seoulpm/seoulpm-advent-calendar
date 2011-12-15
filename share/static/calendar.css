@@ -83,6 +83,12 @@ body {
     font-size: 12px;
     width: 180px;
 }
+#menu li.buttons {
+    margin-top: 19px;
+}
+#menu li.buttons img {
+    padding: 0 9px;
+}
 #tree {
     z-index: 1;
     position: relative;
