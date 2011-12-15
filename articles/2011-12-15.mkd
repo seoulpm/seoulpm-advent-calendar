@@ -311,15 +311,16 @@ Prima 모듈은 멀티 플랫폼 GUI 개발 툴킷입니다.
 참고 문서
 ---------
 
-* [Prima Homepage][http://prima.eu.org/] - http://prima.eu.org/
-* [CPAN Prima][http://metacpan.org/module/Prima] - http://metacpan.org/module/Prima
-* [GyparkWiki][http://gypark.pe.kr/wiki/Perl/Prima] - http://gypark.pe.kr/wiki/Perl/Prima
+* [Prima Homepage][prima] - http://prima.eu.org/
+* [CPAN Prima][cpan-prima] - http://metacpan.org/module/Prima
+* [GyparkWiki][wiki-gypark-prima] - http://gypark.pe.kr/wiki/Perl/Prima
 
 
 
 
 [twitter-gypark]: http://twitter.com/gypark
 [wiki-gypark]: http://gypark.pe.kr/wiki/Perl
+[wiki-gypark-prima]: http://gypark.pe.kr/wiki/Perl/Prima
 
 [img-01]: 2011-12-15-1.png
 [img-02]: 2011-12-15-2.png
@@ -330,3 +331,5 @@ Prima 모듈은 멀티 플랫폼 GUI 개발 툴킷입니다.
 [cpan]: http://cpan.org/
 [cpan-prima]: http://metacpan.org/module/Prima
 [cpan-prima-image]: http://metacpan.org/module/Prima::Image
+
+[prima]: http://prima.eu.org/
