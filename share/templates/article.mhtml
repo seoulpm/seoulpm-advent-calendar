@@ -3,7 +3,9 @@
 <div id="wrap">
   <div id="head">
     <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <a class="prev" href="<% $prev ? $prev->date->ymd.'.html' : '#' %>">≪ 이전 날</a>
     <a class="back" href="<% $global->{base_uri} %>">↑달력으로 돌아가기</a>
+    <a class="next" href="<% $next ? $next->date->ymd.'.html' : '#' %>">다음 날 ≫</a>
   </div>
   <div id="cont-wrap">
     <h1><% $title %></h1>
