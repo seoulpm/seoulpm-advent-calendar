@@ -31,12 +31,14 @@ Author:   JEEN_LEE
 아마 그 다음이나 그 다음다음이 Model을 생성하는 것일 겁니다.
 대충 아래와 같은 커맨드에 길고 긴 옵션을 주면 스키마 클래스가 만들어 집니다.
 
+    #!bash
     $ ./script/myapp_web_create.pl model MyDB DBIC::Schema MyApp::Schema \
       create=static [options] dbi:mysql:test_db test_user test_password
 
 이렇게 해서 `test_db`라는 데이터베이스에 속한 테이블이 각각의 결과클래스가 생성될 것입니다.
 그 중 하나의 예를 들면 아래와 같습니다.
 
+    #!perl
     package MyApp::Schema::Result::Access;
 
     # Created by DBIx::Class::Schema::Loader
@@ -91,6 +93,7 @@ Author:   JEEN_LEE
 처음에 언급한 몇가지 룰이라는 것이 있습니다. 가장 중요한 것이 바로 *'하지말라고 하면 하지 않는다.'*입니다. 
 위의 코드 중 주석 부분의 글귀를 보면
 
+    #!perl
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E8XDlgZJWsPmqTw/xP34A
 
 라는 것이 있습니다. 여기의 `md5sum:8E8XDlgZJWsPmqTw/xP34A`는 해당 결과클래스의 코드들을
@@ -98,6 +101,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 추가로 해주어야 할 때에는 *반드시 이 문구 아래에서부터 코드를 적어나가도록* 합니다.
 이런식으로 말이죠.
 
+    #!perl
     ....
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E8XDlgZJWsPmqTw/xP34A
 
@@ -114,6 +118,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 위에서 입력한 스키마 클래스 생성 커맨드를 그대로 다시 실행합니다. 혹여나 이때 말을 안듣고,
 *저 문구* 위에 스페이스 하나라도 잘못 썼다가는 
 
+    #!bash
     $ ./script/myapp_web_create.pl model MyDB DBIC::Schema MyApp::Schema \
       create=static [options] dbi:mysql:test_db test_user test_password
     exists "/*/../lib/MyApp/Web/Model"
@@ -132,6 +137,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 자, 그럼 이 기본적인 틀 안에서 특정 컬럼을 다양한 컴포넌트 모듈을 사용해
 확장해가고 싶은 생각도 들기 시작하겠죠?
 
+    #!perl
     __PACKAGE__->load_components("InflateColumn::DateTime");
     ....
     __PACKAGE__->add_columns(
@@ -179,6 +185,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 그 외 여타 결과클래스들이 `ResultBase`를 상속받도록 합니다.
 `ResultBase`의 경우는 아래와 같습니다.
 
+    #!perl
     package MyApp::Schema::ResultBase;
     use Moose;
     use MooseX::NonMoose;
@@ -226,6 +233,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 설정 파일은 [Config::Any][cpan-config-any] 모듈로 처리되기에 펄에서 쓰이는 어떤 형식이라도
 다룰 수 있습니다. 심지어는 *펄 코드* 자신도 말이죠. 아래는 저의 `dbicdump` 설정 파일입니다.
 
+    #!perl
     {
         schema_class => "MyApp::Schema",
         connect_info => {
@@ -271,6 +279,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 [스타트업 속도 향상을 위해 권장되고 있습니다][dbic-cookbook-speed].
 
 
+    #!perl
     package MyApp::Schema::ResultBase;
     use Moose;
     use MooseX::NonMoose;
@@ -298,6 +307,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 
 위에서 정의한 설정파일을 `schema-loader-config.pl`이라는 파일로 지정하고
 
+    #!bash
     $ dbicdump schema-loader-config.pl
 
 위와같이 명령을 입력하면 이제부터는 좀 더 유연하게 스키마클래스를 덤프할 수 있게 됩니다.
