@@ -200,6 +200,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 
 그리고 결과 클래스에서 이 `ResultBase`를 상속합니다.
 
+    #!perl
     package MyApp::Schema::Result::Access;
     ....
     - extends 'DBIx::Class::Core';
@@ -208,6 +209,7 @@ MD5 체크섬 값으로서 코드의 변경 유무를 검사하고 있습니다.
 
 어, 그런데 뭔가 걸립니다.
 
+    #!perl
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E8XDlgZJWsPmqTw/xP34A
 
 맙소사 `ResultBase`를 상속하는 것조차도 이 문구위에 놓이게 되니 맘편히 고쳐놓을 수도
