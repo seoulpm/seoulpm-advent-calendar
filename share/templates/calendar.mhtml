@@ -1,4 +1,4 @@
-<& header.mhtml, global => $global, article => undef &>
+<& header.mhtml, global => $global, article => undef, year => $year &>
 <body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
@@ -8,7 +8,7 @@
       <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2011%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
     </menu>
     <menu id="menu">
-      <li class="nook"><a href="http://advent.perl.kr/2010/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
+      <li class="nook"><a href="http://advent.perl.kr/<% $year - 1 %>/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
       <li class="bold large"><a href="#openbook" class="scroller" onClick="perl_scroll('openbook')">&raquo; 펄 크리스마스 달력이란?</a></li>
       <& link.mhtml, global => $global &>
       <li class="margin"><p class="disc">우측의 크리스마스 화환에 하루에 하나씩 날짜가 적힌 장식구가 달립니다.</p></li>
