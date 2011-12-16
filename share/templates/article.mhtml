@@ -1,4 +1,4 @@
-<& header.mhtml, global => $global, article => $article &>
+<& header.mhtml, global => $global, article => $article, year => $year &>
 <body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
