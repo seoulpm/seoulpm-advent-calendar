@@ -135,10 +135,10 @@ ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 �
 ### 댓글 가져오기
 
 여기서는 최근 싱크빅 돋는 댓글이 자주 달리는 [오유][todayhumor]\(오늘의 유머)의 댓글을 가져올 것입니다.
-우선 웹사이트를 긁어오기 위해 [Web::Query][cpan-webquery] CPAN 모듈을 설치합니다.
+우선 웹사이트를 긁어오기 위해 명령 프롬프트에서 아래의 명령을 내려 [Web::Query][cpan-webquery] CPAN 모듈을 설치합니다.
 
-    #!bash
-    cpan Web::Query
+    #!plain
+    C:\> cpan Web::Query
 
 설치 후, event.pl의 윗 줄에 다음 두 모듈을 추가합니다.
 
