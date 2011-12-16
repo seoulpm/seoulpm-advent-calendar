@@ -12,29 +12,29 @@ Author:   JEEN_LEE
 시작하며
 ---------
 
-네, 저는 회사업무에서 Perl 의 대표적인 프레임워크인 [Catalyst][catalystframework] 를
+네, 저는 회사업무에서 Perl의 대표적인 프레임워크인 [Catalyst][catalystframework]를
 사용하고 있습니다. 여느 튜토리얼 문서에서의 기본 구성이라고 할 수 있는 
-[Catalyst][catalystframework] + [Template Toolkit][templatetoolkit] + [DBIx::Class][cpan-dbic] 를 사용하고 있습니다.
+[Catalyst][catalystframework] + [Template Toolkit][templatetoolkit] + [DBIx::Class][cpan-dbic]를 사용하고 있습니다.
 언제나 개발의 시작은 어떤 데이터를 어떤 구조로 유지하며 어떻게 사용하게끔 하느냐 하는
 틀을 만드는 것이려나요? 제 생각에는 그렇지 않을까 하는데...
 
 하지만 처음에 생각해서 마련한 틀은 *시간이 흐름에 따라*, *개발자 본인의 욕심에 따라*,
 *갑이나 경영진의 변덕스러운 요구사항에 따라* 바뀌기 마련일 겁니다.
-이런 과정에 있어서 [DBIx::Class][cpan-dbic] 의 이용에 몇가지 룰을 정하고 그걸 유지하면
+이런 과정에 있어서 [DBIx::Class][cpan-dbic]의 이용에 몇가지 룰을 정하고 그걸 유지하면
 스트레스 덜 받는 행복한 스키마 관리가 이뤄지지 않을까 생각합니다.
 
 
 스키마 클래스 생성
 ------------------
 
-여느 Catalyst 튜토리얼의 첫단락이 일단 `Hello World` 를 찍는 것이라면,
-아마 그 다음이나 그 다음, 다음이 Model 을 생성하는 것일 겁니다.
+여느 Catalyst 튜토리얼의 첫단락이 일단 `Hello World`를 찍는 것이라면,
+아마 그 다음이나 그 다음, 다음이 Model을 생성하는 것일 겁니다.
 대충 아래와 같은 커맨드에 길고 긴 옵션을 주면 스키마 클래스가 만들어 질 것입니다.
 
     $ ./script/myapp_web_create.pl model MyDB DBIC::Schema MyApp::Schema \
       create=static [options] dbi:mysql:test_db test_user test_password
 
-이렇게해서 `test_db` 라는 데이터베이스에 속한 테이블들이 각각의 결과클래스로 존재할 것입니다.
+이렇게해서 `test_db`라는 데이터베이스에 속한 테이블들이 각각의 결과클래스로 존재할 것입니다.
 그 중 하나의 예를 들면 아래와 같습니다.
 
     package MyApp::Schema::Result::Access;
@@ -94,7 +94,7 @@ Author:   JEEN_LEE
 
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E8XDlgZJWsPmqTw/xP34A
 
-라는 것이 있습니다. 여기에서 `md5sum:8E8XDlgZJWsPmqTw/xP34A` 에서 해당 결과클래스의 코드들을
+라는 것이 있습니다. 여기에서 `md5sum:8E8XDlgZJWsPmqTw/xP34A`에서 해당 결과클래스의 코드들을
 md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. 어떤 코드를 추가하거나 테이블 관계설정을
 추가로 해주어야 할 시에는 반드시 이 문구 아래에서부터 코드를 적어나가도록 합니다.
   이런식으로 말이죠.
@@ -161,8 +161,8 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
 
   자 그래서 일단 *그 문구* 위에 쓰지 말라고 했으니까 밑에다가 추가하고 싶은
 컴포넌트(TimeStamp)를 넣고, `created_on` 컬럼에 해당 컴포넌트의 동작을 발생시키는 
-속성값 `set_on_create` 를 추가합니다.
-  이렇게 추가한 코드는 SQL `INSERT` 문에 해당하는 액션이 발생했을 때에 자동으로
+속성값 `set_on_create`를 추가합니다.
+  이렇게 추가한 코드는 SQL `INSERT`문에 해당하는 액션이 발생했을 때에 자동으로
 `created_on` 값을 지정해주도록 합니다.
   위에서 아무리 `그 문구` 위에 쓰지말라고 했어도... 중복되는 코드를 매번 이렇게 
 적어야 된다니... 맙소사! 거기에 `created_on` 같은 경우에는 거의 뭐 대부분의 테이블에
@@ -175,10 +175,10 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
  `Access` 이외에 `Deny`, `User`, `Group` 등의 많은 결과클래스가 있다고 합시다.
 그리고 이 결과클래스들에 토씨하나 안틀리고 똑같은 메소드가 정의된다고 생각해봅니다.
 정말로 피가 DRY 합니다.
- 이 경우에는 대개의 결과 클래스가 상속하고 있는 `DBIx::Class::Core` 를 손을 봐야
-되겠죠. 그럼 `ResultBase` 라는 클래스를 만들고 이것이 `DBIx::Class::Core` 를 상속하도록 하고,
-그외 여타 결과클래스들이 `ResultBase` 를 상속받도록 합니다.
-  `ResultBase` 의 경우는 아래와 같습니다.
+ 이 경우에는 대개의 결과 클래스가 상속하고 있는 `DBIx::Class::Core`를 손을 봐야
+되겠죠. 그럼 `ResultBase`라는 클래스를 만들고 이것이 `DBIx::Class::Core`를 상속하도록 하고,
+그외 여타 결과클래스들이 `ResultBase`를 상속받도록 합니다.
+  `ResultBase`의 경우는 아래와 같습니다.
 
     package MyApp::Schema::ResultBase;
     use Moose;
@@ -192,7 +192,7 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
 
     1;
 
-  그리고 결과 클래스에서 이 `ResultBase` 를 상속받도록 합니다.
+  그리고 결과 클래스에서 이 `ResultBase`를 상속받도록 합니다.
 
     package MyApp::Schema::Result::Access;
     ....
@@ -204,7 +204,7 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
 
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E8XDlgZJWsPmqTw/xP34A
 
- 맙소사 `ResultBase` 를 상속하는 것조차도 이 문구위에 놓이게 되니... 맘편히 고쳐놓을 수도
+ 맙소사 `ResultBase`를 상속하는 것조차도 이 문구위에 놓이게 되니... 맘편히 고쳐놓을 수도
 없네요.
 
 
@@ -218,11 +218,11 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
 커스터마이즈할 필요가 있습니다.
 
  아쉽게도 `그 커맨드`로 호출되는 [Catalyst::Model::DBIC::Schema][cpan-cmds] 모듈에 속해있는
-[Catalyst::Helper::Model::DBIC::Schema][cpan-chmds] 로는 현재의 상황을 헤쳐나가기 힘듭니다.
+[Catalyst::Helper::Model::DBIC::Schema][cpan-chmds]로는 현재의 상황을 헤쳐나가기 힘듭니다.
  그래서 위의 모듈안에서 본질적으로 스키마클래스 덤프에 사용되는 모듈인
-[DBIx::Class::Schema::Loader][cpan-dbic-schema-loader] 를 사용하도록 합니다.
+[DBIx::Class::Schema::Loader][cpan-dbic-schema-loader]를 사용하도록 합니다.
 
- [DBIx::Class::Schema::Loader][cpan-dbic-schema-loader] 가 설치되어 있다면, `dbicdump` 라는 커맨드가
+ [DBIx::Class::Schema::Loader][cpan-dbic-schema-loader]가 설치되어 있다면, `dbicdump`라는 커맨드가
 존재할 것입니다. 이 `dbicdump` 커맨드에 이제부터 이 상황을 타개할 설정파일을 담도록 합니다.
  설정파일은 [Config::Any][cpan-config-any] 모듈로 처리되기에 Perl 에서 쓰이는 어떤 형식이라도
 다룰 수 있습니다. 심지어는 *펄 코드* 자신도 말이죠. 아래는 저의 `dbicdump` 설정파일입니다.
@@ -262,13 +262,13 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
  항목들이 많아서 전부 설명은 무리이겠고, 그냥 위에서 봉착했던 문제에 대해서 추려볼까요.
 
  우선 `ResultBase` 클래스 문제입니다. `result_base_class` 값을 지정해줌으로써
- 모든 결과클래스들은 `DBIx::Class::Core` 가 아니라 `MyApp::Schema::ResultBase` 를
-상속받게 됩니다. 물론 `MyApp::Schema::ResultBase` 는 스스로 정의해줘야 합니다.
+ 모든 결과클래스들은 `DBIx::Class::Core`가 아니라 `MyApp::Schema::ResultBase`를
+상속받게 됩니다. 물론 `MyApp::Schema::ResultBase`는 스스로 정의해줘야 합니다.
 
  다음은 컬럼의 컴포넌트를 이용한 확장 문제입니다. md5체크섬값 아래에 중복되는 매번
 적어줬어야 했었는데, 그 문제에 대해서는 우선 사용할 컴포넌트들은 결과클래스별로
 지정하는 것이 아니라 `ResultBase` 클래스에서 읽어들이도록 합니다. 사실 이렇게
-`ResultBase` 를 놓고 여기에 컴포넌트를 일괄해서 읽어들이는 것은 Cookbook 문서상에서도
+`ResultBase`를 놓고 여기에 컴포넌트를 일괄해서 읽어들이는 것은 Cookbook 문서상에서도
 [STARTUP SPEED 향상을 위해 권장되고 있습니다][dbic-cookbook-speed].
 
 
@@ -289,8 +289,8 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
     1;
 
  그리고 컴포넌트의 사용을 위한 컬럼의 속성지정에는 위의 설정항목 중 하나인
-`custom_column_info` 에 쓰인 코드처럼 지정할 수 있습니다. 코드에서 처럼 `created_on` 에
-`TimeStamp` 컴포넌트를 사용하기 위한 속성값이 `set_on_create` 이 모든 결과클래스에
+`custom_column_info`에 쓰인 코드처럼 지정할 수 있습니다. 코드에서 처럼 `created_on`에
+`TimeStamp` 컴포넌트를 사용하기 위한 속성값이 `set_on_create`이 모든 결과클래스에
 추가되는 것입니다.
 
 
@@ -307,12 +307,12 @@ md5체크섬값으로 지정해서 변경유무를 체크하고 있습니다. �
 정리
 ----
 
-- [DBIx::Class::Schema::Loader][cpan-dbic-schema-loader] 로 스키마 클래스를 덤프합니다.
+- [DBIx::Class::Schema::Loader][cpan-dbic-schema-loader]로 스키마 클래스를 덤프합니다.
 - 결과 클래스 안의 MD5체크섬값에 유의하여 특정 부분 위의 코드는 건드리지 않습니다.
 - `ResultBase` 같은 BaseClass 를 두고 결과클래스 내의 공용 메소드, 컴포넌트들을 
   일괄 정의/관리하도록 한다.
 - 설정파일을 이용해서 추가속성이 필요한 컬럼등을 지정할 수 있습니다.
-- `DBIx::Class` 는 나쁘지 않습니다.
+- `DBIx::Class`는 나쁘지 않습니다.
 - 여타 설정항목들에 대해서는 [DBIx::Class::Schema::Loader::Base][cpan-dbic-schema-loader-base]
   모듈페이지를 참고하도록 합니다.
 - 이 모든 작업에 논의와 영감을 준 [@aanoaa][twitter-aanoaa] (a.k.a. 홍선생) 님에게 경의를 표합니다.
