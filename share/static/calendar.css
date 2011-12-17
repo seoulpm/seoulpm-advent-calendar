@@ -186,6 +186,71 @@ body {
 .ball.today {
     background-position: -50px 0;
 }
+.ball.bling {
+    background-position: -50px 0;
+}
 #tree .cli {
 display: none;
+}
+#tooltip {
+    position: absolute;
+    width: 280px;
+    height: 86px;
+    z-index: 4;
+    top: 100px;
+    left: 40px;
+    padding-bottom: 10px;
+    display: none;
+}
+#tooltip .box {
+    background-color: #1a1a1a;
+    border: solid 1px #999;
+    border-bottom: solid 2px #999;
+    -moz-box-shadow: 0 2px 6px black;
+    -webkit-box-shadow: 0 2px 6px black;
+    box-shadow: 0 2px 6px black;
+}
+#tooltip .pad {
+    min-width: 221px;
+    min-height: 62px;
+    padding: 9px;
+}
+#tooltip table {
+    border: 0;
+}
+#tooltip .cont-img {
+    min-width: 62px;
+    height: 62px;
+    padding-right: 9px;
+    overflow: hidden;
+}
+#tooltip .cont-img img {
+    width: auto;
+    height: 62px;
+}
+#tooltip .cont-msg {
+    vertical-align: bottom;
+    text-align: left;
+    overflow: hidden;
+}
+#tooltip .cont-msg .title {
+    color: #ccdee0;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 100%;
+    width: 189px;
+    height: 45px;
+    overflow: hidden;
+}
+#tooltip .cont-msg .author {
+    padding-top: 3px;
+    padding-right: 2px;
+    font-size: 12px;
+    color: #bfbfbf;
+    text-align: right;
+}
+#tooltip .arrow {
+    position: absolute;
+    bottom: 4px;
+    right: 23px;
 }
