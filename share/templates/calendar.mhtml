@@ -47,10 +47,10 @@
 %         if (     $today->year  == $year
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
-                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')">&nbsp</div>
+                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
 %         }
 %         else {
-                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')">&nbsp;</div>
+                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
 %         }
 %       }
               </a>
