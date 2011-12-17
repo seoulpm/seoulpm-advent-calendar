@@ -1,6 +1,3 @@
-var adventcalendar = {
-    profile: []
-};
 $(window).load(function(){
     window.setInterval(function(){
         $("#ball-today").toggleClass("today");
