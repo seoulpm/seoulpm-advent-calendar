@@ -28,6 +28,7 @@ body {
     padding-top: 12px;
     margin-top: 46px;
     height: 116px;
+    left: 0;
 }
 #like li {
     list-style-type: none;
