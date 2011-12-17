@@ -323,7 +323,7 @@ Cookbook 문서에서도 [스타트업 속도 향상을 위해 권장][dbic-cook
 
 - [DBIx::Class::Schema::Loader][cpan-dbic-schema-loader]로 스키마 클래스를 덤프합니다.
 - 결과 클래스 안의 MD5 체크섬 값에 유의하여 특정 부분 위의 코드는 건드리지 않습니다.
-- `ResultBase` 같은 기본 클래스를 두고 결과클래스 내의 공용 메소드, 컴포넌트들을 일괄로 정의하고 관리하도록 한다.
+- `ResultBase` 같은 기본 클래스를 두고 결과클래스 내의 공용 메소드, 컴포넌트들을 일괄로 정의하고 관리하도록 합니다.
 - 설정 파일을 이용해 추가 속성이 필요한 컬럼 등을 지정할 수 있습니다.
 - `DBIx::Class`는 나쁘지 않습니다.
 - 여타 설정 항목들에 대해서는 [DBIx::Class::Schema::Loader::Base][cpan-dbic-schema-loader-base] 모듈 문서를 참고합니다.
