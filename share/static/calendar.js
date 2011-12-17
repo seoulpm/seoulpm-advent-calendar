@@ -1,5 +1,5 @@
 var adventcalendar = {
-    profile: [];
+    profile: []
 };
 $(window).load(function(){
     window.setInterval(function(){
