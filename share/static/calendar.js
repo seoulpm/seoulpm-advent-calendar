@@ -3,8 +3,8 @@ $(window).load(function(){
         $("#ball-today").toggleClass("today");
     }, 900);
     $(".ball").hover(function(en){
-        $(this).addClass("today");
+        $(this).addClass("bling");
     }, function(){
-        $(this).removeClass("today");
+        $(this).removeClass("bling");
     });
 });
