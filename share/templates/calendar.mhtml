@@ -6,7 +6,7 @@
     <div class="pad">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td rowspan="2" class="cont-img"><img class="image" src="https://si0.twimg.com/profile_images/1421578742/quigon_jinn.jpg" /></td>
+          <td rowspan="2" class="cont-img"><img class="image" src="profile_empty.jpg" /></td>
           <td class="cont-msg">
             <div class="title">열여섯번째 perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기 </div>
         </tr>
@@ -38,27 +38,23 @@
 %       my $key = sprintf("%4d-%02d-%02d", $year, $month->{1}->month, $day);
 %       my $article = $articles->{$key};
 %       if ( $article ) {
+%         my $tb = $global->{tree_ball}->($day);
+            <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
+              <a href="<% $article->atom_id %>" title="<% $day %>일">
+                <span class="cli">
+                  <span class="title"><% $global->{korean_day}->($day) %> 날: <% $article->title  %></span>
+                  - by <span class="author"><% $article->author %></span></span>
 %         if (     $today->year  == $year
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
-%           my $tb = $global->{tree_ball}->($day);
-            <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-              <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <span class="cli"><% $global->{korean_day}->($day) %> 날: <% $article->title . " - by " . $article->author %></span>
                 <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
-              </a>
-            </li>
 %         }
 %         else {
-%           my $tb = $global->{tree_ball}->($day);
-            <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-              <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <span class="cli"><% $global->{korean_day}->($day) %> 날: <% $article->title . " - by " . $article->author %></span>
                 <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
-              </a>
-            </li>
 %         }
 %       }
+              </a>
+            </li>
 %     }
 %   }
 % }
