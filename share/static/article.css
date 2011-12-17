@@ -172,7 +172,7 @@ body {
     border-bottom: 1px solid #0f0f0f;
 }
 #cont h2 {
-    display: table;
+    display: inline-block;
     background-color: #345f53;
     padding: 6px 10px 10px 10px;
     border-bottom: 3px solid #244139;
@@ -180,6 +180,8 @@ body {
     margin-top: 40px;
     margin-bottom: 6px;
     font-size: 24px;
+    zoom: 1;
+    *display: inline;
 }
 #cont h3 {
     padding: 6px 10px 10px 10px;

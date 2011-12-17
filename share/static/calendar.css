@@ -122,6 +122,8 @@ body {
     background: #345f53;
     border-bottom: 3px solid #244139;
     border-right: 2px solid #1b322c;
+    zoom: 1;
+    *display: inline;
 }
 .cont p, .cont ul {
     margin-bottom: 30px;
