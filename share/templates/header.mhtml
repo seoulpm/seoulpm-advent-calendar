@@ -6,6 +6,9 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar <% $year %>" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
+% if ( defined $global->{fb_token} ) {
+  <meta property="fb:admins" content="<% $global->{fb_token} %>" />
+% }
   <meta property="og:title" content="<% $title %>" />
   <meta property="og:url" content="<% $page_uri %>" />
   <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
