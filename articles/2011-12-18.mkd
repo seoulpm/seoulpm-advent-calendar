@@ -74,26 +74,26 @@ Author:   ja3ck
     int outputValue = 0;        // PWM으로 내보낼 센서값
     
     void setup() {
-      // Serial 포트를 9600bps 로 시작
-      Serial.begin(9600); 
+        // Serial 포트를 9600bps로 시작
+        Serial.begin(9600);
     }
     
     void loop() {
-      // 아날로그 값을 읽는다
-      sensorValue = analogRead(analogInPin);            
-      // 읽은 아날로그값을 매핑한다.
-      outputValue = map(sensorValue, 0, 1023, 0, 255);  
-      // 아날로그 값을 출력한다.
-      analogWrite(analogOutPin, outputValue);           
+        // 아날로그 값을 읽는다
+        sensorValue = analogRead(analogInPin);
+        // 읽은 아날로그값을 매핑한다.
+        outputValue = map(sensorValue, 0, 1023, 0, 255);
+        // 아날로그 값을 출력한다.
+        analogWrite(analogOutPin, outputValue);
     
-      // 결과를 시리얼포트를 통해 전송
-      Serial.print("sensor=" );                       
-      Serial.print(sensorValue);      
-      Serial.print("\t output=");      
-      Serial.println(outputValue);   
+        // 결과를 시리얼포트를 통해 전송
+        Serial.print("sensor=" );
+        Serial.print(sensorValue);
+        Serial.print("\t output=");
+        Serial.println(outputValue);
     
-      // 10 밀리세컨드 동안 대기
-      delay(10);                     
+        // 10 밀리세컨드 동안 대기
+        delay(10);
     }
 
 
@@ -110,7 +110,7 @@ Author:   ja3ck
     use Win32::SerialPort qw( :STAT 0.19 );
     
     # 제 PC 에서는 아두이노가 'COM4' 으로 연결되어 있습니다
-    my $serial_port = new Win32::SerialPort('COM4') || die "Can't open COM port : $^E\n";
+    my $serial_port = Win32::SerialPort->new('COM4') or die "Can't open COM port: $^E";
     
     # Serial port 설정들 입니다
     $serial_port->handshake('none');
@@ -122,18 +122,16 @@ Author:   ja3ck
     $serial_port->read_const_time(10);
     $serial_port->write_char_time(1);
     $serial_port->write_const_time(100);
-    $serial_port->write_settings or undef $serial_port;
-    $serial_port->save('my_serial.cfg') if $serial_port;
+    $serial_port->write_settings() or die "Can't change Device_Control_Block: $^E";
+    $serial_port->save('my_serial.cfg');
     
-    while(1) {
-    
-        my $line = $serial_port->input;
-            if(defined($line)) {
-            chomp($line);
-            print $line;
+    while (1) {
+        if (my $line = $serial_port->input) {
+            chomp $line;
+            print $line, "\n";
         }
     }
-
+    
 
 다음과 같이 나오면 성공입니다.
 
@@ -182,46 +180,45 @@ Nunchuck 연결
     #define MINANGLE -90
     
     WiiChuck chuck = WiiChuck();
+
     int angleStart, currentAngle;
     int tillerStart = 0;
     double angle;
     
     void setup() {
-      Serial.begin(115200);
-      chuck.begin();
-      chuck.update();
+        Serial.begin(115200);
+        chuck.begin();
+        chuck.update();
     }
     
-    
     void loop() {
-      delay(20);
-      chuck.update();
+        delay(20);
+        chuck.update();
     
-      Serial.print(chuck.readRoll());
-      Serial.print(":");
-      Serial.print(chuck.readPitch());  
-      Serial.print(":");
-      Serial.print((int)chuck.readAccelX());  
-      Serial.print(":");
-      Serial.print((int)chuck.readAccelY());
-      Serial.print(":");
-      Serial.print((int)chuck.readAccelZ());
-      Serial.print(":");
-      Serial.print((int)chuck.readJoyX());  
-      Serial.print(":");
-      Serial.print((int)chuck.readJoyY());    
-      Serial.print(":");
-      if(chuck.zPressed())
-        Serial.print("T");
-      else
-        Serial.print("F");
-      Serial.print(":");  
-      if(chuck.cPressed())
-        Serial.print("T");
-      else
-        Serial.print("F");  
-      Serial.println();
-    
+        Serial.print(chuck.readRoll());
+        Serial.print(":");
+        Serial.print(chuck.readPitch());  
+        Serial.print(":");
+        Serial.print((int)chuck.readAccelX());  
+        Serial.print(":");
+        Serial.print((int)chuck.readAccelY());
+        Serial.print(":");
+        Serial.print((int)chuck.readAccelZ());
+        Serial.print(":");
+        Serial.print((int)chuck.readJoyX());  
+        Serial.print(":");
+        Serial.print((int)chuck.readJoyY());    
+        Serial.print(":");
+        if(chuck.zPressed())
+            Serial.print("T");
+        else
+            Serial.print("F");
+        Serial.print(":");  
+        if(chuck.cPressed())
+            Serial.print("T");
+        else
+            Serial.print("F");  
+        Serial.println();
     }
 		
 이렇게 Nunchuck의 조작 값을 받아 어디에 이용할까요? 오늘은 Wii Nunchuck을 마우스로 사용해봅시다.
@@ -231,9 +228,9 @@ Nunchuck 연결
     use strict;
     use warnings;
     use Win32::SerialPort qw( :STAT 0.19 );
-    use Win32::GuiTest qw (:ALL);
+    use Win32::GuiTest qw( :ALL );
     
-    my $serial_port = new Win32::SerialPort('COM4') || die "Can't open serial port : $^E\n";
+    my $serial_port = Win32::SerialPort->new('COM4') or die "Can't open serial port : $^E";
     
     $serial_port->handshake('none');
     $serial_port->baudrate(115200);
@@ -245,8 +242,8 @@ Nunchuck 연결
     $serial_port->write_char_time(1);
     $serial_port->write_const_time(100);
     $serial_port->buffers(4096, 4096);
-    $serial_port->write_settings or undef $serial_port;
-    $serial_port->save('my_serial.cfg') if $serial_port;
+    $serial_port->write_settings or die "Can't change Device_Control_Block: $^E";
+    $serial_port->save('my_serial.cfg');
     
     # nuncuck 의 조이스틱 값
     my $prev_joy_x;
@@ -254,44 +251,41 @@ Nunchuck 연결
     	
     $serial_port->are_match("\n");
     
-    while(1) {
-    
-        if(my $line = $serial_port->lookfor) {
-    
-            print "$line\n";
-            $line =~ s/\r//g;
+    while (1) {
+        if (my $line = $serial_port->lookfor) {
+            chomp $line;
+            print $line, "\n";
             
             # nuchuck 으로 부터 수신하는 값은 이렇게 다양합니다. 그러나 우리는 조이스틱의 x,y 값과 두개의 버튼값만을 이용합니다.
             my ($roll, $pitch, $accel_x, $accel_y, $accel_z, $joy_x, $joy_y, $button_z, $button_c) = split ':', $line;
     
             # 두개의 버튼을 동시에 누르면 프로그램을 종료합니다.
-            if($button_c eq "T" && $button_z eq "T") {
+            if ($button_c eq "T" && $button_z eq "T") {
                 print "EXIT\n";
                 $serial_port->close;
-                undef $serial_port;
-                exit(0);
+                exit 0;
             }
     
             # 조이스틱 X 값 처리
-            if($joy_x) {            
-                if($prev_joy_x ne $joy_x) {
-                    SendMouse ( "{REL$joy_x,0}"  );                
+            if ($joy_x) {            
+                if ($prev_joy_x ne $joy_x) {
+                    SendMouse "{REL$joy_x,0}";
                     $prev_joy_x = $joy_x;
                 }
             }
             
-            # 조이스틱의 Y 값 처리
-            if($joy_y) {
+            # 조이스틱 Y 값 처리
+            if ($joy_y) {
                 if($prev_joy_y ne $joy_y) {
                     $joy_y = $joy_y > 0 ? -$joy_y : abs($joy_y);
-                    SendMouse ( "{REL0,$joy_y}"  );                
+                    SendMouse "{REL0,$joy_y}";
                     $prev_joy_y = $joy_y;
-                }            
+                }
             }
             
             # 버튼을 눌렀을때 마우스 클릭 처리
-            if($button_z eq "T") {
-                SendMouse( "{LEFTCLICK}" );
+            if ($button_z eq "T") {
+                SendMouse "{LEFTCLICK}";
             }
         }
     }
