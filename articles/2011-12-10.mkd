@@ -182,16 +182,16 @@ CPAN의 GuiTest는 총 26개의 예제를 제공합니다.
     use strict;
     use warnings;
     use Win32::GuiTest qw(:ALL);
-    while(1){   
+    while (1) {
         sleep 2; # 2초마다 한번씩 윈도우 창을 검색합니다.
-        for (FindWindowLike()) {
-            my $s = sprintf("0x%08X", $_ );
-            $s .= ", '" .  GetWindowText($_) . "', " . GetClassName($_);
-            if($s =~ /박병조/){  # 원격을 걸 수있는 사람을 설정
-                SetForegroundWindow($_); # 찾은 윈도우에 포커스를 맞춥니다.
-                sleep 1;                            
+        for my $window (FindWindowLike()) {
+            my $str = sprintf("0x%08X", $window);
+            $str .= ", '" .  GetWindowText($window) . "', " . GetClassName($window);
+            if($str =~ /박병조/){  # 원격을 걸 수있는 사람을 설정
+                SetForegroundWindow($window); # 찾은 윈도우에 포커스를 맞춥니다.
+                sleep 1;
                 SendKeys("%c"); # 원격제어 수락 단축키 Alt+C 를 뜻합니다.
-                sleep 2;            
+                sleep 2;
                 print "수락되었습니다 :)";
             }
         }
