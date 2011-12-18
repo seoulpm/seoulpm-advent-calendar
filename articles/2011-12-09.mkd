@@ -64,7 +64,7 @@ Youtube 검색을 위해 다음 모듈을 CPAN으로 부터 설치 합니다.
     $limit //= 10;
     
     # 검색 값으로 유투브 검색
-    my $search_youtube = new WebService::GData::YouTube;
+    my $search_youtube = WebService::GData::YouTube->new;
     
     # 쿼리 값 설정
     $search_youtube->query()->q($search)->limit($limit, 0);
