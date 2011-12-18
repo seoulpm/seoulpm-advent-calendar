@@ -5,6 +5,7 @@ return {
     css_article    => 'article.css',
     css_calendar   => 'calendar.css',
     articles_total => 24,
+    base_domain    => 'advent.perl.kr',
     base_uri       => 'http://advent.perl.kr/2011/',
     copyright      => 'Articles by Seoul Perl Mongers<br />Illustrated by Hyunsu Park, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim',
     tree_ball      => sub {
