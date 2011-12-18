@@ -151,7 +151,7 @@ ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 �
     #!perl
     sub getTodayHumorReply {
         my $URL = 'http://todayhumor.co.kr/board/view.php'.
-                  '?kind=&ask_time=&search_table_name=&table=bestofbest&no='.int(rand(60000));
+                  '?table=bestofbest&no='.int(rand(60000));
         my @replys;
         
         # 해당 URL에 있는 리플 추출
@@ -174,7 +174,7 @@ ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 �
 아래와 같은 원본을
 
     #!perl
-    sub OnAITalk{
+    sub OnAITalk {
         $aitalkcount = 0;
         return speak 'sentence';
     }
@@ -182,7 +182,7 @@ ShioriPerl은 이 함수가 60번 호출될 때(즉, 60초 후) `OnAITalk`를 �
 아래와 같이 고칩니다. 
 
     #!perl
-    sub OnAITalk{
+    sub OnAITalk {
         $aitalkcount = 0;
         return getTodayHumorReply();
     }
