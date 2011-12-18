@@ -192,7 +192,7 @@ Prima 코드 예제
     my $outside = 1;    # 현재 스캔하는 가로 라인이 배경인지 아닌지 체크
     my $y1;             # 사진이 시작되는 y좌표를 저장하기 위한 임시 변수
     foreach my $y ( 0 .. $image->height() - 1 ) {
-        if ( not same_color_horizon( $image, $y, $background ) ) {
+        if ( ! same_color_horizon( $image, $y, $background ) ) {
             if ( $outside ) {
                 # 배경에서 배경이 아닌 라인으로 처음 진입할 때 y좌표 기록
                 $y1 = $y;
@@ -200,7 +200,7 @@ Prima 코드 예제
             }
         }
         else {
-            if ( not $outside ) {
+            if ( ! $outside ) {
                 # 배경이 아닌 라인에서 배경 라인으로 나가는 시점에서 이미지 조각 추출
                 push @pieces, $image->extract( 0, $y1, $image->width(), $y - $y1 );
                 $outside = 1;
@@ -217,7 +217,7 @@ Prima 코드 예제
         my $outside = 1;
         my $x1;             # 사진이 시작되는 x좌표를 저장하기 위한 임시 변수
         foreach my $x ( 0 .. $piece->width() - 1 ) {
-            if ( not same_color_vertical( $piece, $x, $background ) ) {
+            if ( ! same_color_vertical( $piece, $x, $background ) ) {
                 if ( $outside ) {
                     # 배경에서 배경이 아닌 라인으로 처음 진입할 때 x좌표 기록
                     $x1 = $x;
@@ -225,7 +225,7 @@ Prima 코드 예제
                 }
             }
             else {
-                if ( not $outside ) {
+                if ( ! $outside ) {
                     # 배경이 아닌 라인에서 배경 라인으로 나가는 시점에서 이미지 조각 추출
                     my $photo = $piece->extract( $x1, 0, $x - $x1, $piece->height() );
                     $outside = 1;
