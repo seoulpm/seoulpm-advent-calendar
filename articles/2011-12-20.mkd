@@ -6,11 +6,17 @@ Author:   eeyees
 
 
 
+저자
+----
 
-*저자
-일본쪽에서 일하다가 한국 후지 제록스로 2011년에 이직 하게 되었습니다.
+[@eeyees][twitter-eeyees] -
+인쇄기기 업계의 기린아, TAFKA_HoliK라는 닉을 사용하기도 한다. 일본에서 일하다가 올해 한국 후지 제록스로 이직하였다.
 
-*시작하며
+
+
+시작하며
+---------
+
 우리는 지난 기사들에서 카탈리스트, 댄서와 같은 웹 프레임워크를 볼 수 있었습니다.
 제가 오늘 소개 소개 시켜 드릴 웹 프레임워크는 Mojolicious라는 웹 프레임워크 입니다.
 
@@ -19,65 +25,77 @@ Author:   eeyees
 오늘은 가볍게 Mojolicious를 이용해 Websocket으로 비동기 채팅하는 소스 코드를 살펴 볼 것 입니다.
 
 
-*인스톨
+
+뼈대 만들기
+-----------
+
 리눅스라면 다음과 같은 코멘트로 간단하게 인스톨을 할 수 있습니다.
 
-$ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
-
+    #!bash
+    $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
 
 *채팅 어플리케이션의 뼈대 만들기
 인스톨이 다되었다면 다음과 같은 코멘트로 뼈대를 만들수 있습니다.
 
 *라이트판 어플리케이션 만들기
 간단한 웹 어플리케이션을 위한 라이트판의 어플리케이션 뼈대를 만들수 있습니다.
-$ mojo generate lite_app
+
+    #!bash
+    $ mojo generate lite_app
+
 오늘은 라이트판이 아닌 정식 어플리케이션을 만들어 봅시다.
-$ mojo generate app chat
+
+    #!bash
+    $ mojo generate app chat
+    Your application name has to be a well formed (camel case) Perl module name
+    like "MyApp".
+
 엔터를 치고 보니 웁스
-Your application name has to be a well formed (camel case) Perl module name
-like "MyApp".
 첫문자를 대문자로 바꾸고 다시 실행 해 보도록 하죠.
 
-$ mojo generate app Chat
-  [mkdir] /home/holik/tmp/chat/script
-  [write] /home/holik/tmp/chat/script/chat
-  [chmod] chat/script/chat 744
-  [mkdir] /home/holik/tmp/chat/lib
-  [write] /home/holik/tmp/chat/lib/Chat.pm
-  [mkdir] /home/holik/tmp/chat/lib/Chat
-  [write] /home/holik/tmp/chat/lib/Chat/Example.pm
-  [mkdir] /home/holik/tmp/chat/t
-  [write] /home/holik/tmp/chat/t/basic.t
-  [mkdir] /home/holik/tmp/chat/log
-  [mkdir] /home/holik/tmp/chat/public
-  [write] /home/holik/tmp/chat/public/index.html
-  [mkdir] /home/holik/tmp/chat/templates/layouts
-  [write] /home/holik/tmp/chat/templates/layouts/default.html.ep
-  [mkdir] /home/holik/tmp/chat/templates/example
-  [write] /home/holik/tmp/chat/templates/example/welcome.html.ep
+    #!bash
+    $ mojo generate app Chat
+      [mkdir] /home/holik/tmp/chat/script
+      [write] /home/holik/tmp/chat/script/chat
+      [chmod] chat/script/chat 744
+      [mkdir] /home/holik/tmp/chat/lib
+      [write] /home/holik/tmp/chat/lib/Chat.pm
+      [mkdir] /home/holik/tmp/chat/lib/Chat
+      [write] /home/holik/tmp/chat/lib/Chat/Example.pm
+      [mkdir] /home/holik/tmp/chat/t
+      [write] /home/holik/tmp/chat/t/basic.t
+      [mkdir] /home/holik/tmp/chat/log
+      [mkdir] /home/holik/tmp/chat/public
+      [write] /home/holik/tmp/chat/public/index.html
+      [mkdir] /home/holik/tmp/chat/templates/layouts
+      [write] /home/holik/tmp/chat/templates/layouts/default.html.ep
+      [mkdir] /home/holik/tmp/chat/templates/example
+      [write] /home/holik/tmp/chat/templates/example/welcome.html.ep
 
 
 char 폴더에 들어가보도록 하죠.
-holik@holikNoteBook:~/tmp/chat$ tree
-.
-├── lib
-│   ├── Chat
-│   │   └── Example.pm
-│   └── Chat.pm
-├── log
-├── public
-│   └── index.html
-├── script
-│   └── chat
-├── t
-│   └── basic.t
-└── templates
-    ├── example
-    │   └── welcome.html.ep
-    └── layouts
-        └── default.html.ep
 
-9 directories, 7 files
+    #!bash
+    ~/tmp/chat$ tree
+    .
+    ├── lib
+    │   ├── Chat
+    │   │   └── Example.pm
+    │   └── Chat.pm
+    ├── log
+    ├── public
+    │   └── index.html
+    ├── script
+    │   └── chat
+    ├── t
+    │   └── basic.t
+    └── templates
+        ├── example
+        │   └── welcome.html.ep
+        └── layouts
+            └── default.html.ep
+    
+    9 directories, 7 files
 
 lib 아래에 있는 부분이 서버의 컨트롤 부분이겠군요.
 log 폴더는 log를 남기는 폴더 겠구요.
@@ -98,12 +116,18 @@ http://127.0.0.1:3000/welcome
 http://127.0.0.1:3000/welcome잘나오네요 :)
 그럼 이제부터 채팅 프로그램을 만들어 봅시다.
 
-*비동기 채팅 만들기
+
+
+비동기 채팅 만들기
+-----------------
+
 lib 폴더로 이동해서 Chat.pm 파일에 chat이라는 라우트를 추가 해 봅시다.
 아까 봤던 /welcome 도 여기에 정의 되어 있군요.
 하단에 /chat를 추가해 봅시다.
 
-$r->route('/chat')->to('ChatControl#chatAction');
+    #!perl
+    $r->route('/chat')->to('ChatControl#chatAction');
+
 to에 있는 ChatControl#chatAction은 ChatControl이라는 컨트롤에 chatAction이라는 액션을 수행해 주세요...라고 생각 하시면 됩니다.
 
 같은 방식으로 웹소켓 부분도 추가해 보죠 :)
@@ -128,9 +152,11 @@ wsAction에서는 websocket으로 통신하는 부분을 작성 해 보았습니
 *뷰의 작성
 이제부터는 뷰부분을 만들어 보겠습니다.
 templeates 폴더로 이동후에 ChatControl폴더를 만들고 그안에 chatAction.html.ep 파일을 마들어 보겠습니다.
-$ mkdir chatControl
-$ cd chatControl
-$ vim chatAction.html.ep
+
+    #!bash
+    $ mkdir chatControl
+    $ cd chatControl
+    $ vim chatAction.html.ep
 
 그리고 다음과 같이 작성해 봅시다.
 
@@ -140,7 +166,9 @@ $ vim chatAction.html.ep
 
 이제 레이아웃을 작성해 볼까요?
 chatAction.html.ep에서 정의한 레이아웃 파일을 먼저 만들어 봅시다.
-$ vim chatLayout.html.ep
+
+    #!bash
+    $ vim chatLayout.html.ep
 
 -- 소스 코드 --
 
@@ -152,8 +180,8 @@ websocket을 지원하지 않는 브라우져를 만저 체크하고
 
 그럼 작성한 소스 코드를 실행 해 보도록 하죠.
 
-$ morbo chat
-
+    #!bash
+    $ morbo chat
 
 브라우져에서 테스트 해 보겠습니다.
 현재 파이어폭스에서는 디폴트로 websocket을 사용할 수 없기때문에 크롬을 이용해서 테스트를 해 보겠습니다.
@@ -162,9 +190,17 @@ $ morbo chat
 
 잘되네요 : )
 
-*정리하며
+
+
+정리하며
+--------
+
 간단하게 Mojolicious를 웹프레임워크로 사용하고 HTML5에 포함되는 Websocket을 이용한 비동기 채팅 프로그램을 만들어 보았습니다.
 한국에서는 아직도 Perl 하면 단순히 문자열 처리나 시스템 엔지니어만 만지는 언어로만 생각 되어지는 것 같습니다.
 이번 Advent Calender를 통해 Perl의 다양한 활용에 대해서 조금이나마 공유 할 수 있는 시간이 되어 다행인 것 같고, 2011년 마무리 잘 하시고
 2012년 새해 복 많이 받으세요;;;
+
+
+
+[twitter-eeyees]: http://twitter.com/eeyees
 
