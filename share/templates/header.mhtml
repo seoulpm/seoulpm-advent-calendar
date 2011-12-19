@@ -24,6 +24,7 @@
   <script type="text/javascript" src="shCore.js"></script>
   <script type="text/javascript" src="shBrushBash.js"></script>
   <script type="text/javascript" src="shBrushYaml.js"></script>
+  <script type="text/javascript" src="shBrushIni.js"></script>
   <script type="text/javascript" src="shBrushPerl.js"></script>
   <script type="text/javascript" src="shBrushJScript.js"></script>
   <script type="text/javascript" src="shBrushPlain.js"></script>
