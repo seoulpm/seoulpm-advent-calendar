@@ -18,12 +18,12 @@ Seoul.pm과 #perl-kr의 육아 전문 컨설턴트, 사회적 기업을 꿈꾸�
 
 비동기 웹서버의 유행들을 따라
 펄에도 비동기 웹서비스를 제공할만한 좋은 방법들이 몇 가지 생겼습니다.
-그 중 [Tatsumaki][]는 Tatsuhiko Miyagawa씨께서
-Python의 [Tornado][]를 펄 버전으로 새로 구현한 프레임워크입니다.
+그 중 [Tatsumaki][cpan-tatsumaki]는 [Tatsuhiko Miyagawa][cpan-author-miyagawa]씨께서
+Python의 [Tornado][python-tornado]를 펄 버전으로 새로 구현한 프레임워크입니다.
 
-비동기 웹서버에 대해 부정적으로 생각하지만(Larry Wall의 표현을 빌어 표현하자면 "Not For Human")
+비동기 웹서버에 대해 부정적으로 생각하지만([Larry Wall][wiki-larry-wall]의 표현을 빌어 표현하자면 *"Not For Human"*),
 웹 상에서 채팅이나 메신저같은 Long Polling 서비스를 구현하려면 마땅한 다른 방법도 없으니...
-필요하면 배워야죠 ㅜ.ㅠ
+필요하면 배워야겠죠. ㅜ.ㅠ
 
 
 
@@ -31,6 +31,7 @@ Python의 [Tornado][]를 펄 버전으로 새로 구현한 프레임워크입니
 -------------
 
 Tatsumaki 소스를 다운받으면 `eg` 디렉터리 아래에 [간단한 채팅 서버 예제][cpan-tatsumaki]가 있습니다.
+먼저, `main` 코드입니다.
 
     #!perl
     package main;
@@ -49,8 +50,7 @@ Tatsumaki 소스를 다운받으면 `eg` 디렉터리 아래에 [간단한 채�
     
     return $app->psgi_app;
 
-먼저 `main` 코드입니다.
-Tatsumaki::Application를 생성하면서 처리할 URL 패턴과 각 패턴에대한 핸들러를 추가해줍니다.
+Tatsumaki::Application를 생성하면서 처리할 URL 패턴과 각 패턴에 대한 핸들러를 추가해줍니다.
 그런 다음 템플릿 경로(`template_path`) 설정도 해주고 정적 파일(`static_file`)을 처리하기 위한 설정도 추가해주네요.
 여기까진 간단하죠?
 
@@ -265,7 +265,19 @@ chat.html에다가
     }
 
 
+참고 문서
+--------
+
+- [Tatsumaki SlideShare](http://www.slideshare.net/miyagawa/tatsumaki)
+- [PSGI/Plack](http://plackperl.org/)
+- 
+
+
+
 [twitter-luzluna]: http://twitter.com/luzluna
 [cpan-tatsumaki]: http://search.cpan.org/perldoc?Tatsumaki
 [plackup]: http://search.cpan.org/perldoc?plackup
 [twiggy]: http://search.cpan.org/perldoc?Twiggy
+[python-tornado]: http://www.tornadoweb.org/
+[cpan-author-miyagawa]: http://search.cpan.org/~miyagawa/
+[wiki-larry-wall]: http://en.wikipedia.org/wiki/Larry_Wall
