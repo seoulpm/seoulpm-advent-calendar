@@ -213,13 +213,12 @@ Tatsumaki::MessageQueue 인스턴스를 하나 만들고 `$mq->poll_once`로 모
 채팅만 하려니까 뭔가 심심해서 재미있는걸 해볼 수 있게 canvas를 추가해봅시다.
 `chat.html`에 아래와 같이 캔버스 한 줄을 추가합니다.
 
-    #!html
+    #!xml
     <canvas id="c" width="200" height="100" style="border:1px solid"></canvas>
 
 그런 다음 아래와 같이 스크립트를 좀 추가해 줍시다.
 
-    #!html
-    <script>
+    #!javascript
     function draw_dot(x,y) {
         var canvas = document.getElementById('c');
         var ctx = canvas.getContext('2d');
@@ -253,7 +252,6 @@ Tatsumaki::MessageQueue 인스턴스를 하나 만들고 `$mq->poll_once`로 모
         }
         $.ev.handlers.game = onGameEvent;
     });
-    </script>
 
 마지막으로, game 타입의 메시지를 다루기 위해 서버 코드를 조금 수정합니다.    
 
