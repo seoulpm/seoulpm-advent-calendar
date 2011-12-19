@@ -200,7 +200,7 @@ Tatsumaki::MessageQueue 인스턴스를 하나 만들고 `$mq->poll_once`로 모
 대신 멀티파트 `multipart_xhr_push`를 한 줄 넣어 멀티파트 헤더를 추가해주고
 연결을 끊지 않고 계속 poll 하기 위해 `stream_write`로 이벤트를 전송합니다.
 
-마지막으로 [plackup][plackup]을 통해서 [Twiggy][twiggy]로 띄우면... 채팅 잘 되네요~
+마지막으로 [plackup][cpan-plackup]을 통해서 [Twiggy][cpan-twiggy]로 띄우면... 채팅 잘 되네요~
 
     #!bash
     $ plackup -s Twiggy app.psgi
@@ -293,20 +293,32 @@ Tatsumaki::MessageQueue 인스턴스를 하나 만들고 `$mq->poll_once`로 모
 이제 캔버스에 클릭으로 점을 찍으면 상대편에게도 점이 찍히는게 보이죠?
 로직을 좀 구현해넣으면 간단한 게임도 만들 수 있을 것 같고 그림을 공유하는 것도 될 것 같습니다.
 
+![완성된 채팅 서비스][img-01]
+
+*그림 1.* 완성된 채팅 서비스 ([원본][img-01])
+
 
 참고 문서
 --------
 
-- [Tatsumaki SlideShare](http://www.slideshare.net/miyagawa/tatsumaki)
-- [Github for Tatsumaki](https://github.com/miyagawa/Tatsumaki)
-- [PSGI/Plack](http://plackperl.org/)
-- [Twiggy](http://search.cpan.org/~miyagawa/Twiggy-0.1010/lib/Twiggy.pm)
+- [Tatsumaki SlideShare][tatsumaki-slideshare]
+- [Github for Tatsumaki][tatsumaki-github]
+- [PSGI/Plack][plackperl]
+- [Twiggy][cpan-twiggy]
 
+
+[img-01]: 2011-12-19-1.png
 
 [twitter-luzluna]: http://twitter.com/luzluna
+
+[tatsumaki-slideshare]: http://www.slideshare.net/miyagawa/tatsumaki
+[tatsumaki-github]: https://github.com/miyagawa/Tatsumaki
+[plackperl]: http://plackperl.org/
+
 [cpan-tatsumaki]: http://search.cpan.org/perldoc?Tatsumaki
-[plackup]: http://search.cpan.org/perldoc?plackup
-[twiggy]: http://search.cpan.org/perldoc?Twiggy
-[python-tornado]: http://www.tornadoweb.org/
+[cpan-plackup]: http://search.cpan.org/perldoc?plackup
+[cpan-twiggy]: http://search.cpan.org/perldoc?Twiggy
 [cpan-author-miyagawa]: http://search.cpan.org/~miyagawa/
+
+[python-tornado]: http://www.tornadoweb.org/
 [wiki-larry-wall]: http://en.wikipedia.org/wiki/Larry_Wall
