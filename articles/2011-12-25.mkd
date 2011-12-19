@@ -1,3 +1,20 @@
+Title:    미정
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
+
+
+저자
+-----
+
+[@luzluna][twitter-luzluna] - ...
+
+
+시작하며
+--------
+
 비동기 웹서버의 유행들을 따라서 펄에도 비동기 웹서비스를 제공할만한 좋은 방법들이 몇가지 생겼습니다. 그중 Tatsumaki는 Tatsuhik
 o Miyagawa씨께서 Python의 Tornado를 펄버전으로 새로 구현한 프레임웍입니다.
 비동기 웹서버에 대해서라면 부정적으로 생각하지만(래리월의 표현을 빌자면 Not For Human) 웹상에서 채팅이나 메신저같은 Long Polli
@@ -6,23 +23,23 @@ ng서비스를 구현하려면 마땅한 다른 방법도 없으니... 필요하
 Tatsumaki소스를 다운받으면 eg디렉토리 아래에 간단한 채팅서버 예제가 있습니다. (http://search.cpan.org/dist/Tatsumaki/lib/Tatsu
 maki.pm)
 
-=code
-package main;
-use File::Basename;
+    #!perl
+    package main;
+    use File::Basename;
+    
+    my $chat_re = '[\w\.\-]+';
+    my $app = Tatsumaki::Application->new([
+        "/chat/($chat_re)/poll" => 'ChatPollHandler',
+        "/chat/($chat_re)/mxhrpoll" => 'ChatMultipartPollHandler',
+        "/chat/($chat_re)/post" => 'ChatPostHandler',
+        "/chat/($chat_re)" => 'ChatRoomHandler',
+    ]);
+    
+    $app->template_path(dirname(__FILE__) . "/templates");
+    $app->static_path(dirname(__FILE__) . "/static");
+    
+    return $app->psgi_app;
 
-my $chat_re = '[\w\.\-]+';
-my $app = Tatsumaki::Application->new([
-    "/chat/($chat_re)/poll" => 'ChatPollHandler',
-    "/chat/($chat_re)/mxhrpoll" => 'ChatMultipartPollHandler',
-    "/chat/($chat_re)/post" => 'ChatPostHandler',
-    "/chat/($chat_re)" => 'ChatRoomHandler',
-]);
-
-$app->template_path(dirname(__FILE__) . "/templates");
-$app->static_path(dirname(__FILE__) . "/static");
-
-return $app->psgi_app;
-=cut
 main 코드입니다.
 Tatsumaki::Application를 생성하면서 처리할 URL패턴과 각 패턴에대한 핸들러를 추가해주네요.
 그리고선 template path설정도 해주고 static file을 처리하기위한 설정도 추가해주네요.
@@ -30,121 +47,122 @@ Tatsumaki::Application를 생성하면서 처리할 URL패턴과 각 패턴에�
 
 
 그럼 ChatRoomHandler를 한번 보겠습니다.
-=code
-package ChatRoomHandler;
-use base qw(Tatsumaki::Handler);
 
-sub get {
-    my($self, $channel) = @_;
-    $self->render('chat.html');
-}
-=cut
+    #!perl
+    package ChatRoomHandler;
+    use base qw(Tatsumaki::Handler);
+    
+    sub get {
+        my($self, $channel) = @_;
+        $self->render('chat.html');
+    }
+
 그냥 chat.html template을 랜더링하네요.
-
-
 이번엔 ChatPostHandler입니다.
-=code
-package ChatPostHandler;
-use base qw(Tatsumaki::Handler);
-use HTML::Entities;
-use Encode;
 
-sub post {
-    my($self, $channel) = @_;
+    #!perl
+    package ChatPostHandler;
+    use base qw(Tatsumaki::Handler);
+    use HTML::Entities;
+    use Encode;
+    
+    sub post {
+        my($self, $channel) = @_;
+    
+        my $v = $self->request->parameters;
+        my $html = $self->format_message($v->{text});
+        my $mq = Tatsumaki::MessageQueue->instance($channel);
+        $mq->publish({
+            type => "message", html => $html, ident => $v->{ident},
+            avatar => $v->{avatar}, name => $v->{name},
+            address => $self->request->address,
+            time => scalar Time::HiRes::gettimeofday,
+        });
+        $self->write({ success => 1 });
+    }
+    
+    sub format_message {
+        my($self, $text) = @_;
+        $text =~ s{ (https?://\S+) | ([&<>"']+) }
+                  { $1 ? do { my $url = HTML::Entities::encode($1); qq(<a target="_blank" href="$url">$url</a>) } :
+                    $2 ? HTML::Entities::encode($2) : '' }egx;
+        $text;
+    }
 
-    my $v = $self->request->parameters;
-    my $html = $self->format_message($v->{text});
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
-    $mq->publish({
-        type => "message", html => $html, ident => $v->{ident},
-        avatar => $v->{avatar}, name => $v->{name},
-        address => $self->request->address,
-        time => scalar Time::HiRes::gettimeofday,
-    });
-    $self->write({ success => 1 });
-}
-
-sub format_message {
-    my($self, $text) = @_;
-    $text =~ s{ (https?://\S+) | ([&<>"']+) }
-              { $1 ? do { my $url = HTML::Entities::encode($1); qq(<a target="_blank" href="$url">$url</a>) } :
-                $2 ? HTML::Entities::encode($2) : '' }egx;
-    $text;
-}
-=cut
 핵심적인 코드는 $mq = Tatsumaki::MessageQueue->instance($channel); 이렇게 체널 이름에 맞는 Tatsumaki::MessageQueue를 만드는 코
 드와 $mq->publish( ... ); 이렇게 메시지를 Queue에 쏘는 두줄이 끝이네요.
 
-
-
 이번엔 ChatPollHander
-=code
-package ChatPollHandler;
-use base qw(Tatsumaki::Handler);
-__PACKAGE__->asynchronous(1);
 
-use Tatsumaki::MessageQueue;
+    #!perl
+    package ChatPollHandler;
+    use base qw(Tatsumaki::Handler);
+    __PACKAGE__->asynchronous(1);
+    
+    use Tatsumaki::MessageQueue;
+    
+    sub get {
+        my($self, $channel) = @_;
+        my $mq = Tatsumaki::MessageQueue->instance($channel);
+        my $client_id = $self->request->param('client_id')
+            or Tatsumaki::Error::HTTP->throw(500, "'client_id' needed");
+        $client_id = rand(1) if $client_id eq 'dummy'; # for benchmarking stuff
+        $mq->poll_once($client_id, sub { $self->on_new_event(@_) });
+    }
+    
+    sub on_new_event {
+        my($self, @events) = @_;
+        $self->write(\@events);
+        $self->finish;
+    }
 
-sub get {
-    my($self, $channel) = @_;
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
-    my $client_id = $self->request->param('client_id')
-        or Tatsumaki::Error::HTTP->throw(500, "'client_id' needed");
-    $client_id = rand(1) if $client_id eq 'dummy'; # for benchmarking stuff
-    $mq->poll_once($client_id, sub { $self->on_new_event(@_) });
-}
-
-sub on_new_event {
-    my($self, @events) = @_;
-    $self->write(\@events);
-    $self->finish;
-}
-=cut
-post비슷하게 Tatsumaki::MessageQueue 인스턴스 하나 만들고 $mq->poll_once로 대기합니다. 이벤트가 도착하면 이벤트를 보낸후($self
-->write(\@events)) 끝.
-
-
+post비슷하게 Tatsumaki::MessageQueue 인스턴스 하나 만들고 $mq->poll_once로 대기합니다. 
+이벤트가 도착하면 이벤트를 보낸후($self->write(\@events)) 끝.
 ChatMultipartPollHandler는?
-=code
-package ChatMultipartPollHandler;
-use base qw(Tatsumaki::Handler);
-__PACKAGE__->asynchronous(1);
 
-sub get {
-    my($self, $channel) = @_;
+    #!perl
+    package ChatMultipartPollHandler;
+    use base qw(Tatsumaki::Handler);
+    __PACKAGE__->asynchronous(1);
+    
+    sub get {
+        my($self, $channel) = @_;
+    
+        my $client_id = $self->request->param('client_id') || rand(1);
+    
+        $self->multipart_xhr_push(1);
+    
+        my $mq = Tatsumaki::MessageQueue->instance($channel);
+        $mq->poll($client_id, sub {
+            my @events = @_;
+            for my $event (@events) {
+                $self->stream_write($event);
+            }
+        });
+    }
 
-    my $client_id = $self->request->param('client_id') || rand(1);
-
-    $self->multipart_xhr_push(1);
-
-    my $mq = Tatsumaki::MessageQueue->instance($channel);
-    $mq->poll($client_id, sub {
-        my @events = @_;
-        for my $event (@events) {
-            $self->stream_write($event);
-        }
-    });
-}
-=cut
-거의 비슷한데 멀티파트니까 multipart_xhr_push를 한줄 넣어서 멀티파트헤더를 추가해주고 커넥션을 끊지않고 계속 poll하면서 stream
-_write로 event를 전송하네요.
+거의 비슷한데 멀티파트니까
+`multipart_xhr_push`를 한줄 넣어서 멀티파트헤더를 추가해주고 커넥션을 끊지않고 계속 poll하면서
+`stream_write`로 event를 전송하네요.
 
 
-plackup -s Twiggy app.psgi
+    #!bash
+    $ plackup -s Twiggy app.psgi
+
 plackup을 통해서 Twiggy로 띄우면... 채팅 잘 되네요~
-
 
 보너스~~
 채팅만 하려니까 뭔가 심심해서 재미있는걸 해볼 수 있게 canvas를 추가해봤습니다.
 chat.html에다가
 
- <canvas id="c" width="200" height="100" style="border:1px solid"></canvas>
+    #!html
+    <canvas id="c" width="200" height="100" style="border:1px solid"></canvas>
 
 이렇게 한줄 추가하고...
 
-=code
-<script>
-function draw_dot(x,y) {
+    #!html
+    <script>
+    function draw_dot(x,y) {
         var canvas = document.getElementById('c');
         var ctx = canvas.getContext('2d');
         ctx.beginPath();
@@ -152,73 +170,75 @@ function draw_dot(x,y) {
         ctx.fillStyle = '#5555AA';
         ctx.fill();
         ctx.stroke();
-}
+    }
 
-$(function(){
+    $(function(){
         $('#c').mouseup(function(e) {
-                var canoffset = $('#c').offset();
-                var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left
-);
-                var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) +
- 1;
-
-                draw_dot(x,y);
-
-                $.ajax({
-                        url: "/chat/<%= $channel %>/post",
-                        data: { type: 'game', x: x, y: y, text:'g' },
-                        type: 'post',
-                        dataType: 'json',
-                        success: function(r) { }
-                });
+            var canoffset = $('#c').offset();
+            var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
+            var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
+            
+            draw_dot(x,y);
+            
+            $.ajax({
+                url: "/chat/<%= $channel %>/post",
+                data: { type: 'game', x: x, y: y, text:'g' },
+                type: 'post',
+                dataType: 'json',
+                success: function(r) { }
+            });
 
         });
 
         var onGameEvent = function(e) {
-                draw_dot(e.x, e.y);
+            draw_dot(e.x, e.y);
         }
         $.ev.handlers.game = onGameEvent;
-});
-</script>
-=cut
+    });
+    </script>
+    
 이렇게 스크립트를 좀 추가해놓으면 캔버스에 클릭으로 점을 찍으면 상대편에게도 점이 찍히는게 보이죠? 로직을 좀 구현해넣으면 간단
 한 게임도 만들 수 있을 것 같고 그림을 공유하는것도 될것같네요.
 
 이렇게 해놓고보니 타입이 game인 경우 처리하는 서버 코드가 좀 들어가야겠네요.
 대충 game타입이 들어올경우만 처리하도록 살짝 수정 했습니다.
-=code
-package ChatPostHandler;
-use base qw(Tatsumaki::Handler);
-use HTML::Entities;
-use Encode;
 
-sub post {
-    my($self, $channel) = @_;
+    #!perl
+    package ChatPostHandler;
+    use base qw(Tatsumaki::Handler);
+    use HTML::Entities;
+    use Encode;
+    
+    sub post {
+        my($self, $channel) = @_;
+    
+        for ( keys %{$self->request->parameters} ) {
+            $self->request->parameters->{$_} = decode('utf8', $self->request->parameters->{$_});
+        }
+        my $v = $self->request->parameters;
+        my $html = $self->format_message($v->{text});
+        my $mq = TatsumakiZeroMQ->instance($channel);
+        if (defined $v->{type} && $v->{type} eq 'game' ) {
+            $mq->publish({
+                type => "game", html => $html,
+                x => $v->{x}, y => $v->{y},
+                ident => $v->{ident},
+                avatar => $v->{avatar}, name => $v->{name},
+                address => $self->request->address,
+                time => scalar Time::HiRes::gettimeofday,
+            });
+        }
+        else {
+            $mq->publish({
+                type => "message", html => $html, ident => $v->{ident},
+                avatar => $v->{avatar}, name => $v->{name},
+                address => $self->request->address,
+                time => scalar Time::HiRes::gettimeofday,
+            });
+        }
+        $self->write({ success => 1 });
+    }
 
-    for ( keys %{$self->request->parameters} ) {
-        $self->request->parameters->{$_} = decode('utf8', $self->request->parameters->{$_});
-    }
-    my $v = $self->request->parameters;
-    my $html = $self->format_message($v->{text});
-    my $mq = TatsumakiZeroMQ->instance($channel);
-    if (defined $v->{type} && $v->{type} eq 'game' ) {
-        $mq->publish({
-            type => "game", html => $html,
-            x => $v->{x}, y => $v->{y},
-            ident => $v->{ident},
-            avatar => $v->{avatar}, name => $v->{name},
-            address => $self->request->address,
-            time => scalar Time::HiRes::gettimeofday,
-        });
-    }
-    else {
-        $mq->publish({
-            type => "message", html => $html, ident => $v->{ident},
-            avatar => $v->{avatar}, name => $v->{name},
-            address => $self->request->address,
-            time => scalar Time::HiRes::gettimeofday,
-        });
-    }
-    $self->write({ success => 1 });
-}
-=cut
+
+[twitter-luzluna]: http://twitter.com/luzluna
+
