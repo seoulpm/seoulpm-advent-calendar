@@ -41,6 +41,7 @@ sub _DoCodeBlocks {
             when ( /^\s*#!bash$/ism       ) { $brush = 'bash'    }
             when ( /^\s*#!cpp$/ism        ) { $brush = 'cpp'     }
             when ( /^\s*#!diff$/ism       ) { $brush = 'diff'    }
+            when ( /^\s*#!ini$/ism        ) { $brush = 'ini'     }
             when ( /^\s*#!java$/ism       ) { $brush = 'java'    }
             when ( /^\s*#!javascript$/ism ) { $brush = 'jscript' }
             when ( /^\s*#!perl$/ism       ) { $brush = 'perl'    }
