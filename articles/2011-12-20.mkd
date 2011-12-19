@@ -1,4 +1,11 @@
-Mojolicious를 이용한 비동기 채팅( HTML5 WebSocket )
+Title:    Mojolicious, HTML5, WebSocket을 이용한 비동기 채팅
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   eeyees
+
+
+
 
 *저자
 일본쪽에서 일하다가 한국 후지 제록스로 2011년에 이직 하게 되었습니다.
