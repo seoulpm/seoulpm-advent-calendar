@@ -8,7 +8,9 @@ Author:   luzluna
 저자
 -----
 
-[@luzluna][twitter-luzluna] - ...
+[@luzluna][twitter-luzluna] - 
+Seoul.pm과 #perl-kr의 육아 전문 컨설턴트, 사회적 기업을 꿈꾸는 커피 매니아이자 백수,
+제주와 서울을 오가며 몽거스 활동을 하고 있다.
 
 
 시작하며
