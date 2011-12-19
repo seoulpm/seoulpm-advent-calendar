@@ -7,7 +7,8 @@ Author:   eeyees
 저자
 -----
 
-[@eeyees][eeyees-twitter] 인쇄기기 업계의 기린아, TAFKA_HoliK라는 닉을 사용하기도 한다.
+[@eeyees][eeyees-twitter] - 인쇄기기 업계의 기린아, TAFKA_HoliK라는 닉을 사용하기도 한다.
+일본에서 일하다가 올해 한국 후지 제록스로 이직하였다.
 
 
 시작하며
