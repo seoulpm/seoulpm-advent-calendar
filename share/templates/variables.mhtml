@@ -94,6 +94,10 @@ return {
             url   => 'http://www.catalystframework.org/calendar/2011',
         },
         {
+            title => 'Perl 中文 Advent Calendar',
+            url   => 'http://perlchina.github.com/advent.perlchina.org/',
+        },
+        {
             title => 'Japan Perl Advent Calendar',
             url   => 'http://perl-users.jp/articles/advent-calendar/2011/',
         },
