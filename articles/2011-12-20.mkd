@@ -17,41 +17,48 @@ Author:   eeyees
 시작하며
 ---------
 
-우리는 지난 기사들에서 카탈리스트, 댄서와 같은 웹 프레임워크를 볼 수 있었습니다.
-제가 오늘 소개 소개 시켜 드릴 웹 프레임워크는 Mojolicious라는 웹 프레임워크 입니다.
+우리는 지난 기사에서 카탈리스트, 댄서와 같은 웹 프레임워크를 볼 수 있었습니다.
+제가 소개시켜 드릴 것은 [Mojolicious][mojolicious]라는 웹 프레임워크입니다.
 
-공식 사이트(http://mojolicio.us/)에서 확인 하실수 있는 것 처럼 Real-Time WebFrameWork을 표방하고 있습니다.
+Mojolicious는 실시간 웹 프레임워크를 표방하고 있습니다.
+그 외에도 멋진 특징들이 많이 있습니다. 공식 사이트에서는 아래와 같이 소개하고 있습니다.
 
-오늘은 가볍게 Mojolicious를 이용해 Websocket으로 비동기 채팅하는 소스 코드를 살펴 볼 것 입니다.
+- 실시간 웹 프레임워크로서 Mojolicious::Lite를 통해 단일 파일로 간소화한 버전도 제공
+- REST 라우트, 플러그인, 펄에 적합한 탬플렛, 세션 관리, 서명된 쿠키, 테스팅 프레임워크, 정적 파일 서버, I18N, 최고의 유니코드 지원 등 강력하고 격이 다른 구성
+- 아주 깔끔하고 이식성 높으며, 비밀스런 작동은 않으며, 펄 5.10.1 외에 의존하는 것이 없다. 순수한 펄 객체지향 API로 제공된다.
+- HTTP 1.1 스택을 완전히 지원하고, IPv6, TLS, Bonjour, IDNA, Comet(long polling), chunking과 멀티파트 지원 및 웹소켓 클라이언트/서버 구현 제공
+- 기본적으로 non-blocking I/O 웹 서버로서, libev와 hot deployment 지원, 임베딩에 최적
+- CGI 및 PSGI 자동 인식
+- JSON, HTML5/XML 파서 및 CSS3 선택자 지원
+- 몇 년 간의 Catalyst 개발 경험을 기반으로 깔끔하게 개발됨.
+
+오늘은 가볍게 Mojolicious를 이용해 Websocket으로 비동기 채팅하는 소스 코드를 살펴봅시다.
 
 
 
 뼈대 만들기
 -----------
 
-리눅스라면 다음과 같은 코멘트로 간단하게 인스톨을 할 수 있습니다.
+리눅스라면 다음과 같은 명령으로 간단하게 설치할 수 있습니다.
 
     #!bash
     $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
+    
+cpan이 설정되어 있다면 아래와 같이 설치합니다.
 
-*채팅 어플리케이션의 뼈대 만들기
-인스톨이 다되었다면 다음과 같은 코멘트로 뼈대를 만들수 있습니다.
+    #!bash
+    $ cpan Mojolicious
 
-*라이트판 어플리케이션 만들기
-간단한 웹 어플리케이션을 위한 라이트판의 어플리케이션 뼈대를 만들수 있습니다.
+Mojolicious가 설치되면 mojo라는 명령행 도구가 생성됩니다.
+Mojolicious::Lite를 기반으로 한 간단한 웹 어플리케이션 뼈대를 만들기 위해서는
+아래와 같이 입력할 것입니다.
 
     #!bash
     $ mojo generate lite_app
 
-오늘은 라이트판이 아닌 정식 어플리케이션을 만들어 봅시다.
-
-    #!bash
-    $ mojo generate app chat
-    Your application name has to be a well formed (camel case) Perl module name
-    like "MyApp".
-
-엔터를 치고 보니 웁스
-첫문자를 대문자로 바꾸고 다시 실행 해 보도록 하죠.
+오늘은 간소화 버전이 아닌 정식 웹 어플리케이션을 만들어 봅시다.
+따라서 `lite_app` 대신 `app` 타입으로 지정합니다.
+어플리케이션의 이름은 Chat로 지어주었습니다.
 
     #!bash
     $ mojo generate app Chat
@@ -72,10 +79,10 @@ Author:   eeyees
       [mkdir] /home/holik/tmp/chat/templates/example
       [write] /home/holik/tmp/chat/templates/example/welcome.html.ep
 
-
-char 폴더에 들어가보도록 하죠.
+생성된 chat 디렉터리에 들어가 내부 구성을 살펴봅시다.
 
     #!bash
+    ~/tmp$ cd chat
     ~/tmp/chat$ tree
     .
     ├── lib
@@ -97,24 +104,27 @@ char 폴더에 들어가보도록 하죠.
     
     9 directories, 7 files
 
-lib 아래에 있는 부분이 서버의 컨트롤 부분이겠군요.
-log 폴더는 log를 남기는 폴더 겠구요.
-public은 공통적으로 쓰는 html페이지를 저장 하고 있네요.
-scrpit파일은 실행 파일을 담고 있구요.
-t는 테스트 파일을 담고 있네요.
-templates부분은 서버의 뷰 부분을 담당하고 있는 친구들인가 보군요.
+`lib` 아래에 있는 부분이 서버의 컨트롤러 부분이겠군요.
+`log` 디렉터리에는 로그를 남길 것입니다.
+`public`에는 공통적으로 쓰이는 정적 파일이 올라갈 것입니다. 여기서는 html 페이지를 보관하고 있네요.
+`script`에는 구동 스크립트가 들어 있습니다.
+`t` 디렉터리에는 테스트 묶음이 들어갈 것입니다.
+`templates` 부분은 서버의 뷰 부분을 담당하고 있는 친구들인가 보군요.
 
-간단하게 웹 서비스를 한번 실행해 보죠.
-scrpit 폴더로 이동후에 다음과 같은 명령어를 입력 해 봅시다.
-holik@holikNoteBook:~/tmp/chat/script$ morbo chat 
-Server available at http://127.0.0.1:3000.
+간단하게 웹 서비스를 한번 실행해 봅시다.
+아래와 같이 `script` 디렉터리에 들어있는 `chat` 스크립트를 `morbo` 명령을 통해 실행합니다.
 
-이후에 브라우져에서 다음과 같이 입력해 봅시다.
-http://127.0.0.1:3000/welcome
+    #!bash
+    ~/tmp/chat$ morbo script/chat 
+    Server available at http://127.0.0.1:3000.
 
--------------------------------------------------스크린샷1 (sc1.png)
-http://127.0.0.1:3000/welcome잘나오네요 :)
-그럼 이제부터 채팅 프로그램을 만들어 봅시다.
+이제 웹 브라우저에서 [http://127.0.0.1:3000/welcome]()에 접근해 봅시다.
+
+![생성된 뼈대를 구동해 열어본 웹 페이지][img-01]
+*그림 1.* 생성된 뼈대를 구동해 열어본 웹 페이지
+
+잘 나오네요.
+그럼 이제부터 채팅 프로그램을 만들어 봅시다. :)
 
 
 
@@ -203,4 +213,5 @@ websocket을 지원하지 않는 브라우져를 만저 체크하고
 
 
 [twitter-eeyees]: http://twitter.com/eeyees
+[mojolicious]: http://mojolicio.us/
 
