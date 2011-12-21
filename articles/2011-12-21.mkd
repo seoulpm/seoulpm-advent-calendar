@@ -2,7 +2,7 @@ Title:    Perl로 시스템 트레이딩하기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   keedi
+Author:   saillinux
 
 저자
 -----
