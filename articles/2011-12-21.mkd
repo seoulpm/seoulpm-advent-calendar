@@ -1,0 +1,459 @@
+* 시작을 알리며
+  오늘은 Perl을 이용한 생소하지만 아주 간단한 시스템 트레이딩을 소개
+  드립니다. 본문에서 소개한 내용을 기반으로 자신만의 Trading System을
+  구축 할수 있는 프레임워크를 구현 하는 것이 이번 기사의 목적입니다.
+
+  본 기사에서 다루는 내용은 수익이 목적이 아닌 시스템 트레이딩 입문을
+  위한 것이 오니, 이로 인해 발생하는 모든 불이익은 책임 지지 않습니다.
+
+* 시작하기 전에...
+  시스템 트레이딩을 구축한다는 것은 여러 분야의 기술을 접목함으로
+  동작하는 시스템 임으로 본 기사를 이해 하기 위해 아래의 사전 지식과
+  준비물을 요구 합니다.
+
+** 시스템 트레이딩 구축을 위한 사전 지식
+  - 기본 주식 지식 및 HTS를 이용한 매매 경험
+    - [[http://www.yes24.com/24/goods/5926363?scode=032&OzSrank=8][주식투자 무작정 따라하기]]
+
+  - 약간의 주식 기술적 분석 (Technical Analysis)
+    - [[http://www.yes24.com/24/goods/4965201?scode=032&OzSrank=9][개념과 원리가 있는 친절한 기술적 분석]]
+
+  - Etrade X-ing API 및 약간의 Win32::OLE 프로그래밍
+    - [[http://search.cpan.org/~jdb/Win32-OLE-0.1709/lib/Win32/OLE.pm][Win32::OLE]] (COM 인터페이스를 다루기 위한 모듈 입니다)
+    - etrade.co.kr X-ING API
+
+** 시스템 트레이딩을 위한 준비물
+  - 증권 계좌
+    - 은행에 방문을 하셔서 증권 계좌를 신설 합니다. 은행 직원 분이
+      친절하게 도와 주십니다. 즉 여러분의 은행 계좌와 증권 계좌를
+      연결합니다. 이쁜 직원 분이 해 주시면 왠지 더 잘되는 기분이
+      듭니다. 기분이 좋습니다.
+
+    <그림. Camel_Invest.jpg>
+      
+    - Etrade의 HTS및 API를 이용하기 위해선 증권 계좌 번호, 은행 계좌
+      번호 그리고 공인 인증서가 필요 합니다.
+
+  - Etrade HTS 및 X-ing COM, Res and DLL 파일 (나중에 설명)
+
+  - StrawBerry Perl http://strawberryperl.com/
+    - Win32::OLE 모둘이 기본으로 제공 됨
+
+* 시스템 트레이딩 구축하기
+
+** Win32::OLE를 이용하여 이트레이드 X-ing API를 활용 하자!
+   이트레이드 증권에서는 X-ing API를 제공하여 개발자들이 자신의 입맞에
+   맞도록 HTS 매매 시스템을 구축 할수 있습니다.
+
+   본 기사에서는 X-ing API가 제공 하는 COM을 이용하여 모의 서버에 접속
+   후 아래의 기능들을 활용 하실 수 있습니다.
+
+   - 이트레이드 증권 서비스를 로긴 후 세션을 유지 하실 수 있습니다.
+   - 실시간 호가 및 체결값을 실시간으로 받으실수 있습니다.
+   - 현물 매수/매도 주문을 낼수 있습니다.
+   - 선물,옵션 그리고 ELW 파생 삼품 서비스를 이용 하실 수 있습니다.
+   - 그 밖에 수많은 기능들은 X-ing API reference를 참조 하시면 됩니다.
+
+*** X-ing API 사용을 위한 필요 파일 설치 하기
+   우선 X-ing API COM, Res 파일을 공식 홈페이지에서 받습니다. 파일을
+   받기 위해서는 Etrade 증권 계좌와 회원 가입이 이미 되어야 하실 수
+   있습니다..
+
+   '-']... 허허 이런건 어여 어여 넘어갔시다 하시는 분들은 아래 파일을
+   받으셔서 C:\에 푸시면 됩니다.
+
+   <link to XING_demo.zip>
+
+   etrade.co.kr 사이트를 방문 하여 X-ing API를 검색창에 넣어 검색 합니다.
+
+   <그림 1. COM_Download.jpg>
+
+   C:\XING 디렉토리를 생성 합니다. 아래의 다운로드 받으신 파일을 압축을
+   풀어 디렉토리에 넣습니다.
+
+   - COM(2011.04.26).zip
+   - Res(2011.10.20).zip
+
+   COM(2011.04.26) -> COM으로 rename합니다.
+   Res(2011.10.20) -> Res로 rename합니다.
+
+   아래 DLL 파일은 COM파일의 최근 업데이트 파일이기 때문에 COM
+   디렉토리에 풀어 주셔야 합니다.
+
+   - Programs(2011.11.10).zip
+
+   파일을 풀고 난후 디렉토리 구조
+   C:\XING
+   C:\XING\COM
+   C:\XING\Res
+   C:\XING\Res\Real
+   C:\XING\Res\Tran
+
+   C:\XING\COM에 들어가서 Reg.bat를 실행하여 X-ing COM
+   오브젝트를 등록 합니다.
+
+   <그림. COM_Install.jpg>
+
+   Xing-API를 사용하기 위한 사전 준비가 완료 되었습니다. API를 테스트
+   하기 위해선 모의 투자 계좌를 이용하여 하도록 하겠습니다. 실전이 아닌
+   증권사에서 제공하는 모의 투자 시스템으로 연습을 먼저 합니다.
+
+   모의 투자 계좌는 증권 계좌와 다르기 때문에 우선 HTS를 받아 설치 후
+   모의 투자 모드로 로긴을 하여 계좌 번호를 받으셔야 합니다.
+
+   <그림. HTS_Download.jpg>
+
+   설치를 완료 하신 후 다음과 같이 HTS 로그인 하시도록 합니다.
+
+   <그림. HTS_Demo.jpg>
+
+   그림에 표시된 모의 증권 계좌 번호를 적어 두도록 합니다. 그리고 모의
+   투자 계좌 비밀 번호는 0000입니다.
+
+   <그림. HTS_Account.jpg>
+
+   위의 사전 준비와 모의 투자 계좌 번호를 받으셨으면 Perl이 제공하는
+   Win32::OLE를 이용하여 Xing-API를 사용 해 보겠습니다.
+
+
+*** X-ing API를 우아하게 펄에서 사용 하도록 하자 '-'] 엣헴!
+
+   Reg.bat를 실행함으로 X-ing COM 객체가 원도우에 등록
+   되었습니다. Win32::OLE를 사용 하면 COM이 제공하는 X-ing API를 직접
+   호출 하여 사용 할수 있는게 여간 편한게 아닙니다. 이를 C++혹 비주얼
+   베이직으로 작성 할라 생각하면 벌써 부터 손가락이 얼얼 해 지는군요.
+
+   우선 X-ing API를 이용하여 로긴을 하여 세션을 생성 하겠습니다. 우선
+   약간의 Win32::OLE의 지식을 요구 합니다만 본 기사에서 소개 하는
+   내용들은 많이 지식을 요구 하지 않습니다. 하지만 되도록 이면 Perl로
+   API를 활용하는 부분에 집중 하는 점 양해 부탁 드리겠습니다.
+
+   본 예제는 trading.pl에 작성 되어 있습니다.
+
+#+BEGIN_SRC perl
+   use strict;
+   use warnings;
+   use Carp;
+   use Win32::OLE qw/EVENTS/;
+#+END_SRC
+
+   Win32::OLE 모듈을 로드 하였습니다. 여기서 [[http://search.cpan.org/~jdb/Win32-OLE-0.1709/lib/Win32/OLE.pm#Events][EVENTS]]를 import하였는데
+   이벤트 핸들링을 할수 있게끔 해주는 기능이라 반드시 import해주셔야
+   합니다.
+
+   우선 X-ing API에서 Session을 담당하는 XA_Session.XASession을 불러
+   OLE 객체를 받도록 합니다.
+
+#+BEGIN_SRC perl
+   my $XASession = Win32::OLE->new('XA_Session.XASession')
+      or croak Win32::OLE->LastError();
+#+END_SRC
+
+   그리고 XASession 사용시 일어나는 모든 이벤트를 핸들 할수 있도록
+   다음과 같은 핸들러를 작성합니다.
+
+#+BEGIN_SRC perl
+   my $XASessionEvents = sub {
+    my ($obj, $event, @args) = @_;
+
+    # 1: OnLogin, 2: OnLogout, 3: OnDisconnect
+    if ($event == 1) {
+	my ($code, $msg) = @args;
+	print "XASession Login Event: [$code] $msg \n";
+	Win32::OLE->QuitMessageLoop();
+    } elsif ($event ==2) {
+	print "XASession Logout Event: @args \n";
+	Win32::OLE->QuitMessageLoop();
+    } elsif ($event == 3) {
+	print "XASession Disconnect Event: @args \n";
+	Win32::OLE->QuitMessageLoop();
+    }
+   };
+#+END_SRC
+
+   이벤트 코드가 1이면 로그인이 성공 되었다는 뜻이면 2번은 로그아웃이
+   성공적으로 이루어 졌다는 뜻입니다. 3번일경우는 Disconnect가
+   이루어졌다는 의미입니다. 그데로 가져다 사용 하시면 됩니다.
+
+#+BEGIN_SRC perl
+   Win32::OLE->WithEvents($XASession, $XASessionEvents,
+			  '{6D45238D-A5EB-4413-907A-9EA14D046FE5}');
+
+   croak Win32::OLE->LastError() if Win32::OLE->LastError() != 0;
+#+END_SRC
+
+   위의 코드는 XASession객체가 생성 하는 모든 이벤트를 핸들링 하겠다는
+   의미 입니다. WithEvents를 사용 하지 않으면 로드 한 객체의 이벤트를
+   핸들링 하지 않게 됩니다.
+
+   간혹 어떤 객체들은 Win32::OLE가 자동으로 이벤트 인터페이스를 판별
+   하지 못할때가 있습니다. 그럴 경우에는 직접 객체의 COCLASS
+   (IProvideClassInfo2를 참조) 값이라던지 혹은 이벤트의 DISPATCH
+   인터페이스를 찾아 3번째 인자로 제공 해 주어야 합니다.
+
+   여기까지는 X-ing API의 OLE 객체를 얻기 까지 위한 준비 였습니다. 다음
+   X-ing API의 프로그램 흐름도에 대해 알아 보겠습니다.
+
+   1. 서버에 연결: X-ing 서버에 연결
+   2. 로그인: 서버에 아이디/암호, 공인인증으로 로그인
+   3. 데이터처리: 조회성 TR/실시간 TR을 이용하여 데이터 조회 및 처리
+   4. 로그아웃: X-ing 서버에서 로그아웃
+   5. 서버연결종료: 서버와 연결된 세션 종료
+
+   서버 연결에 필요 한 정보를 준비 해봅니다.
+
+#+BEGIN_SRC perl
+   my $server  = 'demo.etrade.co.kr';	# 모의 투자 서버 주소
+   my $port    = 20001;			# 서비스 포트
+   my $user    = '';       		# 이트레이드 증권 아이디
+   my $pass    = '';	        	# 이트레이드 증권 암호
+   my $certpwd = '';			# 공인 인증서 암호
+   my $srvtype = 1;			# 서버 타입
+   my $showcerterr = 1;                 # 공인 인증서 에러
+#+END_SRC
+
+   위의 정보를 기반으로 OLE객체를 이용해 XASession의 ConnectServer
+   함수를 호출 하여 세션을 생성합니다.
+   
+#+BEGIN_SRC perl
+   $XASession->ConnectServer($server, $port)
+     or croak $XASession->GetErrorMessage( $XASession->GetLastError );
+#+END_SRC
+
+   생성된 세션을 이용하여 Login 함수를 호출 하여 로그인을 시도
+   합니다. 이를 위해 유저 아이디, 암호, 공인인증암호가 필요
+   합니다. 모의 투자 테스트시 공인인증 암호는 제공 안 하셔도 됩니다.
+
+#+BEGIN_SRC perl
+   $XASession->Login($user, $pass, $certpwd, $srvtype, $showcerterr)
+     or croak $XASession->GetErrorMessage( $XASession->GetLastError );
+#+END_SRC
+
+   로그인에 대한 처리 다이어그램입니다.
+
+   <그림. COM_Login.jpg>
+
+   MessageLoop를 호출 하는 시점에서 프로그램은 QuitMessageLoop가 호출
+   되기전까지 Windows Message Loop(이벤트를 위한 무한 루프) 모드로
+   돌입하며 이벤트를 dispatch 하기 시작 합니다. 이렇게 해서 얻은
+   이벤트는 아까 작성 한 이벤트 핸들러인 XASessionEvents 에서
+   처리됩니다. 여기서는 로그인 세션을 맺은 것이 확인 되면 다음 작업을
+   위해 QuitMessageLoop를 호출하여 이벤트 루프에서 나옵니다.
+   
+#+BEGIN_SRC perl
+   Win32::OLE->MessageLoop();
+#+END_SRC
+
+   지금 까지 모의 서버에 접속 하여 로긴까지 함으로 세션을 생성 하는데까지 성공 하였습니다.
+
+   다음은 실시간으로 호가 및 체결 값을 받는 로직을 구현 하겠습니다.
+
+   X-ing API는 두종류의 Transaction을 지원 합니다. 여기서
+   Transaction이란 서버로부터 데이터를 얻기 위해 요청하고 데이터를 받는
+   일련의 행동을 말합니다.
+
+   1. 조회 TR
+      조회 TR은 서버로 부터 요청 당시의 데이터를 전송 합니다.
+
+   3. 실시간 TR
+      서버로 데이터 요청을 하면 이후에 데이터가 변경될때 마다 데이터를 전송합니다. (이벤트 방식)
+
+   <그림. COM_TR.jpg>
+
+
+   여기서는 호가 데이타를 받아 오는 실시간 TR을 작성 해 보도록
+   하겠습니다.
+
+   실시간 데이터를 제공하는 XAReal COM 객체를 불러 옵니다.
+
+#+BEGIN_SRC perl   
+   my $XAReal = Win32::OLE->new('XA_DataSet.XAReal.1')
+    or croak Win32::OLE->LastError();
+#+END_SRC
+
+   호가 데이터는 실시간으로 업데이트 되는 값이며 X-ing API에서는 실시간
+   TR 구조체인 S3_를 참조 하여 호가 데이터를 요청 및 추출
+   합니다. 우리가 앞서 압축을 풀어 res 폴더에 저장 하였던 디렉토리에
+   있는 파일을 로딩 합니다.
+
+#+BEGIN_SRC perl 
+   $XAReal->LoadFromResFile("$FindBin::Bin/res/Real/H1_.res")
+     or croak Win32::OLE->LastError();
+#+END_SRC
+
+   KOSPI호가잔량 데이터에 대한 이벤트 핸들링 입니다. XAReal OLE객체가
+   제공하는 함수인 GetFieldData로 H1_.res DATA MAP 파일을 참조 하여
+   데이터 블록에서 필드값을 추출 합니다.  여기서 첫번째 인자인
+   OutBlock의 의미는 DATA MAP을 참조시 데이터 블록을 받았을 경우의
+   필드를 참조 하라는 뜻입니다.
+
+#+BEGIN_SRC perl
+   my $XARealEvents = sub {
+   my ($obj, $event, @args) = @_;
+   # 1: OnReceiveRealData
+   if ($event == 1) {
+	# 호가 값이 업데이트 된 시간을 추출 합니다.
+	my $hotime   = $XAReal->GetFieldData('OutBlock', 'hotime');
+	# 매도 호가1 값을 추출합니다.
+	my $offerho1 = $XAReal->GetFieldData('OutBlock', 'offerho1');
+	# 매수 호가1 값을 추출합니다.
+	my $bidho1   = $XAReal->GetFieldData('OutBlock', 'bidho1');
+
+	print "\t$hotime $offerho1 $bidho1\n";
+    }
+   };
+#+END_SRC
+
+   XAReal이 받는 모든 이벤트를 XARealEvents 핸들러가 처리 하겠다고 등록 합니다.
+
+#+BEGIN_SRC perl
+   Win32::OLE->WithEvents($XAReal, $XARealEvents, '{16602768-2C96-4D93-984B-E36E7E35BFBE}');
+
+   croak Win32::OLE->LastError() if Win32::OLE->LastError() != 0;
+#+END_SRC
+
+   데이터를 보낼때 생성할 블록 데이터는 다음과 같이 SetFieldData 함수를
+   호출 하여 생성 할수 있습니다.
+
+#+BEGIN_SRC perl   
+   $XAReal->SetFieldData('InBlock', 'shcode', '000270');
+   $XAReal->AdviseRealData();
+#+END_SRC
+
+   여기서 InBlock을 명시함으로 DATA MAP을 참조 시 데이터 블록을 보낼
+   경우의 필드를 참조 하라는 뜻입니다. 여기서 shcode는 종목을 나타내며
+   000270로 설정 하게 되면 기아차 호가 잔량을 요청 한다는 뜻이 됩니다.
+
+   데이터 블록 생성을 완료 하였으면 AviseReadData 함수를 호출 하여
+   실시간 데이터를 받기 시작 합니다.
+
+   호가 잔량 데이터 핸들링 또한 이벤트 루프를 실행 하지 않으면 생성된
+   이벤트를 처리 하지 못기 때문에 다시 호출 합니다.
+
+#+BEGIN_SRC perl     
+   Win32::OLE->MessageLoop();
+#+END_SRC
+
+   script를 실행 한후 Ctrl-C로 EXIT 시그널 주면 언제나 응용 프로그램
+   오류 창이 뜨지만 가볍게 무시해 주시면 됩니다.
+
+*** 두근두근 매수/매도리얼
+
+   이번엔는 매수/매도 주문을 내 보도록 하겠습니다. 모의 투자 계좌로
+   로그인 하셨기 때문에 부담 없이 팍팍 주문 내시면 됩니다. 걱정
+   마십시요 여러분의 가상 지갑은 튼실 하답니다. 여러분은 여기서 한번
+   죽어셔도 다시 살아 나십니다.
+
+   이번에는 실시간 TR과 달리 조회 TR을 사용하여 주문을 내 보겠습니다.
+
+   본 예제는 order.pl에 작성 되어 있습니다.
+
+#+BEGIN_SRC perl
+   my $XAQuery  = Win32::OLE->new('XA_DataSet.XAQuery')
+     or croak Win32::OLE->LastError();
+
+   $XAQuery->LoadFromResFile("$FindBin::Bin/res/Tran/t5501.res")
+     or croak Win32::OLE->LastError();
+#+END_SRC
+
+   이번에는 XA_DataSet.XAQuery COM 객체를 주어 OLE 객체를 생성
+   하였습니다. 현물 매수/매도 주문을 위한 DATA MAP은 Tran/t5501.res에
+   정의 되어 있어 로드 하였습니다.
+
+#+BEGIN_SRC perl
+    my $XAQueryEvents = sub { };
+#+END_SRC
+
+    현물 주문 조회 TR일 경우는 이벤트 호출로 받아 오는 데이터가 없기
+    때문에 제데로 체결이 이루어 졌는지 알기 위해서는 추가로 실시간 SC0
+    핸들러를 이용하여 주문 체결 이벤트 핸들링 다루겠습니다.
+
+#+BEGIN_SRC perl
+    $XAQuery->SetFieldData('t5501InBlock', 'reccnt',      0, '1');
+    $XAQuery->SetFieldData('t5501InBlock', 'accno',       0, 'XXXXXXXXXXX'); 
+    $XAQuery->SetFieldData('t5501InBlock', 'passwd',      0, '0000');
+    $XAQuery->SetFieldData('t5501InBlock', 'expcode',     0, 'A000270');
+    $XAQuery->SetFieldData('t5501InBlock', 'qty',         0, '1');
+    $XAQuery->SetFieldData('t5501InBlock', 'price',       0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'memegb',      0, '2');
+    $XAQuery->SetFieldData('t5501InBlock', 'hogagb',      0, '03');
+    $XAQuery->SetFieldData('t5501InBlock', 'pgmtype',     0, '00');
+    $XAQuery->SetFieldData('t5501InBlock', 'gongtype',    0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'gonghoga',    0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'tongsingb',   0, '00');
+    $XAQuery->SetFieldData('t5501InBlock', 'sinmemecode', 0, '000');
+    $XAQuery->SetFieldData('t5501InBlock', 'loandt',      0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'memnumber',   0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'ordcondgb',   0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'stragb',      0, '000000');
+    $XAQuery->SetFieldData('t5501InBlock', 'groupid',     0, '00000000000000000000');
+    $XAQuery->SetFieldData('t5501InBlock', 'ordernum',    0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'portnum',     0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'basketnum',   0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'tranchnum',   0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'itemnum',     0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'operordnum',  0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'flowsupgb',   0, '0');
+    $XAQuery->SetFieldData('t5501InBlock', 'oppbuygb',    0, '0');
+
+    $XAQuery->Request(0);
+#+END_SRC
+
+    매수 주문을 넣기 위한 데이터 블록을 생성 하였습니다. 상당히 길어
+    보이지만 여러분이 주위 해야 할 필드는 다음과 같습니다. (X-ing API
+    reference를 참조 하시면 상세히 아실 수 있습니다.)
+
+    - accno 증권계좌 번호 (여기서는 모의투자 계좌 번호)
+    - passwd 증권계좌 암호
+    - expcode 주식 번호 A를 앞에 붙여 합니다.
+    - qty 원하시는 수량
+    - price 지정가일 경우 원하시는 체결 가격
+    - memegb 매매 구분 1일 경우 매수 2일 경우 매도
+    - hogagb 호가유형 코드 00 지정가, 03시장 그외 다수 종류가 존재함
+    - 그외 필드는 예제에 있는 값을 이용하시면 됩니다
+
+    이렇게 해서 생성 된 데이터 블록을 Request 함수를 호출 하여 주문을
+    냅니다.
+
+    주문을 내기만 해서는 접수가 이루어 졌는지 알수 없습니다. 실시간으로
+    접수가 이루어 졌는지 알기 위해 실시간 TR중에 하나인 주식주문접수를
+    등록 하겠습니다.
+
+
+#+BEGIN_SRC perl
+   my $XAReal = Win32::OLE->new('XA_DataSet.XAReal.1')
+    or croak Win32::OLE->LastError();
+
+   $XAReal->LoadFromResFile("$FindBin::Bin/res/Real/SC0_.res")
+     or croak Win32::OLE->LastError();
+
+   my $XARealEvents = sub SC0_handler {
+     my ($obj) = @_;
+
+     print $obj->GetFieldData('OutBlock', 'ordno'), "\n";
+   }
+
+   Win32::OLE->WithEvents($XAReal, $XARealEvents, '{16602768-2C96-4D93-984B-E36E7E35BFBE}');
+   croak Win32::OLE->LastError() if Win32::OLE->LastError() != 0;
+
+   $XAReal->AdviseRealData();
+#+END_SRC    
+
+  실시간 주문 접수와는 달리 데이터 블록을 직접 만드 실 필요 없이 호출
+  하시면 됩니다. 주문 접수가 이루어 졌을 시 넘어 오는 값중에 하나인
+  ordno(주문번호)를 출력 합니다.
+
+  주문 한번 시원 하게 날려 봅니다.
+
+#+BEGIN_SRC perl
+  Win32::OLE->MessageLoop();
+#+END_SRC
+
+* 마무리를 하며...
+  본 기사에서는 Perl을 이용하여 이트레이드 증권사 API를 통해 주식을
+  조회 하고 사고 팔수 있는 방법을 소개 했습니다. 독자 여러분들이
+  실제로 시스템 트레이딩 입문을 원하신다면 Perl로 작성된 [[http://www.geniustrader.org/][GeniusTrader]]와
+  [[https://github.com/tradespring/TradeSpring][TradeSpring]]의 전략엔진 및 위험관리 시스템을 가져오셔서 X-ing API를
+  연동 하셔서 호가,체결 조회 및 매수/매도 주문을 내실수 있습니다.
+
+  <그림. GoodLuck.jpg>
