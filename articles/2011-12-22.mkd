@@ -61,7 +61,7 @@ Author:   cheese_rulez
 
 윈도 환경이라면 [딸기 펄][strawberry]을 설치합니다. 나머지 모듈은 우리의 CPAN 대형 마트를 통해 구할 수 있습니다!
 [LWP::UserAgent][cpan-lwp-ua]는 웹페이지를 가져오는 데 필요합니다.
-[Encode][cpan-encode]는 문자열 인코딩을 자유자제로 다루어줍니다.
+[Encode][cpan-encode]는 문자열 인코딩을 자유자재로 다루어줍니다.
 시간을 구하기 위해서는 펄에 기본 내장된 [POSIX][cpan-posix] 모듈을 쓰는 것도 나쁘지 않지만,
 [DateTime][cpan-datetime]을 쓰는 것이 더 좋다고 하네요.
 
@@ -189,7 +189,7 @@ Author:   cheese_rulez
 `m|...|ig`에서 `g`에 해당하는 정규표현식 옵션은 이 정규표현식이 문자열에 대해 매치하는 모든 곳을 찾도록 돕습니다.
 가져온 모든 결과는 `@result` 배열에 넣었습니다.
 
-이번에는 [dimigo.hs.kr](hs-dimigo) 사이트에서 시도해봅시다.
+이번에는 [이웃집 디미고](hs-dimigo) 사이트에서 시도해봅시다.
 이곳의 식단표 페이지는 날짜와 상관없이 항상 동일하네요!
 그래서 [DateTime][cpan-datetime] 모듈을 사용할 필요는 없게 되었고 단순히 `$url` 변수의 값만 다루게 줍니다. 
 
@@ -247,7 +247,7 @@ Author:   cheese_rulez
 
 일단, [dev.twitter.com/apps/new](twitter-dev-apps-new)로 접속해 트위터 어플을 하나 만들어줍니다.
 하단에 Captcha를 입력하고 'Create your Twitter Application'을 클릭합니다.
-그러면 어플이 등록됩니다. 정말 간단하죠?
+그러면 어플이 등록됩니다. 정말 간단하죠? (어딘가 잘못 써진 것 같지만 그냥 넘어갑시다.)
 
 ![Captcha 입력][img-03]<br />
 *그림 3.* Captcha 입력
