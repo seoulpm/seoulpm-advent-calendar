@@ -7,8 +7,8 @@ Author:   keedi
 저자
 -----
 
-[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후, keedi.k _at_ gmail.com
-
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
 
 
 시작하며
@@ -488,3 +488,4 @@ Enjoy Your Perl! ;-)
 [cpan]:                 http://www.cpan.org/
 [twitter-keedi]:        http://twitter.com/#!/keedi
 [wiki-ascii-art]:       http://en.wikipedia.org/wiki/Ascii_art
+[yes24-4433208]:        http://www.yes24.com/24/goods/4433208

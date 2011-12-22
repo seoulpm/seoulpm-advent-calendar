@@ -7,8 +7,8 @@ Author:   keedi
 저자
 -----
 
-[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후, keedi.k _at_ gmail.com
-
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
 
 
 시작하며
@@ -534,5 +534,6 @@ Enjoy Your Perl! ;-)
 [news-net-api-gett]:    https://github.com/mrallen1/Net-API-Gett/commit/da1268b21ec7049ff867b94fefcb4ac3678b6d1e
 [patch-net-api-gett]:   http://api2.ge.tt/0/3hi7hLB/0/blob/download
 [twitter-keedi]:        http://twitter.com/#!/keedi
-[wiki-linux]:           http://en.wikipedia.org/wiki/Linux
 [wiki-ini]:             http://en.wikipedia.org/wiki/INI_file
+[wiki-linux]:           http://en.wikipedia.org/wiki/Linux
+[yes24-4433208]:        http://www.yes24.com/24/goods/4433208
