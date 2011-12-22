@@ -455,7 +455,7 @@ a.k.a. 치즈군, 평범한 고등학생, 리듬게임이 좋아요, 오덕.
 - [정규표현식 문서][wiki-gypark-regex] - [@gypark][twitter-gypark]
 - [선물 세 가지 :-D - 2010년 Seoul.pm 크리스마스 달력][advent-2010-12-04] - [@gypark][twitter-gypark]
 - [Obtain a switch/case behaviour in Perl 5][switch-case]
-- [거침없이 배우는 Perl 비평][lp5ko-aero-review]
+- [거침없이 배우는 Perl 비평][lp5ko-aero-review] - [@aer0][twitter-aer0]
 
 
 [img-01]:                   2011-12-22-1.png  width=700
