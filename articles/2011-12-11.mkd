@@ -496,27 +496,27 @@ Enjoy Your Perl! ;-)
 
 
 
-[img-01]:               2011-12-26-01.png width=700
-[img-02]:               2011-12-26-02.png width=700
-[img-03]:               2011-12-26-03.png width=700
-[img-04]:               2011-12-26-04.png width=700
-[img-05]:               2011-12-26-05.png width=700
-[img-06]:               2011-12-26-06.png width=700
-[img-07]:               2011-12-26-07.png width=700
-[img-08]:               2011-12-26-08.png width=700
-[img-09]:               2011-12-26-09.png width=700
-[img-10]:               2011-12-26-10.png width=700
+[img-01]:               2011-12-11-01.png width=700
+[img-02]:               2011-12-11-02.png width=700
+[img-03]:               2011-12-11-03.png width=700
+[img-04]:               2011-12-11-04.png width=700
+[img-05]:               2011-12-11-05.png width=700
+[img-06]:               2011-12-11-06.png width=700
+[img-07]:               2011-12-11-07.png width=700
+[img-08]:               2011-12-11-08.png width=700
+[img-09]:               2011-12-11-09.png width=700
+[img-10]:               2011-12-11-10.png width=700
 
-[img-01-original]:      2011-12-26-01.png
-[img-02-original]:      2011-12-26-02.png
-[img-03-original]:      2011-12-26-03.png
-[img-04-original]:      2011-12-26-04.png
-[img-05-original]:      2011-12-26-05.png
-[img-06-original]:      2011-12-26-06.png
-[img-07-original]:      2011-12-26-07.png
-[img-08-original]:      2011-12-26-08.png
-[img-09-original]:      2011-12-26-09.png
-[img-10-original]:      2011-12-26-10.png
+[img-01-original]:      2011-12-11-01.png
+[img-02-original]:      2011-12-11-02.png
+[img-03-original]:      2011-12-11-03.png
+[img-04-original]:      2011-12-11-04.png
+[img-05-original]:      2011-12-11-05.png
+[img-06-original]:      2011-12-11-06.png
+[img-07-original]:      2011-12-11-07.png
+[img-08-original]:      2011-12-11-08.png
+[img-09-original]:      2011-12-11-09.png
+[img-10-original]:      2011-12-11-10.png
 
 [cpan-config-tiny]:     https://metacpan.org/module/Config::Tiny
 [cpan-const-fast]:      https://metacpan.org/module/Const::Fast
