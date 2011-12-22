@@ -531,7 +531,7 @@ Enjoy Your Perl! ;-)
 [gett-home]:            http://ge.tt
 [gnome-home]:           http://www.gnome.org/
 [kde-home]:             http://kde.org/
-[news-net-api-gett]:    https://github.com/mrallen1/Net-API-Gett/pull/1#issuecomment-3178285
+[news-net-api-gett]:    https://github.com/mrallen1/Net-API-Gett/commit/da1268b21ec7049ff867b94fefcb4ac3678b6d1e
 [patch-net-api-gett]:   http://api2.ge.tt/0/3hi7hLB/0/blob/download
 [twitter-keedi]:        http://twitter.com/#!/keedi
 [wiki-linux]:           http://en.wikipedia.org/wiki/Linux
