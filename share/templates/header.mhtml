@@ -20,6 +20,7 @@
 % unless ( $global->{location} ) {
   <script type="text/javascript" src="calendar.js"></script>
 % }
+  <script type="text/javascript" src="snowstorm-min.js"></script>
   <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
   <script type="text/javascript" src="shCore.js"></script>
   <script type="text/javascript" src="shBrushBash.js"></script>
