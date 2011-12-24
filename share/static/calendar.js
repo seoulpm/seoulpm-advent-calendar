@@ -18,4 +18,7 @@ $(window).load(function(){
         $(this).removeClass("bling");
         $("#tooltip").css("display", "none");
     });
+    snowStorm.randomizeWind();
+    snowStorm.zIndex = 5;
+    snowStorm.followMouse = false;
 });
