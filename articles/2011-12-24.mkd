@@ -49,13 +49,14 @@ Learning Perl 5판 번역서인 [거침없이 배우는 Perl][learning-perl]입�
 책을 읽으면서 다음 내용도 같이 참고해서 살을 붙여나가세요.
 
 - [거침없이 배우는 Perl 서평][learning-perl-review]
-- [Perl로 하는 함수형 프로그래밍][advent-2010-12-14]
-- [Moose로 OOP하기][advent-2010-12-20]
 
 Perl은 OOP(Object Oriented Programming), AOP(Aspect Orientied Programming), FP(Functional Programming) 같은
 특정 패러다임을 추구하지 않고 유연한 구조로 멀티 패러다임을 추구하고 있으며(아래 링크 참조)
 Perl이 가지는 문법적 유연성으로 인해 어떤 방향으로든 쉽게 진화가 가능합니다.
 이를 통해 고집스럽게 하위 호환성을 유지하면서도 새로운 모습으로 발전해나가는 힘이 되고 있습니다.
+
+- [Perl로 하는 함수형 프로그래밍][advent-2010-12-14]
+- [Moose로 OOP하기][advent-2010-12-20]
 
 
 Perl 5 와 Perl 6는 어떻게 다른가?
