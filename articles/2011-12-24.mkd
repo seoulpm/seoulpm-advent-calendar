@@ -46,15 +46,16 @@ Perl을 어떻게 배울 것인가?
 시중의 최신 한글 Perl 서적은
 Learning Perl 5판 번역서인 [거침없이 배우는 Perl][learning-perl]입니다. 
 이 책으로 시작하는 것을 추천합니다.
-책과 함께 [거침없이 배우는 Perl 서평][learning-perl-review]의 내용과
-해당 글 아래 쪽 참고문서를 따라 살을 붙여나면 됩니다.
+책을 읽으면서 다음 내용도 같이 참고해서 살을 붙여나가세요.
+
+- [거침없이 배우는 Perl 서평][learning-perl-review]
+- [Perl로 하는 함수형 프로그래밍][advent-2010-12-14]
+- [Moose로 OOP하기][advent-2010-12-20]
+
 Perl은 OOP(Object Oriented Programming), AOP(Aspect Orientied Programming), FP(Functional Programming) 같은
 특정 패러다임을 추구하지 않고 유연한 구조로 멀티 패러다임을 추구하고 있으며(아래 링크 참조)
 Perl이 가지는 문법적 유연성으로 인해 어떤 방향으로든 쉽게 진화가 가능합니다.
 이를 통해 고집스럽게 하위 호환성을 유지하면서도 새로운 모습으로 발전해나가는 힘이 되고 있습니다.
-
-- [Perl로 하는 함수형 프로그래밍][advent-2010-12-14]
-- [Moose로 OOP하기][advent-2010-12-20]
 
 
 Perl 5 와 Perl 6는 어떻게 다른가?
@@ -71,7 +72,7 @@ Perl 6는 현재 본격적인 개발에 사용되기에는 주변 환경이 완�
 Perl 설치와 모듈 설치
 ---------------------
 
-다음 링크는 한눈에 알아볼 수 있는 펄의 다운로드 페이지입니다.
+다음 링크는 한눈에 알아볼 수 있는 Perl의 다운로드 페이지입니다.
 
 - [Download Perl Distributions][perl-get]
 
@@ -129,7 +130,7 @@ Perl 관련 싸이트는?
 CPAN은 라이브러리의 재사용성이 실제로 현실에 적용되도록 해준
 선구자적인 모듈 저장소입니다.
 CPAN의 모듈수는 10만개를 넘는 수준으로 타의 추종을 불허하며 
-TeX의 CTAN, PHP의 PEAR, R의 CRAN, Ruby의 rubygems, Python의 Pypi, Node.js의 npm 등의
+PHP의 PEAR, R의 CRAN, Ruby의 rubygems, Python의 Pypi, Node.js의 npm 등의
 모듈 저장소들이 CPAN의 모델을 따라 만들어 졌습니다.
 
 * [오리지널 CPAN 싸이트](http://www.cpan.org) - cpan.org
@@ -152,9 +153,9 @@ TeX의 CTAN, PHP의 PEAR, R의 CRAN, Ruby의 rubygems, Python의 Pypi, Node.js�
 한국:
 
 * [한국 Perl 대표싸이트](http://perl.kr/) - perl.kr
-* [서울 Perl몽거스](http://seoul.pm) - seoul.pm
-* [네이버 Perl카페](http://cafe.naver.com/perlstudy) - cafe.naver.com/perlstudy
-* [한국 펄 크리스마스 달력](http://advent.perl.kr) - advent.perl.kr
+* [서울 Perl 몽거스](http://seoul.pm) - seoul.pm
+* [네이버 Perl 카페](http://cafe.naver.com/perlstudy) - cafe.naver.com/perlstudy
+* [서울 Perl 몽거스 크리스마스 달력](http://advent.perl.kr) - advent.perl.kr
 * [#perl-kr IRC 채팅](http://webchat.freenode.net/?channels=perl-kr)
 
 ### Perl 뉴스 및 정보 싸이트
@@ -305,40 +306,37 @@ CPAN에는 SSH, Telnet, FTP, SNMP 등 각종 시스템 관리에 필요한 모�
 
 Perl의 세계는 위에서 다 언급하지 못할 정도로 방대합니다.
 그 모든 것을 알려드리기에는 이 글로서는 역부족인 것 같네요.
-더 궁금하신 것들이 있으면 주위의 펄 몽거들에게 도움을 청하면 친절하게 알려줄 것입니다.
-혹시 아나요, 내년 펄 달력에서는 여러분의 글이 실리게 될지... :)
+더 궁금하신 것들이 있으면 주위의 Perl 몽거들에게 도움을 청하면 친절하게 알려줄 것입니다.
+혹시 아나요, 내년 Perl 달력에서는 여러분의 글이 실리게 될지... :)
 
 아무쪼록 이 글이 부족하나마 Perl 여행을 떠나시려는 분들께 
-도움이 되었으면 합니다. Merry Christmas!!
+도움이 되었으면 합니다.
+
+Merry Christmas!! ;-)
 
 
-[twitter-aer0]: http://twitter.com/aer0
-
-[blog-aer0]: http://aero.sarang.net/
-
-[slideshare-modern-perl]: http://www.slideshare.net/search/slideshow?searchfrom=header&q=modern+perl
-
-[learning-perl]: http://books.perl.kr/lp5/
-[learning-perl-review]: https://github.com/aero/perl_docs/blob/master/Learning_Perl_5th_kor_review.md
-[perl-get]: http://www.perl.org/get.html
-[strawberry]: http://strawberryperl.com/
-[activestate]: http://www.activestate.com/activeperl
-[windows-perl-usage]: http://advent.perl.kr/2010/2010-12-01.html
-[windows-perl-use-where]: http://advent.perl.kr/2010/2010-12-05.html
-[windows-perl-wiki]: http://win32.perl.org/wiki/index.php?title=Main_Page
-[dotcloud]: http://docs.dotcloud.com/services/perl/
-[stackato]: http://docs.stackato.com/perl/index.html
-[openshift-dancer]: https://www.redhat.com/openshift/community/kb/kb-e1014-how-to-deploy-the-perl-dancer-framework-on-openshift-express
-[benchmark-comparison]: http://onlyjob.blogspot.com/2011/03/perl5-python-ruby-php-c-c-lua-tcl.html
-
-[advent-2010-12-14]: http://advent.perl.kr/2010/2010-12-14.html
-[advent-2010-12-20]: http://advent.perl.kr/2010/2010-12-20.html
-[advent-2011-12-13]: http://advent.perl.kr/2011/2011-12-13.html
-[advent-2011-12-16]: http://advent.perl.kr/2011/2011-12-16.html
-
-[author-mlehmann]: https://metacpan.org/author/MLEHMANN
-[metacpan-libev]: https://metacpan.org/module/libev
-[metacpan-anyevent]: https://metacpan.org/search?q=anyevent
-[metacpan-poe]: https://metacpan.org/search?q=POE
-[metacpan-coro]: https://metacpan.org/release/Coro
-[poe]: http://poe.perl.org/
+[activestate]:              http://www.activestate.com/activeperl
+[advent-2010-12-14]:        http://advent.perl.kr/2010/2010-12-14.html
+[advent-2010-12-20]:        http://advent.perl.kr/2010/2010-12-20.html
+[advent-2011-12-13]:        http://advent.perl.kr/2011/2011-12-13.html
+[advent-2011-12-16]:        http://advent.perl.kr/2011/2011-12-16.html
+[author-mlehmann]:          https://metacpan.org/author/MLEHMANN
+[benchmark-comparison]:     http://onlyjob.blogspot.com/2011/03/perl5-python-ruby-php-c-c-lua-tcl.html
+[blog-aer0]:                http://aero.sarang.net/
+[dotcloud]:                 http://docs.dotcloud.com/services/perl/
+[learning-perl-review]:     https://github.com/aero/perl_docs/blob/master/Learning_Perl_5th_kor_review.md
+[learning-perl]:            http://books.perl.kr/lp5/
+[metacpan-anyevent]:        https://metacpan.org/search?q=anyevent
+[metacpan-coro]:            https://metacpan.org/release/Coro
+[metacpan-libev]:           https://metacpan.org/module/libev
+[metacpan-poe]:             https://metacpan.org/search?q=POE
+[openshift-dancer]:         https://www.redhat.com/openshift/community/kb/kb-e1014-how-to-deploy-the-perl-dancer-framework-on-openshift-express
+[perl-get]:                 http://www.perl.org/get.html
+[poe]:                      http://poe.perl.org/
+[slideshare-modern-perl]:   http://www.slideshare.net/search/slideshow?searchfrom=header&q=modern+perl
+[stackato]:                 http://docs.stackato.com/perl/index.html
+[strawberry]:               http://strawberryperl.com/
+[twitter-aer0]:             http://twitter.com/aer0
+[windows-perl-usage]:       http://advent.perl.kr/2010/2010-12-01.html
+[windows-perl-use-where]:   http://advent.perl.kr/2010/2010-12-05.html
+[windows-perl-wiki]:        http://win32.perl.org/wiki/index.php?title=Main_Page
