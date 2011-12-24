@@ -35,4 +35,5 @@ $(window).load(function(){
     snowStorm.randomizeWind();
     snowStorm.zIndex = 5;
     snowStorm.followMouse = false;
+    snowStorm.start();
 });
