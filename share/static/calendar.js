@@ -1,6 +1,20 @@
+var calendar = { r1: 1, r2: 10, r3: 9 };
 $(window).load(function(){
     window.setInterval(function(){
-        $("#ball-today").toggleClass("today");
+        var i;
+        var r1 = calendar.r1;
+        var r2 = calendar.r2;
+        var r3 = calendar.r3;
+        r1 += 4; r1 = r1 % 25;
+        r2 -= 5; r2 = r2 % 25;
+        r3 += 6; r3 = r3 % 25;
+        $(".ball").removeClass("today");
+        $("#ball-" + r1).addClass("today");
+        $("#ball-" + r2).addClass("today");
+        $("#ball-" + r3).addClass("today");
+        calendar.r1 = r1;
+        calendar.r2 = r2;
+        calendar.r3 = r3;
     }, 900);
     $(".ball").hover(function(){
         var offset = $(this).offset();

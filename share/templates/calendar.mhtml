@@ -48,14 +48,7 @@
                 <span class="cli">
                   <span class="title"><% $global->{korean_day}->($day) %> 날: <% $article->title  %></span>
                   - by <span class="author"><% $article->author %></span></span>
-%         if (     $today->year  == $year
-%               && $today->month == $month->{1}->month
-%               && $today->day   == $day ) {
-                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
-%         }
-%         else {
-                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
-%         }
+                <div id="ball-<% $day %>" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
 %       }
               </a>
             </li>
