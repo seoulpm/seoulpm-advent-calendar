@@ -1,0 +1,2 @@
+User-Agent: *
+Disallow: /2012/trailer.html
