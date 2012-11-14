@@ -6,12 +6,19 @@
 <style> * { margin: 0; padding: 0; } #wrap { position: absolute; background: url(trailer.png);
 background-color: #212a2c; background-size: 100%; background-repeat: no-repeat;
 width: 100%; min-height: 100%; }
+#nav { position: absolute; padding-left: 0.8em; padding-top: 0.8em;
+line-height:1.9em; color: white; }
+#nav li { list-style: none; }
 #text { padding-top: 0.8em; padding-right: 0.8em; text-align: right;
 color: white; line-height: 1.6em; font-size: 40px; font-family: 'Share Tech', sans-serif; }
 #foot { position: absolute; bottom: 0; color: white; font-size: 12px; }
 #foot a { text-decoration: none; color: white; }
 #foot a:hover { text-decoration: underline; }
-</style></head><body><div id="wrap"><div id="text">Perl is coming for x-mas..
+</style></head><body><div id="wrap">
+<ul id="nav">
+<li><a href="/2010">2010년 달력</a></li>
+<li><a href="/2011">2011년 달력</a></li>
+</ul><div id="text">Perl is coming for x-mas..
 <span id="dd">soon!</span>
 <script>var now=new Date(); var d=now.getDate();
 if (now.getMonth()+1==11) $("#dd").html("D-" + (31-d));</script>
