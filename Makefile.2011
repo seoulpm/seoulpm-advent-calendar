@@ -1,4 +1,6 @@
-DEFAULT_CONFIG := advent-2011.ini
+YEAR := 2011
+
+DEFAULT_CONFIG := advent-$(YEAR).ini
 
 PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
@@ -8,10 +10,10 @@ DEPEND_CPAN_MODULES := Text::MultiMarkdown \
 
 ADVCAL := $(PATCH_LIB) advcal
 ADVCAL_CONFIG  := advent.ini
-ADVCAL_OUT     := 2011
-ADVCAL_OUT_TGZ := 2011.tgz
-ADVCAL_SHARE   := share
-ADVCAL_ARTICLE := articles
+ADVCAL_OUT     := output-$(YEAR)
+ADVCAL_OUT_TGZ := $(ADVCAL_OUT).tgz
+ADVCAL_SHARE   := $(YEAR)/share
+ADVCAL_ARTICLE := $(YEAR)/articles
 
 ADVCAL_FLAGS  += --config $(ADVCAL_CONFIG)
 ADVCAL_FLAGS  += --output-dir $(ADVCAL_OUT)
