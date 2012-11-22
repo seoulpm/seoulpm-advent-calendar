@@ -1,0 +1,259 @@
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    color: #dedede;
+    font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
+}
+body {
+    background: url('bg.gif') repeat-x scroll 0 0 #1a1a1a;
+    width: 100%;
+    text-align: left;
+}
+#wrap {
+    margin-left: auto;
+    margin-right: auto;
+    width: 980px;
+}
+#head {
+    position: relative;
+    margin-bottom: 120px;
+}
+#head h1 {
+    display: none;
+}
+#like {
+    z-index: 3;
+    position: absolute;
+    padding-top: 12px;
+    margin-top: 46px;
+    height: 116px;
+    left: 0;
+}
+#like li {
+    list-style-type: none;
+    display: block
+    overflow: hidden;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+#like li.twt {
+    height: 20px;
+}
+#like li.fb {
+    height: 80px;
+}
+#menu {
+    z-index: 2;
+    position: absolute;
+    display: block;
+    padding-top: 12px;
+    top: 0;
+    left: 0;
+}
+#menu li {
+    list-style-type: none;
+    font-size: 14px;
+}
+#menu li a {
+    text-decoration: none;
+}
+#menu li a:hover {
+    text-decoration: underline;
+}
+#menu li.large {
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+#menu li.nook {
+    font-size: 14px;
+    margin-bottom: 138px;
+}
+#menu li.bold, #menu li.bold a {
+    color: #ffffff;
+    font-weight: bold;
+}
+#menu li.margin {
+    margin-top: 12px;
+}
+#menu li .disc {
+    background-color: #101010;
+    color: #ffffff;
+    margin-top: 20px;
+    padding: 5px;
+    font-size: 12px;
+    width: 180px;
+}
+#menu li.buttons {
+    margin-top: 19px;
+}
+#menu li.buttons img {
+    padding: 2px;
+}
+#tree {
+    z-index: 1;
+    position: relative;
+    background-image: url('tree.gif');
+    list-style-type: none;
+    display: block;
+    width: 610px;
+    height: 614px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+#tree li {
+    position: absolute;
+}
+#cont-wrap {
+    padding-left: 80px;
+    padding-right: 80px;
+}
+.cont h2 img {
+    display: block;
+}
+.cont h2 {
+    font-size: 34px;
+    padding: 10px 20px 10px 30px;
+    margin-bottom: 40px;
+    position: relative;
+    display: inline-block;
+    left: -80px;
+    background: #345f53;
+    border-bottom: 3px solid #244139;
+    border-right: 2px solid #1b322c;
+    zoom: 1;
+    *display: inline;
+}
+.cont p, .cont ul {
+    margin-bottom: 30px;
+    font-size: 16px;
+    line-height: 200%;
+}
+.cont p em, .cont ul em {
+    font-style: normal;
+    background: #060606;
+    border-bottom: 2px solid #ae1932;
+}
+.cont ul {
+    margin-left: 45px;
+}
+.part {
+    margin-bottom: 94px;
+}
+.part img.right {
+    float: right;
+    margin: 10px 0 10px 20px;
+}
+#comment {
+    position: relative;
+    width: 618px;
+    min-height: 1223px;
+}
+#traffic {
+    position: absolute;
+    float: right;
+    width: 198px;
+    top: 0;
+    left: 624px;
+}
+#foot {
+    margin-top: 120px;
+    margin-bottom: 40px;
+    padding-left: 74px;
+}
+#foot p {
+    position: absolute;
+    display: block;
+    margin-left: 186px;
+    padding-top: 4px;
+    padding-left: 100px;
+    font-size: 12px;
+    color: #666;
+}
+#disqus_thread, #disqus_thread p, #disqus_thread ul {
+    font-size: 14px;
+}
+.dsq-comments {
+    font-size: 14px;
+}
+.dsq-comment-text {
+    font-size: 14px;
+}
+.ball {
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 50px;
+    height: 50px;
+}
+.ball.today {
+    background-position: -50px 0;
+}
+.ball.bling {
+    background-position: -50px 0;
+}
+#tree .cli {
+display: none;
+}
+#tooltip {
+    position: absolute;
+    width: 280px;
+    height: 86px;
+    z-index: 4;
+    top: 100px;
+    left: 40px;
+    padding-bottom: 10px;
+    display: none;
+}
+#tooltip .box {
+    background-color: #1a1a1a;
+    border: solid 1px #999;
+    border-bottom: solid 2px #999;
+    -moz-box-shadow: 0 2px 6px black;
+    -webkit-box-shadow: 0 2px 6px black;
+    box-shadow: 0 2px 6px black;
+}
+#tooltip .pad {
+    min-width: 221px;
+    min-height: 62px;
+    padding: 9px;
+}
+#tooltip table {
+    border: 0;
+}
+#tooltip .cont-img {
+    min-width: 62px;
+    height: 62px;
+    padding-right: 9px;
+    overflow: hidden;
+}
+#tooltip .cont-img img {
+    width: auto;
+    height: 62px;
+}
+#tooltip .cont-msg {
+    vertical-align: bottom;
+    text-align: left;
+    overflow: hidden;
+}
+#tooltip .cont-msg .title {
+    color: #ccdee0;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 100%;
+    width: 189px;
+    height: 45px;
+    overflow: hidden;
+}
+#tooltip .cont-msg .author {
+    padding-top: 3px;
+    padding-right: 2px;
+    font-size: 12px;
+    color: #bfbfbf;
+    text-align: right;
+}
+#tooltip .arrow {
+    position: absolute;
+    bottom: 4px;
+    right: 23px;
+}
