@@ -1,4 +1,4 @@
-DEFAULT_CONFIG := advent-$(YEAR).ini
+DEFAULT_CONFIG := $(YEAR)/advent.ini
 
 PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
