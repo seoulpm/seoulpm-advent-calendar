@@ -1,0 +1,15 @@
+<%args>
+  $global
+</%args>
+<div id="traffic">
+<div id="facebook-activity-feed">
+<iframe src="http://www.facebook.com/plugins/activity.php?site=<% $global->{base_domain} %>&amp;width=200&amp;height=550&amp;header=false&amp;colorscheme=dark&amp;recommendations=true&amp;ref=fb_activity" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:200px; height:550px;" allowTransparency="true"></iframe>
+</div>
+<div id="live-traffic">
+  <script type="text/javascript" src="http://feedjit.com/serve/?vv=693&amp;tft=3&amp;dd=0&amp;wid=712f8a0eec4819ae&amp;pid=0&amp;proid=0&amp;bc=214540&amp;tc=FFFFFF&amp;brd1=336699&amp;lnk=CDF3FC&amp;hc=A2CFF2&amp;hfc=18497A&amp;btn=E0D5A8&amp;ww=200&amp;went=10"></script><noscript><a href="http://feedjit.com/">Feedjit Live Blog Stats</a></noscript>
+</div>
+</div>
+
+
+
+

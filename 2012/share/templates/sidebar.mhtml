@@ -1,0 +1,10 @@
+<%args>
+  $global
+  $article
+</%args>
+
+<& sns.mhtml, global => $global, article => $article &>
+
+<& book.mhtml,    global => $global &>
+<& link.mhtml,    global => $global &>
+<& traffic.mhtml, global => $global &>

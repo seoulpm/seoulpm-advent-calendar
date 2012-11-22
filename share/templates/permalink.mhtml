@@ -1,4 +1,0 @@
-<%args>
-  $article
-</%args>
-<p><a id="permalink" href="http://example.com/">http://example.com/</a></p>

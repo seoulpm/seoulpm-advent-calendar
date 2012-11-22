@@ -1,0 +1,10 @@
+<%args>
+  $global
+</%args>
+<div id="book">
+  <a href="http://www.yes24.com/24/goods/4433208" target="_blank">
+    <img src="lp5.jpg" alt="거침없이 배우는 펄" />
+    <strong>거침없이 배우는 펄</strong>
+  </a>
+  <span class="icon">new</span>
+</div>
