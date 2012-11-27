@@ -7,29 +7,261 @@ Author:   h0ney
 저자
 -----
 
+[@perlstudy](http://twitter.com/perlstudy) - [네이버 Perl 카페](http://twitter.com/perlstudy) 운영자, 카페에 광고가 올라오면 번개같이 지운다고 해서 광고어쌔씬 이라 불린다. 홈페이지에는 Perl과 관련한 유용한
+정보를 종종 올리고 있다. 호네이, h0ney라는 닉을 사용하기도 한다.
+
+
 시작하며
 ---------
+
+아래 이미지는 어떤 이미지일까요?? 윈도우 유저분들은 바로 알 수 있으실껍니다 :)
+
+그림 1. 윈도우7 로그온 이미지 (원본)
+
 
 준비물
 -------
 
+Windows7 유저라면 누구나 한번쯤은 접해 본 위의 이미지는 컴퓨터를 부팅한 뒤 Wiondows OS에서 로그인을 할 때 나타나는 기본 설정된 Logon 이미지
+입니다. Vendor 업체가 따로 설정하지 않았다면, 대부분 위의 이미지가 설정되어 있을 것입니다. 이렇게 똑같은 화면을 계속 보게되는 심심함을 참을
+수가 없습니다! 그럼 지금부터 로그온 할 때마다 로그온 이미지가 변경되는 프로그램을 제작해 보죠.
+
+  * Windows에서 Registry 변경을 위한 [CPAN의 Win32::TieRegistry 모듈](http://p3rl.org/Win32::TieRegistry)
+  * Logon Image를 복사하기 위한 [CPAN의 File::Copy 모듈](http://p3rl.org/File::Copy)
+  * 로그온이 성공했는지 검사하기 위한 [CPAN의 Win32::EventLog 모듈](http://p3rl.org/Win32::EventLog)
+
+[Strawberry Perl](http://strawberryperl.com/) 설치 시 위 모듈이 모두 기본모듈이므로 CPAN으로 설치할 필요는 없습니다.
+
+
 레지스트리 변경
 ----------------
+
+로그온 이미지를 변경하기 위해서는 먼저 레지스트리의 값을 설정해야 합니다. "WindowsKey + r" 을 통해 [실행]창에서 "regedit" 를 입력하여 [레지스
+트리 편집기]를 실행시키고 아래의 레지스트리 키의 경로를 찾아갑니다.
+
+    #!plain
+    HKEY_LOCAL_MACHINE\
+    Software\Microsoft\Windows\CurrentVersion\
+    Authentication\LogonUI\Background
+
+위의 키로 찾아가게 되면 OEMBackground라는 값이 보이게 됩니다. 이 값이 로그온 이미지를 변경할 수 있도록 설정하는 값이며, 이 값을 1로 변경해주
+면 설정이 완료됩니다. OEMBackground 값이 없을 경우에 값( DWORD 32 Bit )을 새로 만들어서 1로 설정 해주시면 됩니다.
+
+그럼 이런 행동들을 일일이 하기 귀찮으니 perl 코드를 작성해 보겠습니다. 레지스트리는 Win32::TieRegistry 모듈을 사용하면 쉽고 강력하게 변경할
+수 있습니다. 그리고 코드실행은 꼭 관리자모드로 실행해 주세요~
+
+    #!perl
+    use strict;
+    use warnings;
+     
+    my %reg;
+    my $background ="LMachine/SOFTWARE/Microsoft/Windows".
+                        "/CurrentVersion/Authentication/LogonUI/Background";
+     
+    use Win32::TieRegistry (
+      TiedHash=>\%reg,
+      Delimiter=>'/',
+    );
+     
+    # Registry에 값을 설정해줍니다.
+    my $backgroundKey = $reg{$background};
+     
+    if (defined $backgroundKey) {
+     
+      my $OEMbackground= hex($backgroundKey->GetValue(     'OEMBackground' ));
+       
+      unless (defined $OEMbackground) {
+        print "OEMBackground 값이 없어 새로 만들어 설정합니다.\n";
+        $$backgroundKey{'OEMBackground'} = 1;
+      }
+      else{
+        if($OEMbackground == 0x1){
+          print "이미 설정 되어 있습니다.\n";
+        }
+        else{
+          print "비설정 되어 있어 설정 하였습니다\n";
+          $$backgroundKey{'OEMBackground'} = 1;
+        }
+      }
+    }
 
 Logon 이미지 변경
 ------------------
 
+레지스트리 설정 후에는 변경하고 싶은 로그인 이미지를 아래 경로의 파일이름으로 복사하면 끝입니다!
+
+    #!plain
+    %windir%system32\oobe\info\backgrounds\backgroundDefault.jpg
+
+%windir%의 설정된 폴더가 C:\Windows 일때 아래 경로가 최종적인 파일의 경로가 됩니다.
+
+    #!plain
+    C:\Windows\system32\oobe\info\backgrounds\backgroundDefault.jpg
+
+복사하기에 앞서서 로그온 이미지가 필요합니다. 자신이 로그온 이미지로 저장하고 싶은 이미지를 구글링을 통해 저장하면 되는데 로그온 이미지를 설
+정할 때 주의해야 하는 점은 아래와 같습니다.
+
+  * 복사된 파일의 이름은 무조건 backgroundDefault.jpg 이여야 합니다. ( jpg 파일만 가능 )
+  * 파일의 크기는 256KB 를 넘기지 않아야 합니다. ( 256KB가 넘을시에는 적용되지 않습니다. )
+  * 이미지가 화면 크기에 따라 자동으로 맞춰집니다. ( stretched-to-fit mode )
+
+현재 쓰고 있는 모니터 해상도에 맞춰 9개의 이미지를 구한 뒤 1.jpg 부터 9.jpg 까지 차례대로 저장했습니다.
+
+그림 2. 구글링한 로그온 이미지 (원본)
+
+위의 이미지를 사용하여 다수의 로그인 이미지로 실행을 시킬때마다 [List::Util](http://p3rl.org/List::Util)의 shuffle 함수를 이용해 이미지를 교체해 보겠습니다. 코드를 실행시
+키고 "WindowsKey + L" 으로 로그인 이미지가 변경되었는지 확인해보세요 :)
+
+    #!perl
+    use strict;
+    use warnings;
+    use File::Copy;
+    use List::Util qw(shuffle);
+     
+    my $range = 9;
+    my @LogonImage = map { "./Image/".$_.".jpg" } 1..$range;
+    my $copy_path = $ENV{'WINDIR'}.
+                    "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+    my $random_path = shuffle @LogonImage;
+     
+    copy( $random_path, $copy_path ) or die "Copy failed: $!";
+
+
 로그인 화면 체크
 ----------------
+
+로그온 화면을 바꾸는 부분은 그리 어렵지 않은데, 로그인 화면이 될 때마다 이미지를 바꾸는 일은 일단 로그인 화면인지를 알아내어야 합니다. 고민을
+하던 중 최상위 윈도우를 알아내는 GetForegroundWindow() API 함수를 사용하면 별로 어렵지 않겠지 생각했는데, 이 함수로는 로그인 화면인지 체크하
+지 못하였습니다. 그 이유는 윈도우 NT 보안정책 위반, 즉 사용자의 비밀번호를 얻는 도구로 사용될 수 있기 때문이었죠.(Link) 다른 방법으로 실시간
+은 아니지만 이벤트 로그안의 Security 에서 로그인이 성공여부를 통해 확인하면 가능 하다는 것을 알게 되었습니다.
+
+그림 3. Security Event Log (원본)
+
+이런 방법을 활용해서 이벤트 로그를 1초 단위로 감시를 하다가 이벤트 로그에 변동이 있을 경우, 변동된 로그를 확인합니다. 로그 중에 EventID가
+4624일 때 "로그인 성공" 이니, 이 로그를 확인하면 로그인 화면에서 컴퓨터로 로그인이 되었다는 것을 알 수 있습니다. 그럼 코드를 한번 짜 보겠습니
+다~!
+
+    #!perl
+    use strict;
+    use warnings;
+    use Win32::EventLog;
+     
+    my ($recs,$base);
+    my $hashRef;
+    my $handle = new Win32::EventLog( 'Security' ) || die $!;
+     
+    $handle->GetNumber($recs)
+            or die "Can't get number of EventLog records\n";
+    $handle->GetOldest($base)
+            or die "Can't get number of oldest EventLog record\n";
+    my $currentNumber = $recs;
+     
+    while(1){
+        $handle->GetNumber($recs);
+        if($currentNumber < $recs){
+            foreach my $x($currentNumber..($recs-1)){
+                  $handle->Read(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,
+                                      $base+$x,
+                                      $hashRef)       
+                      or die "Can't read EventLog entry #$x\n";
+              Win32::EventLog::GetMessageText($hashRef);
+              if( $hashRef->{EventID} == 4624){
+                print "EventID : $hashRef->{EventID}\n";
+                last;
+              }
+            }
+            $currentNumber = $recs;
+        }
+        sleep(1);  
+    }
+
 
 만들어 봅시다
 --------------
 
+위의 소스코드를 참고하여, 로그인을 할때마다 이미지가 랜덤으로 변경되는 프로그램 짜잔!!
+
+    #!perl
+    use strict;
+    use warnings;
+    use Win32::EventLog;
+    use List::Util qw(shuffle);
+    use File::Copy;
+     
+    my %reg;
+    my $background ="LMachine/SOFTWARE/Microsoft/Windows".
+                        "/CurrentVersion/Authentication/LogonUI/Background";
+                     
+    use Win32::TieRegistry (
+      TiedHash=>\%reg,
+      Delimiter=>'/',
+    );
+     
+    my $range = 9;
+    my @LogonImage = map { "./Image/".$_.".jpg" } 1..$range;
+    my $copy_path = $ENV{'WINDIR'}.
+                        "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+     
+    my $backgroundKey = $reg{$background};
+    if (defined $backgroundKey) {
+      my $OEMbackground= hex($backgroundKey->GetValue(     'OEMBackground' ));
+      unless (defined $OEMbackground) {
+        $$backgroundKey{'OEMBackground'} = 1;
+      }else{
+        if($OEMbackground == 0x0) {
+          $$backgroundKey{'OEMBackground'} = 1;
+        }
+      }
+    }
+     
+    my ($recs,$base);
+    my $hashRef;
+    my $handle = new Win32::EventLog( 'Security' ) || die $!;
+     
+    $handle->GetNumber($recs)
+            or die "Can't get number of EventLog records\n";
+    $handle->GetOldest($base)
+            or die "Can't get number of oldest EventLog record\n";
+    my $currentNumber = $recs;
+     
+    while(1){
+        $handle->GetNumber($recs);
+        if($currentNumber < $recs){
+            foreach my $x($currentNumber..($recs-1)){
+                    $handle->Read(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,
+                                      $base+$x,$hashRef)       
+                      or die "Can't read EventLog entry #$x\n";
+                Win32::EventLog::GetMessageText($hashRef);         
+                last if( $hashRef->{EventID} == 4624);
+            }      
+            my $random_path = shuffle @LogonImage;
+            copy( $random_path, $copy_path )
+                or die "Copy failed: $!";      
+            $currentNumber = $recs;
+        }
+        sleep(1);
+    }
+
+
 정리하며
 ---------
+
+[Web::Scraper](http://p3rl.org/Web::Scraper)를 통해 자신의 취향에 맞는 이미지를 다운로드 한 뒤([Advent 2010년 기사 참고](http://advent.perl.kr/2010/2010-12-06.html)), 컴퓨터를 켜고 끌때마다 코드를 한번씩만 실행시켜주시
+면, 매번 색다른 이미지로 로그인을 하실 수 있으실 겁니다!
+
 
 후기
 ----
 
+제가 Advent Calendar 의 첫번째 주자라 부담이 많이 되었는데 매년마다 이런 좋은 기회를 주셔서 감사합니다. 저의 본업인 [네이버 Perl 카페](http://cafe.naver.com/perlstudy) 광고도
+열심히 지우겠지만, 향후에는 [Moden Perl](http://sourcediet.cafe24.com/modern_perl_kr/chapter_00.html) 번역작업도 차근차근 진행 하려고 합니다. 같이 하실 분들은 저에게 연락 주세요^^/
+
+이번 해에도 Advent Calendar로 수고해 주시는 @am0c님과 Seoul Perl Mongers 정말 멋지십니다!
+Perl 커뮤니티 화이팅 >_<
+
+
 참고문서
 ---------
+
+  * How To Change Windows 7 Logon Screen
+  * Windows 7 to officially support logon UI background customization
