@@ -181,7 +181,6 @@ ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
 
 ### root 권한 없을 때 DBD::MySQL 설치
 
-
 1. 리눅스 CentOS 6.3 64bit
 1. Perl 환경 : perlbrew로 설치한 perl 5.16.1
 1. mysql-server 패키지는 설치 되어있음.
@@ -192,7 +191,7 @@ ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
 
 cpanm DBD::mysql 해서 설치 되면 얼마나 행복하겠습니까만은 오류가 발생합니다.
 
-결과적으로 제가 한 것들.
+결과적으로 제가 한 것들입니다.
 
 1. mysql-devel 패키지를 압축 풀고
 2. Makefile 파일 내용 수정(mysql-devel 경로 지정)
@@ -203,7 +202,7 @@ cd .cpanm/latest-build/DBD-mysql-4.022
 perl Makefile.PL
 vim Makefile
 </pre>
-
+#  #
 Makefile 파일 수정, LDDLFLAGS, LDFLAGS, INC, LD_RUN_PATH 등의 변수에서 /usr/local/lib, /usr/local/include 와 같이 mysql 소스 경로 지정 된 것을 mysql-devel 압축푼 곳으로 변경 
 
 https://metacpan.org/module/DBD::mysql
@@ -216,13 +215,13 @@ make
 collect2: ld returned 1 exit status
 make: *** [blib/arch/auto/DBD/mysql/mysql.so] 오류 1
 </pre>
-mysql-devel 압축 푼 곳에 .so 파일이 몇 개 빠져서 이러는 모양. /usr/lib64/mysql/ 안의 파일을 ~/mysql-devel/usr/lib64/mysql 로 복사했음.
+로그를 보니 mysql-devel 압축 푼 곳에 .so 파일이 몇 개 빠져서 이러는 모양입니다. 로그를 잘 보면 해결방법이 나옵니다. ^^ /usr/lib64/mysql/ 안의 파일을 ~/mysql-devel/usr/lib64/mysql 로 복사했습니다.
 
 <pre lang="Bash">
 make
 make install
 </pre>
-이후 잘 됨.
+이후 잘 되네요.
 
 
 ## 이제 만들어 봅시다.
@@ -295,7 +294,7 @@ charset: "UTF-8"
 #logger : "file"
 
 
-# 템플릿 엔진 변경, start_tag, end_tag를 설정 않으면 <% %>가 기본 값. HTML TAG와 구분하기 어려워지니 되도록이면 활성화 할 것.
+# 템플릿 엔진 변경, start_tag, end_tag를 설정 않으면 &lt;% %&gt;가 기본 값. HTML TAG와 구분하기 어려워지니 되도록이면 활성화 할 것.
 template: "template_toolkit"
 engines:
   template_toolkit:
@@ -323,7 +322,7 @@ plugins:
 ### 템플릿 엔진 : Template Toolkit
 [Template Toolkit](http://www.template-toolkit.org/) 사이트를 참조하여 문법을 공부합시다. 기본적으로 Perl과 큰 차이가 없어서 금방 쓸 수 있어요.
 
-전 Template Toolkit을 사용했지만 훨씬 성능이 좋은 Xslate를  사용해보시길 바랍니다. 참고 문서는 [Template Toolkit -> Xslate by JEEN_LEE](http://lotus.perl.kr/2012/02.html)입니다.
+전 Template Toolkit을 사용했지만 훨씬 성능이 좋은 Xslate를  사용해보시길 바랍니다. 참고 문서는 [Template Toolkit -&gt; Xslate by JEEN_LEE](http://lotus.perl.kr/2012/02.html)입니다.
 
 ### auto_reload
 Dancer가 실행 되고 난 뒤에 변경사항은 바로 적용이 되지 않기 때문에, 서버 내렸다가 실행하는 과정이 필요하다. 그러나 auto_reload 설정을 활성화하면 변경사항이 바로 적용되어 개발하기 편합니다.
@@ -354,7 +353,7 @@ use Clone;
     1. 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다. 
     http://localhost/hello/2/11
     1. '/' 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
-1. mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -> SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -> 템플릿 엔진으로 넘깁니다.
+1. mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
 1. view 영역입니다. 앞서 넘겨 받은 배열을 템플릿 엔진에서 처리하고요. 템플릿 엔진에서도 Perl 비슷한 문법으로 프로그래밍 가능합니다.
 
 
@@ -385,7 +384,7 @@ mysql> describe md5_list;
  #sql 작성
                 my $sql_time = time_p();
                 my $sql = "insert into md5_list ( saveTime, name ) values ( \"$sql_time\", \"$file_name\")";
-                my $sth = $dbh->prepare($sql);
+                my $sth = $dbh-&gt;prepare($sql);
                 $sth->execute or die "$DBI::errstr\n";
 </pre>
 
