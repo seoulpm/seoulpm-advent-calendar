@@ -38,7 +38,7 @@
 % }
     </ul>
   </div>
-<& footer.mhtml, global => $global &>
+<& calendar_footer.mhtml, global => $global &>
 <%init>
   my $global = $m->comp('variables.mhtml');
   $global->{location} = '';
