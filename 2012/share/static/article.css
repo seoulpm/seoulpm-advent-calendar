@@ -18,6 +18,47 @@
 #head {
     margin-top: 8px;
 }
+#head menu.nav {
+    display: inline-block;
+    float: right;
+    margin-top: 4px;
+}
+#head menu.nav a {
+    display: block;
+    height: 44px;
+}
+#head menu.nav li {
+    display: inline-block;
+    float: left;
+    background: url("nav.gif");
+    height: 44px;
+    margin-left: 4px;
+}
+#head menu.nav li.prev,
+#head menu.nav li.prev a {
+    background-position: 0 0;
+    width: 60px;
+}
+#head menu.nav li.twit,
+#head menu.nav li.twit a {
+    background-position: -60px 0;
+    width: 53px;
+}
+#head menu.nav li.feed,
+#head menu.nav li.feed a {
+    background-position: -113px 0;
+    width: 44px;
+}
+#head menu.nav li.chat,
+#head menu.nav li.chat a {
+    background-position: -157px 0;
+    width: 61px;
+}
+#head menu.nav li.next,
+#head menu.nav li.next a {
+    background-position: -218px 0;
+    width: 57px;
+}
 h1, h2, h3, h4 {
     display: block;
     font-family: 'NanumMyeongjoExtraBoldWeb';
