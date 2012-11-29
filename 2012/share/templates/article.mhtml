@@ -4,17 +4,9 @@
   <div id="head">
     <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
   </div>
-  <div id="cont-wrap">
+  <div id="cont">
     <h1><% $title %></h1>
-    <div id="cont">
-      <div id="cont-main">
-        <% $article->body_html %>
-      </div>
-      <div id="cont-side">
-        <& sidebar.mhtml, global => $global, article => $article &>
-      </div>
-      <div style="clear:both;"></div>
-    </div>
+    <% $article->body_html %>
     <& disqus.mhtml, article => $article, year => undef &>
     <& fb_comment.mhtml, url => $article->atom_id, global => $global &>
   </div>
