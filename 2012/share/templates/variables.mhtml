@@ -1,6 +1,6 @@
 <%init>
 return {
-    title          => '2011 Seoul.pm 펄 크리스마스 달력',
+    title          => '2012 Seoul.pm 펄 크리스마스 달력',
     title_en       => 'Seoul.pm Perl Advent Calendar 2012',
     css_article    => 'article.css',
     css_calendar   => 'calendar.css',
