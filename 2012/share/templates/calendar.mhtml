@@ -36,11 +36,6 @@
   </div>
   <div id="cont-wrap">
     <div class="cont">
-      <div id="comment">
-        <& disqus.mhtml, article => undef, year => $year &>
-        <& fb_comment.mhtml, url => $global->{base_uri}, global => $global &>
-        <& traffic.mhtml, global => $global &>
-      </div>
     </div>
   </div>
 <& footer.mhtml, global => $global &>
