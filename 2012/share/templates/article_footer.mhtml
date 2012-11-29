@@ -6,7 +6,6 @@
     <p>
       <% $global->{copyright} %>
     </p>
-    <img src="bn_seoulpm.gif" />
   </div>
 </div>
 </body>
