@@ -1,6 +1,6 @@
 <& header.mhtml, global => $global, article => undef, year => $year &>
 <body><& xfbml.mhtml &>
-<div id="tooltip">
+<div id="popup">
 </div>
 <div id="wrap">
   <div id="head">
@@ -37,6 +37,17 @@
 %   }
 % }
     </ul>
+    <script>
+      $("#gifts li.on").hover(function() {
+        var offset = $(this).offset();
+        var popup  = $("#popup");
+        popup.css("left", offset.left - (313 / 2) + 30);
+        popup.css("top", offset.top - 229);
+        popup.css("display", "block");
+      }, function() {
+        $("#popup").css("display", "none");
+      });
+    </script>
   </div>
 <& calendar_footer.mhtml, global => $global &>
 <%init>
