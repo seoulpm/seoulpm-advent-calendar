@@ -3,7 +3,7 @@
 <div id="wrap">
   <div id="head">
     <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
-    <img src="title.gif" width="280px" />
+    <img src="title.gif"/>
   </div>
   <div id="cont">
     <h1><% $title %></h1>
