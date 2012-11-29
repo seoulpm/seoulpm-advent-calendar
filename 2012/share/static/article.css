@@ -12,11 +12,52 @@
 }
 * { margin: 0; padding: 0; }
 #wrap {
-    width: 900px;
+    width: 760px;
     margin: 0 auto;
 }
 #head {
-    margin-top: 20px;
+    margin-top: 8px;
+}
+#head menu.nav {
+    display: inline-block;
+    float: right;
+    margin-top: 4px;
+}
+#head menu.nav a {
+    display: block;
+    height: 44px;
+}
+#head menu.nav li {
+    display: inline-block;
+    float: left;
+    background: url("nav.gif");
+    height: 44px;
+    margin-left: 4px;
+}
+#head menu.nav li.prev,
+#head menu.nav li.prev a {
+    background-position: 0 0;
+    width: 60px;
+}
+#head menu.nav li.twit,
+#head menu.nav li.twit a {
+    background-position: -60px 0;
+    width: 53px;
+}
+#head menu.nav li.feed,
+#head menu.nav li.feed a {
+    background-position: -113px 0;
+    width: 44px;
+}
+#head menu.nav li.chat,
+#head menu.nav li.chat a {
+    background-position: -157px 0;
+    width: 61px;
+}
+#head menu.nav li.next,
+#head menu.nav li.next a {
+    background-position: -218px 0;
+    width: 57px;
 }
 h1, h2, h3, h4 {
     display: block;
@@ -25,7 +66,10 @@ h1, h2, h3, h4 {
 }
 h1 {
     font-size: 36px;
-    margin: 1em 0 0.5em 0;
+    margin: 1em 0 0 -10px;
+    display: inline-block;
+    background-color: #f4f4f4;
+    padding: 10px;
 }
 h2 {
     font-size: 28px;
@@ -49,6 +93,7 @@ h3 {
 #cont p, #cont ul{
     display: block;
     margin-left: 12px;
+    margin-bottom: 1.6em;
 }
 #cont ul {
     margin-top: 16px;
@@ -60,9 +105,19 @@ h3 {
     padding-left: 50px;
     background: url("bullet.gif") no-repeat scroll 0 0 transparent;
 }
+#cont em {
+    font-weight: bold;
+}
+#cont code {
+    background-color: #f4f4f4;
+    padding: 4px;
+}
 .hidden {
     width: 0;
     height: 0;
     display: inline-block;
     overflow: hidden;
+}
+#cont .syntaxhighlighter {
+    margin-top: -1em !important;
 }
