@@ -11,7 +11,7 @@
     <& disqus.mhtml, article => $article, year => undef &>
     <& fb_comment.mhtml, url => $article->atom_id, global => $global &>
   </div>
-<& footer.mhtml, global => $global &>
+<& article_footer.mhtml, global => $global &>
 
 <%init>
   my $global = $m->comp('variables.mhtml');
