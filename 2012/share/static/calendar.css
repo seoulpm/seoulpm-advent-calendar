@@ -129,7 +129,7 @@
 #gifts .gift_22.bold { background-position: -1470px -80px; }
 #gifts .gift_23.bold { background-position: -1540px -80px; }
 #gifts .gift_24.bold { background-position: -1610px -80px; }
-#gifts .on a:hover { background-image: url("img/gift.gif"); }
+#gifts .on a:hover { background-image: url("gift.gif"); }
 #gifts .gift_1.on a:hover { background-position: 0 0; }
 #gifts .gift_2.on a:hover { background-position: -70px 0; }
 #gifts .gift_3.on a:hover { background-position: -140px 0; }

@@ -11,9 +11,9 @@
       <li><a href="/2011">펄 크리스마스 달력 #2011</a>
     </ul>
     <ul class="icon">
-      <li><a href="/2012/atom.xml"><img src="img/feed.png"></a></li>
-      <li><a href="http://twitter.com/seoulpm"><img src="img/twitter.png"></a></li>
-      <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="img/chat.png"></a></li>
+      <li><a href="/2012/atom.xml"><img src="feed.png"></a></li>
+      <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
+      <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
     </ul>
   </div>
   <pre class="hidden">
