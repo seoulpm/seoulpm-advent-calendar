@@ -34,9 +34,7 @@
 % }
     </ul>
   </div>
-  <div id="cont-wrap">
-    <div class="cont">
-    </div>
+  <div class="cont">
   </div>
 <& footer.mhtml, global => $global &>
 <%init>
