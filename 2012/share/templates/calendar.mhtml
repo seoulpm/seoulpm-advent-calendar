@@ -7,7 +7,7 @@
     <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
   </div>
   <div class="cont">
-    <ul id="tree">
+    <ul id="gifts">
 % for my $week ( @$calendar ) {
 %   for my $day ( @$week ) {
 %     if ( $day && $day <= $global->{articles_total} ) {
