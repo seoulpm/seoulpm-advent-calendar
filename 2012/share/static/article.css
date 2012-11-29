@@ -67,6 +67,6 @@ h3 {
     display: inline-block;
     overflow: hidden;
 }
-.syntaxhighlighter {
-    margin-top: -1em;
+#cont .syntaxhighlighter {
+    margin-top: -1em !important;
 }
