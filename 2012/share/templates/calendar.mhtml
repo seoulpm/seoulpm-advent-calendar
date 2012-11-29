@@ -23,7 +23,7 @@
             </span></a></li>
 %         }
 %         else {
-            <li class="gift_<% $day %> on"><a href="<% $article->atom_id %>"><span class="hidden">
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
               <% $global->{korean_day}->($day) %> 날: <% $article->title %> - by <% $article->author %>
             </span></a></li>
 %         }
