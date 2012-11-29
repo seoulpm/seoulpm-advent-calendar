@@ -147,7 +147,7 @@ uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.
 2. [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod) : PSGI::FAQ (영문)
 2. [Perl을 위한 Web App 실행 환경 꾸미기 by yuni_kim](https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p) : uWSGI가 짱!!
 
-…역시 잘 모르겠습니다. orz  
+CGI가 있는데 왜 또 다른 인터페이스를 만들어 쓰나? - 성능 때문이죠. 최대의 성능을 낼 수 있도록 저수준(low-level) API를 쓸 수 있게 하다 보니 필요해졌답니다. 그외 다양한 웹서버 - 어플리케이션간 정보 교환을 제공하는 모양이네요.
 
 
 ### 그럼 뭘 선택해야 하나요?
@@ -565,6 +565,66 @@ get '/:site' => sub {
 &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
 &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
 </pre>
+
+### 결과
+![썸네일](http://cfile10.uf.tistory.com/image/0169624050B66F5C269C9F)
+
+사실 위에 있는 코드를 그대로 실행한 페이지가 아니라, 썸네일 보기 페이지 입니다.
+
+주소 표시줄에 /th/가 포함되어 있으면 이미지 경로를
+
+* /[% site %]/[% file %]
+* /[% site %]**/thumb/**[% file %]
+
+위와 같이 보여주는 템플릿을 따로 만들었거든요.
+
+./lib/MyDancer.pm 에서 템플릿 엔진으로 배열을 넘길 때, 아예 HTML 태그를 다 완성해서 넘겨주면 템플릿이 또 있어야 할 필요가 없습니다만, 전 그냥 간단하게 비슷한 코드와 템플릿 여러개 만드는 것으로 해결했습니다.
+
+TIMTOWTDI(There is more than one way to do it, 무언가를 하는 방법은 (언제나)하나보다 많다)!!
+
+
+### 원본글로 링크
+이미지를 수집한 원본 글로 링크를 걸어주는 기능도 추가했는데, 이건 파일명만 넘겨줘선 안되고, 원본 URL을 만들 수 있는 정보도 같이 넘겨줘야 합니다.
+
+DB 테이블 모양에서 나왔던 rgr201210 이 원본글 정보를 갖고 있습니다. 'no'인데요,
+
+* 원본 URL : http://rgrong.kr/bbs/view.php?id=rgr201210& .. 중략 .. &**no=180638**
+* 위의 no에 해당하는 숫자를 DB에 저장했습니다.
+
+<pre language="sql">
+mysql> describe rgr201210;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(11)  | NO   | PRI | NULL    | auto_increment |
+| no    | int(11)  | NO   |     | NULL    |                |
+| name  | char(37) | NO   |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+</pre>
+
+no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형을 만들어 본다면 해쉬 안에 배열이거나, 배열 안에 해쉬가 들어가겠네요.
+
+DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 기능이 없는듯 하여, 한줄씩 처리했습니다.
+
+<pre language="perl">
+    my @ary;
+    my $count = 0;
+    while ( $count < $view )  {
+        my $sql = "select * from $db{$site} order by id desc limit $start, 1";
+        my $sth = database->prepare( $sql );        $sth->execute();
+        my $hr = $sth->fetchrow_hashref();
+        print "$hr->{'no'} $hr->{'name'}\n";
+        $hr->{'no'} = "$url{$site}$hr->{'no'}";
+        $hr->{'name'} =~ s,(..)(.*),$1/$1$2,g;
+        push @ary, $hr; 
+        $start++;
+        $count++;
+    }
+</pre>
+
+쿼리를 이미지 불러오는 횟수만큼 주는데 …뭔가 잘못 하고 있는 기분이 듭니다.
+
+더 좋은 방법 있으면 알려주세요.;;;;
 
 ## 맺음말
 의욕만큼의 실력이 없어 부실한 문서가 되고 말았습니다. 보고 따라만 하면 웹 서비스 하나가 완성되는 문서를 만들고자 하였으나, 각각 다른 환경에 대한 구성을 설명할 실력이 안 되네요.
