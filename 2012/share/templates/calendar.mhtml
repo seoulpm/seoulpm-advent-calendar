@@ -15,22 +15,24 @@
 %       my $article = $articles->{$key};
 %       if ( $article ) {
 %         my $tb = $global->{tree_ball}->($day);
-            <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-              <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <span class="cli">
-                  <span class="title"><% $global->{korean_day}->($day) %> 날: <% $article->title  %></span>
-                  - by <span class="author"><% $article->author %></span></span>
 %         if (     $today->year  == $year
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
-                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날: <% $article->title %> - by <% $article->author %>
+            </span></a></li>
 %         }
 %         else {
-                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+            <li class="gift_<% $day %> on"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날: <% $article->title %> - by <% $article->author %>
+            </span></a></li>
 %         }
 %       }
-              </a>
-            </li>
+%       else {
+          <li class="gift_<% $day %>"><a href="#"><span class="hidden">
+            <% $global->{korean_day}->($day) %> 날.
+          </span></a></li>
+%       }
 %     }
 %   }
 % }
