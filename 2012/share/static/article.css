@@ -64,6 +64,10 @@ h3 {
 #cont em {
     font-weight: bold;
 }
+#cont code {
+    background-color: #f4f4f4;
+    padding: 4px;
+}
 .hidden {
     width: 0;
     height: 0;
