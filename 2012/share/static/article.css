@@ -56,3 +56,9 @@ h2 {
     padding-left: 50px;
     background: url("bullet.gif") no-repeat scroll 0 0 transparent;
 }
+.hidden {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    overflow: hidden;
+}

@@ -2,7 +2,8 @@
 <body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
-    <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <img src="title.gif" width="280px" />
   </div>
   <div id="cont">
     <h1><% $title %></h1>
