@@ -3,13 +3,17 @@
 <div id="wrap">
   <div id="head">
     <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
-    <img src="title.gif"/>
+    <a href="http://advent.perl.kr/<% $year %>"><img src="title.gif"/></a>
     <menu class="nav">
-      <li class="prev"><a href=""><span class="hidden">이전날</span></a></li>
-      <li class="twit"><a href=""><span class="hidden">트위터</span></a></li>
-      <li class="feed"><a href=""><span class="hidden">피드</span></a></li>
-      <li class="chat"><a href=""><span class="hidden">채팅</span></a></li>
-      <li class="next"><a href=""><span class="hidden">다음날</span></a></li>
+%   if ($prev) {
+      <li class="prev"><a href="<% $prev->date->ymd %>.html"><span class="hidden">이전날</span></a></li>
+%   }
+      <li class="twit"><a href="http://twitter.com/seoulpm"><span class="hidden">트위터</span></a></li>
+      <li class="feed"><a href="atom.xml"><span class="hidden">피드</span></a></li>
+      <li class="chat"><a href="http://webchat.freenode.net/?channels=perl-kr"><span class="hidden">채팅</span></a></li>
+%   if ($next) {
+      <li class="next"><a href="<% $next->date->ymd %>.html"><span class="hidden">다음날</span></a></li>
+%   }
     </menu>
   </div>
   <div id="cont">
