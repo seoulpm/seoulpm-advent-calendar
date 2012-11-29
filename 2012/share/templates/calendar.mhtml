@@ -5,10 +5,6 @@
 <div id="wrap">
   <div id="head">
     <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
-    <menu id="like">
-      <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2011/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
-      <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2011%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
-    </menu>
     <menu id="menu">
       <li class="nook"><a href="http://advent.perl.kr/<% $year - 1 %>/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
       <li class="bold large"><a href="#openbook" class="scroller" onClick="perl_scroll('openbook')">&raquo; 펄 크리스마스 달력이란?</a></li>
