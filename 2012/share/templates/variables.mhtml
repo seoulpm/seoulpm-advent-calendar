@@ -8,7 +8,7 @@ return {
     fb_token       => '100001798303989',
     base_domain    => 'advent.perl.kr',
     base_uri       => 'http://advent.perl.kr/2011/',
-    copyright      => 'Articles by Seoul Perl Mongers<br />Illustrated by Hyunsu Park, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim',
+    copyright      => 'Articles by Seoul Perl Mongers<br />Illustrated by Yura Lee, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim',
     tree_ball      => sub {
         my $day = shift;
         my %table = (
