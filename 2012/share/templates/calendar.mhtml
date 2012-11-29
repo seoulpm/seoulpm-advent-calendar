@@ -14,7 +14,6 @@
 %       my $key = sprintf("%4d-%02d-%02d", $year, $month->{1}->month, $day);
 %       my $article = $articles->{$key};
 %       if ( $article ) {
-%         my $tb = $global->{tree_ball}->($day);
 %         if (     $today->year  == $year
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
