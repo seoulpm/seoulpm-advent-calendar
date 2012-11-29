@@ -61,6 +61,9 @@ h3 {
     padding-left: 50px;
     background: url("bullet.gif") no-repeat scroll 0 0 transparent;
 }
+#cont em {
+    font-weight: bold;
+}
 .hidden {
     width: 0;
     height: 0;
