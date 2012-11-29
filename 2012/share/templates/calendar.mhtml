@@ -1,41 +1,13 @@
 <& header.mhtml, global => $global, article => undef, year => $year &>
 <body><& xfbml.mhtml &>
-<div id="tooltip">
-  <img class="arrow" src="tooltip_bottom_arrow.gif" />
-  <div class="box">
-    <div class="pad">
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td rowspan="2" class="cont-img"><img class="image" src="profile_empty.jpg" /></td>
-          <td class="cont-msg">
-            <div class="title">열여섯번째 perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기 </div>
-        </tr>
-        <tr valign="bottom">
-          <td class="cont-msg"><div class="author">by corund</div></td>
-        </tr>
-      </table>
-    </div>
-  </div>
+<div id="popup">
 </div>
 <div id="wrap">
   <div id="head">
-    <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
-    <menu id="like">
-      <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2011/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
-      <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2011%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
-    </menu>
-    <menu id="menu">
-      <li class="nook"><a href="http://advent.perl.kr/<% $year - 1 %>/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
-      <li class="bold large"><a href="#openbook" class="scroller" onClick="perl_scroll('openbook')">&raquo; 펄 크리스마스 달력이란?</a></li>
-      <& link.mhtml, global => $global &>
-      <li class="margin"><p class="disc">우측의 크리스마스 화환에 하루에 하나씩 날짜가 적힌 장식구가 달립니다.</p></li>
-      <li class="buttons">
-        <a href="atom.xml" title="Feed"><img src="feed.png" width="36px" /></a>
-        <a href="http://webchat.freenode.net/?channels=perl-kr" title="Chat"><img src="chat.png" width="36px" /></a>
-        <a href="http://twitter.com/seoulpm" title="Twitter"><img src="twitter.png" width="36px" /></a>
-      </li>
-    </menu>
-    <ul id="tree">
+    <h1 class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
+  </div>
+  <div class="cont">
+    <ul id="gifts">
 % for my $week ( @$calendar ) {
 %   for my $day ( @$week ) {
 %     if ( $day && $day <= $global->{articles_total} ) {
@@ -43,80 +15,41 @@
 %       my $article = $articles->{$key};
 %       if ( $article ) {
 %         my $tb = $global->{tree_ball}->($day);
-            <li style="top: <% $tb->{top} %>px; left: <% $tb->{left} %>px;">
-              <a href="<% $article->atom_id %>" title="<% $day %>일">
-                <span class="cli">
-                  <span class="title"><% $global->{korean_day}->($day) %> 날: <% $article->title  %></span>
-                  - by <span class="author"><% $article->author %></span></span>
 %         if (     $today->year  == $year
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
-                <div id="ball-today" class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날: <% $article->title %> - by <% $article->author %>
+            </span></a></li>
 %         }
 %         else {
-                <div class="ball" style="background-image: url('ball_<% $tb->{fn} %>.png')"></div>
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날: <% $article->title %> - by <% $article->author %>
+            </span></a></li>
 %         }
 %       }
-              </a>
-            </li>
+%       else {
+          <li class="gift_<% $day %>"><a href="#"><span class="hidden">
+            <% $global->{korean_day}->($day) %> 날.
+          </span></a></li>
+%       }
 %     }
 %   }
 % }
     </ul>
+    <script>
+      $("#gifts li.on").hover(function() {
+        var offset = $(this).offset();
+        var popup  = $("#popup");
+        popup.css("left", offset.left - (313 / 2) + 30);
+        popup.css("top", offset.top - 229);
+        popup.css("display", "block");
+      }, function() {
+        $("#popup").css("display", "none");
+      });
+    </script>
   </div>
-  <div id="cont-wrap">
-    <div class="cont">
-      <div id="openbook" class="part">
-        <h2><a name="openbook"><img src="titl_0.gif" alt="펄 크리스마스 달력이 뭐죠?" /></a></h2>
-        <p>
-          사실 여기서 '크리스마스 달력'은 '대림절 달력'(Advent Calendar)을 서울 펄 몽거스식으로 바꾸어 부르는 일종의 브랜드(?)명입니다. 부르기 더 편하니까요. 아무튼 <em>대림절 달력의 유래는 독일 19세기 초</em>까지 올라갑니다. 루터교 사람들은 12월 1일부터 24일까지의 대림절 동안 하루에 하나씩 분필로 표기하여 재림일을 손꼽아 기다리곤 했답니다.
-        </p>
-        <p>
-          <img class="right" src="http://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Rathaus_H%C3%BCnfeld_Adventskalender.JPG/320px-Rathaus_H%C3%BCnfeld_Adventskalender.JPG" />
-          쩝... 나뭇가지에 개수만큼 흠집을 내는 것도 아니고 말이죠! 물론 석기 시대에나 볼 수 있을 듯한 이런 구리구리한 방법만 있던 것은 아닙니다. 멋진 구조물에 24개의 양초를 두기도 했고요. 건물의 창문에 번호를 매기기도 했습니다. 그것이 진짜 달력 형태로 만들어졌다가 마침내 인쇄물 형식의 대림절 달력이 탄생하게 된 것입니다! 짜잔! (아쉽게도 사진은 없습니다.)
-        </p>
-        <p>
-          현대 문화는 이 관습을 고스란히 물려받았습니다. 12월이 다가오면 너나 할 것 없이 온 가정에서 오손도손 모여 대림절 달력을 만듭니다. <em>상자 형태로 만들어 스물 네개의 문을 달고요. 하루에 하나씩 열면! 짜잔~ 깜짝 선물이 나오는 겁니다!</em> 마지막 24일의 문은 초대형 문에 초대형 선물을 넣는 센스도 발휘합니다. 가족이 다함께 종이를 씹고 뜯고 붙이며 만드는 재미. 크리스마스를 조마조마하고 기다리며 하루에 하나씩 문을 열어보는 재미! 올해도 크리스마스가 외로우신 분이나, 충성스러운 삶을 보내고 계시는 분까지, 다함께 글로벌하고 즐거운 크리스마스 달력에 빠져보는 건 어떨까요!
-        </p>
-      </div>
-      <div class="part">
-        <h2><img src="titl_1.gif" alt="세계적인 기념 행사라구요?" /></h2>
-        <p>
-          물론이고 말고요! 전세계의 각 펄 커뮤니티에서도 크리스마스를 기리며 <em>대림절동안 하루에 하나씩 깜짝 선물</em>을 드리는 '펄 크리스마스 달력'(Perl Advent Calendar)을 만듭니다.
-          <img class="right" src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Adventkalender_andrea.JPG/320px-Adventkalender_andrea.JPG" />
-          보통 <em>펄에 대한 재미있고 유익한 글을 선물</em>합니다. 서울 펄 몽거스는 작년 겨울을 처음으로 시작해서 올해 두번째로 달력으로 달리고 있습니다! 이 곳 외에도 올해 세계의 펄 커뮤니티 대림절 달력 목록은 이렇게나 많이 있으니 놀러가봅시다!
-        </p>
-        <& advent_link.mhtml, global => $global &>
-      </div>
-      <div class="part">
-        <h2><img src="titl_2.gif" alt="커뮤니티에 참여할 수 있나요?" /></h2>
-        <p>
-          네, 여러 <em>펄 커뮤니티 사이트</em>에서 소식을 공유하거나 질문과 답변을 할 수 있습니다. 페이지 상단 링크를 따라 IRC <em>채팅방</em>에서 대화를 나눌 수 있습니다. 올해 펄 크리스마스 달력 기사를 쓰실 분도 여전히 받고 있습니다. 펄에 대한 팁이나 좋은 주제를 공유하는데 관심이 있으신 분은 채팅방에 들어오셔서 알려주시거나 담당자에게 <a href="mailto:amoc.yn@gmail.com">이메일</a>을 살짝 날려주시기 바랍니다.
-        </p>
-      </div>
-      <div class="part">
-        <h2><img src="titl_3.gif" alt="펄에 대해 이것저것 알고 싶은데요" /></h2>
-        <p>
-          네이버 펄 카페나 펄 채팅방에 들어오시면 언제든지 질문하실 수 있습니다. 저희는 24시간동안 눈을 뜬 채 모든 작업 병행하며 살아갈 수 있는 슈퍼-외계인이 아니기 때문에 채팅방에 들어오시면 인사하거나 요건을 말하고 다른 사람들이 발견해 줄 때까지 조금 기다릴 필요가 있다는 것은 말하지 않아도 아실겁니다!
-        </p>
-        <p>
-          대부분의 궁금한 사항은 <a href="http://learn.perl.org/" target="_blank">learn.perl.org</a>에서 얻을 수 있습니다. 특히 <a href="http://learn.perl.org/docs/" target="_blank">perldoc</a> 문서의 규모는 어마어마합니다. 그 외에도 문제를 해결하기 위해 10만개가 넘는 CPAN 모듈이 쌓인 보물 던전을 <a href="https://cpan.org/" target="_blank">cpan.org</a>나 <a href="https://metacpan.org/" target="_blank">metacpan.org</a>에서 마음껏 탐험할 수 있습니다. 펄 수도자들이 <a href="http://perlmonks.org" target="_blank">perlmonks.org</a>에 모여있습니다. 여기에서 많은 정보를 얻을 수 있습니다. 세계의 각 도시를 대표하는 펄 몽거스 집단도 있습니다. 여러분이 이 글을 읽고 있다는 것은 여러분이 이미 펄 몽거스와 함께하고 있다는 뜻입니다!
-        </p>
-      </div>
-      <div class="part">
-        <h2><img src="titl_4.gif" alt="오~ 좋아요!" /></h2>
-        <p>
-          자, 그럼 어서 "좋아요"를 누르고 트위터와 페이스북으로 공유합시다.
-        </p>
-      </div>
-      <div id="comment">
-        <& disqus.mhtml, article => undef, year => $year &>
-        <& fb_comment.mhtml, url => $global->{base_uri}, global => $global &>
-        <& traffic.mhtml, global => $global &>
-      </div>
-    </div>
-  </div>
-<& footer.mhtml, global => $global &>
+<& calendar_footer.mhtml, global => $global &>
 <%init>
   my $global = $m->comp('variables.mhtml');
   $global->{location} = '';

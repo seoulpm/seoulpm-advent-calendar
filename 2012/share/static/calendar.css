@@ -1,259 +1,156 @@
-* {
-    padding: 0;
-    margin: 0;
-    border: 0;
-    color: #dedede;
-    font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
-}
-body {
-    background: url('bg.gif') repeat-x scroll 0 0 #1a1a1a;
-    width: 100%;
-    text-align: left;
-}
+* { margin: 0; padding: 0; }
 #wrap {
-    margin-left: auto;
-    margin-right: auto;
-    width: 980px;
+    width: 690px;
+    margin: 0 auto;
+    background: url("hr.png") repeat-x scroll -4px 0;
+    min-height: 100px;
+    overflow: visible;
 }
 #head {
-    position: relative;
-    margin-bottom: 120px;
+    margin-left: 57px;
+    padding-top: 30px;
+    width: 576px;
+    height: 370px;
+    background: url("head.bmp") no-repeat scroll 0 30px transparent;
 }
-#head h1 {
-    display: none;
+#cont {
+    margin-top: 14px;
 }
-#like {
-    z-index: 3;
-    position: absolute;
-    padding-top: 12px;
-    margin-top: 46px;
-    height: 116px;
-    left: 0;
+#gifts {
+    display: inline-block;
+    margin: 0 52px;
 }
-#like li {
-    list-style-type: none;
-    display: block
-    overflow: hidden;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-#like li.twt {
-    height: 20px;
-}
-#like li.fb {
+#gifts li {
+    float: left;
+    display: block;
+    margin-left: 25px;
+    margin-bottom: 10px;
+    background: url("num.bmp") no-repeat scroll 0 0 transparent;
+    width: 70px;
     height: 80px;
 }
-#menu {
-    z-index: 2;
-    position: absolute;
+#gifts a { 
     display: block;
-    padding-top: 12px;
-    top: 0;
-    left: 0;
-}
-#menu li {
-    list-style-type: none;
-    font-size: 14px;
-}
-#menu li a {
-    text-decoration: none;
-}
-#menu li a:hover {
-    text-decoration: underline;
-}
-#menu li.large {
-    font-size: 17px;
-    margin-bottom: 15px;
-}
-#menu li.nook {
-    font-size: 14px;
-    margin-bottom: 138px;
-}
-#menu li.bold, #menu li.bold a {
-    color: #ffffff;
-    font-weight: bold;
-}
-#menu li.margin {
-    margin-top: 12px;
-}
-#menu li .disc {
-    background-color: #101010;
-    color: #ffffff;
-    margin-top: 20px;
-    padding: 5px;
-    font-size: 12px;
-    width: 180px;
-}
-#menu li.buttons {
-    margin-top: 19px;
-}
-#menu li.buttons img {
-    padding: 2px;
-}
-#tree {
-    z-index: 1;
-    position: relative;
-    background-image: url('tree.gif');
-    list-style-type: none;
-    display: block;
-    width: 610px;
-    height: 614px;
-    overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
-}
-#tree li {
-    position: absolute;
-}
-#cont-wrap {
-    padding-left: 80px;
-    padding-right: 80px;
-}
-.cont h2 img {
-    display: block;
-}
-.cont h2 {
-    font-size: 34px;
-    padding: 10px 20px 10px 30px;
-    margin-bottom: 40px;
-    position: relative;
-    display: inline-block;
-    left: -80px;
-    background: #345f53;
-    border-bottom: 3px solid #244139;
-    border-right: 2px solid #1b322c;
-    zoom: 1;
-    *display: inline;
-}
-.cont p, .cont ul {
-    margin-bottom: 30px;
-    font-size: 16px;
-    line-height: 200%;
-}
-.cont p em, .cont ul em {
-    font-style: normal;
-    background: #060606;
-    border-bottom: 2px solid #ae1932;
-}
-.cont ul {
-    margin-left: 45px;
-}
-.part {
-    margin-bottom: 94px;
-}
-.part img.right {
-    float: right;
-    margin: 10px 0 10px 20px;
-}
-#comment {
-    position: relative;
-    width: 618px;
-    min-height: 1223px;
-}
-#traffic {
-    position: absolute;
-    float: right;
-    width: 198px;
-    top: 0;
-    left: 624px;
+    width: 70px;
+    height: 80px;
 }
 #foot {
-    margin-top: 120px;
-    margin-bottom: 40px;
-    padding-left: 74px;
+    position: relative;
+    width: 757px;
+    height: 348px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    background: url("camel.png") no-repeat scroll 381px 0 transparent;
 }
-#foot p {
+#foot .indent {
+    margin-left: 90px;
+}
+#foot ul.detail {
+    line-height: 2em;
+    padding-top: 50px;
+    list-style: none;
+}
+#foot ul.detail li {
+    margin-left: -28px;
+    padding-left: 28px;
+    background: url("bullet2.gif") no-repeat 0 6px transparent;
+}
+#foot ul.icon {
     position: absolute;
     display: block;
-    margin-left: 186px;
-    padding-top: 4px;
-    padding-left: 100px;
-    font-size: 12px;
-    color: #666;
+    bottom: 10px;
+    list-style: none;
 }
-#disqus_thread, #disqus_thread p, #disqus_thread ul {
-    font-size: 14px;
+#foot ul.icon li {
+    float: left;
+    margin-right: 10px;
 }
-.dsq-comments {
-    font-size: 14px;
+#foot a {
+    color: #000;
 }
-.dsq-comment-text {
-    font-size: 14px;
-}
-.ball {
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    width: 50px;
-    height: 50px;
-}
-.ball.today {
-    background-position: -50px 0;
-}
-.ball.bling {
-    background-position: -50px 0;
-}
-#tree .cli {
-display: none;
-}
-#tooltip {
-    position: absolute;
-    width: 280px;
-    height: 86px;
-    z-index: 4;
-    top: 100px;
-    left: 40px;
-    padding-bottom: 10px;
+#popup {
     display: none;
-}
-#tooltip .box {
-    background-color: #1a1a1a;
-    border: solid 1px #999;
-    border-bottom: solid 2px #999;
-    -moz-box-shadow: 0 2px 6px black;
-    -webkit-box-shadow: 0 2px 6px black;
-    box-shadow: 0 2px 6px black;
-}
-#tooltip .pad {
-    min-width: 221px;
-    min-height: 62px;
-    padding: 9px;
-}
-#tooltip table {
-    border: 0;
-}
-#tooltip .cont-img {
-    min-width: 62px;
-    height: 62px;
-    padding-right: 9px;
-    overflow: hidden;
-}
-#tooltip .cont-img img {
-    width: auto;
-    height: 62px;
-}
-#tooltip .cont-msg {
-    vertical-align: bottom;
-    text-align: left;
-    overflow: hidden;
-}
-#tooltip .cont-msg .title {
-    color: #ccdee0;
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 100%;
-    width: 189px;
-    height: 45px;
-    overflow: hidden;
-}
-#tooltip .cont-msg .author {
-    padding-top: 3px;
-    padding-right: 2px;
-    font-size: 12px;
-    color: #bfbfbf;
-    text-align: right;
-}
-#tooltip .arrow {
     position: absolute;
-    bottom: 4px;
-    right: 23px;
+    background: url("popup.gif") no-repeat scroll 0 0 transparent;
+    width: 313px;
+    height: 229px;
 }
+.hidden {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    overflow: hidden;
+}
+#gifts .gift_1 { background-position: 0px 0; }
+#gifts .gift_2 { background-position: -70px 0; }
+#gifts .gift_3 { background-position: -140px 0; }
+#gifts .gift_4 { background-position: -210px 0; }
+#gifts .gift_5 { background-position: -280px 0; }
+#gifts .gift_6 { background-position: -350px 0; }
+#gifts .gift_7 { background-position: -420px 0; }
+#gifts .gift_8 { background-position: -490px 0; }
+#gifts .gift_9 { background-position: -560px 0; }
+#gifts .gift_10 { background-position: -630px 0; }
+#gifts .gift_11 { background-position: -700px 0; }
+#gifts .gift_12 { background-position: -770px 0; }
+#gifts .gift_13 { background-position: -840px 0; }
+#gifts .gift_14 { background-position: -910px 0; }
+#gifts .gift_15 { background-position: -980px 0; }
+#gifts .gift_16 { background-position: -1050px 0; }
+#gifts .gift_17 { background-position: -1120px 0; }
+#gifts .gift_18 { background-position: -1190px 0; }
+#gifts .gift_19 { background-position: -1260px 0; }
+#gifts .gift_20 { background-position: -1330px 0; }
+#gifts .gift_21 { background-position: -1400px 0; }
+#gifts .gift_22 { background-position: -1470px 0; }
+#gifts .gift_23 { background-position: -1540px 0; }
+#gifts .gift_24 { background-position: -1610px 0; }
+#gifts .gift_1.bold { background-position: 0px -80px; }
+#gifts .gift_2.bold { background-position: -70px -80px; }
+#gifts .gift_3.bold { background-position: -140px -80px; }
+#gifts .gift_4.bold { background-position: -210px -80px; }
+#gifts .gift_5.bold { background-position: -280px -80px; }
+#gifts .gift_6.bold { background-position: -350px -80px; }
+#gifts .gift_7.bold { background-position: -420px -80px; }
+#gifts .gift_8.bold { background-position: -490px -80px; }
+#gifts .gift_9.bold { background-position: -560px -80px; }
+#gifts .gift_10.bold { background-position: -630px -80px; }
+#gifts .gift_11.bold { background-position: -700px -80px; }
+#gifts .gift_12.bold { background-position: -770px -80px; }
+#gifts .gift_13.bold { background-position: -840px -80px; }
+#gifts .gift_14.bold { background-position: -910px -80px; }
+#gifts .gift_15.bold { background-position: -980px -80px; }
+#gifts .gift_16.bold { background-position: -1050px -80px; }
+#gifts .gift_17.bold { background-position: -1120px -80px; }
+#gifts .gift_18.bold { background-position: -1190px -80px; }
+#gifts .gift_19.bold { background-position: -1260px -80px; }
+#gifts .gift_20.bold { background-position: -1330px -80px; }
+#gifts .gift_21.bold { background-position: -1400px -80px; }
+#gifts .gift_22.bold { background-position: -1470px -80px; }
+#gifts .gift_23.bold { background-position: -1540px -80px; }
+#gifts .gift_24.bold { background-position: -1610px -80px; }
+#gifts .on a:hover { background-image: url("gift.gif"); }
+#gifts .gift_1.on a:hover { background-position: 0 0; }
+#gifts .gift_2.on a:hover { background-position: -70px 0; }
+#gifts .gift_3.on a:hover { background-position: -140px 0; }
+#gifts .gift_4.on a:hover { background-position: 0 0; }
+#gifts .gift_5.on a:hover { background-position: -70px 0; }
+#gifts .gift_6.on a:hover { background-position: -140px 0; }
+#gifts .gift_7.on a:hover { background-position: -140px 0; }
+#gifts .gift_8.on a:hover { background-position: 0 0; }
+#gifts .gift_9.on a:hover { background-position: -70px 0; }
+#gifts .gift_10.on a:hover { background-position: -140px 0; }
+#gifts .gift_11.on a:hover { background-position: 0 0; }
+#gifts .gift_12.on a:hover { background-position: -70px 0; }
+#gifts .gift_13.on a:hover { background-position: -70px 0; }
+#gifts .gift_14.on a:hover { background-position: -140px 0; }
+#gifts .gift_15.on a:hover { background-position: 0 0; }
+#gifts .gift_16.on a:hover { background-position: -70px 0; }
+#gifts .gift_17.on a:hover { background-position: -140px 0; }
+#gifts .gift_18.on a:hover { background-position: 0 0; }
+#gifts .gift_19.on a:hover { background-position: 0 0; }
+#gifts .gift_20.on a:hover { background-position: -70px 0; }
+#gifts .gift_21.on a:hover { background-position: -140px 0; }
+#gifts .gift_22.on a:hover { background-position: 0 0; }
+#gifts .gift_23.on a:hover { background-position: -70px 0; }
+#gifts .gift_24.on a:hover { background-position: -140px 0; }

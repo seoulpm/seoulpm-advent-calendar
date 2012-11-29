@@ -2,26 +2,27 @@
 <body><& xfbml.mhtml &>
 <div id="wrap">
   <div id="head">
-    <p><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
-    <a class="prev" href="<% $prev ? $prev->date->ymd.'.html' : '#' %>">≪ 이전 날</a>
-    <a class="back" href="<% $global->{base_uri} %>">↑달력으로 돌아가기</a>
-    <a class="next" href="<% $next ? $next->date->ymd.'.html' : '#' %>">다음 날 ≫</a>
+    <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <a href="http://advent.perl.kr/<% $year %>"><img src="title.gif"/></a>
+    <menu class="nav">
+%   if ($prev) {
+      <li class="prev"><a href="<% $prev->date->ymd %>.html"><span class="hidden">이전날</span></a></li>
+%   }
+      <li class="twit"><a href="http://twitter.com/seoulpm"><span class="hidden">트위터</span></a></li>
+      <li class="feed"><a href="atom.xml"><span class="hidden">피드</span></a></li>
+      <li class="chat"><a href="http://webchat.freenode.net/?channels=perl-kr"><span class="hidden">채팅</span></a></li>
+%   if ($next) {
+      <li class="next"><a href="<% $next->date->ymd %>.html"><span class="hidden">다음날</span></a></li>
+%   }
+    </menu>
   </div>
-  <div id="cont-wrap">
+  <div id="cont">
     <h1><% $title %></h1>
-    <div id="cont">
-      <div id="cont-main">
-        <% $article->body_html %>
-      </div>
-      <div id="cont-side">
-        <& sidebar.mhtml, global => $global, article => $article &>
-      </div>
-      <div style="clear:both;"></div>
-    </div>
+    <% $article->body_html %>
     <& disqus.mhtml, article => $article, year => undef &>
     <& fb_comment.mhtml, url => $article->atom_id, global => $global &>
   </div>
-<& footer.mhtml, global => $global &>
+<& article_footer.mhtml, global => $global &>
 
 <%init>
   my $global = $m->comp('variables.mhtml');
