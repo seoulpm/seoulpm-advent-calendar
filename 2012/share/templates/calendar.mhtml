@@ -1,21 +1,6 @@
 <& header.mhtml, global => $global, article => undef, year => $year &>
 <body><& xfbml.mhtml &>
 <div id="tooltip">
-  <img class="arrow" src="tooltip_bottom_arrow.gif" />
-  <div class="box">
-    <div class="pad">
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td rowspan="2" class="cont-img"><img class="image" src="profile_empty.jpg" /></td>
-          <td class="cont-msg">
-            <div class="title">열여섯번째 perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기 </div>
-        </tr>
-        <tr valign="bottom">
-          <td class="cont-msg"><div class="author">by corund</div></td>
-        </tr>
-      </table>
-    </div>
-  </div>
 </div>
 <div id="wrap">
   <div id="head">
