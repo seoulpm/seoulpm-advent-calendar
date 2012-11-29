@@ -49,6 +49,7 @@ h3 {
 #cont p, #cont ul{
     display: block;
     margin-left: 12px;
+    margin-bottom: 1.6em;
 }
 #cont ul {
     margin-top: 16px;
@@ -65,4 +66,7 @@ h3 {
     height: 0;
     display: inline-block;
     overflow: hidden;
+}
+.syntaxhighlighter {
+    margin-top: -1em;
 }
