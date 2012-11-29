@@ -4,7 +4,7 @@
 </div>
 <div id="wrap">
   <div id="head">
-    <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
+    <h1 class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
   </div>
   <div class="cont">
     <ul id="gifts">
