@@ -5,17 +5,6 @@
 <div id="wrap">
   <div id="head">
     <h1><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
-    <menu id="menu">
-      <li class="nook"><a href="http://advent.perl.kr/<% $year - 1 %>/" target="_blank">← 작년 펄 크리스마스 달력으로</a></li>
-      <li class="bold large"><a href="#openbook" class="scroller" onClick="perl_scroll('openbook')">&raquo; 펄 크리스마스 달력이란?</a></li>
-      <& link.mhtml, global => $global &>
-      <li class="margin"><p class="disc">우측의 크리스마스 화환에 하루에 하나씩 날짜가 적힌 장식구가 달립니다.</p></li>
-      <li class="buttons">
-        <a href="atom.xml" title="Feed"><img src="feed.png" width="36px" /></a>
-        <a href="http://webchat.freenode.net/?channels=perl-kr" title="Chat"><img src="chat.png" width="36px" /></a>
-        <a href="http://twitter.com/seoulpm" title="Twitter"><img src="twitter.png" width="36px" /></a>
-      </li>
-    </menu>
     <ul id="tree">
 % for my $week ( @$calendar ) {
 %   for my $day ( @$week ) {
