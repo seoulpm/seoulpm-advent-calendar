@@ -1,5 +1,10 @@
 <%args>
-  $url
+  $article
   $global
 </%args>
-<fb:comments href="<% $url %>" num_posts="6" width="690px" colorscheme="light"></fb:comments>
+% if ( $article ) {
+<fb:comments href="<% $article->atom_id %>" num_posts="6" width="690px" colorscheme="light"></fb:comments>
+% }
+% else {
+<fb:comments href="<% $global->{base_uri} %>" num_posts="6" width="690px" colorscheme="light"></fb:comments>
+% }

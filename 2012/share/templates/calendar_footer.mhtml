@@ -21,6 +21,8 @@
     </ul>
     <p class="copyright"><& copyright.mhtml &></p>
   </div>
+  <& fb_comment.mhtml, article => undef, global => $global &>
+  <& disqus.mhtml, article => undef, year => undef &>
   <pre class="hidden">
    .-'''  __  __
   /     \/  \/  \
