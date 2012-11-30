@@ -5,10 +5,10 @@
 <div id="foot">
   <div class="indent">
     <ul class="detail">
-      <li><a href="http://perl.kr">펄.kr</a>
-      <li><a href="/2011#openbook">크리스마스 달력이란</a>
-      <li><a href="/2010">펄 크리스마스 달력 #2010</a>
-      <li><a href="/2011">펄 크리스마스 달력 #2011</a>
+      <li><a href="http://perl.kr" target="_blank">펄.kr</a>
+      <li><a href="/2011#openbook" target="_blank">크리스마스 달력이란</a>
+      <li><a href="/2010" target="_blank">펄 크리스마스 달력 #2010</a>
+      <li><a href="/2011" target="_blank">펄 크리스마스 달력 #2011</a>
     </ul>
     <ul class="icon">
       <li><a href="/2012/atom.xml"><img src="feed.png"></a></li>
