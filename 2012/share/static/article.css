@@ -94,12 +94,9 @@ h3 {
     font-size: 1.4em;
     margin: 1.4em 0 0.5em -0.6em;
 }
-#cont p a {
+#cont p a, #cont ul a {
     font-family: 'NanumMyeongjoWeb';
     color: black;
-}
-#cont p a:hover {
-
 }
 #cont {
     font-size: 18px;
