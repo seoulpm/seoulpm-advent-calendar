@@ -22,13 +22,13 @@
 %               && $today->month == $month->{1}->month
 %               && $today->day   == $day ) {
             <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
-              <% $global->{korean_day}->($day) %> 날:
+              <% $global->{korean_day}->($day) %> 날.
                  <span class="title"><% $article->title %></span> - by <span class="author"><% $article->author %></span>
             </span></a></li>
 %         }
 %         else {
             <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
-              <% $global->{korean_day}->($day) %> 날:
+              <% $global->{korean_day}->($day) %> 날.
                  <span class="title"><% $article->title %></span> - by <span class="author"><% $article->author %></span>
             </span></a></li>
 %         }
