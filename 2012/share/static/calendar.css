@@ -72,8 +72,21 @@
     display: none;
     position: absolute;
     background: url("popup.gif") no-repeat scroll 0 0 transparent;
-    width: 313px;
-    height: 229px;
+    width: 230px;
+    height: 168px;
+}
+#popup .inner {
+    margin-top: 24px;
+    margin-left: 33px;
+    width: 166px;
+    height: 97px;
+    overflow: hidden;
+}
+#popup .inner strong {
+    display: block;
+    text-align: center;
+    margin-top: 4px;
+    word-break: keep-all;
 }
 .hidden {
     width: 0;

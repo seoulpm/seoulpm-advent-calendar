@@ -1,6 +1,7 @@
 <& header.mhtml, global => $global, article => undef, year => $year &>
 <body><& xfbml.mhtml &>
 <div id="popup">
+<div class="inner"><strong></strong></div>
 </div>
 <div id="wrap">
   <div id="head">
@@ -40,8 +41,8 @@
       $("#gifts li.on").hover(function() {
         var offset = $(this).offset();
         var popup  = $("#popup");
-        popup.css("left", offset.left - (313 / 2) + 30);
-        popup.css("top", offset.top - 229);
+        popup.css("left", offset.left - (230 / 2) + 34);
+        popup.css("top", offset.top - 168 + 6);
         popup.css("display", "block");
       }, function() {
         $("#popup").css("display", "none");
