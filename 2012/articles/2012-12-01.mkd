@@ -284,15 +284,15 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 같이 하실 분은 저에게 연락 주세요^^/
 
 올해에도 펄 크리스마스 달력으로 수고하시는
-@am0c님과 서울 펄 몽거스 여러분 정말 멋지십니다!
+[@am0c](am0c)님과 [서울 펄 몽거스](perlkr) 여러분 정말 멋지십니다!
 펄 커뮤니티 화이팅 >_<
 
 
 참고문서
 ---------
 
-  * How To Change Windows 7 Logon Screen
-  * Windows 7 to officially support logon UI background customization
+ * [How To Change Windows 7 Logon Screen](ref-1)
+ * [Windows 7 to officially support logon UI background customization](ref-2)
 
 
 [author]: http://twitter.com/perlstudy
@@ -306,6 +306,11 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 [perlstudy]: http://cafe.naver.com/perlstudy
 [modern-perl-kr]: http://sourcediet.cafe24.com/modern_perl_kr/chapter_00.html
 [kb-118624]: http://support.microsoft.com/kb/118624/en-us
+[am0c]: http://twitter.com/am0c
+[perlkr]: http://perl.kr/
+
+[ref-1]: http://www.makeuseof.com/tag/how-to-change-windows-7-logon-screen/
+[ref-2]: http://www.withinwindows.com/2009/03/15/windows-7-to-officially-support-logon-ui-background-customization/
 
 [img-1]: 2012-12-01-1.png
 [img-2]: 2012-12-01-2.png
@@ -313,3 +318,4 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 [img-resize-1]: 2012-12-01-1_r.png
 [img-resize-2]: 2012-12-01-2_r.png
 [img-resize-3]: 2012-12-01-3_r.png
+
