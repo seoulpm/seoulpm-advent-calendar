@@ -83,25 +83,26 @@ h3 {
     font-size: 1.4em;
     margin: 1.4em 0 0.5em -0.6em;
 }
-#cont a {
+#cont p a {
+    font-family: 'NanumMyeongjoWeb';
     color: black;
 }
-#cont a:hover {
+#cont p a:hover {
 
 }
 #cont {
-    font-family: 'NanumMyeongjoWeb';
     font-size: 18px;
     line-height: 2em;
 }
 #cont p, #cont ul{
+    font-family: 'NanumMyeongjoWeb';
     display: block;
     margin-bottom: 1.6em;
     text-align: justify;
 }
 #cont ul {
-    margin-top: 1em;
-    margin-bottom: -0.6em;
+    margin-top: -0.6em;
+    margin-bottom: 1em;
     list-style: none;
 }
 #cont li {
@@ -124,4 +125,5 @@ h3 {
 }
 #cont .syntaxhighlighter {
     margin-top: -1em !important;
+    font-size: 0.8em !important;
 }
