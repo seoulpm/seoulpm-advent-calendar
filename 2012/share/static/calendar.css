@@ -87,7 +87,9 @@
     color: #000;
 }
 #comment {
+    background: url("hr.png") repeat-x scroll -4px 0 transparent;
     margin-top: 30px;
+    padding-top: 40px;
 }
 #popup {
     display: none;
