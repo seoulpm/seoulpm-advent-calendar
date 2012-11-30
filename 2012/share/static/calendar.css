@@ -43,7 +43,7 @@
     width: 757px;
     height: 348px;
     margin-top: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     background: url("camel.png") no-repeat scroll 381px 0 transparent;
 }
 #foot .indent {
@@ -65,15 +65,31 @@
 #foot ul.icon {
     position: absolute;
     display: block;
-    bottom: 10px;
+    bottom: 21px;
     list-style: none;
 }
 #foot ul.icon li {
     float: left;
     margin-right: 10px;
 }
+#foot .copyright {
+    position: absolute;
+    font-size: 12px;
+    bottom: -12px;
+}
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
 #foot a {
     color: #000;
+}
+#comment {
+    background: url("hr.png") repeat-x scroll -4px 0 transparent;
+    margin-top: 30px;
+    padding-top: 40px;
 }
 #popup {
     display: none;
