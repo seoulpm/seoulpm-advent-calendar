@@ -2,7 +2,7 @@
 <!doctype html>
 <html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
-  <title><% $global->{location} ? sprintf("%s - %s", $article->title, $title) : $title %></title>
+  <title><% $title %></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar <% $year %>" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
