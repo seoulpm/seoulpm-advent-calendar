@@ -94,6 +94,7 @@ h3 {
     display: block;
     margin-left: 12px;
     margin-bottom: 1.6em;
+    text-align: justify;
 }
 #cont ul {
     margin-top: 16px;
