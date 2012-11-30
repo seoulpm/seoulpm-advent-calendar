@@ -78,20 +78,20 @@ _레지스트리 편집기_를 실행합니다. 아래와 같이 레지스트리
     my $backgroundKey = $reg{$background};
 
     if ( defined $backgroundKey ) {
-        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
+        my $OEMbackground = hex $backgroundKey->GetValue('OEMBackground');
 
         unless ( defined $OEMbackground ) {
             print
               "OEMBackground 값이 없어 새로 만들어 설정합니다.\n";
-            $backgroundKey->{'OEMBackground'} = 1;
+            $backgroundKey->{OEMBackground} = 1;
         }
         else {
             if ( $OEMbackground == 0x1 ) {
-                print "이미 설정 되어 있습니다.\n";
+                print "이미 설정되어 있습니다.\n";
             }
             else {
-                print "비설정 되어 있어 설정 하였습니다\n";
-                $backgroundKey->{'OEMBackground'} = 1;
+                print "비설정되어 있어 설정하였습니다\n";
+                $backgroundKey->{OEMBackground} = 1;
             }
         }
     }
@@ -138,7 +138,7 @@ Logon 이미지 변경
     use List::Util qw(shuffle);
 
     my $range = 9;
-    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my @LogonImage = map { "./Image/$_.jpg" } 1 .. $range;
     my $copy_path =
       "$ENV{WINDIR}/System32/oobe/info/backgrounds/backgroundDefault.jpg";
     my $random_path = shuffle @LogonImage;
@@ -166,7 +166,7 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 이벤트 로그에 변동이 있을 경우, 변동된 로그를 확인합니다.
 로그의 EventID가 4624일 때 "로그인 성공"입니다.
 이 로그를 확인하면 컴퓨터로 로그인 했으므로, 로그인 화면이라는 것을 알 수 있습니다.
-그럼 코드를 한번 짜 보겠습니다~!
+그럼 로그인 화면을 체크하는 코드를 한번 짜보겠습니다~!
 
     #!perl
     use strict;
@@ -175,12 +175,12 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 
     my ( $recs, $base );
     my $hashRef;
-    my $handle = new Win32::EventLog('Security') || die $!;
+    my $handle = Win32::EventLog('Security')->new or die $!;
 
     $handle->GetNumber($recs)
-      or die "Can't get number of EventLog records\n";
+      or die "Can't get number of EventLog records";
     $handle->GetOldest($base)
-      or die "Can't get number of oldest EventLog record\n";
+      or die "Can't get number of oldest EventLog records";
     my $currentNumber = $recs;
 
     while (1) {
@@ -189,7 +189,7 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
             foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
                 $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
                     $base + $x, $hashRef )
-                  or die "Can't read EventLog entry #$x\n";
+                  or die "Can't read EventLog entry #$x";
                 Win32::EventLog::GetMessageText($hashRef);
                 if ( $hashRef->{EventID} == 4624 ) {
                     print "EventID : $hashRef->{EventID}\n";
@@ -206,7 +206,7 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 --------------
 
 위의 소스코드를 참고하여,
-로그인을 할때마다 이미지가 랜덤으로 변경되는 프로그램 짜잔!!
+로그인을 할때마다 이미지가 랜덤으로 변경되는 프로그램을 만듭니다. 짜잔!!
 
     #!perl
     use strict;
@@ -225,31 +225,26 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
     );
 
     my $range = 9;
-    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my @LogonImage = map { "./Image/$_.jpg" } 1 .. $range;
     my $copy_path =
-      $ENV{'WINDIR'} . "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+      "$ENV{WINDIR}/System32/oobe/info/backgrounds/backgroundDefault.jpg";
 
     my $backgroundKey = $reg{$background};
     if ( defined $backgroundKey ) {
-        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
-        unless ( defined $OEMbackground ) {
-            $$backgroundKey{'OEMBackground'} = 1;
-        }
-        else {
-            if ( $OEMbackground == 0x0 ) {
-                $$backgroundKey{'OEMBackground'} = 1;
-            }
+        my $OEMbackground = hex $backgroundKey->GetValue('OEMBackground');
+        if ( !defined $OEMbackground || $OEMbackground == 0x0 ) {
+            $backgroundKey->{OEMBackground} = 1;
         }
     }
 
     my ( $recs, $base );
     my $hashRef;
-    my $handle = new Win32::EventLog('Security') || die $!;
+    my $handle = Win32::EventLog('Security')->new or die $!;
 
     $handle->GetNumber($recs)
-      or die "Can't get number of EventLog records\n";
+      or die "Can't get number of EventLog records";
     $handle->GetOldest($base)
-      or die "Can't get number of oldest EventLog record\n";
+      or die "Can't get number of oldest EventLog record";
     my $currentNumber = $recs;
 
     while (1) {
@@ -258,13 +253,12 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
             foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
                 $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
                     $base + $x, $hashRef )
-                  or die "Can't read EventLog entry #$x\n";
+                  or die "Can't read EventLog entry #$x";
                 Win32::EventLog::GetMessageText($hashRef);
-                last if ( $hashRef->{EventID} == 4624 );
+                last if $hashRef->{EventID} == 4624;
             }
             my $random_path = shuffle @LogonImage;
-            copy( $random_path, $copy_path )
-              or die "Copy failed: $!";
+            copy $random_path, $copy_path or die "Copy failed: $!";
             $currentNumber = $recs;
         }
         sleep(1);
