@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns:fb="http://ogp.me/ns/fb#"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title> 윈도우7에서 로그온 이미지 자동 변경 프로그램 | 2012 Seoul.pm 펄 크리스마스 달력</title>
+  
+  <meta name="description" content="Seoul.pm Perl Advent Calendar 2011">
+  <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm">
+  <meta property="fb:admins" content="100001798303989">
+  <meta property="og:title" content="윈도우 로그온 이미지 자동 변경 프로그램 | 2012 Seoul.pm 펄 크리스마스 달력">
+  <link rel="stylesheet" type="text/css" href="advent_files/article.css">
+
+  <!-- Syntax Highlighter -->
+  <script src="advent_files/ga_002.js" async="" type="text/javascript"></script><script id="facebook-jssdk" src="advent_files/all.js"></script><script type="text/javascript" async="" src="advent_files/ga.js"></script><script type="text/javascript" src="advent_files/jquery-1.js"></script>
+  <script type="text/javascript" src="advent_files/jquery.js"></script>
+  <script type="text/javascript" src="advent_files/shCore.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushBash.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushYaml.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushIni.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushPerl.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushJScript.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushPlain.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushXml.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushSql.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushDiff.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushJava.js"></script>
+  <script type="text/javascript" src="advent_files/shBrushCpp.js"></script>
+  <link type="text/css" rel="stylesheet" href="advent_files/jquery.css">
+  <link type="text/css" rel="stylesheet" href="advent_files/shCore.css">
+  <link type="text/css" rel="stylesheet" href="advent_files/shThemeMidnight.css">
+  <script type="text/javascript">
+      SyntaxHighlighter.all();
+  </script>
+
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-17106600-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+<link type="text/css" rel="stylesheet" href="advent_files/inj_tf.css" media="screen"><script type="text/javascript" async="" src="advent_files/embed.js"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}
+.fb_invisible{display:none}
+.fb_reset{background:none;border-spacing:0;border:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}
+.fb_link img{border:none}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}
+.fb_dialog_advanced{padding:10px;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px}
+.fb_dialog_content{background:#fff;color:#333}
+.fb_dialog_close_icon{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif);cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px;top:8px\9;right:7px\9}
+.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}
+.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}
+.fb_dialog_close_icon:hover{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif)}
+.fb_dialog_close_icon:active{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif)}
+.fb_dialog_loader{background-color:#f2f2f2;border:1px solid #606060;font-size:24px;padding:20px}
+.fb_dialog_top_left,
+.fb_dialog_top_right,
+.fb_dialog_bottom_left,
+.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}
+/* @noflip */
+.fb_dialog_top_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}
+/* @noflip */
+.fb_dialog_top_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}
+/* @noflip */
+.fb_dialog_bottom_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}
+/* @noflip */
+.fb_dialog_bottom_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}
+.fb_dialog_vert_left,
+.fb_dialog_vert_right,
+.fb_dialog_horiz_top,
+.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}
+.fb_dialog_vert_left,
+.fb_dialog_vert_right{width:10px;height:100%}
+.fb_dialog_vert_left{margin-left:-10px}
+.fb_dialog_vert_right{right:0;margin-right:-10px}
+.fb_dialog_horiz_top,
+.fb_dialog_horiz_bottom{width:100%;height:10px}
+.fb_dialog_horiz_top{margin-top:-10px}
+.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}
+.fb_dialog_iframe{line-height:0}
+.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #3b5998;color:#fff;font-size:14px;font-weight:bold;margin:0}
+.fb_dialog_content .dialog_title > span{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yD/x/Cou7n-nqK52.gif)
+no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}
+body.fb_hidden{-webkit-transform:none;height:100%;margin:0;left:-10000px;overflow:visible;position:absolute;top:-10000px;width:100%
+}
+.fb_dialog.fb_dialog_mobile.loading{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yc/x/3rhSv5V8j3o.gif)
+white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}
+.fb_dialog.fb_dialog_mobile.loading.centered{max-height:590px;min-height:590px;max-width:500px;min-width:500px}
+#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;left:0;top:0;width:100%;min-height:100%;z-index:10000}
+#fb-root #fb_dialog_ipad_overlay.hidden{display:none}
+.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}
+.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0 0, 0 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}
+.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%
+}
+.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px
+}
+.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px
+}
+.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0 0, 0 100%, from(#4966A6),
+color-stop(0.5, #355492), to(#2A4887));border:1px solid #29447e;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset,
+rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}
+.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}
+.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}
+.fb_dialog_content .dialog_content{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yJ/x/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}
+.fb_dialog_content .dialog_footer{background:#f2f2f2;border:1px solid #555;border-top-color:#ccc;height:40px}
+#fb_dialog_loader_close{float:left}
+.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}
+.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}
+.fb_iframe_widget{position:relative;display:-moz-inline-block;display:inline-block}
+.fb_iframe_widget iframe{position:absolute}
+.fb_iframe_widget_lift{z-index:1}
+.fb_iframe_widget span{position:relative;display:inline-block;vertical-align:text-bottom;text-align:justify}
+.fb_hide_iframes iframe{position:relative;left:-10000px}
+.fb_iframe_widget_loader{position:relative;display:inline-block}
+.fb_iframe_widget_fluid{display:inline}
+.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}
+.fb_iframe_widget_loader .FB_Loader{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yJ/x/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}
+.fb_button_simple,
+.fb_button_simple_rtl{background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yH/x/eIpbnVKI9lR.png);background-repeat:no-repeat;cursor:pointer;outline:none;text-decoration:none}
+.fb_button_simple_rtl{background-position:right 0}
+.fb_button_simple .fb_button_text{margin:0 0 0 20px;padding-bottom:1px}
+.fb_button_simple_rtl .fb_button_text{margin:0 10px 0 0}
+a.fb_button_simple:hover .fb_button_text,
+a.fb_button_simple_rtl:hover .fb_button_text,
+.fb_button_simple:hover .fb_button_text,
+.fb_button_simple_rtl:hover .fb_button_text{text-decoration:underline}
+.fb_button,
+.fb_button_rtl{background:#29447e url(http://static.ak.fbcdn.net/rsrc.php/v2/yl/x/FGFbc80dUKj.png);background-repeat:no-repeat;cursor:pointer;display:inline-block;padding:0 0 0 1px;text-decoration:none;outline:none}
+.fb_button .fb_button_text,
+.fb_button_rtl .fb_button_text{background:#5f78ab url(http://static.ak.fbcdn.net/rsrc.php/v2/yl/x/FGFbc80dUKj.png);border-top:solid 1px #879ac0;border-bottom:solid 1px #1a356e;color:#fff;display:block;font-family:"lucida grande",tahoma,verdana,arial,sans-serif;font-weight:bold;padding:2px 6px 3px 6px;margin:1px 1px 0 21px;text-shadow:none}
+a.fb_button,
+a.fb_button_rtl,
+.fb_button,
+.fb_button_rtl{text-decoration:none}
+a.fb_button:active .fb_button_text,
+a.fb_button_rtl:active .fb_button_text,
+.fb_button:active .fb_button_text,
+.fb_button_rtl:active .fb_button_text{border-bottom:solid 1px #29447e;border-top:solid 1px #45619d;background:#4f6aa3;text-shadow:none}
+.fb_button_xlarge,
+.fb_button_xlarge_rtl{background-position:left -60px;font-size:24px;line-height:30px}
+.fb_button_xlarge .fb_button_text{padding:3px 8px 3px 12px;margin-left:38px}
+a.fb_button_xlarge:active{background-position:left -99px}
+.fb_button_xlarge_rtl{background-position:right -268px}
+.fb_button_xlarge_rtl .fb_button_text{padding:3px 8px 3px 12px;margin-right:39px}
+a.fb_button_xlarge_rtl:active{background-position:right -307px}
+.fb_button_large,
+.fb_button_large_rtl{background-position:left -138px;font-size:13px;line-height:16px}
+.fb_button_large .fb_button_text{margin-left:24px;padding:2px 6px 4px 6px}
+a.fb_button_large:active{background-position:left -163px}
+.fb_button_large_rtl{background-position:right -346px}
+.fb_button_large_rtl .fb_button_text{margin-right:25px}
+a.fb_button_large_rtl:active{background-position:right -371px}
+.fb_button_medium,
+.fb_button_medium_rtl{background-position:left -188px;font-size:11px;line-height:14px}
+a.fb_button_medium:active{background-position:left -210px}
+.fb_button_medium_rtl{background-position:right -396px}
+.fb_button_text_rtl,
+.fb_button_medium_rtl .fb_button_text{padding:2px 6px 3px 6px;margin-right:22px}
+a.fb_button_medium_rtl:active{background-position:right -418px}
+.fb_button_small,
+.fb_button_small_rtl{background-position:left -232px;font-size:10px;line-height:10px}
+.fb_button_small .fb_button_text{padding:2px 6px 3px;margin-left:17px}
+a.fb_button_small:active,
+.fb_button_small:active{background-position:left -250px}
+.fb_button_small_rtl{background-position:right -440px}
+.fb_button_small_rtl .fb_button_text{padding:2px 6px;margin-right:18px}
+a.fb_button_small_rtl:active{background-position:right -458px}
+.fb_share_count_wrapper{position:relative;float:left}
+.fb_share_count{background:#b0b9ec none repeat scroll 0 0;color:#333;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;text-align:center}
+.fb_share_count_inner{background:#e8ebf2;display:block}
+.fb_share_count_right{margin-left:-1px;display:inline-block}
+.fb_share_count_right .fb_share_count_inner{border-top:solid 1px #e8ebf2;border-bottom:solid 1px #b0b9ec;margin:1px 1px 0 1px;font-size:10px;line-height:10px;padding:2px 6px 3px;font-weight:bold}
+.fb_share_count_top{display:block;letter-spacing:-1px;line-height:34px;margin-bottom:7px;font-size:22px;border:solid 1px #b0b9ec}
+.fb_share_count_nub_top{border:none;display:block;position:absolute;left:7px;top:35px;margin:0;padding:0;width:6px;height:7px;background-repeat:no-repeat;background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yP/x/bSOHtKbCGYI.png)}
+.fb_share_count_nub_right{border:none;display:inline-block;padding:0;width:5px;height:10px;background-repeat:no-repeat;background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yL/x/i_oIVTKMYsL.png);vertical-align:top;background-position:right 5px;z-index:10;left:2px;margin:0 2px 0 0;position:relative}
+.fb_share_no_count{display:none}
+.fb_share_size_Small .fb_share_count_right .fb_share_count_inner{font-size:10px}
+.fb_share_size_Medium .fb_share_count_right .fb_share_count_inner{font-size:11px;padding:2px 6px 3px;letter-spacing:-1px;line-height:14px}
+.fb_share_size_Large .fb_share_count_right .fb_share_count_inner{font-size:13px;line-height:16px;padding:2px 6px 4px;font-weight:normal;letter-spacing:-1px}
+.fb_share_count_hidden .fb_share_count_nub_top,
+.fb_share_count_hidden .fb_share_count_top,
+.fb_share_count_hidden .fb_share_count_nub_right,
+.fb_share_count_hidden .fb_share_count_right{visibility:hidden}
+.fb_connect_bar_container div,
+.fb_connect_bar_container span,
+.fb_connect_bar_container a,
+.fb_connect_bar_container img,
+.fb_connect_bar_container strong{background:none;border-spacing:0;border:0;direction:ltr;font-style:normal;font-variant:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal;vertical-align:baseline}
+.fb_connect_bar_container{position:fixed;left:0 !important;right:0 !important;height:42px !important;padding:0 25px !important;margin:0 !important;vertical-align:middle !important;border-bottom:1px solid #333 !important;background:#3b5998 !important;z-index:99999999 !important;overflow:hidden !important}
+.fb_connect_bar_container_ie6{position:absolute;top:expression(document.compatMode=="CSS1Compat"? document.documentElement.scrollTop+"px":body.scrollTop+"px")}
+.fb_connect_bar{position:relative;margin:auto;height:100%;width:100%;padding:6px 0 0 0 !important;background:none;color:#fff !important;font-family:"lucida grande", tahoma, verdana, arial, sans-serif !important;font-size:13px !important;font-style:normal !important;font-variant:normal !important;font-weight:normal !important;letter-spacing:normal !important;line-height:1 !important;text-decoration:none !important;text-indent:0 !important;text-shadow:none !important;text-transform:none !important;white-space:normal !important;word-spacing:normal !important}
+.fb_connect_bar a:hover{color:#fff}
+.fb_connect_bar .fb_profile img{height:30px;width:30px;vertical-align:middle;margin:0 6px 5px 0}
+.fb_connect_bar div a,
+.fb_connect_bar span,
+.fb_connect_bar span a{color:#bac6da;font-size:11px;text-decoration:none}
+.fb_connect_bar .fb_buttons{float:right;margin-top:7px}
+.fb_edge_widget_with_comment{position:relative;*z-index:1000}
+.fb_edge_widget_with_comment span.fb_edge_comment_widget{position:absolute}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget{z-index:1}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget .FB_Loader{left:0;top:1px;margin-top:6px;margin-left:0;background-position:50% 50%;background-color:#fff;height:150px;width:394px;border:1px #666 solid;border-bottom:2px solid #283e6c;z-index:1}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget.dark .FB_Loader{background-color:#000;border-bottom:2px solid #ccc}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget.siderender
+.FB_Loader{margin-top:0}
+.fbpluginrecommendationsbarleft,
+.fbpluginrecommendationsbarright{position:fixed !important;bottom:0;z-index:999}
+/* @noflip */
+.fbpluginrecommendationsbarleft{left:10px}
+/* @noflip */
+.fbpluginrecommendationsbarright{right:10px}
+</style><script charset="utf-8" type="text/javascript" src="advent_files/saved_resource.asc"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}
+.fb_invisible{display:none}
+.fb_reset{background:none;border-spacing:0;border:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}
+.fb_link img{border:none}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}
+.fb_dialog_advanced{padding:10px;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px}
+.fb_dialog_content{background:#fff;color:#333}
+.fb_dialog_close_icon{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif);cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px;top:8px\9;right:7px\9}
+.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}
+.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}
+.fb_dialog_close_icon:hover{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif)}
+.fb_dialog_close_icon:active{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yA/x/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent;_background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/y6/x/s816eWC-2sl.gif)}
+.fb_dialog_loader{background-color:#f2f2f2;border:1px solid #606060;font-size:24px;padding:20px}
+.fb_dialog_top_left,
+.fb_dialog_top_right,
+.fb_dialog_bottom_left,
+.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}
+/* @noflip */
+.fb_dialog_top_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}
+/* @noflip */
+.fb_dialog_top_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}
+/* @noflip */
+.fb_dialog_bottom_left{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}
+/* @noflip */
+.fb_dialog_bottom_right{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yR/x/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}
+.fb_dialog_vert_left,
+.fb_dialog_vert_right,
+.fb_dialog_horiz_top,
+.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}
+.fb_dialog_vert_left,
+.fb_dialog_vert_right{width:10px;height:100%}
+.fb_dialog_vert_left{margin-left:-10px}
+.fb_dialog_vert_right{right:0;margin-right:-10px}
+.fb_dialog_horiz_top,
+.fb_dialog_horiz_bottom{width:100%;height:10px}
+.fb_dialog_horiz_top{margin-top:-10px}
+.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}
+.fb_dialog_iframe{line-height:0}
+.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #3b5998;color:#fff;font-size:14px;font-weight:bold;margin:0}
+.fb_dialog_content .dialog_title > span{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yD/x/Cou7n-nqK52.gif)
+no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}
+body.fb_hidden{-webkit-transform:none;height:100%;margin:0;left:-10000px;overflow:visible;position:absolute;top:-10000px;width:100%
+}
+.fb_dialog.fb_dialog_mobile.loading{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yc/x/3rhSv5V8j3o.gif)
+white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}
+.fb_dialog.fb_dialog_mobile.loading.centered{max-height:590px;min-height:590px;max-width:500px;min-width:500px}
+#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;left:0;top:0;width:100%;min-height:100%;z-index:10000}
+#fb-root #fb_dialog_ipad_overlay.hidden{display:none}
+.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}
+.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0 0, 0 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}
+.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%
+}
+.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px
+}
+.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px
+}
+.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0 0, 0 100%, from(#4966A6),
+color-stop(0.5, #355492), to(#2A4887));border:1px solid #29447e;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset,
+rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}
+.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}
+.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}
+.fb_dialog_content .dialog_content{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yJ/x/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}
+.fb_dialog_content .dialog_footer{background:#f2f2f2;border:1px solid #555;border-top-color:#ccc;height:40px}
+#fb_dialog_loader_close{float:left}
+.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}
+.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}
+.fb_iframe_widget{position:relative;display:-moz-inline-block;display:inline-block}
+.fb_iframe_widget iframe{position:absolute}
+.fb_iframe_widget_lift{z-index:1}
+.fb_iframe_widget span{position:relative;display:inline-block;vertical-align:text-bottom;text-align:justify}
+.fb_hide_iframes iframe{position:relative;left:-10000px}
+.fb_iframe_widget_loader{position:relative;display:inline-block}
+.fb_iframe_widget_fluid{display:inline}
+.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}
+.fb_iframe_widget_loader .FB_Loader{background:url(http://static.ak.fbcdn.net/rsrc.php/v2/yJ/x/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}
+.fb_button_simple,
+.fb_button_simple_rtl{background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yH/x/eIpbnVKI9lR.png);background-repeat:no-repeat;cursor:pointer;outline:none;text-decoration:none}
+.fb_button_simple_rtl{background-position:right 0}
+.fb_button_simple .fb_button_text{margin:0 0 0 20px;padding-bottom:1px}
+.fb_button_simple_rtl .fb_button_text{margin:0 10px 0 0}
+a.fb_button_simple:hover .fb_button_text,
+a.fb_button_simple_rtl:hover .fb_button_text,
+.fb_button_simple:hover .fb_button_text,
+.fb_button_simple_rtl:hover .fb_button_text{text-decoration:underline}
+.fb_button,
+.fb_button_rtl{background:#29447e url(http://static.ak.fbcdn.net/rsrc.php/v2/yl/x/FGFbc80dUKj.png);background-repeat:no-repeat;cursor:pointer;display:inline-block;padding:0 0 0 1px;text-decoration:none;outline:none}
+.fb_button .fb_button_text,
+.fb_button_rtl .fb_button_text{background:#5f78ab url(http://static.ak.fbcdn.net/rsrc.php/v2/yl/x/FGFbc80dUKj.png);border-top:solid 1px #879ac0;border-bottom:solid 1px #1a356e;color:#fff;display:block;font-family:"lucida grande",tahoma,verdana,arial,sans-serif;font-weight:bold;padding:2px 6px 3px 6px;margin:1px 1px 0 21px;text-shadow:none}
+a.fb_button,
+a.fb_button_rtl,
+.fb_button,
+.fb_button_rtl{text-decoration:none}
+a.fb_button:active .fb_button_text,
+a.fb_button_rtl:active .fb_button_text,
+.fb_button:active .fb_button_text,
+.fb_button_rtl:active .fb_button_text{border-bottom:solid 1px #29447e;border-top:solid 1px #45619d;background:#4f6aa3;text-shadow:none}
+.fb_button_xlarge,
+.fb_button_xlarge_rtl{background-position:left -60px;font-size:24px;line-height:30px}
+.fb_button_xlarge .fb_button_text{padding:3px 8px 3px 12px;margin-left:38px}
+a.fb_button_xlarge:active{background-position:left -99px}
+.fb_button_xlarge_rtl{background-position:right -268px}
+.fb_button_xlarge_rtl .fb_button_text{padding:3px 8px 3px 12px;margin-right:39px}
+a.fb_button_xlarge_rtl:active{background-position:right -307px}
+.fb_button_large,
+.fb_button_large_rtl{background-position:left -138px;font-size:13px;line-height:16px}
+.fb_button_large .fb_button_text{margin-left:24px;padding:2px 6px 4px 6px}
+a.fb_button_large:active{background-position:left -163px}
+.fb_button_large_rtl{background-position:right -346px}
+.fb_button_large_rtl .fb_button_text{margin-right:25px}
+a.fb_button_large_rtl:active{background-position:right -371px}
+.fb_button_medium,
+.fb_button_medium_rtl{background-position:left -188px;font-size:11px;line-height:14px}
+a.fb_button_medium:active{background-position:left -210px}
+.fb_button_medium_rtl{background-position:right -396px}
+.fb_button_text_rtl,
+.fb_button_medium_rtl .fb_button_text{padding:2px 6px 3px 6px;margin-right:22px}
+a.fb_button_medium_rtl:active{background-position:right -418px}
+.fb_button_small,
+.fb_button_small_rtl{background-position:left -232px;font-size:10px;line-height:10px}
+.fb_button_small .fb_button_text{padding:2px 6px 3px;margin-left:17px}
+a.fb_button_small:active,
+.fb_button_small:active{background-position:left -250px}
+.fb_button_small_rtl{background-position:right -440px}
+.fb_button_small_rtl .fb_button_text{padding:2px 6px;margin-right:18px}
+a.fb_button_small_rtl:active{background-position:right -458px}
+.fb_share_count_wrapper{position:relative;float:left}
+.fb_share_count{background:#b0b9ec none repeat scroll 0 0;color:#333;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;text-align:center}
+.fb_share_count_inner{background:#e8ebf2;display:block}
+.fb_share_count_right{margin-left:-1px;display:inline-block}
+.fb_share_count_right .fb_share_count_inner{border-top:solid 1px #e8ebf2;border-bottom:solid 1px #b0b9ec;margin:1px 1px 0 1px;font-size:10px;line-height:10px;padding:2px 6px 3px;font-weight:bold}
+.fb_share_count_top{display:block;letter-spacing:-1px;line-height:34px;margin-bottom:7px;font-size:22px;border:solid 1px #b0b9ec}
+.fb_share_count_nub_top{border:none;display:block;position:absolute;left:7px;top:35px;margin:0;padding:0;width:6px;height:7px;background-repeat:no-repeat;background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yP/x/bSOHtKbCGYI.png)}
+.fb_share_count_nub_right{border:none;display:inline-block;padding:0;width:5px;height:10px;background-repeat:no-repeat;background-image:url(http://static.ak.fbcdn.net/rsrc.php/v2/yL/x/i_oIVTKMYsL.png);vertical-align:top;background-position:right 5px;z-index:10;left:2px;margin:0 2px 0 0;position:relative}
+.fb_share_no_count{display:none}
+.fb_share_size_Small .fb_share_count_right .fb_share_count_inner{font-size:10px}
+.fb_share_size_Medium .fb_share_count_right .fb_share_count_inner{font-size:11px;padding:2px 6px 3px;letter-spacing:-1px;line-height:14px}
+.fb_share_size_Large .fb_share_count_right .fb_share_count_inner{font-size:13px;line-height:16px;padding:2px 6px 4px;font-weight:normal;letter-spacing:-1px}
+.fb_share_count_hidden .fb_share_count_nub_top,
+.fb_share_count_hidden .fb_share_count_top,
+.fb_share_count_hidden .fb_share_count_nub_right,
+.fb_share_count_hidden .fb_share_count_right{visibility:hidden}
+.fb_connect_bar_container div,
+.fb_connect_bar_container span,
+.fb_connect_bar_container a,
+.fb_connect_bar_container img,
+.fb_connect_bar_container strong{background:none;border-spacing:0;border:0;direction:ltr;font-style:normal;font-variant:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal;vertical-align:baseline}
+.fb_connect_bar_container{position:fixed;left:0 !important;right:0 !important;height:42px !important;padding:0 25px !important;margin:0 !important;vertical-align:middle !important;border-bottom:1px solid #333 !important;background:#3b5998 !important;z-index:99999999 !important;overflow:hidden !important}
+.fb_connect_bar_container_ie6{position:absolute;top:expression(document.compatMode=="CSS1Compat"? document.documentElement.scrollTop+"px":body.scrollTop+"px")}
+.fb_connect_bar{position:relative;margin:auto;height:100%;width:100%;padding:6px 0 0 0 !important;background:none;color:#fff !important;font-family:"lucida grande", tahoma, verdana, arial, sans-serif !important;font-size:13px !important;font-style:normal !important;font-variant:normal !important;font-weight:normal !important;letter-spacing:normal !important;line-height:1 !important;text-decoration:none !important;text-indent:0 !important;text-shadow:none !important;text-transform:none !important;white-space:normal !important;word-spacing:normal !important}
+.fb_connect_bar a:hover{color:#fff}
+.fb_connect_bar .fb_profile img{height:30px;width:30px;vertical-align:middle;margin:0 6px 5px 0}
+.fb_connect_bar div a,
+.fb_connect_bar span,
+.fb_connect_bar span a{color:#bac6da;font-size:11px;text-decoration:none}
+.fb_connect_bar .fb_buttons{float:right;margin-top:7px}
+.fb_edge_widget_with_comment{position:relative;*z-index:1000}
+.fb_edge_widget_with_comment span.fb_edge_comment_widget{position:absolute}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget{z-index:1}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget .FB_Loader{left:0;top:1px;margin-top:6px;margin-left:0;background-position:50% 50%;background-color:#fff;height:150px;width:394px;border:1px #666 solid;border-bottom:2px solid #283e6c;z-index:1}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget.dark .FB_Loader{background-color:#000;border-bottom:2px solid #ccc}
+.fb_edge_widget_with_comment span.fb_send_button_form_widget.siderender
+.FB_Loader{margin-top:0}
+.fbpluginrecommendationsbarleft,
+.fbpluginrecommendationsbarright{position:fixed !important;bottom:0;z-index:999}
+/* @noflip */
+.fbpluginrecommendationsbarleft{left:10px}
+/* @noflip */
+.fbpluginrecommendationsbarright{right:10px}
+</style></head>
+
+
+
+<body data-twttr-rendered="true"><div id="fb-root" class=" fb_reset fb_reset"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe id="fb_xdm_frame_http" name="fb_xdm_frame_http" src="advent_files/xd_arbiter.html"></iframe><iframe id="fb_xdm_frame_https" name="fb_xdm_frame_https" src="advent_files/xd_arbiter1.html"></iframe></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div id="wrap">
+  <div id="head">    
+  </div>
+  <div id="cont-wrap">
+    <h1>윈도우7 로그온 이미지 자동 변경 프로그램</h1>
+    <div id="cont">
+      <div id="cont-main">
+        <h2>저자</h2>
+		
+<p><a href="http://twitter.com/perlstudy">@perlstudy</a> - <a href="http://cafe.naver.com/perlstudy">네이버 Perl 카페</a> 운영자, 카페에 광고가 올라오면 번개같이 지운다고 해서 광고어쌔씬 이라 불린다. <a href="http://honeyperl.tistory.com/">홈페이지</a>에는 Perl과 관련한 유용한 정보를 종종 올리고 있다. 호네이, <code>h0ney</code>라는 닉을 사용하기도 한다.</p>
+
+<h2>시작하며</h2>
+<p> 아래 이미지는 어떤 이미지일까요?? 윈도우 유저분들은 바로 알 수 있으실껍니다 :)
+</p><p><img src="advent_files/background.png" alt="기본 로그온 이미지" id="" width="700">
+<br>
+<em>그림 1.</em> 윈도우7 로그온 이미지 <a href="http://sourcediet.cafe24.com/advent/background.png">(원본)</a></p>
+
+<p> Windows7 유저라면 누구나 한번쯤은 접해 본 위의 이미지는 
+컴퓨터를 부팅한 뒤 Wiondows OS에서 로그인을 할 때
+나타나는 기본 설정된 Logon 이미지 입니다. 
+Vendor 업체가 따로 설정하지 않았다면, 
+대부분 위의 이미지가 설정되어 있을 것입니다.
+이렇게 똑같은 화면을 계속 보게되는 심심함을 참을 수가 없습니다! 
+그럼 지금부터 <code>로그온 할 때마다 
+로그온 이미지가 변경되는 프로그램</code>을 제작해 보죠.</p>
+
+<h2>준비물</h2>
+
+<p>필요한 모듈은 다음과 같습니다.</p>
+
+<ul>
+<li>Windows에서 Registry 변경을 위한 <a href="http://p3rl.org/Win32::TieRegistry">CPAN의 Win32::TieRegistry 모듈</a></li>
+<li>Logon Image를 복사하기 위한 <a href="http://p3rl.org/File::Copy">CPAN의 File::Copy 모듈</a></li>
+<li>로그온이 성공했는지 검사하기 위한 <a href="http://p3rl.org/Win32::EventLog">CPAN의 Win32::EventLog 모듈</a></li>
+</ul>
+
+<p><a href="http://strawberryperl.com/">Strawberry Perl</a> 설치 시 위 모듈이 모두 기본모듈이므로 CPAN으로 설치할 필요는 없습니다.</p>
+
+<h2>레지스트리 변경</h2>
+
+<p> 로그온 이미지를 변경하기 위해서는 먼저 레지스트리의 값을 설정해야 합니다. 
+<code>"WindowsKey + r"</code> 을 통해 [실행]창에서 <code>"regedit"</code> 를 입력하여 
+[레지스트리 편집기]를 실행시키고 아래의 레지스트리 키의 경로를 찾아갑니다.</p>
+<div><div id="highlighter_610607" class="syntaxhighlighter  plain"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain plain">HKEY_LOCAL_MACHINE\</code></div><div class="line number2 index1 alt1"><code class="plain plain">Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background</code></div></div></td></tr></tbody></table></div></div>
+
+<p> 위의 키로 찾아가게 되면 OEMBackground라는 값이 보이게 됩니다. 이 값이 로그온 이미지를 변경할 수 있도록 설정하는 값이며, 
+이 값을 1로 변경해주면 설정이 완료됩니다. OEMBackground 값이 없을 경우에 값( DWORD 32 Bit )을 새로 만들어서 1로 설정 해주시면 됩니다.
+
+
+</p><p>그럼 이런 행동들을 일일이 하기 귀찮으니 perl 코드를 작성해 보겠습니다. 
+레지스트리는 <a href="http://p3rl.org/Win32::TieRegistry">Win32::TieRegistry</a> 모듈을 사용하면 쉽고 강력하게 변경할 수 있습니다. 그리고 코드실행은 꼭 관리자모드로 실행해 주세요~</p>
+
+<div><div id="highlighter_578710" class="syntaxhighlighter  perl"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div><div class="line number33 index32 alt2">33</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="perl keyword">use</code> <code class="perl plain">strict;</code></div><div class="line number2 index1 alt1"><code class="perl keyword">use</code> <code class="perl plain">warnings;</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="perl keyword">my</code> <code class="perl variable">%reg</code><code class="perl plain">;</code></div><div class="line number5 index4 alt2"><code class="perl keyword">my</code> <code class="perl variable">$background</code> <code class="perl plain">=</code><code class="perl string">"LMachine/SOFTWARE/Microsoft/Windows"</code><code class="perl plain">.</code></div><div class="line number6 index5 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl string">"/CurrentVersion/Authentication/LogonUI/Background"</code><code class="perl plain">;</code></div><div class="line number7 index6 alt2">&nbsp;</div><div class="line number8 index7 alt1"><code class="perl keyword">use</code> <code class="perl plain">Win32::TieRegistry (</code></div><div class="line number9 index8 alt2"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">TiedHash=&gt;\</code><code class="perl variable">%reg</code><code class="perl plain">, </code></div><div class="line number10 index9 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">Delimiter=&gt;</code><code class="perl string">'/'</code><code class="perl plain">,</code></div><div class="line number11 index10 alt2"><code class="perl plain">);</code></div><div class="line number12 index11 alt1">&nbsp;</div><div class="line number13 index12 alt2"><code class="perl comments"># Registry에 값을 설정해줍니다.</code></div><div class="line number14 index13 alt1"><code class="perl keyword">my</code> <code class="perl variable">$backgroundKey</code> <code class="perl plain">= </code><code class="perl variable">$reg</code><code class="perl plain">{</code><code class="perl variable">$background</code><code class="perl plain">}; </code></div><div class="line number15 index14 alt2">&nbsp;</div><div class="line number16 index15 alt1"><code class="perl keyword">if</code> <code class="perl plain">(</code><code class="perl functions">defined</code> <code class="perl variable">$backgroundKey</code><code class="perl plain">) {</code></div><div class="line number17 index16 alt2">&nbsp;</div><div class="line number18 index17 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl keyword">my</code> <code class="perl variable">$OEMbackground</code><code class="perl plain">= </code><code class="perl functions">hex</code><code class="perl plain">(</code><code class="perl variable">$backgroundKey</code><code class="perl plain">-&gt;GetValue( </code><code class="perl string">'OEMBackground'</code> <code class="perl plain">));</code></div><div class="line number19 index18 alt2"><code class="perl spaces">&nbsp;&nbsp;</code>&nbsp;</div><div class="line number20 index19 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl keyword">unless</code> <code class="perl plain">(</code><code class="perl functions">defined</code> <code class="perl variable">$OEMbackground</code><code class="perl plain">) {</code></div><div class="line number21 index20 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">print</code> <code class="perl string">"OEMBackground 값이 없어 새로 만들어 설정합니다.\n"</code><code class="perl plain">;</code></div><div class="line number22 index21 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">$</code><code class="perl variable">$backgroundKey</code><code class="perl plain">{</code><code class="perl string">'OEMBackground'</code><code class="perl plain">} = 1;</code></div><div class="line number23 index22 alt2"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number24 index23 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl keyword">else</code><code class="perl plain">{</code></div><div class="line number25 index24 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">if</code><code class="perl plain">(</code><code class="perl variable">$OEMbackground</code> <code class="perl plain">== 0x1){</code></div><div class="line number26 index25 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">print</code> <code class="perl string">"이미 설정 되어 있습니다.\n"</code><code class="perl plain">;</code></div><div class="line number27 index26 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number28 index27 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">else</code><code class="perl plain">{</code></div><div class="line number29 index28 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">print</code> <code class="perl string">"비설정 되어 있어 설정 하였습니다\n"</code><code class="perl plain">;</code></div><div class="line number30 index29 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">$</code><code class="perl variable">$backgroundKey</code><code class="perl plain">{</code><code class="perl string">'OEMBackground'</code><code class="perl plain">} = 1;</code></div><div class="line number31 index30 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number32 index31 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number33 index32 alt2"><code class="perl plain">}</code></div></div></td></tr></tbody></table></div></div>
+
+<h2>Logon 이미지 변경</h2>
+
+<p>레지스트리 설정 후에는 변경하고 싶은 로그인 이미지를 아래 경로의 파일이름으로 복사하면 끝입니다! </p>
+
+<div><div id="highlighter_932958" class="syntaxhighlighter  plain"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain plain">%windir%system32\oobe\info\backgrounds\backgroundDefault.jpg</code></div></div></td></tr></tbody></table></div></div>
+
+<p><code>%windir%</code>의 설정된 폴더가 <code>C:\Windows</code> 일때 아래 경로가 최종적인 파일의 경로가 됩니다. </p>
+<div><div id="highlighter_199431" class="syntaxhighlighter  plain"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain plain">C:\Windows\system32\oobe\info\backgrounds\backgroundDefault.jpg</code></div></div></td></tr></tbody></table></div></div>
+
+<p>복사하기에 앞서서 로그온 이미지가 필요합니다. 
+자신이 로그온 이미지로 저장하고 싶은 이미지를 구글링을 통해 저장하면 되는데 
+로그온 이미지를 설정할 때 주의해야 하는 점은 아래와 같습니다.</p>
+<ul>
+<li>복사된 파일의 이름은 무조건 <code>backgroundDefault.jpg</code> 이여야 합니다. ( jpg 파일만 가능 )</li>
+<li>파일의 크기는 <code>256KB</code> 를 넘기지 않아야 합니다. ( 256KB가 넘을시에는 적용되지 않습니다. )</li>
+<li>이미지가 화면 크기에 따라 자동으로 맞춰집니다. ( stretched-to-fit mode ) </li>
+</ul>
+
+<p>현재 쓰고 있는 모니터 해상도에 맞춰 9개의 이미지를 구한 뒤 1.jpg 부터 9.jpg 까지 차례대로 저장했습니다. </p>
+<p><img src="advent_files/Image.png" alt="기본 로그온 이미지" id="" width="700">
+<br>
+<em>그림 2.</em> 구글링한 로그온 이미지 <a href="http://sourcediet.cafe24.com/advent/Image.png">(원본)</a></p>
+<p> 위의 이미지를 사용하여 다수의 로그인 이미지로 실행을 시킬때마다 <a href="http://p3rl.org/List::Util">List::Util</a>의 shuffle 함수를 이용해 
+이미지를 교체해 보겠습니다. 코드를 실행시키고 <code>"WindowsKey + L"</code> 으로 로그인 이미지가 변경되었는지 확인해보세요 :)</p>
+
+<div><div id="highlighter_770716" class="syntaxhighlighter  perl"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="perl keyword">use</code> <code class="perl plain">strict;</code></div><div class="line number2 index1 alt1"><code class="perl keyword">use</code> <code class="perl plain">warnings;</code></div><div class="line number3 index2 alt2"><code class="perl keyword">use</code> <code class="perl plain">File::Copy;</code></div><div class="line number4 index3 alt1"><code class="perl keyword">use</code> <code class="perl plain">List::Util qw(shuffle);</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="perl keyword">my</code> <code class="perl variable">$range</code> <code class="perl plain">= 9;</code></div><div class="line number7 index6 alt2"><code class="perl keyword">my</code> <code class="perl variable">@LogonImage</code> <code class="perl plain">= </code><code class="perl functions">map</code> <code class="perl plain">{ </code><code class="perl string">"./Image/"</code><code class="perl plain">.</code><code class="perl variable">$_</code><code class="perl plain">.</code><code class="perl string">".jpg"</code> <code class="perl plain">} 1..</code><code class="perl variable">$range</code><code class="perl plain">;</code></div><div class="line number8 index7 alt1"><code class="perl keyword">my</code> <code class="perl variable">$copy_path</code> <code class="perl plain">= </code><code class="perl variable">$ENV</code><code class="perl plain">{</code><code class="perl string">'WINDIR'</code><code class="perl plain">}.</code></div><div class="line number9 index8 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl string">"/System32/oobe/info/backgrounds/backgroundDefault.jpg"</code><code class="perl plain">;</code></div><div class="line number10 index9 alt1"><code class="perl keyword">my</code> <code class="perl variable">$random_path</code> <code class="perl plain">= shuffle </code><code class="perl variable">@LogonImage</code><code class="perl plain">;</code></div><div class="line number11 index10 alt2">&nbsp;</div><div class="line number12 index11 alt1"><code class="perl plain">copy( </code><code class="perl variable">$random_path</code><code class="perl plain">, </code><code class="perl variable">$copy_path</code> <code class="perl plain">) or </code><code class="perl keyword">die</code> <code class="perl string">"Copy failed: $!"</code><code class="perl plain">;</code></div></div></td></tr></tbody></table></div></div>
+
+<h2>로그인 화면 체크</h2>
+<p>로그온 화면을 바꾸는 부분은 그리 어렵지 않은데, 로그인 화면이 될 때마다 이미지를 바꾸는 일은 일단 로그인 화면인지를 알아내어야 합니다.
+고민을 하던 중 최상위 윈도우를 알아내는 GetForegroundWindow() API 함수를 사용하면 별로 어렵지 않겠지 생각했는데, 
+이 함수로는 로그인 화면인지 체크하지 못하였습니다. 그 이유는 윈도우 NT 보안정책 위반, 즉 사용자의 비밀번호를 얻는 도구로 사용될 수 있기 때문이었죠.(<a href="http://support.microsoft.com/kb/118624/en-us">Link</a>)
+다른 방법으로 실시간은 아니지만 이벤트 로그안의 <code>Security</code> 에서 로그인이 성공여부를 통해 확인하면 가능 하다는 것을 알게 되었습니다.</p>
+<p><img src="advent_files/EventLog.png" alt="Security Event Log" id="">
+<br>
+<em>그림 3.</em> Security Event Log <a href="http://sourcediet.cafe24.com/advent/EventLog.png">(원본)</a></p>
+
+<p>이런 방법을 활용해서 이벤트 로그를 1초 단위로 감시를 하다가 이벤트 로그에 변동이 있을 경우, 
+변동된 로그를 확인합니다. 로그 중에 EventID가 4624일 때 <code>"로그인 성공"</code> 이니, 
+이 로그를 확인하면 로그인 화면에서 컴퓨터로 로그인이 되었다는 것을 알 수 있습니다. 그럼 코드를 한번 짜 보겠습니다~! </p>
+<div><div id="highlighter_967182" class="syntaxhighlighter  perl"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="perl keyword">use</code> <code class="perl plain">strict;</code></div><div class="line number2 index1 alt1"><code class="perl keyword">use</code> <code class="perl plain">warnings;</code></div><div class="line number3 index2 alt2"><code class="perl keyword">use</code> <code class="perl plain">Win32::EventLog;</code></div><div class="line number4 index3 alt1">&nbsp;</div><div class="line number5 index4 alt2"><code class="perl keyword">my</code> <code class="perl plain">(</code><code class="perl variable">$recs</code><code class="perl plain">,</code><code class="perl variable">$base</code><code class="perl plain">);</code></div><div class="line number6 index5 alt1"><code class="perl keyword">my</code> <code class="perl variable">$hashRef</code><code class="perl plain">;</code></div><div class="line number7 index6 alt2"><code class="perl keyword">my</code> <code class="perl variable">$handle</code> <code class="perl plain">= new Win32::EventLog( </code><code class="perl string">'Security'</code> <code class="perl plain">) || </code><code class="perl keyword">die</code> <code class="perl plain">$!;</code></div><div class="line number8 index7 alt1">&nbsp;</div><div class="line number9 index8 alt2"><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetNumber(</code><code class="perl variable">$recs</code><code class="perl plain">)</code></div><div class="line number10 index9 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't get number of EventLog records\n"</code><code class="perl plain">;</code></div><div class="line number11 index10 alt2"><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetOldest(</code><code class="perl variable">$base</code><code class="perl plain">)</code></div><div class="line number12 index11 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't get number of oldest EventLog record\n"</code><code class="perl plain">;</code></div><div class="line number13 index12 alt2"><code class="perl keyword">my</code> <code class="perl variable">$currentNumber</code> <code class="perl plain">= </code><code class="perl variable">$recs</code><code class="perl plain">;</code></div><div class="line number14 index13 alt1">&nbsp;</div><div class="line number15 index14 alt2"><code class="perl keyword">while</code><code class="perl plain">(1){</code></div><div class="line number16 index15 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetNumber(</code><code class="perl variable">$recs</code><code class="perl plain">);</code></div><div class="line number17 index16 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">if</code><code class="perl plain">(</code><code class="perl variable">$currentNumber</code> <code class="perl plain">&lt; </code><code class="perl variable">$recs</code><code class="perl plain">){</code></div><div class="line number18 index17 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">foreach</code> <code class="perl keyword">my</code> <code class="perl variable">$x</code><code class="perl plain">(</code><code class="perl variable">$currentNumber</code><code class="perl plain">..(</code><code class="perl variable">$recs</code><code class="perl plain">-1)){</code></div><div class="line number19 index18 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$handle</code><code class="perl plain">-&gt;</code><code class="perl functions">Read</code><code class="perl plain">(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,</code></div><div class="line number20 index19 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$base</code><code class="perl plain">+</code><code class="perl variable">$x</code><code class="perl plain">,</code></div><div class="line number21 index20 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$hashRef</code><code class="perl plain">)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number22 index21 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't read EventLog entry #$x\n"</code><code class="perl plain">;</code></div><div class="line number23 index22 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">Win32::EventLog::GetMessageText(</code><code class="perl variable">$hashRef</code><code class="perl plain">);</code></div><div class="line number24 index23 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">if</code><code class="perl plain">( </code><code class="perl variable">$hashRef</code><code class="perl plain">-&gt;{EventID} == 4624){</code></div><div class="line number25 index24 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">print</code> <code class="perl string">"EventID : $hashRef-&gt;{EventID}\n"</code><code class="perl plain">;</code></div><div class="line number26 index25 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">last</code><code class="perl plain">;</code></div><div class="line number27 index26 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number28 index27 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number29 index28 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$currentNumber</code> <code class="perl plain">= </code><code class="perl variable">$recs</code><code class="perl plain">;</code></div><div class="line number30 index29 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number31 index30 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">sleep</code><code class="perl plain">(1);&nbsp;&nbsp; </code></div><div class="line number32 index31 alt1"><code class="perl plain">}</code></div></div></td></tr></tbody></table></div></div>
+
+<h2>만들어 봅시다</h2>
+
+<p>위의 소스코드를 참고하여, 로그인을 할때마다 이미지가 랜덤으로 변경되는 프로그램 짜잔!! </p>
+<div><div id="highlighter_739725" class="syntaxhighlighter  perl"><div class="toolbar"><span><a href="#" class="toolbar_item command_help help">?</a></span></div><table cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div><div class="line number22 index21 alt1">22</div><div class="line number23 index22 alt2">23</div><div class="line number24 index23 alt1">24</div><div class="line number25 index24 alt2">25</div><div class="line number26 index25 alt1">26</div><div class="line number27 index26 alt2">27</div><div class="line number28 index27 alt1">28</div><div class="line number29 index28 alt2">29</div><div class="line number30 index29 alt1">30</div><div class="line number31 index30 alt2">31</div><div class="line number32 index31 alt1">32</div><div class="line number33 index32 alt2">33</div><div class="line number34 index33 alt1">34</div><div class="line number35 index34 alt2">35</div><div class="line number36 index35 alt1">36</div><div class="line number37 index36 alt2">37</div><div class="line number38 index37 alt1">38</div><div class="line number39 index38 alt2">39</div><div class="line number40 index39 alt1">40</div><div class="line number41 index40 alt2">41</div><div class="line number42 index41 alt1">42</div><div class="line number43 index42 alt2">43</div><div class="line number44 index43 alt1">44</div><div class="line number45 index44 alt2">45</div><div class="line number46 index45 alt1">46</div><div class="line number47 index46 alt2">47</div><div class="line number48 index47 alt1">48</div><div class="line number49 index48 alt2">49</div><div class="line number50 index49 alt1">50</div><div class="line number51 index50 alt2">51</div><div class="line number52 index51 alt1">52</div><div class="line number53 index52 alt2">53</div><div class="line number54 index53 alt1">54</div><div class="line number55 index54 alt2">55</div><div class="line number56 index55 alt1">56</div><div class="line number57 index56 alt2">57</div><div class="line number58 index57 alt1">58</div><div class="line number59 index58 alt2">59</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="perl keyword">use</code> <code class="perl plain">strict;</code></div><div class="line number2 index1 alt1"><code class="perl keyword">use</code> <code class="perl plain">warnings;</code></div><div class="line number3 index2 alt2"><code class="perl keyword">use</code> <code class="perl plain">Win32::EventLog;</code></div><div class="line number4 index3 alt1"><code class="perl keyword">use</code> <code class="perl plain">List::Util qw(shuffle);</code></div><div class="line number5 index4 alt2"><code class="perl keyword">use</code> <code class="perl plain">File::Copy;</code></div><div class="line number6 index5 alt1">&nbsp;</div><div class="line number7 index6 alt2"><code class="perl keyword">my</code> <code class="perl variable">%reg</code><code class="perl plain">;</code></div><div class="line number8 index7 alt1"><code class="perl keyword">my</code> <code class="perl variable">$background</code> <code class="perl plain">=</code><code class="perl string">"LMachine/SOFTWARE/Microsoft/Windows"</code><code class="perl plain">.</code></div><div class="line number9 index8 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl string">"/CurrentVersion/Authentication/LogonUI/Background"</code><code class="perl plain">;</code></div><div class="line number10 index9 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>&nbsp;</div><div class="line number11 index10 alt2"><code class="perl keyword">use</code> <code class="perl plain">Win32::TieRegistry (</code></div><div class="line number12 index11 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">TiedHash=&gt;\</code><code class="perl variable">%reg</code><code class="perl plain">, </code></div><div class="line number13 index12 alt2"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">Delimiter=&gt;</code><code class="perl string">'/'</code><code class="perl plain">,</code></div><div class="line number14 index13 alt1"><code class="perl plain">);</code></div><div class="line number15 index14 alt2">&nbsp;</div><div class="line number16 index15 alt1"><code class="perl keyword">my</code> <code class="perl variable">$range</code> <code class="perl plain">= 9;</code></div><div class="line number17 index16 alt2"><code class="perl keyword">my</code> <code class="perl variable">@LogonImage</code> <code class="perl plain">= </code><code class="perl functions">map</code> <code class="perl plain">{ </code><code class="perl string">"./Image/"</code><code class="perl plain">.</code><code class="perl variable">$_</code><code class="perl plain">.</code><code class="perl string">".jpg"</code> <code class="perl plain">} 1..</code><code class="perl variable">$range</code><code class="perl plain">;</code></div><div class="line number18 index17 alt1"><code class="perl keyword">my</code> <code class="perl variable">$copy_path</code> <code class="perl plain">= </code><code class="perl variable">$ENV</code><code class="perl plain">{</code><code class="perl string">'WINDIR'</code><code class="perl plain">}.</code></div><div class="line number19 index18 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl string">"/System32/oobe/info/backgrounds/backgroundDefault.jpg"</code><code class="perl plain">;</code></div><div class="line number20 index19 alt1">&nbsp;</div><div class="line number21 index20 alt2"><code class="perl keyword">my</code> <code class="perl variable">$backgroundKey</code> <code class="perl plain">= </code><code class="perl variable">$reg</code><code class="perl plain">{</code><code class="perl variable">$background</code><code class="perl plain">}; </code></div><div class="line number22 index21 alt1"><code class="perl keyword">if</code> <code class="perl plain">(</code><code class="perl functions">defined</code> <code class="perl variable">$backgroundKey</code><code class="perl plain">) {</code></div><div class="line number23 index22 alt2"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl keyword">my</code> <code class="perl variable">$OEMbackground</code><code class="perl plain">= </code><code class="perl functions">hex</code><code class="perl plain">(</code><code class="perl variable">$backgroundKey</code><code class="perl plain">-&gt;GetValue( </code><code class="perl string">'OEMBackground'</code> <code class="perl plain">));</code></div><div class="line number24 index23 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl keyword">unless</code> <code class="perl plain">(</code><code class="perl functions">defined</code> <code class="perl variable">$OEMbackground</code><code class="perl plain">) {</code></div><div class="line number25 index24 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">$</code><code class="perl variable">$backgroundKey</code><code class="perl plain">{</code><code class="perl string">'OEMBackground'</code><code class="perl plain">} = 1;</code></div><div class="line number26 index25 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">}</code><code class="perl keyword">else</code><code class="perl plain">{</code></div><div class="line number27 index26 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">if</code><code class="perl plain">(</code><code class="perl variable">$OEMbackground</code> <code class="perl plain">== 0x0) {</code></div><div class="line number28 index27 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">$</code><code class="perl variable">$backgroundKey</code><code class="perl plain">{</code><code class="perl string">'OEMBackground'</code><code class="perl plain">} = 1;</code></div><div class="line number29 index28 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number30 index29 alt1"><code class="perl spaces">&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number31 index30 alt2"><code class="perl plain">}</code></div><div class="line number32 index31 alt1">&nbsp;</div><div class="line number33 index32 alt2"><code class="perl keyword">my</code> <code class="perl plain">(</code><code class="perl variable">$recs</code><code class="perl plain">,</code><code class="perl variable">$base</code><code class="perl plain">);</code></div><div class="line number34 index33 alt1"><code class="perl keyword">my</code> <code class="perl variable">$hashRef</code><code class="perl plain">;</code></div><div class="line number35 index34 alt2"><code class="perl keyword">my</code> <code class="perl variable">$handle</code> <code class="perl plain">= new Win32::EventLog( </code><code class="perl string">'Security'</code> <code class="perl plain">) || </code><code class="perl keyword">die</code> <code class="perl plain">$!;</code></div><div class="line number36 index35 alt1">&nbsp;</div><div class="line number37 index36 alt2"><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetNumber(</code><code class="perl variable">$recs</code><code class="perl plain">)</code></div><div class="line number38 index37 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't get number of EventLog records\n"</code><code class="perl plain">;</code></div><div class="line number39 index38 alt2"><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetOldest(</code><code class="perl variable">$base</code><code class="perl plain">)</code></div><div class="line number40 index39 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't get number of oldest EventLog record\n"</code><code class="perl plain">;</code></div><div class="line number41 index40 alt2"><code class="perl keyword">my</code> <code class="perl variable">$currentNumber</code> <code class="perl plain">= </code><code class="perl variable">$recs</code><code class="perl plain">;</code></div><div class="line number42 index41 alt1">&nbsp;</div><div class="line number43 index42 alt2"><code class="perl keyword">while</code><code class="perl plain">(1){</code></div><div class="line number44 index43 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$handle</code><code class="perl plain">-&gt;GetNumber(</code><code class="perl variable">$recs</code><code class="perl plain">);</code></div><div class="line number45 index44 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">if</code><code class="perl plain">(</code><code class="perl variable">$currentNumber</code> <code class="perl plain">&lt; </code><code class="perl variable">$recs</code><code class="perl plain">){</code></div><div class="line number46 index45 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">foreach</code> <code class="perl keyword">my</code> <code class="perl variable">$x</code><code class="perl plain">(</code><code class="perl variable">$currentNumber</code><code class="perl plain">..(</code><code class="perl variable">$recs</code><code class="perl plain">-1)){</code></div><div class="line number47 index46 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$handle</code><code class="perl plain">-&gt;</code><code class="perl functions">Read</code><code class="perl plain">(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,</code></div><div class="line number48 index47 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$base</code><code class="perl plain">+</code><code class="perl variable">$x</code><code class="perl plain">,</code><code class="perl variable">$hashRef</code><code class="perl plain">)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number49 index48 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Can't read EventLog entry #$x\n"</code><code class="perl plain">;</code></div><div class="line number50 index49 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">Win32::EventLog::GetMessageText(</code><code class="perl variable">$hashRef</code><code class="perl plain">);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number51 index50 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">last</code> <code class="perl keyword">if</code><code class="perl plain">( </code><code class="perl variable">$hashRef</code><code class="perl plain">-&gt;{EventID} == 4624);</code></div><div class="line number52 index51 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number53 index52 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl keyword">my</code> <code class="perl variable">$random_path</code> <code class="perl plain">= shuffle </code><code class="perl variable">@LogonImage</code><code class="perl plain">;</code></div><div class="line number54 index53 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">copy( </code><code class="perl variable">$random_path</code><code class="perl plain">, </code><code class="perl variable">$copy_path</code> <code class="perl plain">)</code></div><div class="line number55 index54 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">or </code><code class="perl keyword">die</code> <code class="perl string">"Copy failed: $!"</code><code class="perl plain">;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></div><div class="line number56 index55 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl variable">$currentNumber</code> <code class="perl plain">= </code><code class="perl variable">$recs</code><code class="perl plain">;</code></div><div class="line number57 index56 alt2"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl plain">}</code></div><div class="line number58 index57 alt1"><code class="perl spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="perl functions">sleep</code><code class="perl plain">(1);&nbsp;&nbsp; </code></div><div class="line number59 index58 alt2"><code class="perl plain">}</code></div></div></td></tr></tbody></table></div></div>
+
+<h2>정리하며</h2>
+
+<p><a href="http://p3rl.org/Web::Scraper">Web::Scraper</a>를 통해 자신의 취향에 맞는 이미지를 다운로드 한 뒤(<a href="http://advent.perl.kr/2010/2010-12-06.html">Advent 2010년 기사 참고</a>), 
+컴퓨터를 켜고 끌때마다 코드를 한번씩만 실행시켜주시면, 매번 색다른 이미지로 로그인을 하실 수 있으실 겁니다! </p>
+
+<h2>후기</h2>
+
+<p>제가 Advent Calendar 의 첫번째 주자라 부담이 많이 되었는데 매년마다 이런 좋은 기회를 주셔서 감사합니다. 
+저의 본업인 <a href="http://cafe.naver.com/perlstudy">네이버 Perl 카페</a> 광고도 열심히 지우겠지만, 
+향후에는 <a href="http://sourcediet.cafe24.com/modern_perl_kr/chapter_00.html">Moden Perl</a> 번역작업도 차근차근 진행 하려고 합니다. 
+같이 하실 분들은 저에게 연락 주세요^^/ </p>
+<p>이번 해에도 Advent Calendar로 수고해 주시는 <a href="http://twitter.com/am0c">@am0c</a>님과 <a href="http://perl.kr/">Seoul Perl Mongers</a> 정말 멋지십니다! <br>Perl 커뮤니티 화이팅 &gt;_&lt;</p>
+
+<h2>참고문서</h2>
+<ul>
+<li><a href="http://www.makeuseof.com/tag/how-to-change-windows-7-logon-screen/" title="How To Change Windows 7 Logon Screen">How To Change Windows 7 Logon Screen</a></li>
+<li><a href="http://www.withinwindows.com/2009/03/15/windows-7-to-officially-support-logon-ui-background-customization/" title="Windows 7 to officially support logon UI background customization">Windows 7 to officially support logon UI background customization</a></li>
+
+</ul>
+      </div>
+      <div id="cont-side">
+
+      </div>
+      <div style="clear:both;"></div>
+    </div>
+
+
+    </div>
+
+  <div id="foot">
+    <p>
+      Articles by Seoul Perl Mongers<br>Illustrated by Hyunsu Park, Designed by Hojung Youn, Edited by Hojung Youn &amp; Keedi Kim
+    </p>
+    <img src="advent_files/bn_seoulpm.gif">
+  </div>
+</div>
+</body></html>

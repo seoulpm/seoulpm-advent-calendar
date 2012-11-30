@@ -1,0 +1,322 @@
+Title:    윈도우7 로그온 이미지 자동 변경 프로그램
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   h0ney
+
+저자
+-----
+
+[@perlstudy](author) - [네이버 Perl 카페](perlstudy) 운영자,
+카페에 광고가 올라오면 번개같이 지운다고해서 광고어쌔씬이라 불린다.
+홈페이지에 Perl과 관련한 유용한
+정보를 종종 올리고 있다. 호네이, h0ney라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+아래 그림은 어떤 그림일까요? 윈도우 사용자라면 누구나 바로 알 수 있을 겁니다. :)
+
+![윈도우7 로그온 그림][img-resize-1]
+*그림 1.* 윈도우7 로그온 그림 ([원본](img-1))
+
+이 그림은 컴퓨터를 부팅한 뒤
+Wiondows 7에 로그온할 때 나타나는 기본 로그온 그림입니다.
+업체가 따로 설정하지 않으면 대부분 위의 그림으로 설정되어 있습니다.
+이렇게 진부한 화면을 계속 보는 지루함은 도저히 견딜 수 없습니다!
+지금부터 로그인 할 때마다 로그온 그림이 바뀌는 프로그램을 제작해 봅시다.
+
+
+준비물
+-------
+
+[Strawberry Perl](strawberry)을 설치하면 아래 모듈이 모두
+기본적으로 제공되므로 CPAN으로 따로 설치할 필요는 없습니다.
+
+  * Windows에서 Registry 변경을 위한 [CPAN의 Win32::TieRegistry 모듈](win32-tieregistry)
+  * Logon Image를 복사하기 위한 [CPAN의 File::Copy 모듈](file-copy)
+  * 로그온이 성공했는지 검사하기 위한 [CPAN의 Win32::EventLog 모듈](win32-eventlog)
+
+
+
+레지스트리 변경
+----------------
+
+로그온 그림을 변경하기 위해서는 먼저 레지스트리의 값을 설정해야 합니다.
+_WindowsKey + r_을 통해 _실행_창에서 `regedit`를 입력하여
+_레지스트리 편집기_를 실행합니다. 아래와 같이 레지스트리 키의 경로를 찾아갑니다.
+
+    #!plain
+    HKEY_LOCAL_MACHINE\
+    Software\Microsoft\Windows\CurrentVersion\
+    Authentication\LogonUI\Background
+
+위의 키로 찾아가면 `OEMBackground`라는 값이 보입니다.
+이 값이 로그온 그림을 변경하기 위해 설정하는 값입니다.
+이 값을 1로 변경해 줍시다.
+`OEMBackground`라는 값이 없으면
+값을 _DWORD 32 Bit_ 타입으로 새로 만들어 `1`로 설정합니다.
+
+그러면, 이런 과정을 일일이 거치는 것이 귀찮으니 펄 코드를 작성해 보겠습니다.
+[Win32::TieRegistry](win32-tieregistry) 모듈을 사용하면 레지스트리를 쉽게 조작할 수 있습니다.
+레지스트리를 수정하는 코드는 꼭 관리자 모드로 실행해 주세요~
+
+    #!perl
+    use strict;
+    use warnings;
+
+    my %reg;
+    my $background = "LMachine/SOFTWARE/Microsoft/Windows"
+      . "/CurrentVersion/Authentication/LogonUI/Background";
+
+    use Win32::TieRegistry (
+        TiedHash  => \%reg,
+        Delimiter => '/',
+    );
+
+    # Registry에 값을 설정해줍니다.
+    my $backgroundKey = $reg{$background};
+
+    if ( defined $backgroundKey ) {
+        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
+
+        unless ( defined $OEMbackground ) {
+            print
+              "OEMBackground 값이 없어 새로 만들어 설정합니다.\n";
+            $backgroundKey->{'OEMBackground'} = 1;
+        }
+        else {
+            if ( $OEMbackground == 0x1 ) {
+                print "이미 설정 되어 있습니다.\n";
+            }
+            else {
+                print "비설정 되어 있어 설정 하였습니다\n";
+                $backgroundKey->{'OEMBackground'} = 1;
+            }
+        }
+    }
+
+
+Logon 이미지 변경
+------------------
+
+레지스트리를 설정한 뒤, 변경하고 싶은 로그온 그림을
+아래 경로와 같은 파일명으로 복사하면 끝입니다!
+
+    #!plain
+    %windir%system32\oobe\info\backgrounds\backgroundDefault.jpg
+
+`%windir%`로 설정된 폴더가 `C:\Windows`일 경우에
+최종적인 파일의 경로는 아래와 같습니다.
+
+    #!plain
+    C:\Windows\system32\oobe\info\backgrounds\backgroundDefault.jpg
+
+그림을 복사하기에 앞서 로그온 그림이 필요합니다.
+로그온에 쓸 이미지를 구글링을 통해
+저장합니다. 이때 주의해야 하는 사항은 아래와 같습니다.
+
+  * 복사된 파일의 이름은 반드시 `backgroundDefault.jpg`이어야 합니다. jpg 파일만 가능합니다.
+  * 파일의 크기는 256KB를 넘기면 안됩니다. 이 제한을 넘기면 적용되지 않습니다.
+  * 이미지가 화면 크기에 따라 자동으로(stretched-to-fit) 맞춰집니다. 
+
+지금 사용하고 있는 모니터 해상도에 맞게 9개의 이미지를 구한 뒤
+1.jpg부터 9.jpg까지 차례대로 저장합니다.
+
+![구글링한 로그온 그림][img-resize-2]
+*그림 2.* 구글링한 로그온 그림 ([원본](img-2))
+
+이렇게 받은 다수의 그림을 사용하여 코드를 실행할
+때마다 그림을 교체합시다.
+무작위 선택을 위해 [List::Util](list-util)의 `shuffle`함수를 이용합니다.
+코드를 실행하고 _WindowsKey+L_키를 입력해 로그온 그림이 변경되었는지 확인해보세요. :)
+
+    #!perl
+    use strict;
+    use warnings;
+    use File::Copy;
+    use List::Util qw(shuffle);
+
+    my $range = 9;
+    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my $copy_path =
+      "$ENV{WINDIR}/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+    my $random_path = shuffle @LogonImage;
+
+    copy( $random_path, $copy_path ) or die "Copy failed: $!";
+
+
+로그온 화면 체크
+----------------
+
+로그온 화면을 바꾸는 부분은 그리 어렵지 않았습니다.
+로그온 화면이 뜰 때마다 이미지를 바꾸기 위해서는 먼저 로그온 화면인지를 알아내야 합니다.
+고민을 하던 중 '최상위 윈도우를 알아내는 `GetForegroundWindow()` API 함수를
+사용하면 별로 어렵지 않겠지' 생각했는데,
+이 함수로는 로그온 화면을 판별하지 못했습니다.
+이는 [윈도우 NT 보안정책](kb-118624)으로서
+사용자의 비밀번호를 얻는 도구로 사용될 수 있기 때문이었죠.
+그 대안으로 실시간은 아니지만 이벤트 로그의
+_Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것을 알게 되었습니다.
+
+![Security Event Log][img-resize-3]
+*그림 3.* 구글링한 로그온 그림 ([원본](img-2))
+
+이 방법을 활용해 이벤트 로그를 1초 단위로 감시하다가
+이벤트 로그에 변동이 있을 경우, 변동된 로그를 확인합니다.
+로그의 EventID가 4624일 때 "로그인 성공"입니다.
+이 로그를 확인하면 컴퓨터로 로그인 했으므로, 로그인 화면이라는 것을 알 수 있습니다.
+그럼 코드를 한번 짜 보겠습니다~!
+
+    #!perl
+    use strict;
+    use warnings;
+    use Win32::EventLog;
+
+    my ( $recs, $base );
+    my $hashRef;
+    my $handle = new Win32::EventLog('Security') || die $!;
+
+    $handle->GetNumber($recs)
+      or die "Can't get number of EventLog records\n";
+    $handle->GetOldest($base)
+      or die "Can't get number of oldest EventLog record\n";
+    my $currentNumber = $recs;
+
+    while (1) {
+        $handle->GetNumber($recs);
+        if ( $currentNumber < $recs ) {
+            foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
+                $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
+                    $base + $x, $hashRef )
+                  or die "Can't read EventLog entry #$x\n";
+                Win32::EventLog::GetMessageText($hashRef);
+                if ( $hashRef->{EventID} == 4624 ) {
+                    print "EventID : $hashRef->{EventID}\n";
+                    last;
+                }
+            }
+            $currentNumber = $recs;
+        }
+        sleep(1);
+    }
+
+
+만들어 봅시다
+--------------
+
+위의 소스코드를 참고하여,
+로그인을 할때마다 이미지가 랜덤으로 변경되는 프로그램 짜잔!!
+
+    #!perl
+    use strict;
+    use warnings;
+    use Win32::EventLog;
+    use List::Util qw(shuffle);
+    use File::Copy;
+
+    my %reg;
+    my $background = "LMachine/SOFTWARE/Microsoft/Windows"
+      . "/CurrentVersion/Authentication/LogonUI/Background";
+
+    use Win32::TieRegistry (
+        TiedHash  => \%reg,
+        Delimiter => '/',
+    );
+
+    my $range = 9;
+    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my $copy_path =
+      $ENV{'WINDIR'} . "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+
+    my $backgroundKey = $reg{$background};
+    if ( defined $backgroundKey ) {
+        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
+        unless ( defined $OEMbackground ) {
+            $$backgroundKey{'OEMBackground'} = 1;
+        }
+        else {
+            if ( $OEMbackground == 0x0 ) {
+                $$backgroundKey{'OEMBackground'} = 1;
+            }
+        }
+    }
+
+    my ( $recs, $base );
+    my $hashRef;
+    my $handle = new Win32::EventLog('Security') || die $!;
+
+    $handle->GetNumber($recs)
+      or die "Can't get number of EventLog records\n";
+    $handle->GetOldest($base)
+      or die "Can't get number of oldest EventLog record\n";
+    my $currentNumber = $recs;
+
+    while (1) {
+        $handle->GetNumber($recs);
+        if ( $currentNumber < $recs ) {
+            foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
+                $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
+                    $base + $x, $hashRef )
+                  or die "Can't read EventLog entry #$x\n";
+                Win32::EventLog::GetMessageText($hashRef);
+                last if ( $hashRef->{EventID} == 4624 );
+            }
+            my $random_path = shuffle @LogonImage;
+            copy( $random_path, $copy_path )
+              or die "Copy failed: $!";
+            $currentNumber = $recs;
+        }
+        sleep(1);
+    }
+
+
+정리하며
+---------
+
+[Web::Scraper](web-scraper)를 통해
+자신의 취향에 맞는 그림을 다운로드 한 뒤([Advent 2010년 기사 참고](2010-10-06)),
+컴퓨터를 켜고 끌때마다 코드를 한번씩만 실행시켜주어도
+매번 색다른 그림으로 로그인 할 수 있습니다!
+
+
+후기
+----
+
+제가 펄 크리스마스 달력의 첫번째 주자라 부담이 많이 되었는데,
+매년마다 이런 좋은 기회를 주셔서 감사합니다.
+저의 본업인 [네이버 Perl 카페](perlstudy) 광고 지우기도 열심히 하겠지만,
+향후에는 [Moden Perl](modern-perl-kr) 번역 작업도 차근차근 진행하려 합니다.
+같이 하실 분은 저에게 연락 주세요^^/
+
+올해에도 펄 크리스마스 달력으로 수고하시는
+@am0c님과 서울 펄 몽거스 여러분 정말 멋지십니다!
+펄 커뮤니티 화이팅 >_<
+
+
+참고문서
+---------
+
+  * How To Change Windows 7 Logon Screen
+  * Windows 7 to officially support logon UI background customization
+
+
+[author]: http://twitter.com/perlstudy
+[win32-tieregistry]: http://p3rl.org/Win32::TieRegistry
+[file-copy]: http://p3rl.org/File::Copy
+[win32-eventlog]: http://p3rl.org/Win32::EventLog
+[strawberry]: http://strawberryperl.com/
+[list-util]: http://p3rl.org/List::Util
+[web-scraper]: http://p3rl.org/Web::Scraper
+[2010-12-06]: http://advent.perl.kr/2010/2010-12-06.html
+[perlstudy]: http://cafe.naver.com/perlstudy
+[modern-perl-kr]: http://sourcediet.cafe24.com/modern_perl_kr/chapter_00.html
+[kb-118624]: http://support.microsoft.com/kb/118624/en-us
+
+[img-1]: 2012-12-01-1.png
+[img-2]: 2012-12-01-2.png
+[img-3]: 2012-12-01-3.png
+[img-resize-1]: 2012-12-01-1_r.png
+[img-resize-2]: 2012-12-01-2_r.png
+[img-resize-3]: 2012-12-01-3_r.png
