@@ -1,0 +1,607 @@
+Title:    내겐 너무 가벼운 잡큐
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+대부분의 사람은 동기적이기 때문에 많은 일을 하면서도,
+또는 맡기면서도 동기적이려하고 동기적이길 기대합니다.
+비동기적으로 일하기 위해서는 본능에 역행하는 노력이 필요합니다.
+그러다보니 여러가지 IT 작업을 처리하다보면 자연스럽게
+동기적으로 많은 일들을 처리합니다.
+이것은 명확하며, 간결하고 이해하기 쉽죠.
+하지만 때로는, 정말 때로는 어쩔수 없이 비동기적으로 처리해야하는 일들도 있습니다.
+요청에 대한 응답시간은 정해져 있는데 처음에 예상했던 것과 다르게
+처리해야 할 것이 너무 많은 경우가 대표적인 경우입니다.
+이 경우 최소한의 응답시간 확보를 위해 비동기로 일을 처리해야 하는데
+이 때 사용할 수 있는 가장 간결하고 손쉬운 방법이 바로 잡큐를 사용하는 것입니다.
+
+    #!plain
+    Simple Job Queue                             +---------+
+                                            +--->| Worker1 |
+                                            |    +---------+
+    ------+----+----+----+----+----+----+   |    +---------+
+      ... | Jn |... | J4 | J3 | J2 | J1 |   +--->| Worker2 |
+          |    |    |    |    |    |    +---+    +---------+
+    ------+----+----+----+----+----+----+   |    +---------+
+                                            +--->| Worker3 |
+                                                 +---------+
+
+[위키피디아의 정의][wiki-jobqueue]를 살펴보면 시스템 소프트웨어에서 잡큐는
+배치 큐라고 하기도 하며 잡 스케줄러가 관리하면서 실행시키기 위해 필요한
+작업 내역을 담고 있는 자료 구조라고 합니다.
+잡큐를 사용하면 다음과 같은 장점이 있습니다.
+
+- 컴퓨터 자원을 많은 사용자가 공유할 수 있음
+- 컴퓨터가 덜 바쁠때 작업을 처리할 수 있도록 시간을 조정할 수 있음
+- 사람이 관리하지 않아도 컴퓨터 자원이 쉬는 것을 막을 수 있음
+- 비싼 컴퓨터 자원을 높은 활용도로 사용할 수 있음
+
+2012년 석가탄신일 달력 아홉째 날의 기사 역시 잡큐를 다루고 있습니다.
+고전적이지만 널리 사용하고 있는 [TheSchwartz][cpan-theschwartz]
+모듈과 [Qudo][cpan-qudo] 모듈을 소개하고 있지요.
+이 두 모듈은 무척 훌륭한 잡큐 시스템이지만, 두 가지 단점이 있습니다.
+하나는 데이터베이스를 사용한다는 점이며, 다른 하나는 조금 복잡하다는 점입니다.
+물론 데이터베이스는 오랜 시간 검증된 훌륭한 저장소이며, 상태를 저장하고
+확인하기에는 더할 나위없이 좋지만, 구현하려는 시스템이 무척 간결하다면
+이마저도 부담스러울 수 있습니다.
+무엇보다 DB조차 필요없는 간결한 시스템을 구현했는데 잡큐 때문에
+데이터베이스를 설치하고 설정하고 관리해야 하는 것은 관리 부담으로 다가옵니다.
+아무래도 간결한 시스템이라면 간결한 잡큐가 낫겠죠. :)
+
+[Directory::Queue][cpan-directory-queue]는 데이터베이스 대신
+파일 시스템을 저장 공간으로 사용하는 단순하고 간결한 큐입니다.
+많은 기능을 제공하지는 않지만, 모듈 의존성이 적고 가벼운것이 특징입니다.
+지금부터 `Directory::Queue`를 이용한 잡큐 시스템을 살펴보겠습니다.
+
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Directory::Queue 모듈][cpan-directory-queue]
+- [CPAN의 JSON 모듈][cpan-json]
+- [CPAN의 Try::Tiny 모듈][cpan-try-tiny]
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Directory::Queue JSON Try::Tiny Mojolicious
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Directory::Queue JSON Try::Tiny Mojolicious
+
+`Directory::Queue` 모듈은 [ActivePerl][active-perl]과
+[Strawberry Perl][strawberry-perl] 양쪽 모두에서 잘 동작합니다.
+*AcitvePerl*을 사용하는 경우 `ppm`을 이용해서 설치하고
+*Strawberry Perl*을 사용하는 경우 `cpan`을 이용해서 설치합니다.
+
+
+
+사용 방법
+----------
+
+`Directory::Queue`는 다음 모듈로 구성됩니다.
+
+- `Directory::Queue`
+- `Directory::Queue::Null`
+- `Directory::Queue::Normal`
+- `Directory::Queue::Simple`
+- `Directory::Queue::Set`
+
+`Directory::Queue` 모듈은 `::Null`, `::Normal`, `::Simple` 모듈의
+부모 클래스이면서 기본으로 객체 생성시 `Directory::Queue::Normal` 타입의
+큐를 생성합니다.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    use Directory::Queue;
+    
+    my $dirq = Directory::Queue->new(path => "/tmp/test");
+    foreach $count (1 .. 100) {
+        my $name = $dirq->add(... some data ...);
+        say "# added element [$count] as [$name]";
+    }
+
+앞의 예제는 `/tmp/test` 디렉터리를 저장소로 지정하고 `::Normal` 타입의
+큐를 생성합니다. 이후 생성한 큐에 100개의 데이터를 집어 넣습니다.
+`::Simple` 타입의 큐를 생성하려고 한다면 `type` 속성을 추가합니다.
+
+    #!perl
+    use Directory::Queue;
+    
+    my $dirq = Directory::Queue->new(
+        path => "/tmp/test",
+        type => "Simple",
+    );
+
+또는 간단히 `Directory::Queue::<Type>` 모듈을 사용해도 됩니다.
+
+    #!perl
+    use Directory::Queue::Simple;
+    
+    my $dirq = Directory::Queue::Simple->new(
+        path => "/tmp/test",
+    );
+
+`::Null` 큐는 \*nix 시스템의 `/dev/null` 장치 파일처럼
+모든 데이터를 삼켜버리고, `::Normal` 큐는 간단한 스키마를 지원하며,
+`::Simple` 큐는 단순히 문자열만을 저장할 수 있습니다.
+물론 여기서 말하는 문자열은 바이너리 문자열이기 때문에
+마샬링, 언마샬링만 제대로 한다면 자료를 저장하는데 한계는 없습니다.
+개인적으로는 `::Normal` 형식에서 사용하는 스키마가 조금 번거롭기도 하고,
+번거로운 것에 비해서는 제공하는 타입이 다양하지는 않아,
+`::Simple` 형식을 사용하되 잡큐에 *넣기 전*이나 *뺀 직후*에
+직접 *JSON으로 마샬링/언마샬링*하는 방법을 선호합니다.
+
+잡큐에서 집어넣는 자료를 추출하는 방법은 다음과 같습니다.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    use Directory::Queue::Simple;
+    
+    my $dirq = Directory::Queue::Simple->new(path => "/tmp/test");
+    for ( my $name = $dirq->first; $name; $name = $dirq->next ) {
+        next unless $dirq->lock($name);
+        say "# reading element $name";
+        $data = $dirq->get($name);
+        process_job($data) ? $dirq->remove($name) : $dirq->unlock($name);
+    }
+
+자료를 집어넣을 때 사용한 저장소 위치와 동일한 경로를 사용해
+큐 객체를 생성하고 `first()` 및 `next()` 메소드를 이용해서
+큐를 순회합니다. `lock()` 메소드로 해당 아이템이 사용 가능한지 체크하고,
+이후 `get()` 메소드로 데이터 추출을 합니다.
+모든 작업이 완료되어 큐에서 해당 항목을 제거하려면 `remove()` 메소드를
+사용하고 추가 처리를 위해 큐에 남겨놓으려면 `unlock()` 메소드로
+배타적 잠금을 해제합니다.
+
+마지막으로 `::Set` 모듈은 여러 개의 잡큐를 생성할 경우
+마치 하나의 잡큐처럼 동작할 수 있도록 추상 레이어를 제공합니다.
+두 개 이상의 잡큐를 사용할 경우 무척 편리합니다.
+자세한 내용은 공식 문서를 참조하세요.
+
+
+
+JSON 마샬링/언마샬링
+---------------------
+
+펄에서 손쉽게 자료를 마샬링/언마샬링하는 방법은 여러가지가 있습니다.
+
+- [Storable][cpan-storable]
+- [XML][home-xml]
+- [JSON][home-json]
+- [MessagePack][home-messagepack]
+- [Sereal][home-sereal]
+
+*Storable*은 오랜 시간동안 유용하게 써오며 검증된 방식으로
+펄의 코어 모듈에 들어가 있기 때문에 의존 모듈 없이 작업할
+경우 무척 유용하게 사용할 수 있습니다.
+*XML*은 SOAP 통신에서 즐겨 사용하던 데이더 인코딩/디코딩 규격으로
+유연함 덕에 대부분의 자료를 표현할 수 있는 산업 표준입니다.
+다만 무거운 구조 덕에 파싱의 부담이 있는데
+*JSON*은 상대적으로 XML에 비해 간결하며 가볍습니다.
+웹 프로그래밍 분야에서는 거의 표준이라고 볼 수 있습니다.
+*MessagePack*과 *Sereal*은 비교적 오래되지 않은
+바이너리 프로토콜로 속도에 중점을 둔 프로토콜입니다.
+
+어떤 프로토콜을 사용해도 상관은 없지만 지금은
+가벼우면서 디버깅이 용이할수록 좋겠죠?
+따라서 JSON을 예로 들어 진행해보죠.
+아! 앞에서도 말했다시피 큐는 `::Simple` 방식을 사용합니다. :)
+
+
+### 마샬링 -> 큐에 넣기
+
+마샬링을 해야하는 만큼 `enqueue()` 함수를 만들어 보죠.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    use Directory::Queue::Simple;
+    use JSON;
+    use Try::Tiny;
+    
+    my $dirq = Directory::Queue::Simple->new(path => "/tmp/test");
+    ...
+    my $ret = enqueue($dirq, $data);
+    unless ($ret) {
+        # enqueue failed...
+    }
+    
+    sub enqueue {
+        my ( $dirq, $data ) = @_;
+    
+        # validate parameter
+        _validate_param($data);
+    
+        my $json = try { encode_json($data) };
+        return unless $json;
+    
+        my $job = $dirq->add($json);
+        return $job;
+    }
+
+[JSON][cpan-json] 모듈의 `encode_json()` 함수는 변환 실패시
+프로그램을 종료시키므로 [Try::Tiny][cpan-try-tiny] 모듈을 이용해서
+예외를 처리하도록 합니다.
+
+
+
+### 큐에서 빼기 -> 언마샬링
+
+이번에는 `dequeue()` 함수를 만들어 보죠.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    use Directory::Queue::Simple;
+    use JSON;
+    use Try::Tiny;
+    
+    my $dirq = Directory::Queue::Simple->new(path => "/tmp/test");
+    ...
+    while ( my $data = dequeue($dirq) ) {
+        # process the job!
+    }
+    
+    sub dequeue {
+        my $dirq = shift;
+    
+        my $name;
+        for ( $name = $dirq->first; $name; $name = $dirq->next ) {
+            next unless $dirq->lock($name);
+        }
+    
+        return unless $name;
+    
+        my $json = $dirq->get($name);
+        my $data = try { decode_json($data) };
+        $dirq->remove($name);
+    
+        return $data;
+    }
+
+[JSON][cpan-json] 모듈의 `decode_json()` 함수는 변환 실패시
+프로그램을 종료시키므로 [Try::Tiny][cpan-try-tiny] 모듈을 이용해서
+예외를 처리하도록 합니다.
+
+
+
+실전!!
+-------
+
+마샬링/언마샬링과 더불어 큐에 자료를 넣는 `enqueue()` 함수와
+큐에서 자료를 빼오는 `dequeue()` 함수를  만들었으므로
+이제는 정말 잡큐를 사용할 모든 준비가 끝났습니다.
+자, 이제 실전입니다!
+웹에서 사용자의 요청에 따라 해당 서버의 사용자 계정을
+추가하거나 제거하는 기능을 넣어볼까요?
+아마도 구성은 다음과 같을 것입니다.
+
+    #!plain
+    User             +----------+     +-----------------+
+    Req --------+    |   Mojo   |     |  Worker Daemon  |
+                |    |----------|     |-----------------|
+    User        +--->|          |     |   Job Worker    |
+    Req ------------>|          |     |     add    user |<-----+
+                +--->|  WebApp  |     |     delete user |      |
+    User        |    |          |     +-----------------+      |
+    Req --------+    |          |                              |
+                     +----+-----+                              |
+                          |   --------+--+-----+--+--+--+--+   |
+                          +----> ...  |Jn| ... |J4|J3|J2|J1|+--+
+                              --------+--+-----+--+--+--+--+
+
+
+### 프론트엔드
+
+그럴듯한 잡큐 연동 시스템을 만들기 위해 간단한 웹앱을
+만들어서 사용자의 요청을 받을 수 있도록 합니다.
+새로 만드는 웹앱은 다음 두 가지 요청을 처리하도록 합니다.
+
+- `/user/add`: 사용자 추가
+- `/user/del`: 사용자 제거
+
+[Mojolicious][home-mojolicious]를 사용해서 간단히 웹앱을 구현한 예제는 다음과 같습니다.
+이전에 구현한 `enqueue()` 함수를 소스 코드 내에 같이 포함시키거나
+따로 모듈로 만들어서 `use`를 이용해 불러오도록 합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    #
+    # FILE: manage-user-web.pl
+    #
+    
+    use Mojolicious::Lite;
+    use Directory::Queue::Simple;
+    use JSON;
+    use Try::Tiny;
+    
+    my $dirq = Directory::Queue::Simple->new( path => '/tmp/manage-user' );
+    
+    post '/user/add' => sub {
+        my $self = shift;
+    
+        my $id   = $self->param('id');
+        my $name = $self->param('name');
+        my $key  = $self->param('key');
+    
+        $self->render_json({ err => 'require id'   }), return unless $id;
+        $self->render_json({ err => 'require name' }), return unless $name;
+        $self->render_json({ err => 'require key'  }), return unless $key;
+    
+        my $ret = enqueue(
+            $dirq,
+            {
+                type => 'user.add',
+                id   => $id,
+                name => $name,
+                key  => $key,
+            },
+        );
+    
+        $self->render_json({ err => 'enqueue failed'   }), return unless $ret;
+        $self->render_json({ msg => 'user.add success' });
+    };
+    
+    post '/user/del' => sub {
+        my $self = shift;
+    
+        my $id       = $self->param('id');
+    
+        $self->render_json({ err => 'require id' }), return unless $id;
+    
+        my $ret = enqueue(
+            $dirq,
+            {
+                type => 'user.del',
+                id   => $self->param('id'),
+            },
+        );
+    
+        $self->render_json({ err => 'enqueue failed'   }), return unless $ret;
+        $self->render_json({ msg => 'user.del success' });
+    };
+    
+    app->start;
+    
+    sub enqueue {
+        my ( $dirq, $data ) = @_;
+    
+        my $json = try { encode_json($data) };
+        return unless $json;
+    
+        my $job = $dirq->add($json);
+        return $job;
+    }
+
+단순한 작업을 위해 간결한 잡큐를 사용한다면 웹프레임워크 역시
+간결할 수록 좋겠죠? [Mojolicious][home-mojolicious]는 [Dancer][home-dancer]와
+더불어 펄의 대표적인 경량 웹 프레임워크입니다.
+각각의 웹 프레임워크에 대한 자세한 설명은 공식 홈페이지
+또는 CPAN의 공식 문서를 참조하세요.
+
+*겨우 50~70여줄의 코드*로 *HTTP 기반의 API 서버*를 만들었습니다.
+우리의 API 서버와 잡큐 시스템이 제대로 동작하는지 테스트해보죠.
+HTTP POST 요청을 받도록 했기 때문에 시스템의 `curl` 명령을 이용해서
+간단히 테스트할 수 있습니다.
+우선 다음 명령을 이용해서 API 서버를 실행시킵니다.
+
+    #!bash
+    $ morbo manage-user-web.pl
+
+`curl` 명령을 이용해 사용자 추가 및 제거 기능을
+테스트하는 명령은 다음과 같습니다.
+
+    #!bash
+    # 사용자 추가 테스트
+    $ curl -d '' http://localhost:3000/user/add ;echo;
+    {"err":"require id"}
+    $ curl -d 'id=keedi' http://localhost:3000/user/add ;echo;
+    {"err":"require name"}
+    $ curl -d 'id=keedi&name=Keedi%20Kim' http://localhost:3000/user/add ;echo;
+    {"err":"require key"}
+    $ curl -d 'id=keedi&name=Keedi%20Kim&key=pubkey_string' http://localhost:3000/user/add
+    {"msg":"user.add success"}
+    
+    # 사용자 제거 테스트
+    $ curl -d '' http://localhost:3000/user/del ;echo;
+    {"err":"require id"}
+    $ curl -d 'id=keedi' http://localhost:3000/user/del ; echo;
+    {"msg":"user.del success"}
+
+잘 동작하는군요. 이제 큐에 제대로 저장되었는지 확인해보죠.
+
+    #!bash
+    $ tree /tmp/manage-user/
+    /tmp/manage-user/
+    |-- 50af3084
+    |   `-- 50af30be7356e0
+    `-- 50af30c0
+        `-- 50af30f96a20a0
+    
+    2 directories, 2 files
+
+`tree` 명령으로 `/tmp/manage-user` 디렉터리 구조를 살펴보면
+두 개의 파일이 추가되었음을 확인할 수 있습니다.
+각각의 파일을 살펴보죠.
+
+    #!bash
+    $ cat /tmp/manage-user/50af3084/50af30be7356e0 
+    {"key":"pubkey_string","name":"Keedi Kim","id":"keedi","type":"user.add"}
+    $ cat /tmp/manage-user/50af30c0/50af30f96a20a0
+    {"id":"keedi","type":"user.del"}
+
+이전 HTTP POST 방식으로 보낸 요청이 `type` 속성과 함께 JSON으로 인코딩되어
+정상적으로 저장되었음을 확인할 수 있습니다. :)
+
+
+
+### 백엔드
+
+큐에는 작업이 쌓여가고 이제는 큐에서 요청을 꺼내서 작업을 처리해야겠죠?
+잡큐에 쌓인 일을 꺼내서 하나씩 처리하는 프로세스를 잡큐 워커라고 합니다.
+서버처럼 계속 상주하면서 큐를 감시해야 하므로 워커 데몬이라고 부를 수도 있습니다.
+워커 데몬을 만드는 방법은 무척 많습니다.
+가장 간단한 방법 중 하나인 `while (1) { ... }` 구문을 이용할텐데
+이부분은 취향에 따라 적절하게 구현하거나 관련 모듈을 사용하면 됩니다.
+HTTP API로 받은 사용자의 요청을 처리하는 워커 데몬을 만들어보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use utf8;
+    use strict;
+    use warnings;
+    
+    use Directory::Queue::Simple;
+    use Encode qw( decode_utf8 );
+    use JSON;
+    use Log::Log4perl qw( :easy );
+    use Try::Tiny;
+    
+    my $dirq = Directory::Queue::Simple->new(
+        path => '/tmp/manage-user',
+    );
+    
+    while (1) {
+        for ( my $name = $dirq->first; $name; $name = $dirq->next ) {
+            next unless $dirq->lock($name);
+    
+            DEBUG "Dequeue $name";
+    
+            my $data = try { decode_json $dirq->get($name) };
+            given ($data->{type}) {
+                add_user($data),  $dirq->remove($name) when 'user.add';
+                del_user($data),  $dirq->remove($name) when 'user.del';
+                default { WARN "Ignore: $data->{type}"; $dirq->unlock($name); }
+            }
+    
+            sleep 3;
+        }
+    
+        sleep 5;
+    }
+    
+    sub add_user {
+        my $params = shift;
+    
+        my $id   = $params->{id};
+        my $name = $params->{name};
+        my $key  = $params->{key};
+    
+        INFO decode_utf8("Add $id($name)");
+    
+        my $sh = <<"END_SH";
+    /usr/sbin/adduser --gecos '$name' --disabled-password '$id';
+    mkdir '/home/$id/.ssh';
+    echo '$key' > '/home/$id/.ssh/authorized_keys';
+    chmod 600 '/home/$id/.ssh';
+    chmod 600 '/home/$id/.ssh/authorized_keys';
+    END_SH
+    
+        DEBUG decode_utf8($sh);
+    
+        system $sh;
+    }
+    
+    sub del_user {
+        my $params = shift;
+    
+        my $id = $params->{id};
+    
+        INFO decode_utf8("Del $id");
+    
+        my $sh = <<"END_SH";
+    /usr/sbin/deluser --remove-home '$id';
+    END_SH
+    
+        DEBUG decode_utf8($sh);
+    
+        system $sh;
+    }
+
+워커 자체는 두 개의 함수로 이루어져 있는 매우 간단한 스크립트입니다.
+잡큐에 저장되어 있는 처리해야 할 일의 종류(`type`)에 따라 `add_user()` 함수와
+`del_user()` 함수 중 적절한 항목을 실행합니다.
+실제로 `adduser`나 `deluser`는 루트권한이 필요한 시스템 명령어(데비안 리눅스 기준)이기
+때문에 워커 스크립트는 반드시 루트 권한으로 실행해야 합니다.
+각각의 시스템 명령어에 대한 자세한 정보는 `man` 페이지를 참조하세요.
+
+
+
+정리하며
+---------
+
+지금까지 작성한 잡큐와 프론트엔드(웹응용), 그리고 백엔드(워커)는
+매우 간단한 수준이지만 더욱 더 발전시킨다면 시스템 관리 측면에서
+제법 높은 수준의 자동화를 완성할 수 있습니다.
+현재는 사용자 입력에 대한 검증 부분이 빠져 있으므로 쉘 명령 실행시
+싱글 쿼터 인젝션으로 인해 `rm -rf`와 같은 명령이 실행될 여지가 있습니다.
+이런 부분은 프론트엔드인 웹 응용쪽에서 입력값 검증을 통해 간단하게 해결할 수 있습니다.
+더불어 사용자에게 잡큐로 처리한 결과를 되돌려주는 비동기 처리에 대한
+응답(콜백이나 훅 등)을 어떻게할 것인지도 고민(물론 필요없을수도 있지만...)해야 합니다.
+이러한 추가적인 기능이나 보완 사항은 숙제로 남겨두겠습니다. :)
+
+비록 잡큐는 새로운 기술이 아닌만큼 조금 진부할 수도 있는 주제입니다만
+잡큐 관리와 비동기 처리에 대한 부담만 받아들일 수 있다면
+시간을 많이 소요하는 복잡한 일을 수월하게 처리할 수 있게 도와주는 매력적인 도구입니다.
+펄 역시 현대적이고 견고한 여러 잡큐를 지원하고 있습니다.
+그 중에서도 [Directory::Queue][cpan-directory-queue]는 무척 가벼운 잡큐 시스템입니다.
+여러분이 구현해야할 시스템에 따라 적절한 잡큐를 선택한다면
+성공적인 시스템을 만드는데 도움이 될 것입니다.
+
+Enjoy Your Perl! ;-)
+
+
+
+[active-perl]:          http://www.activestate.com/activeperl
+[cpan-directory-queue]: https://metacpan.org/module/Directory::Queue
+[cpan-json]:            https://metacpan.org/module/JSON
+[cpan-mojolicious]:     https://metacpan.org/module/Mojolicious
+[cpan-qudo]:            https://metacpan.org/module/Qudo
+[cpan-storable]:        https://metacpan.org/module/Storable
+[cpan-theschwartz]:     https://metacpan.org/module/TheSchwartz
+[cpan-try-tiny]:        https://metacpan.org/module/Try::Tiny
+[cpan]:                 http://www.cpan.org/
+[home-dancer]:          http://perldancer.org/
+[home-json]:            http://www.json.org/
+[home-messagepack]:     http://msgpack.org/
+[home-mojolicious]:     http://mojolicio.us/
+[home-perlbrew]:        http://perlbrew.pl/
+[home-sereal]:          https://github.com/Sereal/Sereal
+[home-xml]:             http://en.wikipedia.org/wiki/XML
+[strawberry-perl]:      http://strawberryperl.com/
+[twitter-keedi]:        http://twitter.com/#!/keedi
+[wiki-jobqueue]:        http://en.wikipedia.org/wiki/Job_queue
+[yes24-4433208]:        http://www.yes24.com/24/goods/4433208
