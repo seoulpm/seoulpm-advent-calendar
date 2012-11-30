@@ -10,7 +10,11 @@
     font-weight: 400;
     src: url('NanumMyeongjoCompact.woff') format('woff');
 }
-* { margin: 0; padding: 0; }
+* {
+    margin: 0;
+    padding: 0;
+    font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
+}
 #wrap {
     width: 690px;
     margin: 0 auto;
