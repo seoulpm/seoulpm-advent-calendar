@@ -2,7 +2,7 @@
 <!doctype html>
 <html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
-  <title><% $title %></title>
+  <title><% $global->{location} ? sprintf("%s - %s", $article->title, $title) : $title %></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar <% $year %>" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
@@ -16,10 +16,7 @@
   <link rel="alternate" type="application/atom+xml" title="<% $year %> Seoul.pm 펄 크리스마스 달력 - Atom" href="<% $global->{base_uri} %>atom.xml" />
 
   <!-- Syntax Highlighter -->
-  <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
-% unless ( $global->{location} ) {
-  <script type="text/javascript" src="calendar.js"></script>
-% }
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
   <script type="text/javascript" src="shCore.js"></script>
   <script type="text/javascript" src="shBrushBash.js"></script>

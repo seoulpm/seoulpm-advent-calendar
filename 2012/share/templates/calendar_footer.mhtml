@@ -1,0 +1,35 @@
+<%args>
+  $global
+</%args>
+
+<div id="foot">
+  <div class="indent">
+    <ul class="detail">
+      <li><a href="http://perl.kr" target="_blank">펄.kr</a>
+      <li><a href="/2011#openbook" target="_blank">크리스마스 달력이란</a>
+      <li><a href="/2010" target="_blank">펄 크리스마스 달력 #2010</a>
+      <li><a href="/2011" target="_blank">펄 크리스마스 달력 #2011</a>
+    </ul>
+    <ul class="like">
+      <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2012/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
+      <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2012%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
+    </ul>
+    <ul class="icon">
+      <li><a href="/2012/atom.xml"><img src="feed.png"></a></li>
+      <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
+      <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
+    </ul>
+  </div>
+  <pre class="hidden">
+   .-'''  __  __
+  /     \/  \/  \
+  =-_-           |
+      \. -____- / \
+       //    /||  ''
+      //|   //||
+     == =  == ==
+  </pre>
+</div>
+</div>
+</body>
+</html>

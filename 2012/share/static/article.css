@@ -1,231 +1,140 @@
+@font-face {
+    font-family: 'NanumMyeongjoExtraBoldWeb';
+    font-style: normal;
+    font-weight: 800;
+    src: url('NanumMyeongjoExtraBoldCompact.woff') format('woff');
+}
+@font-face {
+    font-family: 'NanumMyeongjoWeb';
+    font-style: normal;
+    font-weight: 400;
+    src: url('NanumMyeongjoCompact.woff') format('woff');
+}
 * {
-    padding: 0;
     margin: 0;
-    border: 0;
-    color: #dedede;
+    padding: 0;
     font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
 }
-body {
-    background: url('bg.png') repeat-x scroll 0 0 #1a1a1a;
-    width: 100%;
-    text-align: left;
-}
 #wrap {
-    margin-left: auto;
-    margin-right: auto;
-    width: 992px;
+    width: 690px;
+    margin: 0 auto;
 }
 #head {
-    position: relative;
-    background: url('adventcal.png') no-repeat scroll 185px 0;
-    height: 160px;
+    margin-top: 8px;
 }
-#head p {
-    display: none;
+#head menu.nav, #head ul.like {
+    list-style: none;
+    display: inline-block;
+    float: right;
 }
-#head a.back {
-    position: absolute;
-    top: 132px;
-    left: 28px;
-    font-size: 14px;
+#head menu.nav {
+    margin-top: 4px;
 }
-#head a.back:hover {
-    text-decoration: none;
-}
-#title {
+#head menu.nav a {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    height: 44px;
 }
-#like {
-    z-index: 3;
-    position: absolute;
-    padding-top: 12px;
-    margin-top: 46px;
-    height: 116px;
+#head menu.nav li {
+    display: inline-block;
+    float: left;
+    background: url("nav.gif");
+    background-repeat: no-repeat;
+    height: 44px;
+    margin-left: 4px;
 }
-#like li {
-    list-style-type: none;
-    display: block
-    overflow: hidden;
-    padding-top: 2px;
-    padding-bottom: 2px;
+#head menu.nav li.prev,
+#head menu.nav li.prev a {
+    background-position: 0 0;
+    width: 60px;
 }
-#like li.twt {
-    height: 20px;
+#head menu.nav li.twit,
+#head menu.nav li.twit a {
+    background-position: -60px 0;
+    width: 53px;
 }
-#like li.fb {
-    height: 80px;
+#head menu.nav li.feed,
+#head menu.nav li.feed a {
+    background-position: -113px 0;
+    width: 44px;
 }
-#menu {
-    z-index: 2;
-    position: absolute;
+#head menu.nav li.chat,
+#head menu.nav li.chat a {
+    background-position: -157px 0;
+    width: 61px;
+}
+#head menu.nav li.next,
+#head menu.nav li.next a {
+    background-position: -218px 0;
+    width: 57px;
+}
+#head ul.like {
+    margin-top: 2px;
+    margin-left: 24px;
+}
+#head ul.like li {
+    display: inline-block;
+}
+h1, h2, h3, h4 {
     display: block;
-    padding-top: 12px;
-    top: 0;
-    left: 0;
+    font-family: 'NanumMyeongjoExtraBoldWeb';
+    line-height: 1.2em;
 }
-#menu li {
-    list-style-type: none;
-    font-size: 14px;
+h1 {
+    font-size: 1.8em;
+    margin: 1em -2em 0 -1.4em;
+    display: inline-block;
+    background-color: #f4f4f4;
+    padding: 0.4em;
 }
-#menu li a {
-    text-decoration: none;
+h2 {
+    font-size: 1.8em;
+    margin: 1.4em 0 0.5em -1em;
 }
-#menu li a:hover {
-    text-decoration: underline;
+h3 {
+    font-size: 1.4em;
+    margin: 1.4em 0 0.5em -0.6em;
 }
-#menu li.large {
-    font-size: 17px;
-    margin-bottom: 15px;
-}
-#menu li.nook {
-    font-size: 14px;
-    margin-bottom: 138px;
-}
-#menu li.bold, #menu li.bold a {
-    color: #ffffff;
-    font-weight: bold;
-}
-#menu li.margin {
-    margin-top: 12px;
-}
-#menu li .disc {
-    background-color: #101010;
-    color: #ffffff;
-    margin-top: 20px;
-    padding: 5px;
-    font-size: 12px;
-    width: 180px;
-}
-#cont-wrap {
-    background: url('cont_br.png') no-repeat 0 0;
-    background-color: #1a1a1a;
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    min-height: 264px;
+#cont p a, #cont ul a {
+    font-family: 'NanumMyeongjoWeb';
+    color: black;
 }
 #cont {
-    position: relative;
+    font-size: 18px;
+    line-height: 2em;
 }
-#cont-main {
-    width: 743px;
-    padding-right: 4px;
+#cont p, #cont ul{
+    font-family: 'NanumMyeongjoWeb';
+    display: block;
+    margin-bottom: 1.6em;
+    text-align: justify;
 }
-#cont-side {
-    position: absolute;
-    width: 194px;
-    float: right;
-    top: 0;
-    right: 0;
-    padding-top: 10px;
-    padding-left: 10px;
-    padding-bottom: 6px;
-    border-left: 1px solid #0f0f0f;
-    font-size: 16px;
-    line-height: 120%;
-}
-#cont-side p, #cont-side ul {
-    margin-bottom: 18px;
-}
-#cont-side ul {
-    list-style-type: none;
-}
-#cont-side .like li {
-    display: inline-block;
-}
-#book, #link, #live-traffic {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-#cont-side .icon {
-    color: red;
-    font-size: 0.8em;
-}
-#book img {
-    display:block;
-    width:100px;
-}
-#link li {
-    line-height: 1.2em;
-    font-size: 0.8em;
-}
-#cont-side li {
+#cont ul {
+    margin-top: -0.6em;
+    margin-bottom: 1em;
     list-style: none;
 }
-#cont-side a {
-    text-decoration: none !important; 
+#cont li {
+    margin: 8px 0 8px 12px;
+    padding-left: 50px;
+    background: url("bullet.gif") no-repeat scroll 4px 4px transparent;
 }
-#cont-side a:hover {
-    text-decoration: underline !important;
-}
-#cont-side strong {
-    color: orange;
+#cont em {
     font-weight: bold;
 }
-#cont-wrap h1 {
+#cont code {
+    background-color: #f4f4f4;
+    padding: 4px;
+}
+#cont img {
     display: block;
-    font-size: 36px;
-    font-weight: bold;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #0f0f0f;
 }
-#cont h2 {
+.hidden {
+    width: 0;
+    height: 0;
     display: inline-block;
-    background-color: #345f53;
-    padding: 6px 10px 10px 10px;
-    border-bottom: 3px solid #244139;
-    border-right: 2px solid #1b322c;
-    margin-top: 40px;
-    margin-bottom: 6px;
-    font-size: 24px;
-    zoom: 1;
-    *display: inline;
+    overflow: hidden;
 }
-#cont h3 {
-    padding: 6px 10px 10px 10px;
-    margin-top: 20px;
-    margin-bottom: 6px;
-    font-size: 20px;
-}
-#cont-main p, #cont-main ul {
-    line-height: 180%;
-    margin-bottom: 20px;
-}
-#cont-main ul {
-    margin-left: 30px;
-}
-#cont-main code {
-    color: yellow;
-}
-#cont-main em {
-    font-weight: bold;
-    text-decoration: underline;
-}
-#cont-main a {
-    text-decoration: none;
-    font-weight: bold;
-    color: orange;
-}
-#cont-main a:hover {
-    color: yellow;
-    text-decoration: underline;
-}
-#cont-main img {
-    margin: 15px;
-}
-#foot {
-    margin-top: 120px;
-    margin-bottom: 40px;
-    padding-left: 74px;
-}
-#foot p {
-    position: absolute;
-    display: block;
-    margin-left: 186px;
-    padding-top: 4px;
-    padding-left: 100px;
-    font-size: 12px;
-    color: #666;
+#cont .syntaxhighlighter {
+    margin-top: -1em !important;
+    font-size: 0.8em !important;
 }
