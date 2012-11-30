@@ -22,9 +22,12 @@
 #head {
     margin-top: 8px;
 }
-#head menu.nav {
+#head menu.nav, #head ul.like {
+    list-style: none;
     display: inline-block;
     float: right;
+}
+#head menu.nav {
     margin-top: 4px;
 }
 #head menu.nav a {
@@ -35,6 +38,7 @@
     display: inline-block;
     float: left;
     background: url("nav.gif");
+    background-repeat: no-repeat;
     height: 44px;
     margin-left: 4px;
 }
@@ -62,6 +66,13 @@
 #head menu.nav li.next a {
     background-position: -218px 0;
     width: 57px;
+}
+#head ul.like {
+    margin-top: 2px;
+    margin-left: 24px;
+}
+#head ul.like li {
+    display: inline-block;
 }
 h1, h2, h3, h4 {
     display: block;

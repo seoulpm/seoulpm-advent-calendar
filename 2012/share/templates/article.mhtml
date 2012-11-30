@@ -4,6 +4,7 @@
   <div id="head">
     <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
     <a href="http://advent.perl.kr/<% $year %>"><img src="title.gif"/></a>
+    <& sns.mhtml, global => $global, article => $article &>
     <menu class="nav">
 %   if ($prev) {
       <li class="prev"><a href="<% $prev->date->ymd %>.html"><span class="hidden">이전날</span></a></li>
