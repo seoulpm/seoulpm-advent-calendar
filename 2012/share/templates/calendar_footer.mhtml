@@ -32,8 +32,8 @@
   </pre>
 </div>
 <div id="comment">
-  <& fb_comment.mhtml, article => undef, global => $global &>
   <& disqus.mhtml, article => undef, year => undef &>
+  <& fb_comment.mhtml, article => undef, global => $global &>
 </div>
 </div>
 </body>
