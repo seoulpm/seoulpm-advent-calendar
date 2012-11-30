@@ -64,36 +64,36 @@ _레지스트리 편집기_를 실행합니다. 아래와 같이 레지스트리
     #!perl
     use strict;
     use warnings;
-     
+
     my %reg;
-    my $background ="LMachine/SOFTWARE/Microsoft/Windows".
-                        "/CurrentVersion/Authentication/LogonUI/Background";
-     
+    my $background = "LMachine/SOFTWARE/Microsoft/Windows"
+      . "/CurrentVersion/Authentication/LogonUI/Background";
+
     use Win32::TieRegistry (
-      TiedHash=>\%reg,
-      Delimiter=>'/',
+        TiedHash  => \%reg,
+        Delimiter => '/',
     );
-     
+
     # Registry에 값을 설정해줍니다.
     my $backgroundKey = $reg{$background};
-     
-    if (defined $backgroundKey) {
-     
-      my $OEMbackground= hex($backgroundKey->GetValue(     'OEMBackground' ));
-       
-      unless (defined $OEMbackground) {
-        print "OEMBackground 값이 없어 새로 만들어 설정합니다.\n";
-        $$backgroundKey{'OEMBackground'} = 1;
-      }
-      else{
-        if($OEMbackground == 0x1){
-          print "이미 설정 되어 있습니다.\n";
+
+    if ( defined $backgroundKey ) {
+        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
+
+        unless ( defined $OEMbackground ) {
+            print
+              "OEMBackground 값이 없어 새로 만들어 설정합니다.\n";
+            $backgroundKey->{'OEMBackground'} = 1;
         }
-        else{
-          print "비설정 되어 있어 설정 하였습니다\n";
-          $$backgroundKey{'OEMBackground'} = 1;
+        else {
+            if ( $OEMbackground == 0x1 ) {
+                print "이미 설정 되어 있습니다.\n";
+            }
+            else {
+                print "비설정 되어 있어 설정 하였습니다\n";
+                $backgroundKey->{'OEMBackground'} = 1;
+            }
         }
-      }
     }
 
 
@@ -135,13 +135,13 @@ Logon 이미지 변경
     use warnings;
     use File::Copy;
     use List::Util qw(shuffle);
-     
+
     my $range = 9;
-    my @LogonImage = map { "./Image/".$_.".jpg" } 1..$range;
-    my $copy_path = $ENV{'WINDIR'}.
-                    "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my $copy_path =
+      "$ENV{WINDIR}/System32/oobe/info/backgrounds/backgroundDefault.jpg";
     my $random_path = shuffle @LogonImage;
-     
+
     copy( $random_path, $copy_path ) or die "Copy failed: $!";
 
 
@@ -170,34 +170,33 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
     use strict;
     use warnings;
     use Win32::EventLog;
-     
-    my ($recs,$base);
+
+    my ( $recs, $base );
     my $hashRef;
-    my $handle = new Win32::EventLog( 'Security' ) || die $!;
-     
+    my $handle = new Win32::EventLog('Security') || die $!;
+
     $handle->GetNumber($recs)
-            or die "Can't get number of EventLog records\n";
+      or die "Can't get number of EventLog records\n";
     $handle->GetOldest($base)
-            or die "Can't get number of oldest EventLog record\n";
+      or die "Can't get number of oldest EventLog record\n";
     my $currentNumber = $recs;
-     
-    while(1){
+
+    while (1) {
         $handle->GetNumber($recs);
-        if($currentNumber < $recs){
-            foreach my $x($currentNumber..($recs-1)){
-                  $handle->Read(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,
-                                      $base+$x,
-                                      $hashRef)       
-                      or die "Can't read EventLog entry #$x\n";
-              Win32::EventLog::GetMessageText($hashRef);
-              if( $hashRef->{EventID} == 4624){
-                print "EventID : $hashRef->{EventID}\n";
-                last;
-              }
+        if ( $currentNumber < $recs ) {
+            foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
+                $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
+                    $base + $x, $hashRef )
+                  or die "Can't read EventLog entry #$x\n";
+                Win32::EventLog::GetMessageText($hashRef);
+                if ( $hashRef->{EventID} == 4624 ) {
+                    print "EventID : $hashRef->{EventID}\n";
+                    last;
+                }
             }
             $currentNumber = $recs;
         }
-        sleep(1);  
+        sleep(1);
     }
 
 
@@ -213,56 +212,57 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
     use Win32::EventLog;
     use List::Util qw(shuffle);
     use File::Copy;
-     
+
     my %reg;
-    my $background ="LMachine/SOFTWARE/Microsoft/Windows".
-                        "/CurrentVersion/Authentication/LogonUI/Background";
-                     
+    my $background = "LMachine/SOFTWARE/Microsoft/Windows"
+      . "/CurrentVersion/Authentication/LogonUI/Background";
+
     use Win32::TieRegistry (
-      TiedHash=>\%reg,
-      Delimiter=>'/',
+        TiedHash  => \%reg,
+        Delimiter => '/',
     );
-     
+
     my $range = 9;
-    my @LogonImage = map { "./Image/".$_.".jpg" } 1..$range;
-    my $copy_path = $ENV{'WINDIR'}.
-                        "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
-     
+    my @LogonImage = map { "./Image/" . $_ . ".jpg" } 1 .. $range;
+    my $copy_path =
+      $ENV{'WINDIR'} . "/System32/oobe/info/backgrounds/backgroundDefault.jpg";
+
     my $backgroundKey = $reg{$background};
-    if (defined $backgroundKey) {
-      my $OEMbackground= hex($backgroundKey->GetValue(     'OEMBackground' ));
-      unless (defined $OEMbackground) {
-        $$backgroundKey{'OEMBackground'} = 1;
-      }else{
-        if($OEMbackground == 0x0) {
-          $$backgroundKey{'OEMBackground'} = 1;
+    if ( defined $backgroundKey ) {
+        my $OEMbackground = hex( $backgroundKey->GetValue('OEMBackground') );
+        unless ( defined $OEMbackground ) {
+            $$backgroundKey{'OEMBackground'} = 1;
         }
-      }
+        else {
+            if ( $OEMbackground == 0x0 ) {
+                $$backgroundKey{'OEMBackground'} = 1;
+            }
+        }
     }
-     
-    my ($recs,$base);
+
+    my ( $recs, $base );
     my $hashRef;
-    my $handle = new Win32::EventLog( 'Security' ) || die $!;
-     
+    my $handle = new Win32::EventLog('Security') || die $!;
+
     $handle->GetNumber($recs)
-            or die "Can't get number of EventLog records\n";
+      or die "Can't get number of EventLog records\n";
     $handle->GetOldest($base)
-            or die "Can't get number of oldest EventLog record\n";
+      or die "Can't get number of oldest EventLog record\n";
     my $currentNumber = $recs;
-     
-    while(1){
+
+    while (1) {
         $handle->GetNumber($recs);
-        if($currentNumber < $recs){
-            foreach my $x($currentNumber..($recs-1)){
-                    $handle->Read(EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ,
-                                      $base+$x,$hashRef)       
-                      or die "Can't read EventLog entry #$x\n";
-                Win32::EventLog::GetMessageText($hashRef);         
-                last if( $hashRef->{EventID} == 4624);
-            }      
+        if ( $currentNumber < $recs ) {
+            foreach my $x ( $currentNumber .. ( $recs - 1 ) ) {
+                $handle->Read( EVENTLOG_FORWARDS_READ | EVENTLOG_SEEK_READ,
+                    $base + $x, $hashRef )
+                  or die "Can't read EventLog entry #$x\n";
+                Win32::EventLog::GetMessageText($hashRef);
+                last if ( $hashRef->{EventID} == 4624 );
+            }
             my $random_path = shuffle @LogonImage;
             copy( $random_path, $copy_path )
-                or die "Copy failed: $!";      
+              or die "Copy failed: $!";
             $currentNumber = $recs;
         }
         sleep(1);
