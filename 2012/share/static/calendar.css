@@ -58,6 +58,10 @@
     padding-left: 28px;
     background: url("bullet2.gif") no-repeat 0 6px transparent;
 }
+#foot ul.like {
+    margin-top: 30px;
+    list-style: none;
+}
 #foot ul.icon {
     position: absolute;
     display: block;
