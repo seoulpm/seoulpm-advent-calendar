@@ -19,7 +19,7 @@ Author:   h0ney
 아래 그림은 어떤 그림일까요? 윈도우 사용자라면 누구나 바로 알 수 있을 겁니다. :)
 
 ![윈도우7 로그온 그림][img-resize-1]
-*그림 1.* 윈도우7 로그온 그림 ([원본](img-1))
+*그림 1.* 윈도우7 로그온 그림 ([원본][img-1])
 
 이 그림은 컴퓨터를 부팅한 뒤
 Wiondows 7에 로그온할 때 나타나는 기본 로그온 그림입니다.
@@ -34,10 +34,9 @@ Wiondows 7에 로그온할 때 나타나는 기본 로그온 그림입니다.
 [Strawberry Perl](strawberry)을 설치하면 아래 모듈이 모두
 기본적으로 제공되므로 CPAN으로 따로 설치할 필요는 없습니다.
 
-  * Windows에서 Registry 변경을 위한 [CPAN의 Win32::TieRegistry 모듈](win32-tieregistry)
-  * Logon Image를 복사하기 위한 [CPAN의 File::Copy 모듈](file-copy)
-  * 로그온이 성공했는지 검사하기 위한 [CPAN의 Win32::EventLog 모듈](win32-eventlog)
-
+ * Windows에서 Registry 변경을 위한 [CPAN의 Win32::TieRegistry 모듈](win32-tieregistry)
+ * Logon Image를 복사하기 위한 [CPAN의 File::Copy 모듈](file-copy)
+ * 로그온이 성공했는지 검사하기 위한 [CPAN의 Win32::EventLog 모듈](win32-eventlog)
 
 
 레지스트리 변경
@@ -117,15 +116,15 @@ Logon 이미지 변경
 로그온에 쓸 이미지를 구글링을 통해
 저장합니다. 이때 주의해야 하는 사항은 아래와 같습니다.
 
-  * 복사된 파일의 이름은 반드시 `backgroundDefault.jpg`이어야 합니다. jpg 파일만 가능합니다.
-  * 파일의 크기는 256KB를 넘기면 안됩니다. 이 제한을 넘기면 적용되지 않습니다.
-  * 이미지가 화면 크기에 따라 자동으로(stretched-to-fit) 맞춰집니다. 
+ * 복사된 파일의 이름은 반드시 `backgroundDefault.jpg`이어야 합니다. jpg 파일만 가능합니다.
+ * 파일의 크기는 256KB를 넘기면 안됩니다. 이 제한을 넘기면 적용되지 않습니다.
+ * 이미지가 화면 크기에 따라 자동으로(stretched-to-fit) 맞춰집니다. 
 
 지금 사용하고 있는 모니터 해상도에 맞게 9개의 이미지를 구한 뒤
 1.jpg부터 9.jpg까지 차례대로 저장합니다.
 
 ![구글링한 로그온 그림][img-resize-2]
-*그림 2.* 구글링한 로그온 그림 ([원본](img-2))
+*그림 2.* 구글링한 로그온 그림 ([원본][img-2])
 
 이렇게 받은 다수의 그림을 사용하여 코드를 실행할
 때마다 그림을 교체합시다.
@@ -161,7 +160,7 @@ Logon 이미지 변경
 _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것을 알게 되었습니다.
 
 ![Security Event Log][img-resize-3]
-*그림 3.* 구글링한 로그온 그림 ([원본](img-2))
+*그림 3.* 구글링한 로그온 그림 ([원본][img-3])
 
 이 방법을 활용해 이벤트 로그를 1초 단위로 감시하다가
 이벤트 로그에 변동이 있을 경우, 변동된 로그를 확인합니다.
