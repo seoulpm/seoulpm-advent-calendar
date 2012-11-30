@@ -22,7 +22,7 @@
 }
 #gifts {
     display: inline-block;
-    margin: 0 52px;
+    margin: 0 52px 0 40px;;
 }
 #gifts li {
     float: left;
@@ -40,14 +40,14 @@
 }
 #foot {
     position: relative;
-    width: 757px;
+    width: 706px;
     height: 348px;
     margin-top: 15px;
     margin-bottom: 16px;
-    background: url("camel.png") no-repeat scroll 381px 0 transparent;
+    background: url("camel.png") no-repeat scroll 330px 0 transparent;
 }
 #foot .indent {
-    margin-left: 90px;
+    margin-left: 63px;
 }
 #foot ul.detail {
     line-height: 2em;
