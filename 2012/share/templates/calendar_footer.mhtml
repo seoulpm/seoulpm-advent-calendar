@@ -19,6 +19,7 @@
       <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
       <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
     </ul>
+    <p class="copyright"><& copyright.mhtml &></p>
   </div>
   <pre class="hidden">
    .-'''  __  __
@@ -29,6 +30,10 @@
       //|   //||
      == =  == ==
   </pre>
+</div>
+<div id="comment">
+  <& disqus.mhtml, article => undef, year => undef &>
+  <& fb_comment.mhtml, article => undef, global => $global &>
 </div>
 </div>
 </body>

@@ -21,7 +21,7 @@
     <h1><% $title %></h1>
     <% $article->body_html %>
     <& disqus.mhtml, article => $article, year => undef &>
-    <& fb_comment.mhtml, url => $article->atom_id, global => $global &>
+    <& fb_comment.mhtml, article => $article, global => $global &>
   </div>
 <& article_footer.mhtml, global => $global &>
 

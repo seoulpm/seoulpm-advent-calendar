@@ -4,7 +4,7 @@
 
   <div id="foot">
     <p>
-      <% $global->{copyright} %>
+      <& copyright.mhtml &>
     </p>
     <img src="bn_seoulpm.gif" />
   </div>

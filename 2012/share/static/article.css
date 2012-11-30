@@ -138,3 +138,16 @@ h3 {
     margin-top: -1em !important;
     font-size: 0.8em !important;
 }
+#foot {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+#foot .copyright {
+    font-size: 14px;
+}
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
