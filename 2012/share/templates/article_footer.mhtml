@@ -3,7 +3,7 @@
 </%args>
 
   <div id="foot">
-    <p>
+    <p class="copyright">
       <% $global->{copyright} %>
     </p>
   </div>
