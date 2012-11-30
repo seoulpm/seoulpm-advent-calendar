@@ -7,7 +7,6 @@
 ## 목표
 * 데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여주기
 
-
 ## 개요
 2012년 1월부터 진행한 [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html)를 통해 짤방(그림 파일)을 20여만개 모았습니다.
 
@@ -129,6 +128,20 @@ $ ./bin/app.pl
 실제 서비스용도로 쓸 때는 Starman 혹은 uWSGI를 권장합니다(uWSGI가 훨씬 성능이 좋다고 하니 이쪽을 권장).
 
 #### uWSGI를 이용한 서비스 실행의 예
+##### uWSGI 설치
+[uWSGI 홈페이지](http://projects.unbit.it/uwsgi/)를 잘 봅시다.
+
+다양한 언어를 지원하는데, 우리에게 필요한건 [Quickstart (for Perl/PSGI)](http://projects.unbit.it/uwsgi/wiki/QuickstartPSGI)입니다.
+
+<pre language="bash">
+curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
+# uwsgi 파일 위치는 절대경로로 적어야 합니다.
+</pre>
+
+위 명령어를 쉘에서 실행하면 /tmp/ 경로 밑에 uwsgi 실행파일이 생성 됩니다.
+
+
+##### uWSGI 실행
 OS X에서 테스트 해보니 웹 앱 실행파일을 절대경로로 하지 않으니까 파일을 못 찾는 경우가 있었습니다.
 
 <pre language="bash">
@@ -657,3 +670,12 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
 * 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
 * [Fey, Fey, Fey](http://advent.perl.kr/2010/2010-12-11.html) :
 * [DBIx::Class로 스키마 관리하기](http://advent.perl.kr/2011/2011-12-17.html)
+
+
+## 네줄 요약
+<pre language="bash">
+cpanm Dancer DBI DBD::mysql
+dancer -a Myapp
+cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
+./bin/app.pl						# 웹앱 실행, 브라우저로 접속
+</pre>
