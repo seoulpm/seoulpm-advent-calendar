@@ -80,6 +80,9 @@
 #foot a {
     color: #000;
 }
+#comment {
+    margin-top: 30px;
+}
 #popup {
     display: none;
     position: absolute;
