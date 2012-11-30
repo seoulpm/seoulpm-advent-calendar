@@ -77,6 +77,12 @@
     font-size: 12px;
     bottom: -12px;
 }
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
 #foot a {
     color: #000;
 }

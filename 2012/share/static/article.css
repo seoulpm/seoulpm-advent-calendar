@@ -145,3 +145,9 @@ h3 {
 #foot .copyright {
     font-size: 14px;
 }
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
