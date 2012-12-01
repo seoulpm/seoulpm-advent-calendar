@@ -269,7 +269,7 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 ---------
 
 [Web::Scraper][web-scraper]를 통해
-자신의 취향에 맞는 그림을 다운로드 한 뒤([Advent 2010년 기사 참고][2010-10-06]),
+자신의 취향에 맞는 그림을 다운로드 한 뒤([Advent 2010년 기사 참고][2010-12-06]),
 컴퓨터를 켜고 끌때마다 코드를 한번씩만 실행시켜주어도
 매번 색다른 그림으로 로그인 할 수 있습니다!
 
@@ -308,6 +308,7 @@ _Security_에서 로그인의 성공 여부를 확인하면 가능하다는 것�
 [kb-118624]: http://support.microsoft.com/kb/118624/en-us
 [am0c]: http://twitter.com/am0c
 [perlkr]: http://perl.kr/
+[2010-12-06]: http://advent.perl.kr/2010/2010-12-06.html
 
 [ref-1]: http://www.makeuseof.com/tag/how-to-change-windows-7-logon-screen/
 [ref-2]: http://www.withinwindows.com/2009/03/15/windows-7-to-officially-support-logon-ui-background-customization/
