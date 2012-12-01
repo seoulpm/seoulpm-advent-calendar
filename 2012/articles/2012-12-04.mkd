@@ -1,0 +1,681 @@
+00날 : 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
+===========================================
+
+## 저자
+@JellyPooo, 시스템 관리자
+
+## 목표
+* 데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여주기.
+* 아래 네 줄 요약을 위한 배경 지식과 설정 방법을 기술했습니다.
+
+### 네 줄 요약
+<pre language="bash">
+cpanm Dancer DBI DBD::mysql			# 관련 모듈 설치
+dancer -a Myapp						# 뼈대 만들기
+cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
+./bin/app.pl						# 웹앱 실행, 브라우저로 접속
+</pre>
+
+## 개요
+2012년 1월부터 진행한 [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html)를 통해 짤방(그림 파일)을 20여만개 모았습니다.
+
+특정 사이트에 접속해서 그림파일을 받고 -&gt; 새로 받은 파일의 파일명을 배열에 넣어 두었다가 -&gt; 해당 배열에 IMG 태그를 씌워 HTML 생성 -&gt; Apache 데몬을 통해 웹으로 그림 파일 보기 까지 구현 되어 있습니다.
+
+이정도면 괜찮지 않나... 하고 수 개월간 쓰다 보니 불편한 점이 하나, 둘 눈에 띕니다.
+
+### HTML 파일이 너무 많아졌다.
+![이미지 수집하며 같이 생성된 HTML](http://cfile23.uf.tistory.com/image/1257C13B50B2D1CD261003)
+![소스는 이렇게 생겼다](http://cfile5.uf.tistory.com/image/12583D3B50B2D1CD22FAFF)
+
+1. HTML파일 하나에 그림 파일을 40개를 보여주는데, 그림 파일이 20만개나 되다보니 HTML 파일만 5000여개가 되었습니다. 파일명만 다를 뿐, IMG 태그는 똑같이 쓰고 있고요. 비효율적으로 느껴집니다. 한 번에 볼 수 있는 그림 수 40개를 조절할 수도 없어요.
+
+1. 썸네일을 만들어 모은 짤방을 좀 더 편하고 빠르게 확인하고 싶습니다. 이 경우, 썸네일의 파일명이나 경로를 달리한 HTML을 또 만들어야 할 것 같네요. HTML 파일만 10,000개가 넘겠어요!
+
+1. HTML 파일 간 연결이 안 되어있습니다. 다음 페이지로 넘어가는 것은 주소창에 파일명을 직접 입력하는 수밖에 없고요, 전체 파일에 대한 링크를 만들어서 덧붙이는 방법을 써봤는데 ...10,000여개에 덧붙이는 것은 시간이 꽤 걸립니다.
+
+
+자주 쓰는 파일 정보를 데이터 베이스(이하 DB)에 보관하다가, 파일 정보를 '틀'에 넣어 보여주면 문제를 해결할 수 있을거 같습니다. 마침 [여섯째 날: 초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) 이런 내용도 있네요. DB만 접목하면 쉽게 할 수 있을거 같습니다.
+
+DB에 파일명을 저장해 두었다가, 실제 파일이 있는 경로를 붙이고 앞뒤로 &lt;IMG&gt; 태그를 붙인 내용을 브라우저로 보내면 이미지 출력용 HTML 페이지를 만들 수 있겠네요.
+
+Let's Dance!!
+
+## 개발 환경 및 전제조건
+### 개발 환경
+[GNU/Linux Ubuntu](http://www.ubuntu.com/) : 관리자(root) 권한 있음, MySQL 설치/실행 중.
+
+[CentOS](http://centos.org/) : 관리자 권한 없음,  MySQL 설치/실행 중.
+
+### 전제조건
+#### 참고문서
+이하의 문서를 미리 읽어두시기 바랍니다.
+
+1. [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) : 네이버 카페, 가입 필요.
+1. [초소형 프레임워크와 함께 춤을 by am0c](http://advent.perl.kr/2011/2011-12-06.html) : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
+1. [웹툰을 한 눈에 내 만화 프로젝트 Manaba by rumidier](http://advent.perl.kr/2011/2011-12-12.html) : 역시 Dancer를 이용한 웹 앱입니다.
+1. [Minimal Perl Web App for Your Minimal Life by keedi](http://slide.keedi.pe.kr/s/20121220-minimal-perl-webapp#/) : Dancer만큼 가볍고 빠른 웹 프레임워크 Mojolicious에 대한 소개 슬라이드
+
+
+### 기술수준
+1. Apache, lighttpd, nginx 등 웹 데몬에 대한 이해
+1. MySQL DB, Table 생성 및 데이터 insert, select 가능 할 것(join 등 복잡한건 안 씁니다).
+1. Perl 환경 설정 및 모듈 설치에 대한 이해
+
+
+## [Dancer](https://www.metacpan.org/module/Dancer)가 뭐야?
+웹 프레임 워크라네요.
+
+### 웹 프레임 워크가 뭐야??
+Apache, lighttpd, nginx 까진 알겠는데, 웹 프레임 워크는 대체 뭔지... 잘 정리된 자료가 마침 이번 [kth](http://www.kthcorp.com/)의 [H3 행사](http://h3.kthcorp.com/2012/)에서 발표 되었고, [자료집](http://dev.kthcorp.com/2012/11/02/h3-2012-ebook/)도 다운로드 가능하니 여길 참조 하시기 바랍니다. '봄날은 간다' 항목을 보시면 됩니다.
+
+
+## Dancer 실행 방법
+[Dancer::Deployment](https://metacpan.org/module/Dancer::Deployment)에 따르면 아래와 같이 수많은 방법을 지원합니다.
+
+    Running as a cgi-script (or fast-cgi)
+    Running stand-alone
+        Running on Perl webservers with plackup
+            Enabling content compression
+        Running multiple apps with Plack::Builder
+        Hosting on DotCloud
+            In case you have issues with Template::Toolkit on Dotcloud
+        Creating a service
+            Using Ubic
+            Using daemontools
+        Running stand-alone behind a proxy / load balancer
+            Using Apache's mod_proxy
+            Using perlbal
+            Using balance
+            Using Lighttpd
+            Using Nginx
+    Running from Apache
+        Running from Apache with Plack
+        Running from Apache under appdir
+    Running on lighttpd (CGI)
+    Running on lighttpd (FastCGI)
+
+크게 cgi-bin으로 실행, 단독 실행으로 나눌 수 있겠네요. 여기선 단독 실행을 기준으로 설명합니다. ...다른건 모를 뿐더러 복잡해서요.
+
+
+가장 간단하게 테스트 할 때는 
+
+1. Dancer Root/bin/app.pl 실행 하면 끝. 3000번 포트로 잘 열리는지 로그 확인.
+2. 브라우저에서 http://localhost:3000/
+
+접속 되는지 확인해보면 됩니다.
+
+아래 페이지는 그 외 정보 나열이니 넘어가도 됩니다.
+
+
+### cgi-bin
+기존 웹 데몬(Apache, lighttpd, nginx)에서 Dancer Root/public/dispatch.cgi 를 실행할 수 있도록 설정하면 됩니다.
+
+근데 제가 이걸 할줄 몰라요 ...
+
+문제는 perl 실행 환경이 개인화 설정, 이를테면 [perl 환경구축 최단코스](http://lotus.perl.kr/2012/08.html)에 나온 것처럼 perlbrew, local::lib 등으로 된 경우, 펄 실행파일 위치를 시스템 펄이 아닌 개인화 펄 실행파일 위치로 변경해주고, 실행 권한도 개인 사용자로 맞추는 등의 설정이 필요하다고 합니다.
+
+개인화 Perl환경을 왜 쓰냐고요? 관리자 권한에 구애받지 않고 모듈 사용할 수 있기 때문에 그렇습니다. Perl 최신 버전을 별도로 설치해 쓸 수 있는 장점도 있고요. …시작부터 해결해야 할 전제조건이 매우 많군요! PHP에 비하면 국내 일반 호스팅 서비스에서 Perl 웹 어플리케이션을 실행하기가 힘든 것이 사실입니다. ㅠ_ㅠ
+
+
+### 단독 실행
+Dancer Root 디렉토리에서 ./bin/app.pl 을 해봅시다.
+
+HTTP::Server::Simple 이 서버 역할을 해줘서 웹 브라우저로 접속할 수 있게 실행 된다고 합니다. 성능이 낮으니 테스트 용도로만 사용하는게 좋다고 하네요.
+
+<pre>
+$ ./bin/app.pl
+[445]  core @0.000009> loading Dancer::Handler::Standalone handler in /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer/Handler.pm l. 45
+[445]  core @0.000183> loading handler 'Dancer::Handler::Standalone' in /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer.pm l. 474
+>> Dancer 1.311 server 445 listening on http://0.0.0.0:3000
+>> Dancer::Plugin::Database (2.01)
+>> Dancer::Plugin::Database::Handle (0.12)
+== Entering the development dance floor ...
+</pre>
+
+이제 http://localhost:3000 로 접속할 수 있습니다.
+
+실제 서비스용도로 쓸 때는 Starman 혹은 uWSGI를 권장합니다(uWSGI가 훨씬 성능이 좋다고 하니 이쪽을 권장).
+
+#### uWSGI를 이용한 서비스 실행의 예
+##### uWSGI 설치
+[uWSGI 홈페이지](http://projects.unbit.it/uwsgi/)를 잘 봅시다.
+
+다양한 언어를 지원하는데, 우리에게 필요한건 [Quickstart (for Perl/PSGI)](http://projects.unbit.it/uwsgi/wiki/QuickstartPSGI)입니다.
+
+<pre language="bash">
+curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
+# uwsgi 파일 위치는 절대경로로 적어야 합니다.
+</pre>
+
+위 명령어를 쉘에서 실행하면 /tmp/ 경로 밑에 uwsgi 실행파일이 생성 됩니다.
+
+
+##### uWSGI 실행
+OS X에서 테스트 해보니 웹 앱 실행파일을 절대경로로 하지 않으니까 파일을 못 찾는 경우가 있었습니다.
+
+<pre language="bash">
+uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.pl
+</pre>
+
+이와 같이 Dancer를 http://localhost:3000 으로 열었습니다.
+
+## 잠깐!! PSGI/Plack 은 뭔가요?
+엄 …그냥 넘어가는게 좋은데…
+
+웹서버(apache, lighttpd, nignx, starman, uWSGI)과 Perl을 연결하기 위한 규격이라고 합니다. CGI랑 비슷하면서 다소 다르다고 나와 있네요.
+
+1. [PSGI/Plack](http://plackperl.org) : PSGI 홈페이지(영문)
+2. [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod) : PSGI::FAQ (영문)
+2. [Perl을 위한 Web App 실행 환경 꾸미기 by yuni_kim](https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p) : uWSGI가 짱!!
+
+CGI가 있는데 왜 또 다른 인터페이스를 만들어 쓰나? - 성능 때문이죠. 최대의 성능을 낼 수 있도록 저수준(low-level) API를 쓸 수 있게 하다 보니 필요해졌답니다. 그외 다양한 웹서버 - 어플리케이션간 정보 교환을 제공하는 모양이네요.
+
+
+### 그럼 뭘 선택해야 하나요?
+1. 성능
+2. 권한
+
+위 두 가지를 고려해 가능한 쪽을 선택하면 됩니다.
+
+단독 실행시 기본값으로 TCP 3000번이나 5000번으로 포트가 열리는데, 이를 80번으로 포트 포워딩 하지 않으면 외부에서 접속시 URL에 포트를 붙여줘야 합니다. 포트 포워딩 설정할 권한이 없고, 방화벽에서 기본 웹 포트만 열려 있다면 단독 실행 한다 해도 외부에서 접속할 수 없습니다.
+
+성능이나 권한 문제를 해결할 수 없다면 cgi-bin으로 실행해야 하는데 이것도 기존 웹 데몬 설정을 변경해야 합니다.
+
+…어쨌든 서버 관리자에게 굽신굽신을 시전해서 **되는 쪽을 선택**하시면 됩니다.
+
+
+## 관련 모듈 설치
+<pre>
+cpanm Dancer DBI DBD::MySQL
+</pre>
+
+여기서 문제 발생 하는 경우가 있는데, DBD::MySQL을 설치하려면 mysql의 소스가 필요합니다.
+
+CentOS는 mysql-devel 패키지를 설치하면 되고
+
+ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
+
+관리자 권한이 없다면?
+
+사용법이라기 보단 삽질기입니다만... 아래 내용을 참고하세요.
+
+
+### root 권한 없을 때 DBD::MySQL 설치
+
+1. 리눅스 CentOS 6.3 64bit
+1. Perl 환경 : perlbrew로 설치한 perl 5.16.1
+1. mysql-server 패키지는 설치 되어있음.
+1. mysql-devel (mysql 소스) 패키지가 시스템에 설치 안 되어 있음 -> 본인 계정에 압축 풀었음(/home/jellypo/mysql-devel/)
+    1. rpm 파일 압축 풀기
+        1. rpm2cpio RPM파일 | cpio -id
+
+
+cpanm DBD::mysql 해서 설치 되면 얼마나 행복하겠습니까만은 오류가 발생합니다.
+
+결과적으로 제가 한 것들입니다.
+
+1. mysql-devel 패키지를 압축 풀고
+2. Makefile 파일 내용 수정(mysql-devel 경로 지정)
+3. /usr/lib64/mysql 안의 파일을 mysql-devel/usr/lib64/mysql/ 밑으로 복사
+
+<pre lang="Bash">
+cd .cpanm/latest-build/DBD-mysql-4.022
+perl Makefile.PL
+vim Makefile
+</pre>
+#  #
+Makefile 파일 수정, LDDLFLAGS, LDFLAGS, INC, LD_RUN_PATH 등의 변수에서 /usr/local/lib, /usr/local/include 와 같이 mysql 소스 경로 지정 된 것을 mysql-devel 압축푼 곳으로 변경 
+
+https://metacpan.org/module/DBD::mysql
+
+<pre lang="Bash">
+make
+
+#중략 (make 실행 결과)
+/usr/bin/ld: cannot find -lmysqlclient
+collect2: ld returned 1 exit status
+make: *** [blib/arch/auto/DBD/mysql/mysql.so] 오류 1
+</pre>
+로그를 보니 mysql-devel 압축 푼 곳에 .so 파일이 몇 개 빠져서 이러는 모양입니다. 로그를 잘 보면 해결방법이 나옵니다. ^^ /usr/lib64/mysql/ 안의 파일을 ~/mysql-devel/usr/lib64/mysql 로 복사했습니다.
+
+<pre lang="Bash">
+make
+make install
+</pre>
+이후 잘 되네요.
+
+
+## 이제 만들어 봅시다.
+<pre language="bash">
+$ dancer -a MyApp
+</pre>
+
+실행한 경로에 MyApp 디렉토리가 생기고, 그 아래 구성은 아래와 같습니다.
+<pre>
+.
+|-- bin              # app.pl
+|-- environments     # 환경 설정 파일 예제가 들어있음.
+|-- lib              # MyApp.pm 이 있음. 라우트 핸들링은 이 파일에서 함.
+|-- public           # 정적 파일들이 위치함
+|   |-- css
+|   |-- javascripts
+|   |-- rgr           # 이건 제가 만든 디렉토리입니다. 수집한 이미지 저장 되어 있는 경로.
+|-- t
+`-- views             # 템플릿 파일 위치
+    `-- layouts
+</pre>
+
+
+## Dancer 살펴보기
+<pre language="bash">
+cpanm Dancer
+dancer -a MyDancer
+</pre>
+
+Dancer 모듈이 설치되고 나면 실행명령어 dancer가 생깁니다. 하는 일은 기초 뼈대를 세우는 일입니다. 이 명령 없이 직접 작성해줘도 되는데 환경 설정 등을 직접 다 해줘야 하니까 그냥 있는 기능을 씁시다.
+
+bin/app.bin 은 Dancer로서 실행용 파일이고, 실제 내용도
+
+<pre language="perl">
+#!/usr/bin/env perl
+use Dancer;
+use MyDancer;
+dance;
+</pre>
+
+이렇게 세 줄 뿐입니다.
+
+웹앱으로써 컨트롤은 lib/MyDancer.pm에 들어갑니다. 여기에 http://localhost:3000/ URL에 대한 서브루틴을 작성하면 해당 URL 요청이 올 때마다 그 서브루틴을 실행하고, 해당 서브루틴의 결과값을 템플릿 엔진으로 넘기면 템플릿 엔진에서 예쁘게 가공해서 보여줄 수 있습니다. (서브루틴에서 바로 출력도 가능한데 권장하진 않습니다.. http 헤더부터 다 작성해야 함)
+
+템플릿은 view 디렉토리 밑에 확장자 .tt 파일들 입니다. 기본 템플릿 엔진은 기능이 거의 없다시피 하니 [Template Toolkit](http://www.template-toolkit.org/)을 사용합니다.
+
+DB 접속 설정이나 템플릿 엔진 변경은 config.yml 파일에서 합니다.
+
+
+## Dancer config.yml 설정하기
+Dancer 에서 MySQL 접속하기 위한 정보를 config.yml파일에 적습니다. Dancer Root 디렉토리에 있습니다.
+
+<pre language="yml">
+# This is the main configuration file of your Dancer app
+# env-related settings should go to environments/$env.yml
+# all the settings in this file will be loaded at Dancer's startup.
+
+# Your application's name
+appname: "MyDancer"
+
+# The default layout to use for your application (located in
+# views/layouts/main.tt)
+layout: "main"
+
+# when the charset is set to UTF-8 Dancer will handle for you
+# all the magic of encoding and decoding. You should not care
+# about unicode within your app when this setting is set (recommended).
+charset: "UTF-8"
+
+#logger : "file"
+
+
+# 템플릿 엔진 변경, start_tag, end_tag를 설정 않으면 &lt;% %&gt;가 기본 값. HTML TAG와 구분하기 어려워지니 되도록이면 활성화 할 것.
+template: "template_toolkit"
+engines:
+  template_toolkit:
+    encoding:  'utf8'
+    start_tag: '[%'
+    end_tag:   '%]'
+
+# DB 접속 정보 입력.
+plugins:
+    Database:
+        driver: 'mysql'
+        database: 'DB NAME'
+        username: 'DB USER NAME'
+        password: 'DB PASSWORD'
+
+
+# 개발용 설정.
+# Dancer가 실행되고 난 뒤에, ./lib/MyApp.pm이 변경되어도 이미 메모리에 올라간 내용에 적용되지 않기 때문에 재실행을 해야 한다. 개발 과정에서 번거롭기 때문에 auto_reload 활성화 해놓고 테스트 하는 것도 방법 중 하나.
+# Be aware it's unstable and may cause a memory leak.
+# DO NOT EVER USE THIS FEATURE IN PRODUCTION
+# OR TINY KITTENS SHALL DIE WITH LOTS OF SUFFERING
+#auto_reload: 0
+</pre>
+
+### 템플릿 엔진 : Template Toolkit
+[Template Toolkit](http://www.template-toolkit.org/) 사이트를 참조하여 문법을 공부합시다. 기본적으로 Perl과 큰 차이가 없어서 금방 쓸 수 있어요.
+
+전 Template Toolkit을 사용했지만 훨씬 성능이 좋은 Xslate를  사용해보시길 바랍니다. 참고 문서는 [Template Toolkit -&gt; Xslate by JEEN_LEE](http://lotus.perl.kr/2012/02.html)입니다.
+
+### auto_reload
+Dancer가 실행 되고 난 뒤에 변경사항은 바로 적용이 되지 않기 때문에, 서버 내렸다가 실행하는 과정이 필요하다. 그러나 auto_reload 설정을 활성화하면 변경사항이 바로 적용되어 개발하기 편합니다.
+
+config.yml에서 auto_reload: 1 설정과 ./lib/MyApp.pm 모듈 로딩 부분에 아래 설정을 해줍니다.
+<pre lagnguage="perl">
+use Module::Refresh;
+use Clone;
+</pre>
+
+
+관련 참고 문서 
+
+[dancer 실행 이후 수정한 내용 반영하는 방법은?](http://cafe.naver.com/perlstudy/1308) - 네이버 카페, 가입 필요함
+
+
+## 설계
+1. 미리 만들어둔 크롤러로 이미지를 모으고, DB에 파일명을 저장합니다.
+1. 방문자가 주소를 통해 1번째부터 30번째 이미지를 보여달라고 요청합니다.
+1. mysql에 접속해 1 번째, 30 번째를 인자로 넘겨 1 .. 30 까지 파일 이름 배열을 받습니다.
+1. 배열에 이미지 경로를 덧붙이고, 다시 &lt;IMG&gt; 태그를 씌워서 보여주면 끝!!
+
+이걸 Dancer 시점에서 볼까요?
+
+1. 1번인 크롤러 부분은 Dancer에서 하는 일이 아닙니다. 별도 프로그램이고요.
+1. 2번, 방문자의 주소는 http://localhost:5000/30/1 이런 식으로 넘어왔을 때, 30이 배열 끝 인자, 1이 배열 시작 인자가 될 수 있습니다. 이 주소엔 정규식도 쓸 수 있는 등 다양한 표현이 가능합니다만, 기본적으로
+    1. http://localhost/bbs/zboard.php?id=hello&page=2&select_arrange=headnum&desc=asc&category=&sn=on&ss=on&sc=on&keyword=&sn1=&divpage=11 이런 주소에서 각 인자값을 &으로 나누는걸 / 로 나눈다고 생각하면 편합니다.
+    1. 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다. 
+    http://localhost/hello/2/11
+    1. '/' 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
+1. mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
+1. view 영역입니다. 앞서 넘겨 받은 배열을 템플릿 엔진에서 처리하고요. 템플릿 엔진에서도 Perl 비슷한 문법으로 프로그래밍 가능합니다.
+
+
+## DB 테이블 모양
+<pre language="sql">
+mysql> describe rgr201210;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(11)  | NO   | PRI | NULL    | auto_increment |
+| no    | int(11)  | NO   |     | NULL    |                |
+| name  | char(37) | NO   |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+
+mysql> describe md5_list;
++----------+----------+------+-----+---------+----------------+
+| Field    | Type     | Null | Key | Default | Extra          |
++----------+----------+------+-----+---------+----------------+
+| id       | int(11)  | NO   | PRI | NULL    | auto_increment |
+| saveTime | datetime | NO   |     | NULL    |                |
+| name     | char(37) | NO   |     | NULL    |                |
++----------+----------+------+-----+---------+----------------+
+</pre>
+
+**삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지**의 스크립트에서 이미지 파일를 수집하여 해당 파일의 이름을 입력한다.
+
+<pre language="perl">
+ #sql 작성
+                my $sql_time = time_p();
+                my $sql = "insert into md5_list ( saveTime, name ) values ( \"$sql_time\", \"$file_name\")";
+                my $sth = $dbh-&gt;prepare($sql);
+                $sth->execute or die "$DBI::errstr\n";
+</pre>
+
+입력된 데이터는 다음과 같습니다(아래 스크린샷의 프로그램은 [App::AltSQL](https://www.metacpan.org/module/App::AltSQL)입니다.)
+![md5_list 일부](http://cfile8.uf.tistory.com/image/160A3C3F50B2FB6825F52A)
+
+<pre language="sql">
+select name from md5_list order by id desc limig 0, 10;
+</pre>
+위 SQL문을 실행해서, name 배열을 얻어온 다음, 해당 배열을 이미지가 실제 저장된 경로를 지정해 HTML TAG IMG를 씌우면 될거 같네요!!
+
+## Perl DBI 사용하기
+Perl 에서 MySQL 접속해서 결과를 어떻게 받아오면 될까요?
+
+[DBI](https://www.metacpan.org/module/DBI) 문서를 봅시다.
+
+fetchrow\_hashref, selectcol\_arrayref 같은걸 쓰면 결과를 해쉬 레퍼런스나 배열 레퍼런스로 받아올 수 있는 모양입니다.
+
+### Perl에서 DBI(MySQL) 사용하기 예시
+DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다. 아래의 참고문서를 확인 바랍니다.
+
+* 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
+
+<pre language="perl">
+#!/usr/bin/perl
+use strict;
+use warnings;
+use DBI;	# perl에서 DB 사용을 위한 모듈입니다. DBD::MySQL도 설치 되어야 함.
+
+# mysql 접속 과정 리눅스 커맨드라인에서 아래 명령어 실행한 것과 같으려나요.
+# mysql -uDBUSER -pDBPASSWORD DBNAME
+my $dbh = DBI->connect(
+    'dbi:mysql:database=DBNAME',
+    'DBUSER',
+    'DBPASSWORD',
+    { RaiseError => 1, PrintError => 0, AutoCommit => 0 },
+);
+
+
+# 이제 MySQL 접속이 됐습니다. 쿼리를 보내봅시다.
+# 아래 내용은 MySQL 접속 후
+# select * from rg_img;
+# 한 것과 같습니다.
+my $sql = "select * from rg_img";
+my $sth = $dbh->prepare($sql);
+$sth->execute or die "$DBI::errstr\n";
+while ( my @row = $sth->fetchrow_array ) {
+    print "@row\n";
+}
+$dbh->disconnect();
+</pre>
+
+이 테스트가 되면 Perl에서 MySQL 접속해서 정보 가져오기가 가능합니다.
+
+## 이미지 파일 위치
+정적 파일은 public 밑에 두면 됩니다.
+
+편의를 위해 사이트별로 디렉토리를 만들고, 그리고 수많은 파일을 적절히 저장하기 위해 md5를 이용해 파일명을 변경, 앞의 두 글자를 따서 디렉토리 00 ~ FF개를 생성하고 -> 거기에 맞는 위치에 파일을 저장 중입니다.
+
+<pre language="bash">
+Dancer Root/public/rgr/
+.
+|____00
+| |____00e805967b64bb85c892eca3ab4bb6c1.jpg
+| |____00cda059e36a6ba121976bfa6010aa0c.jpg
+| |____0016d5dc919de8c2b176b84745f079c9.jpg
+|      ………중략………..
+|____82
+| |____82e805967b64bb85c892eca3ab4bb6c1.jpg
+| |____82cda059e36a6ba121976bfa6010aa0c.jpg
+| |____8216d5dc919de8c2b176b84745f079c9.jpg
+|      ………중략………..
+|____cf
+| |____cfef5f425c83f9c398f76f8299d126c5.jpg
+| |____cff5bc5665f9cdbb328189a9b4e48af7.jpg
+| |____cf3c3bcf519822ded8ec0b8d1f129a52.jpg
+|____ff
+  |____ff3c3bcf519822ded8ec0b8d1f129a52.jpg
+</pre>
+
+
+## 이제 달려볼까?
+필요한건 어느정도 갖춘거 같습니다. 소스에 곁들인 주석과 함께 봅시다.
+
+### MyApp 소스 일부
+<pre lang="perl">
+package MyDancer;
+use 5.012;
+use Dancer ':syntax';
+use Dancer::Plugin::Database;
+use Data::Dump;                 # 디버그용으로 넣어둔 모듈입니다.
+our $VERSION = '0.1';
+
+
+# 기본으로 있는 페이지. Dancer 대문이네요. 그냥 두기로 합니다.
+get '/' => sub {
+	template 'index';
+};
+
+
+# URL 끝에 '/'가 붙어도 다른 경로로 인식합니다. 없는 경로라고 에러가 나오니까 리다이렉트를 하나 만들었습니다.
+get '/:site/' => sub {
+	my $site = params->{site};
+	redirect "/$site";
+};
+
+# 가장 기본 페이지.
+get '/:site' => sub {
+	my $site = params->{site};
+	my $start = 0;
+	my $view = 30;
+
+    # $site에 해당하는 테이블을 읽어올 수 있도록 만든 해쉬
+	my %db = (
+		"rgr" => "md5_list",
+		"bi" => "md5_bi",
+	);
+
+    # $site명이 엉뚱한거라 테이블이 없는 경우 첫 페이지로 보냄
+	unless ( defined $db{$site} ) {
+		redirect "/";
+		return;
+	}
+
+    # 저장된 이미지 전체 갯수를 구하기 위한 부분, 이게 있어야 $view 크기를 제한할 수 있고(이미지는 1000개인데 $view는 2000을 요청할 수 있기 때문), 끝 페이지 링크 생성할 수 있다.
+	my $sql = "SELECT id FROM $db{$site} WHERE id order by id DESC LIMIT 0, 1";
+	my @end = @{database->selectcol_arrayref($sql)};
+	my $end_page = $end[0];
+
+    # 0에서 30까지 그림 파일 이름 얻어오기. $start와 $view를 이용.
+	$sql = "SELECT name FROM $db{$site} WHERE id order by id DESC LIMIT $start, $view";
+	my @ary = @{database->selectcol_arrayref($sql)};
+	my @nary; # 실제 경로 저장을 위해 만든 배열
+	foreach my $tmp ( @ary ) {
+		$tmp =~ s,(..)(.*),$1/$1$2,g;     # name의 앞부분 두글자 떼다 디렉토리로 이용
+		push @nary, $tmp;
+	}
+	$start += $view;
+	
+	# 템플릿 view/result.tt 로 변수를 넘깁니다. 
+	template 'result', {
+		images => [@nary],
+		start => $start,
+		img_num => $view,
+		end_page => $end_page,
+		site => $site,
+	};
+};
+</pre>
+
+### view : result.tt 내용
+<pre language="html">
+&lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+[% IF (start - img_num * 2) &gt; 0 %]
+&lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+[% END %]
+[% start - img_num %]
+&lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
+&lt;ol&gt;
+	[% FOREACH file IN images %]
+	&lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
+	[% END %]
+&lt;/ol&gt;
+&lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+[% IF (start - img_num * 2) &gt; 0 %]
+&lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+[% END %]
+[% start - img_num %]
+&lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
+&lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
+</pre>
+
+### 결과
+![썸네일](http://cfile10.uf.tistory.com/image/0169624050B66F5C269C9F)
+
+사실 위에 있는 코드를 그대로 실행한 페이지가 아니라, 썸네일 보기 페이지 입니다.
+
+주소 표시줄에 /th/가 포함되어 있으면 이미지 경로를
+
+* /[% site %]/[% file %]
+* /[% site %]**/thumb/**[% file %]
+
+위와 같이 보여주는 템플릿을 따로 만들었거든요.
+
+./lib/MyDancer.pm 에서 템플릿 엔진으로 배열을 넘길 때, 아예 HTML 태그를 다 완성해서 넘겨주면 템플릿이 또 있어야 할 필요가 없습니다만, 전 그냥 간단하게 비슷한 코드와 템플릿 여러개 만드는 것으로 해결했습니다.
+
+TIMTOWTDI(There is more than one way to do it, 무언가를 하는 방법은 (언제나)하나보다 많다)!!
+
+
+### 원본글로 링크
+이미지를 수집한 원본 글로 링크를 걸어주는 기능도 추가했는데, 이건 파일명만 넘겨줘선 안되고, 원본 URL을 만들 수 있는 정보도 같이 넘겨줘야 합니다.
+
+DB 테이블 모양에서 나왔던 rgr201210 이 원본글 정보를 갖고 있습니다. 'no'인데요,
+
+* 원본 URL : http://rgrong.kr/bbs/view.php?id=rgr201210& .. 중략 .. &**no=180638**
+* 위의 no에 해당하는 숫자를 DB에 저장했습니다.
+
+<pre language="sql">
+mysql> describe rgr201210;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(11)  | NO   | PRI | NULL    | auto_increment |
+| no    | int(11)  | NO   |     | NULL    |                |
+| name  | char(37) | NO   |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+</pre>
+
+no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형을 만들어 본다면 해쉬 안에 배열이거나, 배열 안에 해쉬가 들어가겠네요.
+
+DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 기능이 없는듯 하여, 한줄씩 배열에 넣는 방법으로 처리했습니다. DBI 문서를 보고 각자 데이터 구조를 잘 설계해서 만들어봅시다.
+
+<pre language="perl">
+    my @ary;
+    my $count = 0;
+    while ( $count < $view )  {
+        my $sql = "select * from $db{$site} order by id desc limit $start, 1";
+        my $sth = database->prepare( $sql );        $sth->execute();
+        my $hr = $sth->fetchrow_hashref();
+        print "$hr->{'no'} $hr->{'name'}\n";
+        $hr->{'no'} = "$url{$site}$hr->{'no'}";
+        $hr->{'name'} =~ s,(..)(.*),$1/$1$2,g;
+        push @ary, $hr; 
+        $start++;
+        $count++;
+    }
+</pre>
+
+쿼리를 이미지 불러오는 횟수만큼 주는데 …뭔가 잘못 하고 있는 기분이 듭니다.
+
+더 좋은 방법 있으면 알려주세요.;;;;
+
+## 맺음말
+의욕만큼의 실력이 없어 부실한 문서가 되고 말았습니다. 보고 따라만 하면 웹 서비스 하나가 완성되는 문서를 만들고자 하였으나, 각각 다른 환경에 대한 구성을 설명할 실력이 안 되네요.
+
+이 기사의 의의는 1년 전만 해도 Perl에 대해 아는 것이 거의 없던 초보 JellyPooo가 웹 프레임워크, DB등을 주물럭 거리면서 웹 서비스를 만들어 냈다는데 두겠습니다.
+
+문서에서 설명되지 않거나 부실한 부분은 해 보시면서 검색과 수많은 삽질로 매워주시기 바라며, 다소 무책임한 이 기사를 마칩니다.
+
+문서 작성할 때 PSGI/Plack에 대한 이해를 못하고 있었는데, 이에 답해주신 yongbin 님, luz1una_hc 님께 감사 말씀 드립니다.
+
+## 참고문서
+### Perl 환경 구성
+* [perl 환경구축 최단코스](http://lotus.perl.kr/2012/08.html)
+
+### 크롤링 관련
+* [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html) by @JellyPooo
+* [나만의 E-Book으로 따뜻한 크리스마스를](http://advent.perl.kr/2010/2010-12-06.html) by @eeyees
+* [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) by @JellyPooo : 네이버 카페, 가입 필요.
+
+### 웹 프레임워크 관련 : Dancer, Mojolicious, PSGI, uWSGI
+* [초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) by @am0c : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
+* [웹툰을 한 눈에 내 만화 프로젝트 Manaba](http://advent.perl.kr/2011/2011-12-12.html) by @rumidier
+* [Minimal Perl Web App for Your Minimal Life](http://slide.keedi.pe.kr/s/20121220-minimal-perl-webapp#/) by @keedi : Dancer만큼 가볍고 빠른 웹 프레임워크 Mojolicious에 대한 소개 슬라이드
+* [H3 컨퍼런스 자료집](http://dev.kthcorp.com/2012/11/02/h3-2012-ebook/)
+* [Dancer::Deployment](https://metacpan.org/module/Dancer::Deployment) : Dancer 실행의 다양한 방법(영문)
+* [PSGI/Plack](http://plackperl.org) : PSGI 홈페이지(영문)
+* [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod) : PSGI::FAQ (영문)
+* [Perl을 위한 Web App 실행 환경 꾸미기](https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p) by @yuni_kim : uWSGI가 짱!!
+
+### Perl과 DB에 관련된 문서 링크 모음
+* 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
+* [Fey, Fey, Fey](http://advent.perl.kr/2010/2010-12-11.html) by @y0ngbin 
+* [DBIx::Class로 스키마 관리하기](http://advent.perl.kr/2011/2011-12-17.html) by @JEEN_LEE
