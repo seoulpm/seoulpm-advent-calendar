@@ -4,6 +4,11 @@ Category: perl
 Category: Seoul.pm
 Author: aanoaa
 
+## 저자 #
+aanoaa -
+
+## p5-hubot ##
+
 쉽게 확장 가능한 IRC bot hubot 을 소개하고 이를 사용, 확장하는 방법에 대해
 이야기 합니다.
 
