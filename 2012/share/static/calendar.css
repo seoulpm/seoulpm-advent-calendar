@@ -110,9 +110,9 @@
     margin-top: 19px;
 }
 #popup_text .title {
+    display: block;
     word-break: keep-all;
     text-align: center;
-
 }
 #popup_text .author {
     margin-top: 0.8em;
