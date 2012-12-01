@@ -12,7 +12,7 @@
   <meta property="og:title" content="<% $title %>" />
   <meta property="og:url" content="<% $page_uri %>" />
 % if ( $article && (my $img = $global->{profile_image}{$article->author}) ) {
-  <meta property="og:image" content="<% $img %>" />
+  <meta property="og:image" content="<% $global->{base_uri} %><% $img %>" />
 % } else {
   <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
 % }
