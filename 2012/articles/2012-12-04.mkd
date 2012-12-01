@@ -1,14 +1,21 @@
-00날 : 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
-===========================================
+Title: 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: JellyPooo
 
 ## 저자
+
 @JellyPooo, 시스템 관리자
 
+
 ## 목표
+
 * 데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여주기.
 * 아래 네 줄 요약을 위한 배경 지식과 설정 방법을 기술했습니다.
 
 ### 네 줄 요약
+
 <pre language="bash">
 cpanm Dancer DBI DBD::mysql			# 관련 모듈 설치
 dancer -a Myapp						# 뼈대 만들기
@@ -16,14 +23,18 @@ cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
 ./bin/app.pl						# 웹앱 실행, 브라우저로 접속
 </pre>
 
+
 ## 개요
+
 2012년 1월부터 진행한 [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html)를 통해 짤방(그림 파일)을 20여만개 모았습니다.
 
 특정 사이트에 접속해서 그림파일을 받고 -&gt; 새로 받은 파일의 파일명을 배열에 넣어 두었다가 -&gt; 해당 배열에 IMG 태그를 씌워 HTML 생성 -&gt; Apache 데몬을 통해 웹으로 그림 파일 보기 까지 구현 되어 있습니다.
 
 이정도면 괜찮지 않나... 하고 수 개월간 쓰다 보니 불편한 점이 하나, 둘 눈에 띕니다.
 
+
 ### HTML 파일이 너무 많아졌다.
+
 ![이미지 수집하며 같이 생성된 HTML](http://cfile23.uf.tistory.com/image/1257C13B50B2D1CD261003)
 ![소스는 이렇게 생겼다](http://cfile5.uf.tistory.com/image/12583D3B50B2D1CD22FAFF)
 
@@ -39,6 +50,7 @@ cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
 DB에 파일명을 저장해 두었다가, 실제 파일이 있는 경로를 붙이고 앞뒤로 &lt;IMG&gt; 태그를 붙인 내용을 브라우저로 보내면 이미지 출력용 HTML 페이지를 만들 수 있겠네요.
 
 Let's Dance!!
+
 
 ## 개발 환경 및 전제조건
 ### 개발 환경
