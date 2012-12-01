@@ -25,7 +25,7 @@ p5는 _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
 ![hubot][img-resize-1]
 *그림 1.* hubot ([원본][img-1])
 
-[hubot](http://hubot.github.com/)은 [github](https://github.com/)에서
+[hubot][hubot]은 [github][github]에서
 만든 채팅용 봇입니다. 어댑터(adapter)와 스크립트(script)를 확장해서 사용할 수
 있습니다. CoffeeScript로 작성되어 있고, node.js로 동작합니다.
 
@@ -60,7 +60,7 @@ p5는 _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
 
 ## p5-hubot? ##
 
-[p5-hubot](http://search.cpan.org/~aanoaa/Hubot-0.0.7/lib/Hubot.pm)은 펄로 만든
+[p5-hubot][p5-hubot]은 펄로 만든
 hubot입니다.
 CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 구조를 자세히 살펴봅시다.
@@ -70,11 +70,11 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 먼저, 어댑터입니다. `Hubot::Adapter`는 연계될 서비스와의 인터페이스입니다.
 현재 기본으로 제공되는 어댑터는 다음과 같습니다.
 
-- [Shell](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Shell.pm)
+- [Shell][hubot-shell]
   - 스크립트 개발과 디버깅에 적합합니다
   - 입력과 출력을 터미널에서 주고 받습니다.
-- [IRC](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Irc.pm)
-- [Campfire](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Campfire.pm)
+- [IRC][hubot-irc]
+- [Campfire][hubot-campfire]
 
 따라서 동일한 버전의 p5-hubot은 IRC에서도 구동될 수 있고, 다른 환경에서도 구동될 수 있습니다.
 카카오톡, 마이피플 등의 API가 공개되면 새 어댑터를 구현하면 쉽게 p5-hubot을 확장하여 사용할 수 있겠죠?
@@ -191,7 +191,7 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 가장 좋은 방법은 이미 구현되어 있는 스크립트의 소스 코드를 살펴보는
 것입니다. tell 스크립트의 구현을 직접 살펴보세요.
 
-[Hubot::Scripts::tell](https://metacpan.org/source/AANOAA/Hubot-Scripts-Bundle-0.0.12/lib/Hubot/Scripts/tell.pm)
+- [Hubot::Scripts::tell][hubot-tell]
 
 ### 설치 및 실행 ###
 
@@ -215,13 +215,13 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 
 ## 참고 ##
 
-- http://hubot.github.com
-- https://github.com/github/hubot
-- https://github.com/github/hubot-scripts
+- [Hubot](http://hubot.github.com)
+- [Hubot repository](https://github.com/github/hubot)
+- [Hubot scripts](https://github.com/github/hubot-scripts)
 
 ## 정리하며 ##
 
-[프리노드의 #perl-kr 채널]()에는 최신 버전의 `p5-hubot`이 `hongbot`이라는
+[프리노드의 #perl-kr 채널][perl-kr-irc]에는 최신 버전의 `p5-hubot`이 `hongbot`이라는
 이름으로 동작하고 있습니다. 와서 구경해보시는 것도 좋겠지요. 확장해서
 사용하고 싶은데 어려움을 느끼는 분은 채널에 들어오셔서 저에게 메세지를
 남겨주세요.
@@ -232,6 +232,14 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 
 봇은 이제 그만 만들고 확장 스크립트를 만들어 공유하면 좋겠습니다.
 
+[hubot]: http://hubot.github.com/
+[github]: https://github.com/
+[p5-hubot]: http://metacpan.org/module/Hubot
+[hubot-shell]: https://metacpan.org/module/Hubot::Adapter::Shell
+[hubot-irc]: https://metacpan.org/module/Hubot::Adapter::Irc
+[hubot-campfire]: https://metacpan.org/module/Hubot::Adapter::Campfire
+[hubot-tell]: https://metacpan.org/module/Hubot::Scripts::tell
+[perl-kr-irc]: http://webchat.freenode.net/?channels=perl-kr
 
 [img-1]: 2012-12-02-1.jpg
 [img-resize-1]: 2012-12-02-1_r.jpg
