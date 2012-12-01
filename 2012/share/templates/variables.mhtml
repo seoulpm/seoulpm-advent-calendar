@@ -45,6 +45,31 @@ return {
         );
         return $table{$day};
     },
+    profile_image => {
+        '1985xmas'     => 'profile_1985xmas.jpg',
+        'aanoaa'       => 'profile_aanoaa.jpg',
+        'aer0'         => 'profile_aer0.jpg',
+        'am0c'         => 'profile_am0c.jpg',
+        'ascendo'      => 'profile_ascendo.jpg',
+        'cheese_rulez' => 'profile_cheese_rulez.jpg',
+        'corund'       => 'profile_corund.jpg',
+        'dalinaum'     => 'profile_dalinaum.jpg',
+        'eeyees'       => 'profile_eeyees.jpg',
+        'empty'        => 'profile_empty.jpg',
+        'gypark'       => 'profile_gypark.jpg',
+        'ja3ck'        => 'profile_ja3ck.jpg',
+        'JEEN_LEE'     => 'profile_JEEN_LEE.jpg',
+        'keedi'        => 'profile_keedi.jpg',
+        'luzluna'      => 'profile_luzluna.jpg',
+        'mintegrals'   => 'profile_mintegrals.jpg',
+        'nving'        => 'profile_nving.jpg',
+        'owl0908'      => 'profile_owl0908.jpg',
+        'perlstudy'    => 'profile_perlstudy.jpg',
+        'pung96'       => 'profile_pung96.jpg',
+        'rumidier'     => 'profile_rumidier.jpg',
+        'saillinux'    => 'profile_saillinux.jpg',
+        'y0ngbin'      => 'profile_y0ngbin.jpg',
+      },
     advent_links => [
         {
             title => 'Perl Advent Calendar',
