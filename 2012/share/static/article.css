@@ -118,6 +118,14 @@ h3 {
     padding-left: 50px;
     background: url("bullet.gif") no-repeat scroll 4px 4px transparent;
 }
+#cont li ul {
+    margin-top: -0.4em;
+    margin-bottom: 1em;
+}
+#cont li li {
+    background: url("bullet2.gif") no-repeat scroll 6px 6px transparent;
+    padding-left: 34px;
+}
 #cont em {
     font-weight: bold;
 }
