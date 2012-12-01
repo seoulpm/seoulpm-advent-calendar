@@ -7,24 +7,24 @@ Author: aanoaa
 ## 저자 #
 aanoaa -
 
-## p5-hubot ##
+## 시작하며 ##
 
-쉽게 확장 가능한 IRC bot hubot 을 소개하고 이를 사용, 확장하는 방법에 대해
-이야기 합니다.
+p5-hubot은 쉽게 확장 가능한 IRC 봇입니다.
+p5-hubot을 소개하고 이를 사용, 확장하는 방법에 대해 이야기합니다.
 
 ## p5? ##
 
-Perl 5 를 뜻합니다. Perl 에서는 일반적으로 모듈이름이 대문자로
-시작하지만, 소스저장소(repository) 이름으로는 다른 프로젝트와 구별하기
-위해서 `p5` prefix 를 붙이곤 합니다.
+_Perl 5_를 뜻합니다. Perl의 모듈 이름은 대문자로
+시작하지만, 소스 저장소의 이름로 사용할 때에는 다른 프로젝트와 구별하기
+위해서 `p5`를 접두어로 붙이곤 합니다.
 
 ## hubot? ##
 
 ![hubot](http://octodex.github.com/images/hubot.jpg)
 
-[hubot](http://hubot.github.com/) 은 [github](https://github.com/)
-에서 만든 채팅용 bot 입니다. adapter, script 를 확장해서 사용할 수
-있습니다. CoffeeScript 로 쓰여져 있고, node.js 로 동작합니다.
+[hubot](http://hubot.github.com/)은 [github](https://github.com/)에서
+만든 채팅용 봇입니다. 어댑터(adapter)와 스크립트(script)를 확장해서 사용할 수
+있습니다. CoffeeScript로 작성되어 있고, node.js로 동작합니다.
 
                                             +---------+
                                             |  ascii  |
@@ -44,15 +44,15 @@ Perl 5 를 뜻합니다. Perl 에서는 일반적으로 모듈이름이 대문�
                                             |  .....  |
                                             +---------+
 
-- script 를 확장해서 필요한 기능을 구현해서 사용할 수 있습니다
-- 추가로 Adapter 를 구현해서 외부 서비스에 붙이면 이미 구현된 많은
-  script 를 재사용할 수 있습니다.
+- script를 확장해서 필요한 기능을 구현해서 사용할 수 있습니다.
+- 추가로 Adapter를 구현해서 외부 서비스에 붙이면 이미 구현된 많은
+  script를 재사용할 수 있습니다.
 
 ### Adapter ###
 
-`Hubot::Adapter` 는 연계될 서비스와의 인터페이스 입니다.
+`Hubot::Adapter`는 연계될 서비스와의 인터페이스 입니다.
 
-built-in Adapter 로는
+기본으로 제공되는 어댑터는 다음과 같습니다.
 
 - [Shell](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Shell.pm)
   - Script 개발과 디버깅에 적합합니다
@@ -60,9 +60,7 @@ built-in Adapter 로는
 - [IRC](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Irc.pm)
 - [Campfire](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Campfire.pm)
 
-가 있습니다.
-
-original 버전에는
+원래 버전의 hubot은 아래와 같은 어댑터가 구현되어 있습니다.
 
 - [Flowdock](https://github.com/github/hubot/wiki/Adapter:-Flowdock)
 - [HipChat](https://github.com/github/hubot/wiki/Adapter:-HipChat)
@@ -77,46 +75,43 @@ original 버전에는
 - [Skype](https://github.com/netpro2k/hubot-skype)
 - [Jabbr](https://github.com/smoak/hubot-jabbr)
 
-의 Adapter 가 구현되어 있습니다.
-
-카카오톡, 마이피플등의 API 가 공개되어 있다면 확장해서 사용가능합니다.
+카카오톡, 마이피플 등의 API가 공개되어 있다면 확장해서 사용할 수 있습니다.
 
 ### Scripts ###
 
-특정 pattern 에 대해 반응하고 예약된 작업을 하는 논리적 코드의
+특정 패턴에 대해 반응하여 예약된 작업을 하는 논리적 코드의
 집합입니다.
 
-예를들면 adapter 로 부터 `hi` 라는 text input 이 들어왔을때 해야 할
-작업(또는 처리)입니다.
+예를들면 어댑터로 부터 `hi`라는 텍스트 입력이 들어왔을때 해야 할
+작업입니다.
 
     $robot->hear(qr/hi/i, sub { shift->send('hello') });
 
-라는 코드가 있을때, `hi` 라는 텍스트가 정규표현식에 매칭되면, `hello`
-라는 output 을 보내는 코드입니다.
+위와 같은 코드가 있을때, `hi`라는 텍스트가 정규표현식에 일치하면, `hello`라는
+출력을 보내는 코드입니다.
 
     hshong> hi
     hubot> hello
 
-이와 같이 필요로하는 다양한 상황에 대해 pattern 과 예약된 작업을
+이와 같이 다양한 상황에 대해 pattern 과 예약된 작업을
 작성해서 확장해 나갈 수 있습니다.
 
 이를 쉽게 하기 위해 편리한 인터페이스가 마련되어 있습니다.
 
 ## p5-hubot? ##
 
-perl 로 만든
-[hubot](http://search.cpan.org/~aanoaa/Hubot-0.0.7/lib/Hubot.pm)
-입니다.
+펄로 만든
+[hubot](http://search.cpan.org/~aanoaa/Hubot-0.0.7/lib/Hubot.pm)입니다.
 
-CoffeeScript 를 모르는 perl 사용자를 위해 만들어졌습니다.
+CoffeeScript를 모르는 펄 사용자를 위해 만들어 졌습니다.
 
 ### 확장 ###
 
-`.pm` 파일을 만들고 PERL5LIB 환경변수에 `@INC` PATH 를 추가해서 사용할
+`.pm` 파일을 만들고 `PERL5LIB` 환경변수에 `@INC` PATH를 추가해서 사용할
 수 있습니다.
 
-`/path/to/lib/Hubot/Scripts/hello.pm`
-
+    #!perl
+    # /path/to/lib/Hubot/Scripts/hello.pm
     package Hubot::Scripts::hello;
     sub load {
         my ( $class, $robot ) = @_;
@@ -153,17 +148,17 @@ CoffeeScript 를 모르는 perl 사용자를 위해 만들어졌습니다.
 
 `./hubot-scripts.json`
 
+    #!js
     ["hello","help"]
 
 지금 작성한 스크립트를 사용할 수 있습니다.
 
 ### 주요 메소드 ###
 
-- `load` 함수는 반드시 구현해 주어야 합니다. `hubot-scripts.json` 에
-   포함된 스크립트를 메인 loop 실행전에 `load` 라는 이름의 함수로
+- `load` 함수는 반드시 구현해 주어야 합니다. `hubot-scripts.json`에
+   포함된 스크립트를 메인 loop 실행 전에 `load`라는 이름의 함수로
    불러들이기 때문입니다.
-   - `$class` 는 package 이름이고, `$robot` 은 `Hubot::Robot` 의
-     instance 입니다.
+   - `$class`는 package 이름이고, `$robot`은 `Hubot::Robot`의 인스턴스입니다.
 - `$robot->respond(pattern, callback)`
   - `pattern` 에 대한 예약된 작업 `callback` 입니다.
   - `<robotname>[:,]?\s*<pattern>` 에 매치합니다.
@@ -181,13 +176,14 @@ CoffeeScript 를 모르는 perl 사용자를 위해 만들어졌습니다.
 - `$robot->catchAll(callback)`
   - 모든 이벤트에 대해 실행됩니다.
 
-가장 좋은 방법은 이미 구현되어 있는 Script 의 소스코드를 살펴보는
+가장 좋은 방법은 이미 구현되어 있는 스크립트의 소스 코드를 살펴보는
 것입니다.
 
 [Hubot::Scripts::tell](https://metacpan.org/source/AANOAA/Hubot-Scripts-Bundle-0.0.12/lib/Hubot/Scripts/tell.pm)
 
 ### 설치 및 실행 ###
 
+    #!bash
     $ cpanm Hubot
     $ export PERL5LIB=/path/to/lib:$PERL5LIB
     $ hubot
@@ -200,24 +196,24 @@ CoffeeScript 를 모르는 perl 사용자를 위해 만들어졌습니다.
     hello
     Hubot> hubot hi
     Shell: hi
-
+    
     # irc 에 접속하시려면..
     $ hubot -a irc
 
-## 더보기 ##
+## 참고 ##
 
 - http://hubot.github.com
 - https://github.com/github/hubot
 - https://github.com/github/hubot-scripts
 
-## 결론 ##
+## 정리하며 ##
 
-`freenode #perl-kr` 채널에는 최신버전의 `p5-hubot` 이 `hongbot` 이라는
-이름으로 동작하고 있습니다. 와서 구경해보시는 것도 좋겟지요. 확장해서
+[프리노드의 #perl-kr 채널]()에는 최신 버전의 `p5-hubot`이 `hongbot`이라는
+이름으로 동작하고 있습니다. 와서 구경해보시는 것도 좋겠지요. 확장해서
 사용하고 싶은데 어려움을 느끼신다면 채널에 들어오셔서 저에게 메세지를
 남겨주세요.
 
     ### @freenode #perl-kr
     you> hongbot tell hshong 아 이걸 이렇게 저렇게 하고 싶어여.
 
-봇은 이제 그만 만들고 확장 script 를 만들어서 공유하면 좋겟습니다.
+봇은 이제 그만 만들고 확장 스크립트를 만들어 공유하면 좋겠습니다.
