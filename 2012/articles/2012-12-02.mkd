@@ -22,7 +22,8 @@ p5는 _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
 
 ## hubot? ##
 
-![hubot](http://octodex.github.com/images/hubot.jpg)
+![hubot][img-resize-1]
+*그림 1.* hubot ([원본][img-1])
 
 [hubot](http://hubot.github.com/)은 [github](https://github.com/)에서
 만든 채팅용 봇입니다. 어댑터(adapter)와 스크립트(script)를 확장해서 사용할 수
@@ -230,3 +231,7 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
     you> hongbot tell hshong 아 이걸 이렇게 저렇게 하고 싶어여.
 
 봇은 이제 그만 만들고 확장 스크립트를 만들어 공유하면 좋겠습니다.
+
+
+[img-1]: 2012-12-02-1.jpg
+[img-resize-1]: 2012-12-02-1_r.jpg
