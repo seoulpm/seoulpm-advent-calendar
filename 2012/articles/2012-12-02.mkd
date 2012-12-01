@@ -201,9 +201,14 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 
 ### 설치 및 실행 ###
 
+CPAN을 통해 hubot을 설치합니다.
+
     #!bash
     $ cpanm Hubot
-    $ export PERL5LIB=/path/to/lib:$PERL5LIB
+
+그런 다음 바로 hubot을 입력하면 실행됩니다.
+옵션을 지정하지 않으면 Shell 어댑터를 기본으로 사용합니다.
+
     $ hubot
     hubot> hubot help
     # hubot help - Displays all of the help commands that Hubot knows about
@@ -214,9 +219,17 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
     hello
     Hubot> hubot hi
     Shell: hi
-    
+
+IRC에 접속하려면 `-a irc` 옵션을 추가합니다.
+
     # irc 에 접속하시려면..
     $ hubot -a irc
+
+직접 만든 모듈을 로드하기 위해서는 PERL5LIB에 해당 모듈 경로를 등록합니다.
+
+    $ vim /path/to/lib/MyScript.pm
+    $ export PERL5LIB=/path/to/lib:$PERL5LIB
+    $ hubot
 
 
 ## 정리하며 ##
