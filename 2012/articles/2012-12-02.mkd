@@ -180,13 +180,14 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
    - 이때 `$class`는 패키지 이름이고, `$robot`은 `Hubot::Robot`의 인스턴스입니다.
 - `$robot->respond(pattern, callback)`
   - `pattern` 패턴에 대해 `callback` 함수를 예약 작업으로 등록합니다.
-  - `<robotname>[:,]?\s*<pattern>`에 일치합니다.
+  - `^<robotname>[:,]?\s*<pattern>`에 일치합니다. 즉, 문장 앞에 hubot의 이름을
+    언급한 경우에만 해당합니다.
   - `callback`은 `Hubot::Response`의 인스턴스를 인자로 받습니다.
   - `Hubot::Response`는 `send`, `reply`, `random`, `finish`,
     `http` 등의 메소드를 통해 편리하게 어댑터에
     데이터를 보낼 수 있습니다.
 - `$robot->hear(pattern, callback)`
-  - `respond` 메소드와 비슷하지만 `<pattern>`에 일치합니다.
+  - `respond` 메소드와 비슷하지만 단순히 `<pattern>`에 일치합니다.
 - `$robot->enter(callback)`
   - 누군가가 들어왔을때 실행됩니다.
 - `$robot->leave(callback)`
