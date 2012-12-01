@@ -219,12 +219,6 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
     $ hubot -a irc
 
 
-## 참고 ##
-
-- [Hubot](http://hubot.github.com)
-- [Hubot repository](https://github.com/github/hubot)
-- [Hubot scripts](https://github.com/github/hubot-scripts)
-
 ## 정리하며 ##
 
 [프리노드의 #perl-kr 채널][perl-kr-irc]에는 최신 버전의 `p5-hubot`이 `hongbot`이라는
@@ -237,6 +231,14 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
     you> hongbot tell hshong 아 이걸 이렇게 저렇게 하고 싶어여.
 
 봇은 이제 그만 만들고 확장 스크립트를 만들어 공유하면 좋겠습니다.
+
+
+## 참고 ##
+
+- [Hubot](http://hubot.github.com)
+- [Hubot repository](https://github.com/github/hubot)
+- [Hubot scripts](https://github.com/github/hubot-scripts)
+
 
 [aanoaa]: http://twitter.com/aanoaa
 [aanoaa-home]: http://aanoaa.github.com/
