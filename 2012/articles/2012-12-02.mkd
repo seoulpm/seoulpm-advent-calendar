@@ -6,7 +6,11 @@ Author: aanoaa
 
 ## 저자 #
 
-aanoaa -
+[@aanoaa][aanoaa] - Perl, 콧수염, 야구, 자전거, 낙타, 돌고래, 포청천 마니아.
+아이유 열혈 삼촌팬. Perl과 Javascript, 안드로이드 어플리케이션 개발에 능하다.
+일신 상의 이유로 Vim을 버리고 Emacs로 투신. [콧수염 블로그][aanoaa-home]를 운영 중.
+최근 hubot 모듈 운영에 애정을 쏟고 있다.
+
 
 ## 시작하며 ##
 
@@ -231,6 +235,9 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
     you> hongbot tell hshong 아 이걸 이렇게 저렇게 하고 싶어여.
 
 봇은 이제 그만 만들고 확장 스크립트를 만들어 공유하면 좋겠습니다.
+
+[aanoaa]: http://twitter.com/aanoaa
+[aanoaa-home]: http://aanoaa.github.com/
 
 [hubot]: http://hubot.github.com/
 [github]: https://github.com/
