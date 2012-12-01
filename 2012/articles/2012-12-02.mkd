@@ -11,12 +11,13 @@ aanoaa -
 ## 시작하며 ##
 
 p5-hubot은 쉽게 확장 가능한 IRC 봇입니다.
+하지만 IRC에 국한되지 않고 다양한 프로토콜 환경에서 동작할 수 있습니다.
 p5-hubot을 소개하고 이를 사용하고 확장하는 방법에 대해 이야기합니다.
 
 ## p5? ##
 
-_Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
-시작하지만, 소스 저장소의 이름로 사용할 때에는 다른 프로젝트와 구별하기
+p5는 _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
+시작하지만, 소스저장소의 이름로 사용할 때에는 다른 프로젝트와 구별하기
 위해 `p5`를 접두어로 붙이곤 합니다.
 
 ## hubot? ##
@@ -48,7 +49,8 @@ _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
                                             |  .....  |
                                             +---------+
 
-위와 같은 구조로 설계되어 있기 때문에 다음의 장점이 있습니다.
+위와 같이 어댑터와 스크립트 단이 분리된
+구조로 설계되어 있기 때문에 다음의 장점이 있습니다.
 
 - 스크립트를 확장해서 필요한 기능을 구현하고 사용할 수 있습니다.
 - 어댑터를 추가로 구현해서 외부 서비스에 붙이면 이미 구현된 많은
@@ -57,16 +59,15 @@ _Perl 5_를 뜻합니다. 펄 모듈의 이름은 대문자로
 
 ## p5-hubot? ##
 
-p5-hubot은 펄로 만든
-[hubot](http://search.cpan.org/~aanoaa/Hubot-0.0.7/lib/Hubot.pm)입니다.
+[p5-hubot](http://search.cpan.org/~aanoaa/Hubot-0.0.7/lib/Hubot.pm)은 펄로 만든
+hubot입니다.
 CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 구조를 자세히 살펴봅시다.
 
 ### Adapter ###
 
-`Hubot::Adapter`는 연계될 서비스와의 인터페이스입니다.
-
-기본으로 제공되는 어댑터는 다음과 같습니다.
+먼저, 어댑터입니다. `Hubot::Adapter`는 연계될 서비스와의 인터페이스입니다.
+현재 기본으로 제공되는 어댑터는 다음과 같습니다.
 
 - [Shell](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Shell.pm)
   - 스크립트 개발과 디버깅에 적합합니다
@@ -74,7 +75,11 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 - [IRC](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Irc.pm)
 - [Campfire](http://search.cpan.org/~aanoaa/Hubot-0.0.9/lib/Hubot/Adapter/Campfire.pm)
 
+따라서 동일한 버전의 p5-hubot은 IRC에서도 구동될 수 있고, 다른 환경에서도 구동될 수 있습니다.
+카카오톡, 마이피플 등의 API가 공개되면 새 어댑터를 구현하면 쉽게 p5-hubot을 확장하여 사용할 수 있겠죠?
+
 참고로, 원래 버전의 hubot은 아래와 같은 어댑터가 구현되어 있습니다.
+이것을 p5-hubot을 위해 포팅해 보는 것은 어떨까요?
 
 - [Flowdock](https://github.com/github/hubot/wiki/Adapter:-Flowdock)
 - [HipChat](https://github.com/github/hubot/wiki/Adapter:-HipChat)
@@ -89,7 +94,6 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 - [Skype](https://github.com/netpro2k/hubot-skype)
 - [Jabbr](https://github.com/smoak/hubot-jabbr)
 
-카카오톡, 마이피플 등의 API가 공개되어 있다면 확장해서 사용할 수 있겠죠?
 
 ### Script ###
 
@@ -108,12 +112,12 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 
 이와 같이 다양한 상황의 패턴에 대해 예약된 작업을
 작성하여 기능을 확장해 나갈 수 있습니다.
-특히 확장을 쉽게 하기 위한 편리한 인터페이스도 마련되어 있습니다.
+이렇게 편리한 인터페이스를 통해 쉽게 확장할 수 있습니다.
 
 ### 확장 ###
 
-`.pm` 파일을 만들고 `PERL5LIB` 환경변수에 `@INC`에 등록할 경로를 추가해서 사용할
-수 있습니다.
+직접 hello라는 스크립트를 만들어 p5-hubot을 확장해 봅시다.
+먼저 `hello.pm` 파일을 생성하고 아래와 같이 작성합니다.
 
     #!perl
     # /path/to/lib/Hubot/Scripts/hello.pm
@@ -150,14 +154,16 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 
     =cut
 
-이 스크립트를 사용하기 위해 아래와 같이 json 포맷으로 구성된
-설정파일을 만듭니다.
+이제 이것을 `PERL5LIB` 환경변수에 `@INC`에 등록할 경로를 추가해 사용할
+수 있습니다.
+아래와 같이 json 포맷으로 구성된
+설정파일을 만들면 hubot이 구동될 때 자동으로 스크립트를 불러옵니다.
 
     #!js
     // hubot-scripts.json
     ["hello","help"]
 
-이제, 여러분이 작성한 스크립트를 사용할 수 있습니다.
+이제, 여러분이 작성한 스크립트를 사용할 수 있습니다!
 
 ### 주요 메소드 ###
 
