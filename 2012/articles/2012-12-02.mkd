@@ -107,11 +107,13 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 예를 들면, 어댑터가 `"hi"`라는 텍스트 입력을 보내면 해야 할
 작업이 될 것입니다.
 
+    #!perl
     $robot->hear(qr/hi/i, sub { shift->send('hello') });
 
 위 코드는 어댑터가 받은 입력이 `"hi"`라는 텍스트가 정규표현식에 일치하면, `"hello"`라는
 출력을 보내는 코드입니다.
 
+    #!plain
     hshong> hi
     hubot> hello
 
@@ -164,7 +166,7 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 아래와 같이 json 포맷으로 구성된
 설정파일을 만들면 hubot이 구동될 때 자동으로 스크립트를 불러옵니다.
 
-    #!js
+    #!javascript
     // hubot-scripts.json
     ["hello","help"]
 
