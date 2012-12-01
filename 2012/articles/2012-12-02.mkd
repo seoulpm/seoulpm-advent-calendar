@@ -189,14 +189,14 @@ CoffeeScript보다 펄에 친숙한 사용자를 위해 만들어졌습니다.
 - `$robot->hear(pattern, callback)`
   - `respond` 메소드와 비슷하지만 단순히 `<pattern>`에 일치합니다.
 - `$robot->enter(callback)`
-  - 누군가가 들어왔을때 실행됩니다.
+  - 누군가가 들어왔을 때 실행됩니다.
 - `$robot->leave(callback)`
-  - 누군가가 나갔을때 실행됩니다.
+  - 누군가가 나갔을 때 실행됩니다.
 - `$robot->catchAll(callback)`
   - 모든 이벤트에 대해 실행됩니다.
 
 가장 좋은 방법은 이미 구현되어 있는 스크립트의 소스 코드를 살펴보는
-것입니다. tell 스크립트의 구현을 직접 살펴보세요.
+것입니다. `tell` 스크립트의 구현을 직접 살펴보세요.
 
 - [Hubot::Scripts::tell][hubot-tell]
 
@@ -228,7 +228,7 @@ IRC에 접속하려면 `-a irc` 옵션을 추가합니다.
     # irc 에 접속하시려면..
     $ hubot -a irc
 
-직접 만든 모듈을 로드하기 위해서는 PERL5LIB에 해당 모듈 경로를 등록합니다.
+직접 만든 모듈을 로드하기 위해서는 `PERL5LIB`에 해당 모듈 경로를 등록합니다.
 
     #!bash
     $ vim /path/to/lib/MyScript.pm
