@@ -340,7 +340,7 @@ config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부�
     use Module::Refresh;
     use Clone;
 
-관련 참고 문서 
+관련 참고 문서
 
 [dancer 실행 이후 수정한 내용 반영하는 방법은?](http://cafe.naver.com/perlstudy/1308) - 네이버 카페, 가입 필요함
 
@@ -357,7 +357,7 @@ config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부�
 - 먼저 크롤러 부분은 Dancer에서 하는 일이 아닙니다. 별도 프로그램이고요.
 - 다음으로 방문자의 주소는 http://localhost:5000/30/1 이런 식으로 넘어왔을 때, 30이 배열 끝 인자, 1이 배열 시작 인자가 될 수 있습니다. 이 주소엔 정규식도 쓸 수 있는 등 다양한 표현이 가능합니다만, 기본적으로
   - http://localhost/bbs/zboard.php?id=hello&page=2&select_arrange=headnum&desc=asc&category=&sn=on&ss=on&sc=on&keyword=&sn1=&divpage=11 이런 주소에서 각 인자값을 &으로 나누는걸 / 로 나눈다고 생각하면 편합니다.
-  - 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다. 
+  - 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다.
     http://localhost/hello/2/11
   - `/` 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
 - mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
@@ -483,83 +483,83 @@ DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다. �
     
     # 기본으로 있는 페이지. Dancer 대문이네요. 그냥 두기로 합니다.
     get '/' => sub {
-    	template 'index';
+        template 'index';
     };
     
     # URL 끝에 '/'가 붙어도 다른 경로로 인식합니다. 없는 경로라고 에러가 나오니까 리다이렉트를 하나 만들었습니다.
     get '/:site/' => sub {
-    	my $site = params->{site};
-    	redirect "/$site";
+        my $site = params->{site};
+        redirect "/$site";
     };
     
     # 가장 기본 페이지.
     get '/:site' => sub {
-    	my $site = params->{site};
-    	my $start = 0;
-    	my $view = 30;
+        my $site = params->{site};
+        my $start = 0;
+        my $view = 30;
     
         # $site에 해당하는 테이블을 읽어올 수 있도록 만든 해쉬
-    	my %db = (
-    		"rgr" => "md5_list",
-    		"bi" => "md5_bi",
-    	);
+        my %db = (
+            "rgr" => "md5_list",
+            "bi" => "md5_bi",
+        );
     
         # $site명이 엉뚱한거라 테이블이 없는 경우 첫 페이지로 보냄
-    	unless ( defined $db{$site} ) {
-    		redirect "/";
-    		return;
-    	}
+        unless ( defined $db{$site} ) {
+            redirect "/";
+            return;
+        }
     
         # 저장된 이미지 전체 갯수를 구하기 위한 부분, 이게 있어야 $view 크기를 제한할 수 있고(이미지는 1000개인데 $view는 2000을 요청할 수     있기 때문), 끝 페이지 링크 생성할 수 있다.
-    	my $sql = "SELECT id FROM $db{$site} WHERE id order by id DESC LIMIT 0, 1";
-    	my @end = @{database->selectcol_arrayref($sql)};
-    	my $end_page = $end[0];
+        my $sql = "SELECT id FROM $db{$site} WHERE id order by id DESC LIMIT 0, 1";
+        my @end = @{database->selectcol_arrayref($sql)};
+        my $end_page = $end[0];
     
         # 0에서 30까지 그림 파일 이름 얻어오기. $start와 $view를 이용.
-    	$sql = "SELECT name FROM $db{$site} WHERE id order by id DESC LIMIT $start, $view";
-    	my @ary = @{database->selectcol_arrayref($sql)};
-    	my @nary; # 실제 경로 저장을 위해 만든 배열
-    	foreach my $tmp ( @ary ) {
-    		$tmp =~ s,(..)(.*),$1/$1$2,g;     # name의 앞부분 두글자 떼다 디렉토리로 이용
-    		push @nary, $tmp;
-    	}
-    	$start += $view;
-    	
-    	# 템플릿 view/result.tt 로 변수를 넘깁니다. 
-    	template 'result', {
-    		images => [@nary],
-    		start => $start,
-    		img_num => $view,
-    		end_page => $end_page,
-    		site => $site,
-    	};
+        $sql = "SELECT name FROM $db{$site} WHERE id order by id DESC LIMIT $start, $view";
+        my @ary = @{database->selectcol_arrayref($sql)};
+        my @nary; # 실제 경로 저장을 위해 만든 배열
+        foreach my $tmp ( @ary ) {
+            $tmp =~ s,(..)(.*),$1/$1$2,g;     # name의 앞부분 두글자 떼다 디렉토리로 이용
+            push @nary, $tmp;
+        }
+        $start += $view;
+    
+        # 템플릿 view/result.tt 로 변수를 넘깁니다.
+        template 'result', {
+            images => [@nary],
+            start => $start,
+            img_num => $view,
+            end_page => $end_page,
+            site => $site,
+        };
     };
 
 ### view : result.tt 내용
 
     #!html
-    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt;
     [% IF (start - img_num * 2) &gt; 0 %]
     &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
     [% END %]
     [% start - img_num %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt;
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
     &lt;ol&gt;
-    	[% FOREACH file IN images %]
-    	&lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
-    	[% END %]
+        [% FOREACH file IN images %]
+        &lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
+        [% END %]
     &lt;/ol&gt;
-    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt;
     [% IF (start - img_num * 2) &gt; 0 %]
     &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
     [% END %]
     [% start - img_num %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt;
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
     &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
@@ -610,7 +610,7 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
         print "$hr->{'no'} $hr->{'name'}\n";
         $hr->{'no'} = "$url{$site}$hr->{'no'}";
         $hr->{'name'} =~ s,(..)(.*),$1/$1$2,g;
-        push @ary, $hr; 
+        push @ary, $hr;
         $start++;
         $count++;
     }
@@ -645,5 +645,5 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
 
 ### Perl과 DB에 관련된 문서 링크 모음
 * 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
-* [Fey, Fey, Fey](http://advent.perl.kr/2010/2010-12-11.html) by @y0ngbin 
+* [Fey, Fey, Fey](http://advent.perl.kr/2010/2010-12-11.html) by @y0ngbin
 * [DBIx::Class로 스키마 관리하기](http://advent.perl.kr/2011/2011-12-17.html) by @JEEN_LEE
