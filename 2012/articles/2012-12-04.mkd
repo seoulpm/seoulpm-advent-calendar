@@ -38,12 +38,9 @@ cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
 ![이미지 수집하며 같이 생성된 HTML](http://cfile23.uf.tistory.com/image/1257C13B50B2D1CD261003)
 ![소스는 이렇게 생겼다](http://cfile5.uf.tistory.com/image/12583D3B50B2D1CD22FAFF)
 
-1. HTML파일 하나에 그림 파일을 40개를 보여주는데, 그림 파일이 20만개나 되다보니 HTML 파일만 5000여개가 되었습니다. 파일명만 다를 뿐, IMG 태그는 똑같이 쓰고 있고요. 비효율적으로 느껴집니다. 한 번에 볼 수 있는 그림 수 40개를 조절할 수도 없어요.
-
-1. 썸네일을 만들어 모은 짤방을 좀 더 편하고 빠르게 확인하고 싶습니다. 이 경우, 썸네일의 파일명이나 경로를 달리한 HTML을 또 만들어야 할 것 같네요. HTML 파일만 10,000개가 넘겠어요!
-
-1. HTML 파일 간 연결이 안 되어있습니다. 다음 페이지로 넘어가는 것은 주소창에 파일명을 직접 입력하는 수밖에 없고요, 전체 파일에 대한 링크를 만들어서 덧붙이는 방법을 써봤는데 ...10,000여개에 덧붙이는 것은 시간이 꽤 걸립니다.
-
+- HTML파일 하나에 그림 파일을 40개를 보여주는데, 그림 파일이 20만개나 되다보니 HTML 파일만 5000여 개가 되었습니다. 파일명만 다를 뿐, `IMG` 태그는 똑같이 쓰고 있고요. 비효율적으로 느껴집니다. 한 번에 볼 수 있는 그림 수 40개를 조절할 수도 없어요.
+- 썸네일을 만들어 모은 짤방을 좀 더 편하고 빠르게 확인하고 싶습니다. 이 경우, 썸네일의 파일명이나 경로를 달리한 HTML을 또 만들어야 할 것 같네요. HTML 파일만 10,000개가 넘겠어요!
+- HTML 파일 간 연결이 안 되어있습니다. 다음 페이지로 넘어가는 것은 주소창에 파일명을 직접 입력하는 수 밖에 없고요, 전체 파일에 대한 링크를 만들어서 덧붙이는 방법을 써봤는데... 10,000여 개에 덧붙이는 것은 시간이 꽤 걸립니다.
 
 자주 쓰는 파일 정보를 데이터 베이스(이하 DB)에 보관하다가, 파일 정보를 '틀'에 넣어 보여주면 문제를 해결할 수 있을거 같습니다. 마침 [여섯째 날: 초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) 이런 내용도 있네요. DB만 접목하면 쉽게 할 수 있을거 같습니다.
 
@@ -60,22 +57,22 @@ Let's Dance!!
 
 ### 전제조건
 #### 참고문서
+
 이하의 문서를 미리 읽어두시기 바랍니다.
 
-1. [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) : 네이버 카페, 가입 필요.
-1. [초소형 프레임워크와 함께 춤을 by am0c](http://advent.perl.kr/2011/2011-12-06.html) : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
-1. [웹툰을 한 눈에 내 만화 프로젝트 Manaba by rumidier](http://advent.perl.kr/2011/2011-12-12.html) : 역시 Dancer를 이용한 웹 앱입니다.
-1. [Minimal Perl Web App for Your Minimal Life by keedi](http://slide.keedi.pe.kr/s/20121220-minimal-perl-webapp#/) : Dancer만큼 가볍고 빠른 웹 프레임워크 Mojolicious에 대한 소개 슬라이드
-
+- [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397): 네이버 카페. 가입 필요.
+- [초소형 프레임워크와 함께 춤을 by am0c](http://advent.perl.kr/2011/2011-12-06.html): 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
+- [웹툰을 한 눈에 내 만화 프로젝트 Manaba by rumidier](http://advent.perl.kr/2011/2011-12-12.html): 역시 Dancer를 이용한 웹 앱입니다.
+- [Minimal Perl Web App for Your Minimal Life by keedi](http://slide.keedi.pe.kr/s/20121220-minimal-perl-webapp#/): Dancer만큼 가볍고 빠른 웹 프레임워크. Mojolicious에 대한 소개 슬라이드
 
 ### 기술수준
-1. Apache, lighttpd, nginx 등 웹 데몬에 대한 이해
-1. MySQL DB, Table 생성 및 데이터 insert, select 가능 할 것(join 등 복잡한건 안 씁니다).
-1. Perl 환경 설정 및 모듈 설치에 대한 이해
+- Apache, lighttpd, nginx 등 웹 데몬에 대한 이해
+- MySQL DB, Table 생성 및 데이터 insert, select 가능 할 것(join 등 복잡한건 안 씁니다).
+- Perl 환경 설정 및 모듈 설치에 대한 이해
 
 
-## [Dancer](https://www.metacpan.org/module/Dancer)가 뭐야?
-웹 프레임 워크라네요.
+## Dancer가 뭐야?
+[Dancer](https://www.metacpan.org/module/Dancer)는 웹 프레임워크라네요.
 
 ### 웹 프레임 워크가 뭐야??
 Apache, lighttpd, nginx 까진 알겠는데, 웹 프레임 워크는 대체 뭔지... 잘 정리된 자료가 마침 이번 [kth](http://www.kthcorp.com/)의 [H3 행사](http://h3.kthcorp.com/2012/)에서 발표 되었고, [자료집](http://dev.kthcorp.com/2012/11/02/h3-2012-ebook/)도 다운로드 가능하니 여길 참조 하시기 바랍니다. '봄날은 간다' 항목을 보시면 됩니다.
@@ -111,8 +108,8 @@ Apache, lighttpd, nginx 까진 알겠는데, 웹 프레임 워크는 대체 뭔�
 
 가장 간단하게 테스트 할 때는 
 
-1. Dancer Root/bin/app.pl 실행 하면 끝. 3000번 포트로 잘 열리는지 로그 확인.
-2. 브라우저에서 http://localhost:3000/
+- Dancer Root/bin/app.pl 실행 하면 끝. 3000번 포트로 잘 열리는지 로그 확인.
+- 브라우저에서 http://localhost:3000/
 
 접속 되는지 확인해보면 됩니다.
 
@@ -176,16 +173,16 @@ uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.
 
 웹서버(apache, lighttpd, nignx, starman, uWSGI)과 Perl을 연결하기 위한 규격이라고 합니다. CGI랑 비슷하면서 다소 다르다고 나와 있네요.
 
-1. [PSGI/Plack](http://plackperl.org) : PSGI 홈페이지(영문)
-2. [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod) : PSGI::FAQ (영문)
-2. [Perl을 위한 Web App 실행 환경 꾸미기 by yuni_kim](https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p) : uWSGI가 짱!!
+- [PSGI/Plack](http://plackperl.org): PSGI 홈페이지(영문)
+- [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod): PSGI::FAQ (영문)
+- [Perl을 위한 Web App 실행 환경 꾸미기 by yuni_kim](https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p): uWSGI가 짱!!
 
 CGI가 있는데 왜 또 다른 인터페이스를 만들어 쓰나? - 성능 때문이죠. 최대의 성능을 낼 수 있도록 저수준(low-level) API를 쓸 수 있게 하다 보니 필요해졌답니다. 그외 다양한 웹서버 - 어플리케이션간 정보 교환을 제공하는 모양이네요.
 
 
 ### 그럼 뭘 선택해야 하나요?
-1. 성능
-2. 권한
+- 성능
+- 권한
 
 위 두 가지를 고려해 가능한 쪽을 선택하면 됩니다.
 
@@ -214,46 +211,40 @@ ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
 
 ### root 권한 없을 때 DBD::MySQL 설치
 
-1. 리눅스 CentOS 6.3 64bit
-1. Perl 환경 : perlbrew로 설치한 perl 5.16.1
-1. mysql-server 패키지는 설치 되어있음.
-1. mysql-devel (mysql 소스) 패키지가 시스템에 설치 안 되어 있음 -> 본인 계정에 압축 풀었음(/home/jellypo/mysql-devel/)
-    1. rpm 파일 압축 풀기
-        1. rpm2cpio RPM파일 | cpio -id
+- 리눅스 CentOS 6.3 64bit
+- Perl 환경 : perlbrew로 설치한 perl 5.16.1
+- mysql-server 패키지는 설치 되어있음.
+- mysql-devel (mysql 소스) 패키지가 시스템에 설치 안 되어 있음 -> 본인 계정에 압축 풀었음(/home/jellypo/mysql-devel/)
+  - rpm 파일 압축 풀기: `rpm2cpio RPM파일 | cpio -id`
 
-
-cpanm DBD::mysql 해서 설치 되면 얼마나 행복하겠습니까만은 오류가 발생합니다.
-
+`cpanm DBD::mysql`해서 설치 되면 얼마나 행복하겠습니까만은 오류가 발생합니다.
 결과적으로 제가 한 것들입니다.
 
-1. mysql-devel 패키지를 압축 풀고
-2. Makefile 파일 내용 수정(mysql-devel 경로 지정)
-3. /usr/lib64/mysql 안의 파일을 mysql-devel/usr/lib64/mysql/ 밑으로 복사
+- mysql-devel 패키지를 압축 풀고
+- Makefile 파일 내용 수정(mysql-devel 경로 지정)
+- `/usr/lib64/mysql` 안의 파일을 `mysql-devel/usr/lib64/mysql/` 밑으로 복사
 
-<pre lang="Bash">
-cd .cpanm/latest-build/DBD-mysql-4.022
-perl Makefile.PL
-vim Makefile
-</pre>
-#  #
-Makefile 파일 수정, LDDLFLAGS, LDFLAGS, INC, LD_RUN_PATH 등의 변수에서 /usr/local/lib, /usr/local/include 와 같이 mysql 소스 경로 지정 된 것을 mysql-devel 압축푼 곳으로 변경 
+      #!bash
+      $ cd .cpanm/latest-build/DBD-mysql-4.022
+      $ perl Makefile.PL
+      
+      $ vim Makefile
+      # Makefile 파일 수정, LDDLFLAGS, LDFLAGS, INC, LD_RUN_PATH 등의 변수에서
+      # /usr/local/lib, /usr/local/include 와 같이 mysql 소스 경로 지정 된 것을 mysql-devel 압축푼 곳으로 변경.
+      # https://metacpan.org/module/DBD::mysql
+      
+      $ make
+      ...
+      /usr/bin/ld: cannot find -lmysqlclient
+      collect2: ld returned 1 exit status
+      make: *** [blib/arch/auto/DBD/mysql/mysql.so] 오류 1
 
-https://metacpan.org/module/DBD::mysql
+로그를 보니 `mysql-devel` 압축 푼 곳에 `.so` 파일이 몇 개 빠져서 이러는 모양입니다. 로그를 잘 보면 해결방법이 나옵니다. ^^ `/usr/lib64/mysql/` 안의 파일을 `~/mysql-devel/usr/lib64/mysql`로 복사했습니다.
 
-<pre lang="Bash">
-make
+    #!bash
+    make
+    make install
 
-#중략 (make 실행 결과)
-/usr/bin/ld: cannot find -lmysqlclient
-collect2: ld returned 1 exit status
-make: *** [blib/arch/auto/DBD/mysql/mysql.so] 오류 1
-</pre>
-로그를 보니 mysql-devel 압축 푼 곳에 .so 파일이 몇 개 빠져서 이러는 모양입니다. 로그를 잘 보면 해결방법이 나옵니다. ^^ /usr/lib64/mysql/ 안의 파일을 ~/mysql-devel/usr/lib64/mysql 로 복사했습니다.
-
-<pre lang="Bash">
-make
-make install
-</pre>
 이후 잘 되네요.
 
 
@@ -373,21 +364,22 @@ use Clone;
 
 
 ## 설계
-1. 미리 만들어둔 크롤러로 이미지를 모으고, DB에 파일명을 저장합니다.
-1. 방문자가 주소를 통해 1번째부터 30번째 이미지를 보여달라고 요청합니다.
-1. mysql에 접속해 1 번째, 30 번째를 인자로 넘겨 1 .. 30 까지 파일 이름 배열을 받습니다.
-1. 배열에 이미지 경로를 덧붙이고, 다시 &lt;IMG&gt; 태그를 씌워서 보여주면 끝!!
+
+- 미리 만들어둔 크롤러로 이미지를 모으고, DB에 파일명을 저장합니다.
+- 방문자가 주소를 통해 1번째부터 30번째 이미지를 보여달라고 요청합니다.
+- mysql에 접속해 1 번째, 30 번째를 인자로 넘겨 1 .. 30 까지 파일 이름 배열을 받습니다.
+- 배열에 이미지 경로를 덧붙이고, 다시 &lt;IMG&gt; 태그를 씌워서 보여주면 끝!!
 
 이걸 Dancer 시점에서 볼까요?
 
-1. 1번인 크롤러 부분은 Dancer에서 하는 일이 아닙니다. 별도 프로그램이고요.
-1. 2번, 방문자의 주소는 http://localhost:5000/30/1 이런 식으로 넘어왔을 때, 30이 배열 끝 인자, 1이 배열 시작 인자가 될 수 있습니다. 이 주소엔 정규식도 쓸 수 있는 등 다양한 표현이 가능합니다만, 기본적으로
-    1. http://localhost/bbs/zboard.php?id=hello&page=2&select_arrange=headnum&desc=asc&category=&sn=on&ss=on&sc=on&keyword=&sn1=&divpage=11 이런 주소에서 각 인자값을 &으로 나누는걸 / 로 나눈다고 생각하면 편합니다.
-    1. 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다. 
+- 먼저 크롤러 부분은 Dancer에서 하는 일이 아닙니다. 별도 프로그램이고요.
+- 다음으로 방문자의 주소는 http://localhost:5000/30/1 이런 식으로 넘어왔을 때, 30이 배열 끝 인자, 1이 배열 시작 인자가 될 수 있습니다. 이 주소엔 정규식도 쓸 수 있는 등 다양한 표현이 가능합니다만, 기본적으로
+  - http://localhost/bbs/zboard.php?id=hello&page=2&select_arrange=headnum&desc=asc&category=&sn=on&ss=on&sc=on&keyword=&sn1=&divpage=11 이런 주소에서 각 인자값을 &으로 나누는걸 / 로 나눈다고 생각하면 편합니다.
+  - 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다. 
     http://localhost/hello/2/11
-    1. '/' 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
-1. mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
-1. view 영역입니다. 앞서 넘겨 받은 배열을 템플릿 엔진에서 처리하고요. 템플릿 엔진에서도 Perl 비슷한 문법으로 프로그래밍 가능합니다.
+  - `/` 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
+- mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
+- view 영역입니다. 앞서 넘겨 받은 배열을 템플릿 엔진에서 처리하고요. 템플릿 엔진에서도 Perl 비슷한 문법으로 프로그래밍 가능합니다.
 
 
 ## DB 테이블 모양
