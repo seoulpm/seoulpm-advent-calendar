@@ -149,7 +149,7 @@ Dancer Root 디렉토리에서 `./bin/app.pl`을 해봅시다.
     curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
     # uwsgi 파일 위치는 절대경로로 적어야 합니다.
 
-위 명령어를 쉘에서 실행하면 /tmp/ 경로 밑에 uwsgi 실행파일이 생성 됩니다.
+위 명령어를 쉘에서 실행하면 `/tmp/` 경로 밑에 `uwsgi` 실행파일이 생성됩니다.
 
 
 ##### uWSGI 실행
@@ -158,12 +158,12 @@ OS X에서 테스트 해보니 웹 앱 실행파일을 절대경로로 하지 �
     #!bash
     uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.pl
 
-이와 같이 Dancer를 http://localhost:3000 으로 열었습니다.
+이와 같이 Dancer를 [http://localhost:3000](http://localhost:3000/)으로 열었습니다.
 
 ## 잠깐!! PSGI/Plack 은 뭔가요?
 엄 …그냥 넘어가는게 좋은데…
 
-웹서버(apache, lighttpd, nignx, starman, uWSGI)과 Perl을 연결하기 위한 규격이라고 합니다. CGI랑 비슷하면서 다소 다르다고 나와 있네요.
+웹서버(apache, lighttpd, nignx, starman, uWSGI)와 Perl을 연결하기 위한 규격이라고 합니다. CGI랑 비슷하면서 다소 다르다고 나와 있네요.
 
 - [PSGI/Plack](http://plackperl.org): PSGI 홈페이지(영문)
 - [PSGI::FAQ](http://search.cpan.org/~miyagawa/PSGI-1.101/PSGI/FAQ.pod): PSGI::FAQ (영문)
@@ -271,11 +271,11 @@ Dancer 모듈이 설치되고 나면 실행 명령어 `dancer`가 생깁니다. 
 
 이렇게 세 줄 뿐입니다.
 
-웹앱으로써 컨트롤은 lib/MyDancer.pm에 들어갑니다. 여기에 http://localhost:3000/ URL에 대한 서브루틴을 작성하면 해당 URL 요청이 올 때마다 그 서브루틴을 실행하고, 해당 서브루틴의 결과값을 템플릿 엔진으로 넘기면 템플릿 엔진에서 예쁘게 가공해서 보여줄 수 있습니다. (서브루틴에서 바로 출력도 가능한데 권장하진 않습니다.. http 헤더부터 다 작성해야 함)
+웹앱으로써 컨트롤은 `lib/MyDancer.pm`에 들어갑니다. 여기에 http://localhost:3000/ URL에 대한 서브루틴을 작성하면 해당 URL 요청이 올 때마다 그 서브루틴을 실행하고, 해당 서브루틴의 결과값을 템플릿 엔진으로 넘기면 템플릿 엔진에서 예쁘게 가공해서 보여줄 수 있습니다. (서브루틴에서 바로 출력도 가능한데 권장하진 않습니다.. http 헤더부터 다 작성해야 함)
 
-템플릿은 view 디렉토리 밑에 확장자 .tt 파일들 입니다. 기본 템플릿 엔진은 기능이 거의 없다시피 하니 [Template Toolkit](http://www.template-toolkit.org/)을 사용합니다.
+템플릿은 view 디렉토리 밑에 확장자 `.tt` 파일들 입니다. 기본 템플릿 엔진은 기능이 거의 없다시피 하니 [Template Toolkit](http://www.template-toolkit.org/)을 사용합니다.
 
-DB 접속 설정이나 템플릿 엔진 변경은 config.yml 파일에서 합니다.
+DB 접속 설정이나 템플릿 엔진 변경은 `config.yml` 파일에서 합니다.
 
 
 ## Dancer config.yml 설정하기
@@ -329,10 +329,10 @@ Dancer 에서 MySQL 접속하기 위한 정보를 `config.yml`파일에 적습�
 ### 템플릿 엔진 : Template Toolkit
 [Template Toolkit](http://www.template-toolkit.org/) 사이트를 참조하여 문법을 공부합시다. 기본적으로 Perl과 큰 차이가 없어서 금방 쓸 수 있어요.
 
-전 Template Toolkit을 사용했지만 훨씬 성능이 좋은 Xslate를  사용해보시길 바랍니다. 참고 문서는 [Template Toolkit -&gt; Xslate by JEEN_LEE](http://lotus.perl.kr/2012/02.html)입니다.
+전 Template Toolkit을 사용했지만 훨씬 성능이 좋은 Xslate를 사용해보시길 바랍니다. 참고 문서는 [Template Toolkit -> Xslate by JEEN_LEE](http://lotus.perl.kr/2012/02.html)입니다.
 
 ### auto_reload
-Dancer가 실행 되고 난 뒤에 변경사항은 바로 적용이 되지 않기 때문에, 서버 내렸다가 실행하는 과정이 필요하다. 그러나 auto_reload 설정을 활성화하면 변경사항이 바로 적용되어 개발하기 편합니다.
+Dancer가 실행 되고 난 뒤에 변경사항은 바로 적용이 되지 않기 때문에, 서버 내렸다가 실행하는 과정이 필요합니다. 그러나 auto_reload 설정을 활성화하면 변경사항이 바로 적용되어 개발하기 편합니다.
 
 config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부분에 아래 설정을 해줍니다.
 
