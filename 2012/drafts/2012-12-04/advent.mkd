@@ -77,6 +77,10 @@ Let's Dance!!
 1. Perl 환경 설정 및 모듈 설치에 대한 이해
 
 
+### Dancer Root
+1. ***dancer -a Myapp*** 를 실행해 생성된 디렉토리를 말합니다. 해당 명령 실행된 위치에 Myapp 디렉토리가 생깁니다.
+
+
 ## [Dancer](https://www.metacpan.org/module/Dancer)가 뭐야?
 웹 프레임 워크라네요.
 
@@ -109,13 +113,16 @@ Apache, lighttpd, nginx 까진 알겠는데, 웹 프레임 워크는 대체 뭔�
     Running on lighttpd (CGI)
     Running on lighttpd (FastCGI)
 
-크게 cgi-bin으로 실행, 단독 실행으로 나눌 수 있겠네요. 여기선 단독 실행을 기준으로 설명합니다. ...다른건 모를 뿐더러 복잡해서요.
+크게 cgi-bin으로 실행, 단독 실행으로 나눌 수 있겠네요. 여기선 단독 실행을 기준으로 설명합니다. ...그 외 실행방법에 대해 간략하게 설명하고 넘어가자면 - 대규모 시스템에서 부하 분산(로드 밸런싱)을 위한 실행, 여러개의 웹 앱 실행(TCP 포트 한 개로 여러개의 웹 앱 실행) 방법인데, 이건 Dancer 초보자가 다룰 내용이 아닌거 같습니다. 못 본채 하죠.
 
 
 가장 간단하게 테스트 할 때는 
 
 1. Dancer Root/bin/app.pl 실행 하면 끝. 3000번 포트로 잘 열리는지 로그 확인.
-2. 브라우저에서 http://localhost:3000/
+    1. 포트 변경 옵션이 있습니다. ***Dancer Root/bin/app.pl --help*** 로 확인 가능
+    1. --port=XXXX :     This lets you change the port number to use when running the process. By default, the port 3000 will be used.
+    1. ***Dancer Root/bin/app.pl --port=9999*** 이렇게 하면 TCP 9999포트로 실행
+1. 브라우저에서 http://localhost:3000/
 
 접속 되는지 확인해보면 됩니다.
 
@@ -667,7 +674,7 @@ no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형
 
 이 기사의 의의는 1년 전만 해도 Perl에 대해 아는 것이 거의 없던 초보 JellyPooo가 웹 프레임워크, DB등을 주물럭 거리면서 웹 서비스를 만들어 냈다는데 두겠습니다. 그만큼 Perl과 관련 모듈은 쓰기 편하고 성능도 만족스럽습니다.
 
-문서에서 설명되지 않거나 부실한 부분은 해 보시면서 검색과 수많은 삽질로 매워주시기 바라며, 다소 무책임한 이 기사를 마칩니다.
+문서에서 설명되지 않거나 부실한 부분은 해 보시면서 검색과 수많은 삽질로 매워주시기 바라며, 다소 무책임한 이 기사를 마칩니다. 궁금하신 부분이나 기사의 오류 신고를 카페나 이 기사에 댓글로 남겨주시면 최대한 답변 및 수정하도록 하겠습니다.
 
 문서 작성할 때 PSGI/Plack에 대한 이해를 못하고 있었는데, 이에 답해주신 yongbin 님, luz1una_hc 님께 감사 말씀 드립니다.
 
@@ -677,8 +684,11 @@ no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형
 
 ### 크롤링 관련
 * [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html) by @JellyPooo
-* [나만의 E-Book으로 따뜻한 크리스마스를](http://advent.perl.kr/2010/2010-12-06.html) by @eeyees
-* [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) by @JellyPooo : 네이버 카페, 가입 필요.
+    * 위 기사 하단에 스포츠 신문 연재만화 긁어오기는 현재 동작하지 않습니다. JavaScript 등으로 랜덤 변수를 생성해 크롤링을 차단했더군요.
+    * [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) by @JellyPooo : 네이버 카페, 가입 필요. 이쪽이 최신버전.
+* [나만의 E-Book으로 따뜻한 크리스마스를](http://advent.perl.kr/2010/2010-12-06.html) by @eeyees : 제가 만든 프로그램의 원형입니다. 필요한 기능을 추가하다보니 이 지경에 이르렀네요. @eeyees++
+    * 관련 발표 : [나의 Perl 투신기: 보다 나은 Perl 개미지옥을 위하여](http://www.slideshare.net/JellyPo/perl-perl-14826332) by @JellyPooo
+
 
 ### 웹 프레임워크 관련 : Dancer, Mojolicious, PSGI, uWSGI
 * [초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) by @am0c : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
