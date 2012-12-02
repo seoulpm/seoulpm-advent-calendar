@@ -79,6 +79,7 @@ Apache, lighttpd, nginx까진 알겠는데, 웹 프레임워크는 대체 뭔지
 ## Dancer 실행 방법
 [Dancer::Deployment](https://metacpan.org/module/Dancer::Deployment)에 따르면 아래와 같이 수많은 방법을 지원합니다.
 
+    #!plain
     Running as a cgi-script (or fast-cgi)
     Running stand-alone
         Running on Perl webservers with plackup
@@ -124,15 +125,16 @@ Apache, lighttpd, nginx까진 알겠는데, 웹 프레임워크는 대체 뭔지
 Dancer Root 디렉토리에서 `./bin/app.pl`을 해봅시다.
 `HTTP::Server::Simple`이 서버 역할을 해줘서 웹 브라우저로 접속할 수 있게 실행된다고 합니다. 성능이 낮으니 테스트 용도로만 사용하는게 좋다고 하네요.
 
-<pre>
-$ ./bin/app.pl
-[445]  core @0.000009> loading Dancer::Handler::Standalone handler in /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer/Handler.pm l. 45
-[445]  core @0.000183> loading handler 'Dancer::Handler::Standalone' in /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer.pm l. 474
->> Dancer 1.311 server 445 listening on http://0.0.0.0:3000
->> Dancer::Plugin::Database (2.01)
->> Dancer::Plugin::Database::Handle (0.12)
-== Entering the development dance floor ...
-</pre>
+    #!plain
+    $ ./bin/app.pl
+    [445]  core @0.000009> loading Dancer::Handler::Standalone handler in
+    /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer/Handler.pm l. 45
+    [445]  core @0.000183> loading handler 'Dancer::Handler::Standalone' in
+    /Users/jellypo/.perlbrew/libs/perl-5.16.2@mydev/lib/perl5/Dancer.pm l. 474
+    >> Dancer 1.311 server 445 listening on http://0.0.0.0:3000
+    >> Dancer::Plugin::Database (2.01)
+    >> Dancer::Plugin::Database::Handle (0.12)
+    == Entering the development dance floor ...
 
 이제 [http://localhost:3000](http://localhost:3000/)로 접속할 수 있습니다.
 실제 서비스 용도로 쓸 때는 Starman 혹은 uWSGI를 권장합니다(uWSGI가 훨씬 성능이 좋다고 하니 이쪽을 권장).
@@ -143,10 +145,9 @@ $ ./bin/app.pl
 
 다양한 언어를 지원하는데, 우리에게 필요한건 [Quickstart (for Perl/PSGI)](http://projects.unbit.it/uwsgi/wiki/QuickstartPSGI)입니다.
 
-<pre language="bash">
-curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
-# uwsgi 파일 위치는 절대경로로 적어야 합니다.
-</pre>
+    #!bash
+    curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
+    # uwsgi 파일 위치는 절대경로로 적어야 합니다.
 
 위 명령어를 쉘에서 실행하면 /tmp/ 경로 밑에 uwsgi 실행파일이 생성 됩니다.
 
@@ -154,9 +155,8 @@ curl http://uwsgi.it/install | bash -s psgi /tmp/uwsgi
 ##### uWSGI 실행
 OS X에서 테스트 해보니 웹 앱 실행파일을 절대경로로 하지 않으니까 파일을 못 찾는 경우가 있었습니다.
 
-<pre language="bash">
-uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.pl
-</pre>
+    #!bash
+    uwsgi --http :3000 --http-modifier1 5 --psgi /Uers/jellypo/src/MyDancer/bin/app.pl
 
 이와 같이 Dancer를 http://localhost:3000 으로 열었습니다.
 
@@ -183,12 +183,11 @@ CGI가 있는데 왜 또 다른 인터페이스를 만들어 쓰나? - 성능 �
 
 
 ## 관련 모듈 설치
-<pre>
-cpanm Dancer DBI DBD::MySQL
-</pre>
 
-여기서 문제 발생 하는 경우가 있는데, DBD::MySQL을 설치하려면 mysql의 소스가 필요합니다.
+    #!bash
+    cpanm Dancer DBI DBD::MySQL
 
+여기서 문제가 발생하는 경우가 있는데, `DBD::MySQL`을 설치하려면 mysql의 소스가 필요합니다.
 CentOS는 mysql-devel 패키지를 설치하면 되고
 ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
 관리자 권한이 없다면?
@@ -235,42 +234,40 @@ ubuntu는 cpan 모듈을 패키지 설치로 지원하니 문제가 안되는데
 
 
 ## 이제 만들어 봅시다.
-<pre language="bash">
-$ dancer -a MyApp
-</pre>
+
+    #!bash
+    $ dancer -a MyApp
 
 실행한 경로에 MyApp 디렉토리가 생기고, 그 아래 구성은 아래와 같습니다.
-<pre>
-.
-|-- bin              # app.pl
-|-- environments     # 환경 설정 파일 예제가 들어있음.
-|-- lib              # MyApp.pm 이 있음. 라우트 핸들링은 이 파일에서 함.
-|-- public           # 정적 파일들이 위치함
-|   |-- css
-|   |-- javascripts
-|   |-- rgr           # 이건 제가 만든 디렉토리입니다. 수집한 이미지 저장 되어 있는 경로.
-|-- t
-`-- views             # 템플릿 파일 위치
-    `-- layouts
-</pre>
 
+    #!plain
+    .
+    |-- bin              # app.pl
+    |-- environments     # 환경 설정 파일 예제가 들어있음.
+    |-- lib              # MyApp.pm 이 있음. 라우트 핸들링은 이 파일에서 함.
+    |-- public           # 정적 파일들이 위치함
+    |   |-- css
+    |   |-- javascripts
+    |   |-- rgr           # 이건 제가 만든 디렉토리입니다. 수집한 이미지 저장 되어 있는 경로.
+    |-- t
+    `-- views             # 템플릿 파일 위치
+        `-- layouts
 
 ## Dancer 살펴보기
-<pre language="bash">
-cpanm Dancer
-dancer -a MyDancer
-</pre>
 
-Dancer 모듈이 설치되고 나면 실행명령어 dancer가 생깁니다. 하는 일은 기초 뼈대를 세우는 일입니다. 이 명령 없이 직접 작성해줘도 되는데 환경 설정 등을 직접 다 해줘야 하니까 그냥 있는 기능을 씁시다.
+    #!bash
+    $ cpanm Dancer
+    $ dancer -a MyDancer
 
-bin/app.bin 은 Dancer로서 실행용 파일이고, 실제 내용도
+Dancer 모듈이 설치되고 나면 실행 명령어 `dancer`가 생깁니다. 하는 일은 기초 뼈대를 세우는 일입니다. 이 명령 없이 직접 작성해줘도 되는데 환경 설정 등을 직접 다 해줘야 하니까 그냥 있는 기능을 씁시다.
 
-<pre language="perl">
-#!/usr/bin/env perl
-use Dancer;
-use MyDancer;
-dance;
-</pre>
+`bin/app.bin`은 Dancer로서 실행용 파일이고, 실제 내용도
+
+    #!perl
+    #!/usr/bin/env perl
+    use Dancer;
+    use MyDancer;
+    dance;
 
 이렇게 세 줄 뿐입니다.
 
@@ -282,52 +279,52 @@ DB 접속 설정이나 템플릿 엔진 변경은 config.yml 파일에서 합니
 
 
 ## Dancer config.yml 설정하기
-Dancer 에서 MySQL 접속하기 위한 정보를 config.yml파일에 적습니다. Dancer Root 디렉토리에 있습니다.
+Dancer 에서 MySQL 접속하기 위한 정보를 `config.yml`파일에 적습니다. Dancer Root 디렉토리에 있습니다.
 
-<pre language="yml">
-# This is the main configuration file of your Dancer app
-# env-related settings should go to environments/$env.yml
-# all the settings in this file will be loaded at Dancer's startup.
-
-# Your application's name
-appname: "MyDancer"
-
-# The default layout to use for your application (located in
-# views/layouts/main.tt)
-layout: "main"
-
-# when the charset is set to UTF-8 Dancer will handle for you
-# all the magic of encoding and decoding. You should not care
-# about unicode within your app when this setting is set (recommended).
-charset: "UTF-8"
-
-#logger : "file"
-
-
-# 템플릿 엔진 변경, start_tag, end_tag를 설정 않으면 &lt;% %&gt;가 기본 값. HTML TAG와 구분하기 어려워지니 되도록이면 활성화 할 것.
-template: "template_toolkit"
-engines:
-  template_toolkit:
-    encoding:  'utf8'
-    start_tag: '[%'
-    end_tag:   '%]'
-
-# DB 접속 정보 입력.
-plugins:
-    Database:
-        driver: 'mysql'
-        database: 'DB NAME'
-        username: 'DB USER NAME'
-        password: 'DB PASSWORD'
-
-
-# 개발용 설정.
-# Dancer가 실행되고 난 뒤에, ./lib/MyApp.pm이 변경되어도 이미 메모리에 올라간 내용에 적용되지 않기 때문에 재실행을 해야 한다. 개발 과정에서 번거롭기 때문에 auto_reload 활성화 해놓고 테스트 하는 것도 방법 중 하나.
-# Be aware it's unstable and may cause a memory leak.
-# DO NOT EVER USE THIS FEATURE IN PRODUCTION
-# OR TINY KITTENS SHALL DIE WITH LOTS OF SUFFERING
-#auto_reload: 0
-</pre>
+    #!yaml
+    # This is the main configuration file of your Dancer app
+    # env-related settings should go to environments/$env.yml
+    # all the settings in this file will be loaded at Dancer's startup.
+    
+    # Your application's name
+    appname: "MyDancer"
+    
+    # The default layout to use for your application (located in
+    # views/layouts/main.tt)
+    layout: "main"
+    
+    # when the charset is set to UTF-8 Dancer will handle for you
+    # all the magic of encoding and decoding. You should not care
+    # about unicode within your app when this setting is set (recommended).
+    charset: "UTF-8"
+    
+    #logger : "file"
+    
+    # 템플릿 엔진 변경, start_tag, end_tag를 설정 않으면
+    # <% %>가 기본 값. HTML TAG와 구분하기 어려워지니 되도록이면 활성화 할 것.
+    template: "template_toolkit"
+    engines:
+      template_toolkit:
+        encoding:  'utf8'
+        start_tag: '[%'
+        end_tag:   '%]'
+    
+    # DB 접속 정보 입력.
+    plugins:
+        Database:
+            driver: 'mysql'
+            database: 'DB NAME'
+            username: 'DB USER NAME'
+            password: 'DB PASSWORD'
+    
+    # 개발용 설정.
+    # Dancer가 실행되고 난 뒤에, ./lib/MyApp.pm이 변경되어도 이미 메모리에
+    # 올라간 내용에 적용되지 않기 때문에 재실행을 해야 한다. 개발 과정에서
+    # 번거롭기 때문에 auto_reload 활성화 해놓고 테스트 하는 것도 방법 중 하나.
+    # Be aware it's unstable and may cause a memory leak.
+    # DO NOT EVER USE THIS FEATURE IN PRODUCTION
+    # OR TINY KITTENS SHALL DIE WITH LOTS OF SUFFERING
+    #auto_reload: 0
 
 ### 템플릿 엔진 : Template Toolkit
 [Template Toolkit](http://www.template-toolkit.org/) 사이트를 참조하여 문법을 공부합시다. 기본적으로 Perl과 큰 차이가 없어서 금방 쓸 수 있어요.
@@ -337,12 +334,11 @@ plugins:
 ### auto_reload
 Dancer가 실행 되고 난 뒤에 변경사항은 바로 적용이 되지 않기 때문에, 서버 내렸다가 실행하는 과정이 필요하다. 그러나 auto_reload 설정을 활성화하면 변경사항이 바로 적용되어 개발하기 편합니다.
 
-config.yml에서 auto_reload: 1 설정과 ./lib/MyApp.pm 모듈 로딩 부분에 아래 설정을 해줍니다.
-<pre lagnguage="perl">
-use Module::Refresh;
-use Clone;
-</pre>
+config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부분에 아래 설정을 해줍니다.
 
+    #!perl
+    use Module::Refresh;
+    use Clone;
 
 관련 참고 문서 
 
@@ -369,42 +365,41 @@ use Clone;
 
 
 ## DB 테이블 모양
-<pre language="sql">
-mysql> describe rgr201210;
-+-------+----------+------+-----+---------+----------------+
-| Field | Type     | Null | Key | Default | Extra          |
-+-------+----------+------+-----+---------+----------------+
-| id    | int(11)  | NO   | PRI | NULL    | auto_increment |
-| no    | int(11)  | NO   |     | NULL    |                |
-| name  | char(37) | NO   |     | NULL    |                |
-+-------+----------+------+-----+---------+----------------+
 
-mysql> describe md5_list;
-+----------+----------+------+-----+---------+----------------+
-| Field    | Type     | Null | Key | Default | Extra          |
-+----------+----------+------+-----+---------+----------------+
-| id       | int(11)  | NO   | PRI | NULL    | auto_increment |
-| saveTime | datetime | NO   |     | NULL    |                |
-| name     | char(37) | NO   |     | NULL    |                |
-+----------+----------+------+-----+---------+----------------+
-</pre>
+    #!plain
+    mysql> describe rgr201210;
+    +-------+----------+------+-----+---------+----------------+
+    | Field | Type     | Null | Key | Default | Extra          |
+    +-------+----------+------+-----+---------+----------------+
+    | id    | int(11)  | NO   | PRI | NULL    | auto_increment |
+    | no    | int(11)  | NO   |     | NULL    |                |
+    | name  | char(37) | NO   |     | NULL    |                |
+    +-------+----------+------+-----+---------+----------------+
+    
+    mysql> describe md5_list;
+    +----------+----------+------+-----+---------+----------------+
+    | Field    | Type     | Null | Key | Default | Extra          |
+    +----------+----------+------+-----+---------+----------------+
+    | id       | int(11)  | NO   | PRI | NULL    | auto_increment |
+    | saveTime | datetime | NO   |     | NULL    |                |
+    | name     | char(37) | NO   |     | NULL    |                |
+    +----------+----------+------+-----+---------+----------------+
 
 **삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지**의 스크립트에서 이미지 파일를 수집하여 해당 파일의 이름을 입력한다.
 
-<pre language="perl">
- #sql 작성
-                my $sql_time = time_p();
-                my $sql = "insert into md5_list ( saveTime, name ) values ( \"$sql_time\", \"$file_name\")";
-                my $sth = $dbh-&gt;prepare($sql);
-                $sth->execute or die "$DBI::errstr\n";
-</pre>
+    #!perl
+    # sql 작성
+    my $sql_time = time_p();
+    my $sql = "insert into md5_list ( saveTime, name ) values ( \"$sql_time\", \"$file_name\")";
+    my $sth = $dbh-&gt;prepare($sql);
+    $sth->execute or die "$DBI::errstr\n";
 
 입력된 데이터는 다음과 같습니다(아래 스크린샷의 프로그램은 [App::AltSQL](https://www.metacpan.org/module/App::AltSQL)입니다.)
 ![md5_list 일부](http://cfile8.uf.tistory.com/image/160A3C3F50B2FB6825F52A)
 
-<pre language="sql">
-select name from md5_list order by id desc limig 0, 10;
-</pre>
+    #!plain
+    select name from md5_list order by id desc limig 0, 10;
+
 위 SQL문을 실행해서, name 배열을 얻어온 다음, 해당 배열을 이미지가 실제 저장된 경로를 지정해 HTML TAG IMG를 씌우면 될거 같네요!!
 
 ## Perl DBI 사용하기
@@ -417,34 +412,32 @@ DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다. �
 
 * 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
 
-<pre language="perl">
-#!/usr/bin/perl
-use strict;
-use warnings;
-use DBI;	# perl에서 DB 사용을 위한 모듈입니다. DBD::MySQL도 설치 되어야 함.
-
-# mysql 접속 과정 리눅스 커맨드라인에서 아래 명령어 실행한 것과 같으려나요.
-# mysql -uDBUSER -pDBPASSWORD DBNAME
-my $dbh = DBI->connect(
-    'dbi:mysql:database=DBNAME',
-    'DBUSER',
-    'DBPASSWORD',
-    { RaiseError => 1, PrintError => 0, AutoCommit => 0 },
-);
-
-
-# 이제 MySQL 접속이 됐습니다. 쿼리를 보내봅시다.
-# 아래 내용은 MySQL 접속 후
-# select * from rg_img;
-# 한 것과 같습니다.
-my $sql = "select * from rg_img";
-my $sth = $dbh->prepare($sql);
-$sth->execute or die "$DBI::errstr\n";
-while ( my @row = $sth->fetchrow_array ) {
-    print "@row\n";
-}
-$dbh->disconnect();
-</pre>
+    #!perl
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use DBI;	# perl에서 DB 사용을 위한 모듈입니다. DBD::MySQL도 설치 되어야 함.
+    
+    # mysql 접속 과정 리눅스 커맨드라인에서 아래 명령어 실행한 것과 같으려나요.
+    # mysql -uDBUSER -pDBPASSWORD DBNAME
+    my $dbh = DBI->connect(
+        'dbi:mysql:database=DBNAME',
+        'DBUSER',
+        'DBPASSWORD',
+        { RaiseError => 1, PrintError => 0, AutoCommit => 0 },
+    );
+    
+    # 이제 MySQL 접속이 됐습니다. 쿼리를 보내봅시다.
+    # 아래 내용은 MySQL 접속 후
+    # select * from rg_img;
+    # 한 것과 같습니다.
+    my $sql = "select * from rg_img";
+    my $sth = $dbh->prepare($sql);
+    $sth->execute or die "$DBI::errstr\n";
+    while ( my @row = $sth->fetchrow_array ) {
+        print "@row\n";
+    }
+    $dbh->disconnect();
 
 이 테스트가 되면 Perl에서 MySQL 접속해서 정보 가져오기가 가능합니다.
 
@@ -454,127 +447,124 @@ $dbh->disconnect();
 
 편의를 위해 사이트별로 디렉토리를 만들고, 그리고 수많은 파일을 적절히 저장하기 위해 md5를 이용해 파일명을 변경, 앞의 두 글자를 따서 디렉토리 00 ~ FF개를 생성하고 -> 거기에 맞는 위치에 파일을 저장 중입니다.
 
-<pre language="bash">
-Dancer Root/public/rgr/
-.
-|____00
-| |____00e805967b64bb85c892eca3ab4bb6c1.jpg
-| |____00cda059e36a6ba121976bfa6010aa0c.jpg
-| |____0016d5dc919de8c2b176b84745f079c9.jpg
-|      ………중략………..
-|____82
-| |____82e805967b64bb85c892eca3ab4bb6c1.jpg
-| |____82cda059e36a6ba121976bfa6010aa0c.jpg
-| |____8216d5dc919de8c2b176b84745f079c9.jpg
-|      ………중략………..
-|____cf
-| |____cfef5f425c83f9c398f76f8299d126c5.jpg
-| |____cff5bc5665f9cdbb328189a9b4e48af7.jpg
-| |____cf3c3bcf519822ded8ec0b8d1f129a52.jpg
-|____ff
-  |____ff3c3bcf519822ded8ec0b8d1f129a52.jpg
-</pre>
+    #!plain
+    Dancer Root/public/rgr/
+    .
+    |____00
+    | |____00e805967b64bb85c892eca3ab4bb6c1.jpg
+    | |____00cda059e36a6ba121976bfa6010aa0c.jpg
+    | |____0016d5dc919de8c2b176b84745f079c9.jpg
+    |      ………중략………..
+    |____82
+    | |____82e805967b64bb85c892eca3ab4bb6c1.jpg
+    | |____82cda059e36a6ba121976bfa6010aa0c.jpg
+    | |____8216d5dc919de8c2b176b84745f079c9.jpg
+    |      ………중략………..
+    |____cf
+    | |____cfef5f425c83f9c398f76f8299d126c5.jpg
+    | |____cff5bc5665f9cdbb328189a9b4e48af7.jpg
+    | |____cf3c3bcf519822ded8ec0b8d1f129a52.jpg
+    |____ff
+      |____ff3c3bcf519822ded8ec0b8d1f129a52.jpg
 
 
 ## 이제 달려볼까?
 필요한건 어느정도 갖춘거 같습니다. 소스에 곁들인 주석과 함께 봅시다.
 
 ### MyApp 소스 일부
-<pre lang="perl">
-package MyDancer;
-use 5.012;
-use Dancer ':syntax';
-use Dancer::Plugin::Database;
-use Data::Dump;                 # 디버그용으로 넣어둔 모듈입니다.
-our $VERSION = '0.1';
 
-
-# 기본으로 있는 페이지. Dancer 대문이네요. 그냥 두기로 합니다.
-get '/' => sub {
-	template 'index';
-};
-
-
-# URL 끝에 '/'가 붙어도 다른 경로로 인식합니다. 없는 경로라고 에러가 나오니까 리다이렉트를 하나 만들었습니다.
-get '/:site/' => sub {
-	my $site = params->{site};
-	redirect "/$site";
-};
-
-# 가장 기본 페이지.
-get '/:site' => sub {
-	my $site = params->{site};
-	my $start = 0;
-	my $view = 30;
-
-    # $site에 해당하는 테이블을 읽어올 수 있도록 만든 해쉬
-	my %db = (
-		"rgr" => "md5_list",
-		"bi" => "md5_bi",
-	);
-
-    # $site명이 엉뚱한거라 테이블이 없는 경우 첫 페이지로 보냄
-	unless ( defined $db{$site} ) {
-		redirect "/";
-		return;
-	}
-
-    # 저장된 이미지 전체 갯수를 구하기 위한 부분, 이게 있어야 $view 크기를 제한할 수 있고(이미지는 1000개인데 $view는 2000을 요청할 수 있기 때문), 끝 페이지 링크 생성할 수 있다.
-	my $sql = "SELECT id FROM $db{$site} WHERE id order by id DESC LIMIT 0, 1";
-	my @end = @{database->selectcol_arrayref($sql)};
-	my $end_page = $end[0];
-
-    # 0에서 30까지 그림 파일 이름 얻어오기. $start와 $view를 이용.
-	$sql = "SELECT name FROM $db{$site} WHERE id order by id DESC LIMIT $start, $view";
-	my @ary = @{database->selectcol_arrayref($sql)};
-	my @nary; # 실제 경로 저장을 위해 만든 배열
-	foreach my $tmp ( @ary ) {
-		$tmp =~ s,(..)(.*),$1/$1$2,g;     # name의 앞부분 두글자 떼다 디렉토리로 이용
-		push @nary, $tmp;
-	}
-	$start += $view;
-	
-	# 템플릿 view/result.tt 로 변수를 넘깁니다. 
-	template 'result', {
-		images => [@nary],
-		start => $start,
-		img_num => $view,
-		end_page => $end_page,
-		site => $site,
-	};
-};
-</pre>
+    #!perl
+    package MyDancer;
+    use 5.012;
+    use Dancer ':syntax';
+    use Dancer::Plugin::Database;
+    use Data::Dump;                 # 디버그용으로 넣어둔 모듈입니다.
+    our $VERSION = '0.1';
+    
+    # 기본으로 있는 페이지. Dancer 대문이네요. 그냥 두기로 합니다.
+    get '/' => sub {
+    	template 'index';
+    };
+    
+    # URL 끝에 '/'가 붙어도 다른 경로로 인식합니다. 없는 경로라고 에러가 나오니까 리다이렉트를 하나 만들었습니다.
+    get '/:site/' => sub {
+    	my $site = params->{site};
+    	redirect "/$site";
+    };
+    
+    # 가장 기본 페이지.
+    get '/:site' => sub {
+    	my $site = params->{site};
+    	my $start = 0;
+    	my $view = 30;
+    
+        # $site에 해당하는 테이블을 읽어올 수 있도록 만든 해쉬
+    	my %db = (
+    		"rgr" => "md5_list",
+    		"bi" => "md5_bi",
+    	);
+    
+        # $site명이 엉뚱한거라 테이블이 없는 경우 첫 페이지로 보냄
+    	unless ( defined $db{$site} ) {
+    		redirect "/";
+    		return;
+    	}
+    
+        # 저장된 이미지 전체 갯수를 구하기 위한 부분, 이게 있어야 $view 크기를 제한할 수 있고(이미지는 1000개인데 $view는 2000을 요청할 수     있기 때문), 끝 페이지 링크 생성할 수 있다.
+    	my $sql = "SELECT id FROM $db{$site} WHERE id order by id DESC LIMIT 0, 1";
+    	my @end = @{database->selectcol_arrayref($sql)};
+    	my $end_page = $end[0];
+    
+        # 0에서 30까지 그림 파일 이름 얻어오기. $start와 $view를 이용.
+    	$sql = "SELECT name FROM $db{$site} WHERE id order by id DESC LIMIT $start, $view";
+    	my @ary = @{database->selectcol_arrayref($sql)};
+    	my @nary; # 실제 경로 저장을 위해 만든 배열
+    	foreach my $tmp ( @ary ) {
+    		$tmp =~ s,(..)(.*),$1/$1$2,g;     # name의 앞부분 두글자 떼다 디렉토리로 이용
+    		push @nary, $tmp;
+    	}
+    	$start += $view;
+    	
+    	# 템플릿 view/result.tt 로 변수를 넘깁니다. 
+    	template 'result', {
+    		images => [@nary],
+    		start => $start,
+    		img_num => $view,
+    		end_page => $end_page,
+    		site => $site,
+    	};
+    };
 
 ### view : result.tt 내용
-<pre language="html">
-&lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
-[% IF (start - img_num * 2) &gt; 0 %]
-&lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
-[% END %]
-[% start - img_num %]
-&lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
-&lt;ol&gt;
-	[% FOREACH file IN images %]
-	&lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
-	[% END %]
-&lt;/ol&gt;
-&lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
-[% IF (start - img_num * 2) &gt; 0 %]
-&lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
-[% END %]
-[% start - img_num %]
-&lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
-&lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
-</pre>
+
+    #!html
+    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+    [% IF (start - img_num * 2) &gt; 0 %]
+    &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+    [% END %]
+    [% start - img_num %]
+    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
+    &lt;ol&gt;
+    	[% FOREACH file IN images %]
+    	&lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
+    	[% END %]
+    &lt;/ol&gt;
+    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt; 
+    [% IF (start - img_num * 2) &gt; 0 %]
+    &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+    [% END %]
+    [% start - img_num %]
+    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
+    &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
 
 ### 결과
 ![썸네일](http://cfile10.uf.tistory.com/image/0169624050B66F5C269C9F)
@@ -597,21 +587,20 @@ DB 테이블 모양에서 나왔던 rgr201210 이 원본글 정보를 갖고 있
 * 원본 URL : http://rgrong.kr/bbs/view.php?id=rgr201210& .. 중략 .. &**no=180638**
 * 위의 no에 해당하는 숫자를 DB에 저장했습니다.
 
-<pre language="sql">
-mysql> describe rgr201210;
-+-------+----------+------+-----+---------+----------------+
-| Field | Type     | Null | Key | Default | Extra          |
-+-------+----------+------+-----+---------+----------------+
-| id    | int(11)  | NO   | PRI | NULL    | auto_increment |
-| no    | int(11)  | NO   |     | NULL    |                |
-| name  | char(37) | NO   |     | NULL    |                |
-+-------+----------+------+-----+---------+----------------+
-</pre>
+    #!plain
+    mysql> describe rgr201210;
+    +-------+----------+------+-----+---------+----------------+
+    | Field | Type     | Null | Key | Default | Extra          |
+    +-------+----------+------+-----+---------+----------------+
+    | id    | int(11)  | NO   | PRI | NULL    | auto_increment |
+    | no    | int(11)  | NO   |     | NULL    |                |
+    | name  | char(37) | NO   |     | NULL    |                |
+    +-------+----------+------+-----+---------+----------------+
 
 no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형을 만들어 본다면 해쉬 안에 배열이거나, 배열 안에 해쉬가 들어가겠네요.
 DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 기능이 없는듯 하여, 한줄씩 배열에 넣는 방법으로 처리했습니다. DBI 문서를 보고 각자 데이터 구조를 잘 설계해서 만들어봅시다.
 
-<pre language="perl">
+    #!perl
     my @ary;
     my $count = 0;
     while ( $count < $view )  {
@@ -625,7 +614,6 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
         $start++;
         $count++;
     }
-</pre>
 
 쿼리를 이미지 불러오는 횟수만큼 주는데 …뭔가 잘못 하고 있는 기분이 듭니다.
 더 좋은 방법 있으면 알려주세요.;;;;
