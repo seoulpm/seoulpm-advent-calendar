@@ -1,3 +1,9 @@
+Title: eXternal Subroutine - XS !!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: hazzling
+
 ## 저자
 hazzling
 
