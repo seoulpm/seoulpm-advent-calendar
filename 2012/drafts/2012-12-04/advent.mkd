@@ -1,14 +1,21 @@
-00날 : 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
-===========================================
+Title: 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: JellyPooo
 
 ## 저자
+
 @JellyPooo, 시스템 관리자
 
+
 ## 목표
+
 * 데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여주기.
 * 아래 네 줄 요약을 위한 배경 지식과 설정 방법을 기술했습니다.
 
 ### 네 줄 요약
+
 <pre language="bash">
 cpanm Dancer DBI DBD::mysql			# 관련 모듈 설치
 dancer -a Myapp						# 뼈대 만들기
@@ -16,14 +23,18 @@ cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
 ./bin/app.pl						# 웹앱 실행, 브라우저로 접속
 </pre>
 
+
 ## 개요
+
 2012년 1월부터 진행한 [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html)를 통해 짤방(그림 파일)을 20여만개 모았습니다.
 
 특정 사이트에 접속해서 그림파일을 받고 -&gt; 새로 받은 파일의 파일명을 배열에 넣어 두었다가 -&gt; 해당 배열에 IMG 태그를 씌워 HTML 생성 -&gt; Apache 데몬을 통해 웹으로 그림 파일 보기 까지 구현 되어 있습니다.
 
 이정도면 괜찮지 않나... 하고 수 개월간 쓰다 보니 불편한 점이 하나, 둘 눈에 띕니다.
 
+
 ### HTML 파일이 너무 많아졌다.
+
 ![이미지 수집하며 같이 생성된 HTML](http://cfile23.uf.tistory.com/image/1257C13B50B2D1CD261003)
 ![소스는 이렇게 생겼다](http://cfile5.uf.tistory.com/image/12583D3B50B2D1CD22FAFF)
 
@@ -34,11 +45,12 @@ cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
 1. HTML 파일 간 연결이 안 되어있습니다. 다음 페이지로 넘어가는 것은 주소창에 파일명을 직접 입력하는 수밖에 없고요, 전체 파일에 대한 링크를 만들어서 덧붙이는 방법을 써봤는데 ...10,000여개에 덧붙이는 것은 시간이 꽤 걸립니다.
 
 
-자주 쓰는 파일 정보를 데이터 베이스(이하 DB)에 보관하다가, 파일 정보를 '틀'에 넣어 보여주면 문제를 해결할 수 있을거 같습니다. 마침 [여섯째 날: 초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) 이런 내용도 있네요. DB만 접목하면 쉽게 할 수 있을거 같습니다.
+자주 쓰는 파일 정보를 데이터 베이스(이하 DB)에 보관하다가, 파일 정보를 '틀'에 넣어 보여주면 문제를 해결할 수 있을거 같습니다. 마침 [여섯째 날: 초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) by am0c 이런 내용도 있네요. 다만 am0c 님의 기사에서 DB를 제게 낯선 redis를 사용했습니다. 익숙한 MySQL로 바꿔 적용하면 쉽게 할 수 있을거 같네요.
 
-DB에 파일명을 저장해 두었다가, 실제 파일이 있는 경로를 붙이고 앞뒤로 &lt;IMG&gt; 태그를 붙인 내용을 브라우저로 보내면 이미지 출력용 HTML 페이지를 만들 수 있겠네요.
+DB는 MySQL로, 테이블에 파일명을 저장해 두었다가, 실제 파일이 있는 경로를 붙이고 앞뒤로 &lt;IMG&gt; 태그를 붙인 내용을 브라우저로 보내면 이미지 출력용 HTML 페이지를 만들 수 있겠네요.
 
 Let's Dance!!
+
 
 ## 개발 환경 및 전제조건
 ### 개발 환경
@@ -46,11 +58,14 @@ Let's Dance!!
 
 [CentOS](http://centos.org/) : 관리자 권한 없음,  MySQL 설치/실행 중.
 
+[OS X](http://www.apple.com/kr/osx/) : 관리자 권한 있음, [Homebrew](http://mxcl.github.com/homebrew/)와 [Perlbrew](http://perlbrew.pl/) 사용.
+
+
 ### 전제조건
 #### 참고문서
 이하의 문서를 미리 읽어두시기 바랍니다.
 
-1. [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) : 네이버 카페, 가입 필요.
+1. [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) : 네이버 카페, 가입 필요. 카페에 공개한 버전이 [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html) 보다 최신 버전입니다.
 1. [초소형 프레임워크와 함께 춤을 by am0c](http://advent.perl.kr/2011/2011-12-06.html) : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
 1. [웹툰을 한 눈에 내 만화 프로젝트 Manaba by rumidier](http://advent.perl.kr/2011/2011-12-12.html) : 역시 Dancer를 이용한 웹 앱입니다.
 1. [Minimal Perl Web App for Your Minimal Life by keedi](http://slide.keedi.pe.kr/s/20121220-minimal-perl-webapp#/) : Dancer만큼 가볍고 빠른 웹 프레임워크 Mojolicious에 대한 소개 슬라이드
@@ -60,6 +75,10 @@ Let's Dance!!
 1. Apache, lighttpd, nginx 등 웹 데몬에 대한 이해
 1. MySQL DB, Table 생성 및 데이터 insert, select 가능 할 것(join 등 복잡한건 안 씁니다).
 1. Perl 환경 설정 및 모듈 설치에 대한 이해
+
+
+### Dancer Root
+1. ***dancer -a Myapp*** 를 실행해 생성된 디렉토리를 말합니다. 해당 명령 실행된 위치에 Myapp 디렉토리가 생깁니다.
 
 
 ## [Dancer](https://www.metacpan.org/module/Dancer)가 뭐야?
@@ -94,13 +113,16 @@ Apache, lighttpd, nginx 까진 알겠는데, 웹 프레임 워크는 대체 뭔�
     Running on lighttpd (CGI)
     Running on lighttpd (FastCGI)
 
-크게 cgi-bin으로 실행, 단독 실행으로 나눌 수 있겠네요. 여기선 단독 실행을 기준으로 설명합니다. ...다른건 모를 뿐더러 복잡해서요.
+크게 cgi-bin으로 실행, 단독 실행으로 나눌 수 있겠네요. 여기선 단독 실행을 기준으로 설명합니다. ...그 외 실행방법에 대해 간략하게 설명하고 넘어가자면 - 대규모 시스템에서 부하 분산(로드 밸런싱)을 위한 실행, 여러개의 웹 앱 실행(TCP 포트 한 개로 여러개의 웹 앱 실행) 방법인데, 이건 Dancer 초보자가 다룰 내용이 아닌거 같습니다. 못 본채 하죠.
 
 
 가장 간단하게 테스트 할 때는 
 
 1. Dancer Root/bin/app.pl 실행 하면 끝. 3000번 포트로 잘 열리는지 로그 확인.
-2. 브라우저에서 http://localhost:3000/
+    1. 포트 변경 옵션이 있습니다. ***Dancer Root/bin/app.pl --help*** 로 확인 가능
+    1. --port=XXXX :     This lets you change the port number to use when running the process. By default, the port 3000 will be used.
+    1. ***Dancer Root/bin/app.pl --port=9999*** 이렇게 하면 TCP 9999포트로 실행
+1. 브라우저에서 http://localhost:3000/
 
 접속 되는지 확인해보면 됩니다.
 
@@ -399,7 +421,7 @@ mysql> describe md5_list;
 +----------+----------+------+-----+---------+----------------+
 </pre>
 
-**삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지**의 스크립트에서 이미지 파일를 수집하여 해당 파일의 이름을 입력한다.
+**[삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397)**의 스크립트에서 이미지 파일를 수집하여 해당 파일의 이름을 입력한다.
 
 <pre language="perl">
  #sql 작성
@@ -625,12 +647,12 @@ mysql> describe rgr201210;
 
 no와 name에서 각각 30개씩 값을 가져오고 싶은데, 펄로 자료형을 만들어 본다면 해쉬 안에 배열이거나, 배열 안에 해쉬가 들어가겠네요.
 
-DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 기능이 없는듯 하여, 한줄씩 배열에 넣는 방법으로 처리했습니다. DBI 문서를 보고 각자 데이터 구조를 잘 설계해서 만들어봅시다.
+데이터를 복수의 컬럼으로부터 Perl 해쉬 - 배열로 한 번에 가져오는 기능이 DBI에 없는듯 하여, 반복문을 이용해 한줄씩 배열에 넣는 방법으로 처리했습니다. DBI 문서를 보고 각자 데이터 구조를 잘 설계해서 만들어봅시다.
 
 <pre language="perl">
     my @ary;
     my $count = 0;
-    while ( $count < $view )  {
+    while ( $count < $view )  {                  
         my $sql = "select * from $db{$site} order by id desc limit $start, 1";
         my $sth = database->prepare( $sql );        $sth->execute();
         my $hr = $sth->fetchrow_hashref();
@@ -648,11 +670,11 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
 더 좋은 방법 있으면 알려주세요.;;;;
 
 ## 맺음말
-의욕만큼의 실력이 없어 부실한 문서가 되고 말았습니다. 보고 따라만 하면 웹 서비스 하나가 완성되는 문서를 만들고자 하였으나, 각각 다른 환경에 대한 구성을 설명할 실력이 안 되네요.
+직접 Dancer와 MySQL을 다뤄보며 궁금했던 부분에 대해 정리해, 비슷한 서비스를 필요로 하는 초보 분들이 쉽게 따라할 수 있는 기사를 작성해 보고 따라만 하면 웹 서비스 하나가 완성되는 문서를 만들고자 하였으나, 의욕만큼의 실력이 없어 부실한 문서가 되고 말았습니다. 웹 앱은 다뤄야 할 주제가 너무 많고, 각각 다른 환경에 대한 구성 역시 달라지는데 이를 설명할 실력이 안 되네요.
 
-이 기사의 의의는 1년 전만 해도 Perl에 대해 아는 것이 거의 없던 초보 JellyPooo가 웹 프레임워크, DB등을 주물럭 거리면서 웹 서비스를 만들어 냈다는데 두겠습니다.
+이 기사의 의의는 1년 전만 해도 Perl에 대해 아는 것이 거의 없던 초보 JellyPooo가 웹 프레임워크, DB등을 주물럭 거리면서 웹 서비스를 만들어 냈다는데 두겠습니다. 그만큼 Perl과 관련 모듈은 쓰기 편하고 성능도 만족스럽습니다.
 
-문서에서 설명되지 않거나 부실한 부분은 해 보시면서 검색과 수많은 삽질로 매워주시기 바라며, 다소 무책임한 이 기사를 마칩니다.
+문서에서 설명되지 않거나 부실한 부분은 해 보시면서 검색과 수많은 삽질로 매워주시기 바라며, 다소 무책임한 이 기사를 마칩니다. 궁금하신 부분이나 기사의 오류 신고를 카페나 이 기사에 댓글로 남겨주시면 최대한 답변 및 수정하도록 하겠습니다.
 
 문서 작성할 때 PSGI/Plack에 대한 이해를 못하고 있었는데, 이에 답해주신 yongbin 님, luz1una_hc 님께 감사 말씀 드립니다.
 
@@ -662,8 +684,11 @@ DBI에 복수의 컬럼에서 데이터를 Perl 해쉬 - 배열로 가져오는 
 
 ### 크롤링 관련
 * [펄을 이용한 그림파일 긁어오기](http://lotus.perl.kr/2012/01.html) by @JellyPooo
-* [나만의 E-Book으로 따뜻한 크리스마스를](http://advent.perl.kr/2010/2010-12-06.html) by @eeyees
-* [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) by @JellyPooo : 네이버 카페, 가입 필요.
+    * 위 기사 하단에 스포츠 신문 연재만화 긁어오기는 현재 동작하지 않습니다. JavaScript 등으로 랜덤 변수를 생성해 크롤링을 차단했더군요.
+    * [삽질기 - 이미지 긁어와서 저장하기 - 썸네일 생성까지](http://cafe.naver.com/perlstudy/1397) by @JellyPooo : 네이버 카페, 가입 필요. 이쪽이 최신버전.
+* [나만의 E-Book으로 따뜻한 크리스마스를](http://advent.perl.kr/2010/2010-12-06.html) by @eeyees : 제가 만든 프로그램의 원형입니다. 필요한 기능을 추가하다보니 이 지경에 이르렀네요. @eeyees++
+    * 관련 발표 : [나의 Perl 투신기: 보다 나은 Perl 개미지옥을 위하여](http://www.slideshare.net/JellyPo/perl-perl-14826332) by @JellyPooo
+
 
 ### 웹 프레임워크 관련 : Dancer, Mojolicious, PSGI, uWSGI
 * [초소형 프레임워크와 함께 춤을](http://advent.perl.kr/2011/2011-12-06.html) by @am0c : 이번 기사에서 다룰 내용이 대부분 있습니다. 차이점이라면 DB를 MySQL가 아닌 redis를 사용 했다는 점?
