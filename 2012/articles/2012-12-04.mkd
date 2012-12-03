@@ -11,18 +11,14 @@ Author: JellyPooo
 
 ## 목표
 
-* 데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여주기.
-* 아래 네 줄 요약을 위한 배경 지식과 설정 방법을 기술했습니다.
+데이터베이스에 저장된 정보를 가공해 웹 페이지에서 보여줍니다.
+아래 네 줄로 요약된 과정을 위한 배경 지식과 설정 방법을 기술했습니다.
 
-### 네 줄 요약
-
-<pre language="bash">
-cpanm Dancer DBI DBD::mysql			# 관련 모듈 설치
-dancer -a Myapp						# 뼈대 만들기
-cd Myapp; vim lib/Myapp.pm			# Myapp.pm에 경로별 서브루틴 작성
-./bin/app.pl						# 웹앱 실행, 브라우저로 접속
-</pre>
-
+    #!bash
+    $ cpanm Dancer DBI DBD::mysql  # 관련 모듈 설치
+    $ dancer -a Myapp              # 뼈대 만들기
+    $ cd Myapp; vim lib/Myapp.pm   # Myapp.pm에 경로별 서브루틴 작성
+    $ ./bin/app.pl                 # 웹앱 실행, 브라우저로 접속
 
 ## 개요
 
@@ -421,9 +417,8 @@ Perl 에서 MySQL 접속해서 결과를 어떻게 받아오면 될까요?
 `fetchrow_hashref`, `selectcol_arrayref` 같은걸 쓰면 결과를 해쉬 레퍼런스나 배열 레퍼런스로 받아올 수 있는 모양입니다.
 
 ### Perl에서 DBI(MySQL) 사용하기 예시
-DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다. 아래의 참고문서를 확인 바랍니다.
-
-* 옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)
+DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다.
+옛날 글이지만 이해하기 쉬운 [mysql 튜토리얼](http://database.sarang.net/database/mysql/tutorial/MySQL_Tutorial-KLDP)를 참고하세요.
 
     #!perl
     #!/usr/bin/perl
@@ -549,7 +544,7 @@ DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다. �
 
 ### view : result.tt 내용
 
-    #!html
+    #!plain
     &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt;
     [% IF (start - img_num * 2) &gt; 0 %]
     &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
@@ -595,10 +590,12 @@ _TIMTOWTDI(There is more than one way to do it_, 무언가를 하는 방법은 (
 
 ### 원본글로 링크
 이미지를 수집한 원본 글로 링크를 걸어주는 기능도 추가했는데, 이건 파일명만 넘겨줘선 안되고, 원본 URL을 만들 수 있는 정보도 같이 넘겨줘야 합니다.
-DB 테이블 모양에서 나왔던 rgr201210 이 원본글 정보를 갖고 있습니다. 'no'인데요,
+DB 테이블 모양에서 나왔던 rgr201210이 원본글 정보를 갖고 있습니다. 'no'인데요,
 
-* 원본 URL : http://rgrong.kr/bbs/view.php?id=rgr201210& .. 중략 .. &**no=180638**
-* 위의 no에 해당하는 숫자를 DB에 저장했습니다.
+    #!plain
+    http://rgrong.kr/bbs/view.php?id=rgr201210& .. 중략 .. &**no=180638**
+
+위의 `no`에 해당하는 숫자를 DB에 저장했습니다.
 
     #!plain
     mysql> describe rgr201210;
