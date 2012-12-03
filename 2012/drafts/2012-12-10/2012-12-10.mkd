@@ -11,9 +11,11 @@ Author:   laen0k
 
 ## 시작하며
 
-여러분들중에도 웹상에 떠도는 데이타를 내 수중에 넣고 요리해 보고 싶은 분들이 계실 것입니다.
+여러분들 중에도 웹상에 떠도는 데이타를 내 수중에 넣고 요리해 보고 싶은 분들이 계실 것입니다.
 
-저의 경우에는 최근 심취해 있는 대항해시대의 각 함선에 대한 레벨별 정보를 뽑아 그리드 형식으로 출력하는 프로그램을 한번 만들어보았습니다. 이러한 작업은 CPAN에 있는 다양하고 유용한 여러 모듈들을 지니고 있는 Perl과 함께라면 아주 간단합니다. 저같은 초보도 잘 사용하기만 하면 뚝딱 만들어낼수 있을정도니까요~
+제 경우, 최근 심취해 있는 대항해시대의 각 함선에 대한 레벨별 정보를 뽑아 그리드 형식으로 출력하는 프로그램을 한 번 만들어보았습니다.
+
+이러한 작업은 CPAN에 있는 다양하고 유용한 여러 모듈들을 지니고 있는 Perl과 함께라면 아주 간단합니다. 저같은 초보도 잘 사용하기만 하면 뚝딱 만들어 낼수 있을 정도니까요~
 
 그럼 시작해 볼까요?
 
@@ -26,7 +28,9 @@ Author:   laen0k
 - [Wx][wx] 모듈 - 크로스 플랫폼 GUI 어플 개발 툴킷으로 윈도, 맥, 리눅스 등의 OS 지원
 - [wxPerl::Styles][wxperl-styles] - Wx 그리드 셀 내부 문자를 정렬시켜주기 위한 상수처리를 포함
 
-Wx모듈같은 경우에는 CPAN대신 PPM으로 바이너리 파일들을 받아옵시다.(strawberry 5.14.2.1 버전은 상위 버전의 PPM으로 설치해주셔야 ppd를 제대로 읽어오는데 [Installing PDL on Windows][pdl_on_windows] 하단 Installing PPM을 참고하시기 바랍니다)
+Wx모듈같은 경우에는 CPAN대신 PPM으로 바이너리 파일들을 받아옵시다.
+
+(strawberry 5.14.2.1 버전은 상위 버전의 PPM으로 설치해주셔야 ppd를 제대로 읽어오는데 [Installing PDL on Windows][pdl_on_windows] 하단 Installing PPM을 참고하시기 바랍니다)
 
 
 ### ppm install 
@@ -56,11 +60,11 @@ Wx모듈같은 경우에는 CPAN대신 PPM으로 바이너리 파일들을 받�
 	|--main.pl
 
 ### lib\Ship.pm - 함선 정보를 담당하는 모듈 작성
-perl에서는 class가 package 입니다. new() 생성자는 bless로 내부에서 객체를 생성하고 생성한 객체를 반환해주며 그 사이에 `_init` 함수를 실행하게 됩니다.
+perl에서는 class가 package 입니다. `new()` 생성자는 bless로 내부에서 객체를 생성하고 생성한 객체를 반환해주며 그 사이에 `_init` 함수를 실행하게 됩니다.
 
  상단에 보이는 utf8 프라그마는 코드문서가 유니코드 형식일때 사용하며 코드문서 내에서 사용하는 유니코드(해쉬키값 한글 사용)를 perl 내부유니코드 포맷으로 변경해주는 역할을 합니다.
 
-이러한 처리가 없게되면 wxPerl에서 문자를 출력시에 글자가 깨지게 되는데 use Encode qw/decode/ 프라그마의 decode 함수 또한 LWP::UserAgent로 받아온 html 문서를 동일한 포맷으로 변경하여 perl 내부에서의 유니코드 처리를 원활하게 해줍니다.
+이러한 처리가 없게되면 wxPerl에서 문자를 출력시에 글자가 깨지게 되는데 `use Encode qw/decode/` 프라그마의 decode 함수 또한 `LWP::UserAgent`로 받아온 html 문서를 동일한 포맷으로 변경하여 perl 내부에서의 유니코드 처리를 원활하게 해줍니다.
 
 	#!perl
 	package Ship;
@@ -79,9 +83,9 @@ perl에서는 class가 package 입니다. new() 생성자는 bless로 내부에�
 
 객체생성 시점에 [대항해시대 두부][shipinfo]에서 함선 정보를 가져옵니다.
 
-하나씩 설명해보자면 LWP::UserAgent가 get('<URL>')로 해당 페이지의 소스를 긁어오는데 이때 해당 텍스트를 decode해서 perl 내부유니코드포맷으로 변경해주어야 문자열 처리에 문제가 생기지 않습니다.(편집자 주: WWW::Mechanize 최신버전은 자동으로 디코드 합니다.)
+하나씩 설명해보자면 `LWP::UserAgent`가 get('<URL>')로 해당 페이지의 소스를 긁어오는데 이때 해당 텍스트를 decode해서 perl 내부유니코드포맷으로 변경해주어야 문자열 처리에 문제가 생기지 않습니다.(편집자 주: [WWW::Mechanize][www-mechanize]  최신버전은 자동으로 디코드 합니다.)
 
-다음으로 HTML::TreeBuilder가 parse로 구문분석을 하며 분석을 완료한 객체를 look_down함수를 이용해 `$_[0]->attr('속성명')`으로 접근해 정규표현식이 일치하는 태그를 빼옵니다.
+다음으로 `HTML::TreeBuilder`가 parse로 구문분석을 하며 분석을 완료한 객체를 `look_down` 함수를 이용해 `$_[0]->attr('속성명')`으로 접근해 정규표현식이 일치하는 태그를 빼옵니다.
 
 이제 해당 태그의 text를 추출해서 배의 정보를 고스란히 담아주면 완료입니다.
 
@@ -145,7 +149,7 @@ perl에서는 class가 package 입니다. new() 생성자는 bless로 내부에�
 	    return $ship_grid;
 	}    
 
-wxGrid 쪽에서 마우스 이벤트가 발생했을때 grid_list로 다시 재정렬해서 grid에 그려주기 위한 서브루틴입니다.
+wxGrid 쪽에서 마우스 이벤트가 발생했을때 `grid_list`로 다시 재정렬해서 grid에 그려주기 위한 서브루틴입니다.
 
 자세히 보시면 익명함수를 두단계에 걸쳐서 반환하게 되는데 wxGrid모듈안의 마우스 클릭 이벤트가 인자로 가져야 할 익명함수를 반환하고 그 내부에서의 처리를 위해 또 다시 익명함수를 반환하게되는 형태의 클로져입니다.
 
@@ -258,7 +262,7 @@ Ship.pm 모듈보다는 상당히 짧습니다. 모든 기능을 Ship쪽에 다 
 
 그 뒤로 ( window style, window name)까지 가능하지만 이부분은 취향대로 하시면 되고, Wx::Grid의 경우도 비슷한데 title 항목을 제외하게 됩니다.
 
-네 이제 그리드 객체에 함선정보를 인자로 넘겨 $grid에 담고, evt_click을 활성화해두고, $frame->show와 $app->MainLoop를 통해 GUI를 띄워주면 완료입니다.
+네 이제 그리드 객체에 함선정보를 인자로 넘겨 `$grid`에 담고, `evt_click`을 활성화해두고, `$frame->show`와 `$app->MainLoop`를 통해 GUI를 띄워주면 완료입니다.
 
 이제 실행해 보는 일만 남았군요~!
 
@@ -287,16 +291,16 @@ Ship.pm 모듈보다는 상당히 짧습니다. 모든 기능을 Ship쪽에 다 
 	
 	#print Dumper($ship);
 
-덧, 주석처리한 print Dumper($ship) 부분이 있는데 Data::Dumper모듈이 필요하며 해당 레퍼런스의 데이타를 몽땅 보여주게 됩니다. 내가 작성한 배열, 해쉬, 객체가 데이타를 제대로 보유하고 있는지 확인하고 싶다면 필수겠죠?^^
+덧, 주석처리한 `print Dumper($ship)` 부분이 있는데 [Data::Dumper][data-dumper] 모듈이 필요하며 해당 레퍼런스의 데이타를 몽땅 보여주게 됩니다. 내가 작성한 배열, 해쉬, 객체가 데이타를 제대로 보유하고 있는지 확인하고 싶다면 필수겠죠?^^ (편집자 주 : [Data::Dump][data-dump]의 dd() 함수도 디버깅 할 때 좋습니다.)
 
-또한 wxPerl Demo를 시연해보고 싶으시다면 perl\bin\wxperl_demo.bat 파일을 실행해 보시면 됩니다.
+또한 wxPerl Demo를 시연해보고 싶으시다면 `perl\bin\wxperl_demo.bat` 파일을 실행해 보시면 됩니다.
 
 [스크린샷][img-1]
 
 
 ## 정리하며
 
-150줄의 이 짧은 코드는 제가 처음으로 제대로 작성해본 코드입니다. 이자리를 빌어 2011 2012 크리스마스를 달력을 통해 perl의 세계로 인도해주신 perl프로그래머 분들께 감사의 인사를 올립니다.
+150줄의 이 짧은 코드는 제가 처음으로 제대로 작성해본 코드입니다. 이 자리를 빌어 2011, 2012 크리스마스 기념 달력을 통해 Perl의 세계로 인도해주신 Perl 프로그래머 분들께 감사의 인사를 올립니다.
 
 
 ## 참고
@@ -312,7 +316,9 @@ Ship.pm 모듈보다는 상당히 짧습니다. 모든 기능을 Ship쪽에 다 
 [wxperl-styles] : https://metacpan.org/module/wxPerl::Styles
 [pdl_on_windows] : http://sourceforge.net/apps/mediawiki/pdl/index.php?title=Installing_PDL_on_Windows
 [shipinfo] : http://uwodb.ivyro.net/kr/main.php?id=145&chp=1
-
+[www-mechanize] : https://metacpan.org/module/WWW::Mechanize
+[data-dumper] : https://metacpan.org/module/Data::Dumper;
+[data-dump] : https://metacpan.org/module/Data::Dump;
 [img-1] : laen0k-2012-AdvCAL.png
 [ref_1] : https://github.com/laen0k/2012AdvCAL
 [ref_2] : http://docs.wxwidgets.org/2.8.4/wx_classref.html#classref
