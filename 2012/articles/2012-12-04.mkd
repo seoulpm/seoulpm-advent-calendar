@@ -1,4 +1,4 @@
-Title: 초보에게서 초보에게 - Dancer, DBI, DBD::MySQL
+Title: 초심자를 위해 남긴 초보의 비망록 - Dancer, DBI, DBD::MySQL
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
