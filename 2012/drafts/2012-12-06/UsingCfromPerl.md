@@ -5,7 +5,7 @@ Category: Seoul.pm
 Author: hazzling
 
 ## 저자
-[author]
+[@hazzling][author] : 초야에 있던 Perl 고수, XS를 사용 중인 모습이 Perl 커뮤니티에 포착, 섭외 되어 기사 작성하게 되었다.
 
 
 ## 개요
@@ -14,7 +14,7 @@ Author: hazzling
 
 특히, Perl의 경우 강력한 문자열 처리가 가능해서 일단 형태소분석기의 perl wrapper를 만들어둔다면 개발속도 등 여러 측면에서 시너지가 날것으로 예상됩니다.
 
-이와 같은 배경에서, 이 글에서는 Perl의 XS([eXternal Subroutine](http://en.wikipedia.org/wiki/XS_%28Perl%29))를 이용해서 C 라이브러리를 Perl에서 사용하는 방법에 대해 기술합니다. 더불어 FCGI와 연동해서 WEB API를 작성하는 방법에 대해서도 살펴보고자 합니다.
+이와 같은 배경에서, 이 글에서는 Perl의 XS([eXternal Subroutine](XS_PERL))를 이용해서 C 라이브러리를 Perl에서 사용하는 방법에 대해 기술합니다. 더불어 FCGI와 연동해서 WEB API를 작성하는 방법에 대해서도 살펴보고자 합니다.
 
 
 ## Extension 만들기
@@ -60,16 +60,16 @@ Moran이라는 이름으로 extension 파일들이 만들어집니다.
 	# See lib/ExtUtils/MakeMaker.pm for details of how to influence
 	# the contents of the Makefile that is written.
 	WriteMakefile(
-	    NAME =&gt; 'Moran',
-	    VERSION_FROM =&gt; 'lib/Moran.pm', # finds $VERSION
-	    PREREQ_PM =&gt; {}, # e.g., Module::Name =&gt; 1.1
-	    ($] &gt;= 5.005 ? ## Add these new keywords supported since 5.005
-	        (ABSTRACT_FROM =&gt; 'lib/Moran.pm', # retrieve abstract from module            AUTHOR =&gt; 'yourname &lt;yourname@gmail.com&gt;') : ()),
-	    LIBS =&gt; [$MORAN_LIB], # e.g., '-lm'
-	    DEFINE =&gt; '', # e.g., '-DHAVE_SOMETHING'
-	    INC =&gt; "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
+	    NAME =&> 'Moran',
+	    VERSION_FROM =&> 'lib/Moran.pm', # finds $VERSION
+	    PREREQ_PM =&> {}, # e.g., Module::Name =&> 1.1
+	    ($] &>= 5.005 ? ## Add these new keywords supported since 5.005
+	        (ABSTRACT_FROM =&> 'lib/Moran.pm', # retrieve abstract from module            AUTHOR =&> 'yourname &<yourname@gmail.com&>') : ()),
+	    LIBS =&> [$MORAN_LIB], # e.g., '-lm'
+	    DEFINE =&> '', # e.g., '-DHAVE_SOMETHING'
+	    INC =&> "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
-	# OBJECT =&gt; '$(O_FILES)', # link all the C files too
+	# OBJECT =&> '$(O_FILES)', # link all the C files too
 	);
 	
 편집을 마친 이후, 아래 명령으로 Makefile을 생성합니다.
@@ -159,16 +159,16 @@ ST(0) 즉, Perl에서 initialize_moran_xs() 서브루틴을 호출할 때 넘기
 	RETVAL
 
 	
-	이제 초기화 루틴을 완성했습니다. 다음으로 사전을 해제하는 루틴은 아래와 같이 간단히 작성할 수 있습니다.
+이제 초기화 루틴을 완성했습니다. 다음으로 사전을 해제하는 루틴은 아래와 같이 간단히 작성할 수 있습니다.
 	
 	#!c
 	void
 	finalize_moran_xs()
-	        CODE:
-	        if(dict != NULL) {
-	                finalize_moran(dict);
-	                dict = NULL;
-	        }
+        CODE:
+        if(dict != NULL) {
+                finalize_moran(dict);
+                dict = NULL;
+        }
 
 마지막으로 analyze_moran()에 대한 서브루틴을 작성하면 아래와 같습니다.
 
@@ -203,8 +203,7 @@ ST(0) 즉, Perl에서 initialize_moran_xs() 서브루틴을 호출할 때 넘기
 
 이제 Moran.xs를 저장하고 make해서 정상적으로 컴파일되는지 확인해봅니다.
 
-	#!bash
-	$ make
+	`$ make`
 
 문제가 없다면 기본적으로 perl에서 사용할 준비는 마쳤다고 볼 수 있습니다.
 
@@ -233,7 +232,7 @@ Moran.xs에 정의된 서브루틴들을 다시한번 Perl에서 사용하기 �
 	# This allows declaration use Moran ':all';
 	# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 	# will save memory.
-	our %EXPORT_TAGS = ( 'all' =&gt; [ qw(
+	our %EXPORT_TAGS = ( 'all' =&> [ qw(
 	        ) ] );
 	our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 	# export할 서브루틴의 이름을 기술합니다.
@@ -366,15 +365,15 @@ FCGI를 사용하기 위해서는 CGI::Fast 패키지가 설치되어 있어야�
 	#!plain
 	# FCGI
 	LoadModule fastcgi_module modules/mod_fastcgi.so
-	&lt;IfModule mod_fastcgi.c&gt;
+	&<IfModule mod_fastcgi.c&>
 	    Alias /fcgi/ /home/wrapper/perl/www/
-	    &lt;Directory /home/wrapper/perl/www/&gt;
+	    &<Directory /home/wrapper/perl/www/&>
 	        SetHandler fastcgi-script
 	        Options +ExecCGI
 	        Allow from all
-	    &lt;/Directory&gt;
+	    &</Directory&>
 	    AppClass /home/trunk/wrapper/perl/www/fcgi.pl
-	&lt;/IfModule&gt;
+	&</IfModule&>
 
 
 ## 마침
@@ -382,3 +381,6 @@ FCGI를 사용하기 위해서는 CGI::Fast 패키지가 설치되어 있어야�
 지금까지 C로 작성된 라이브러리를 Perl에서 사용하는 방법과 만들어진 Perl 패키지를 FCGI를 사용해서 API 서비스하는 방법에 대해 간략히 살펴봤습니다. 사실 Perl 개발은 이제 시작하는 단계라 초짜나 다름 없지만 비슷한 니즈가 있는 분들께 작게나마 도움이 되었으면 합니다.
 
 감사합니다.
+
+[author] : http://blog.daum.net/hazzling/
+[XS_PERL] : http://en.wikipedia.org/wiki/XS_%28Perl%29
