@@ -55,16 +55,16 @@ my $MORAN_INC="-I. -I$MORAN_HOME/include";
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME => 'Moran',
-    VERSION_FROM => 'lib/Moran.pm', # finds $VERSION
-    PREREQ_PM => {}, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ? ## Add these new keywords supported since 5.005
-        (ABSTRACT_FROM => 'lib/Moran.pm', # retrieve abstract from module            AUTHOR => 'yourname <yourname@gmail.com>') : ()),
-    LIBS => [$MORAN_LIB], # e.g., '-lm'
-    DEFINE => '', # e.g., '-DHAVE_SOMETHING'
-    INC => "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
+    NAME =&gt; 'Moran',
+    VERSION_FROM =&gt; 'lib/Moran.pm', # finds $VERSION
+    PREREQ_PM =&gt; {}, # e.g., Module::Name =&gt; 1.1
+    ($] &gt;= 5.005 ? ## Add these new keywords supported since 5.005
+        (ABSTRACT_FROM =&gt; 'lib/Moran.pm', # retrieve abstract from module            AUTHOR =&gt; 'yourname &lt;yourname@gmail.com&gt;') : ()),
+    LIBS =&gt; [$MORAN_LIB], # e.g., '-lm'
+    DEFINE =&gt; '', # e.g., '-DHAVE_SOMETHING'
+    INC =&gt; "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
 # Un-comment this if you add C files to link with later:
-# OBJECT => '$(O_FILES)', # link all the C files too
+# OBJECT =&gt; '$(O_FILES)', # link all the C files too
 );
 </pre>
 
@@ -238,8 +238,8 @@ our @ISA = qw(Exporter);
 # This allows declaration use Moran ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-) ] );
+our %EXPORT_TAGS = ( 'all' =&gt; [ qw(
+        ) ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 # export할 서브루틴의 이름을 기술합니다.
 our @EXPORT = qw(
@@ -251,17 +251,17 @@ require XSLoader;
 XSLoader::load('Moran', $VERSION);
 # Preloaded methods go here.
 sub initialize_moran {
-my $dictionary_path = shift;
+    my $dictionary_path = shift;
 # …. some error handling
-initialize_moran_xs($dictionary_path);
+    initialize_moran_xs($dictionary_path);
 }
 sub finalize_moran {
-finalize_moran_xs();
+    finalize_moran_xs();
 }
 sub analyze_moran {
-my $string = shift;
+    my $string = shift;
 # …. some error handling
-return analyze_moran_xs($string);
+    return analyze_moran_xs($string);
 }
 1;
 __END__
@@ -336,36 +336,36 @@ our $dictionary_path = q(/home/dictionary.dict);
 initialize_moran($dictionary_path);
 my $q;
 while( $q = new CGI::Fast ) {
-CGI->compile();
-proc_cgi($q);
+    CGI->compile();
+    proc_cgi($q);
 }
 finalize_moran();
 exit;
 1;
 sub proc_cgi {
-my $q = shift || (new CGI);
-$q->charset('utf-8');
-my $path_info = $q->path_info;
-my ($cmd, $path, $suffix) = fileparse($path_info, ".xml", ".json", ".txt", ".html", );
-$suffix = ".json" unless $suffix;
-my $callback = param('callback');
-my $mode = param('mode') || "";
-my $query = decode(utf8=>param('q')) || "";
-my $tag = param('tag') || "";
-my $content_type = mime_type($suffix, $callback);
-my $full_url = $q->url(-full=>1);
-my $absolute_url = $q->url(-absolute=>1);
-….
-$header = $q->header(-charset=>'utf-8',
--type=>$content_type,
--expires=>'+3m',
--cache_control => q(public, s-maxage=180),
-)
-….
-print $header;
-….
-$rst = anaylze_moran($query);
-….
+    my $q = shift || (new CGI);
+    $q->charset('utf-8');
+    my $path_info = $q->path_info;
+    my ($cmd, $path, $suffix) = fileparse($path_info, ".xml", ".json", ".txt", ".html", );
+    $suffix = ".json" unless $suffix;
+    my $callback = param('callback');
+    my $mode = param('mode') || "";
+    my $query = decode(utf8=>param('q')) || "";
+    my $tag = param('tag') || "";
+    my $content_type = mime_type($suffix, $callback);
+    my $full_url = $q->url(-full=>1);
+    my $absolute_url = $q->url(-absolute=>1);
+    ….
+    $header = $q->header(-charset=>'utf-8',
+        -type=>$content_type,
+        -expires=>'+3m',
+        -cache_control => q(public, s-maxage=180),
+    )
+    ….
+    print $header;
+    ….
+    $rst = anaylze_moran($query);
+    ….
 }
 ….
 </pre>
@@ -375,15 +375,15 @@ $rst = anaylze_moran($query);
 <pre language="conf">
 # FCGI
 LoadModule fastcgi_module modules/mod_fastcgi.so
-<IfModule mod_fastcgi.c>
-Alias /fcgi/ /home/wrapper/perl/www/
-<Directory /home/wrapper/perl/www/>
-SetHandler fastcgi-script
-Options +ExecCGI
-Allow from all
-</Directory>
-AppClass /home/trunk/wrapper/perl/www/fcgi.pl
-</IfModule>
+&lt;IfModule mod_fastcgi.c&gt;
+    Alias /fcgi/ /home/wrapper/perl/www/
+    &lt;Directory /home/wrapper/perl/www/&gt;
+        SetHandler fastcgi-script
+        Options +ExecCGI
+        Allow from all
+    &lt;/Directory&gt;
+    AppClass /home/trunk/wrapper/perl/www/fcgi.pl
+&lt;/IfModule&gt;
 </pre>
 
 
