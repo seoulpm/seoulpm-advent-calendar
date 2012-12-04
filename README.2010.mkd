@@ -1,0 +1,6 @@
+initial commit
+
+make 하시게되면, ~오늘까지의 articles/ 에 있는 파일들이 generate 됩니다.
+오늘 이후의 article을 미리 generate 해서 보시려면 아래처럼 build 하시면 됩니다.
+
+    % PERL5LIB=./patch/lib/ advcal --today 2010-12-31 --config advent.ini --output-dir out --article-dir articles --share-dir share

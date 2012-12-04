@@ -1,0 +1,10 @@
+<%args>
+  $global
+</%args>
+
+  <div id="footer">
+    <% $global->{copyright} %>
+  </div>
+</div>
+</body>
+</html>

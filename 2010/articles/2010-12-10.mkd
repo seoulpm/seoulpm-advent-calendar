@@ -1,0 +1,154 @@
+Title:    Everything is better with perl
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aer0
+
+저자
+-----
+
+[@aer0][twitter-aer0] - Seoul.pm, #perl-kr의 정신적 지주,
+Perl에 대한 근원적이면서 깊은 부분까지 놓치지 않고 다루는
+[홈페이지 및 블로그][aero-home]를 운영하고 있다.
+aero라는 닉을 사용하기도 한다.
+
+[@JEEN_LEE][twitter-jeen_lee] -
+산간오지 자연청년, 도쿄에 살고있는 꽃청년 하지만 유부남,
+한 때 Drip에 일가견이 있던 리즈 시절이 있었다.
+[블로그인 이빨까기인형][jeen-home]을 운영하고 있으며,
+기술적이며, 현대적인 Perl 관련 글을 꾸준히 올리고 있다.
+주로 jeen이라는 닉을 사용한다.
+
+
+펄 코드가 실제 어떻게 해석되는지 보기 - @aer0
+----------------------------------------------
+
+    #!bash
+    $ perl -MO=Deparse,-p -e '$a*$b+$c'
+    (($a * $b) + $c);
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -e '@a=(1,2)'
+    (@a = (1, 2));
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -e '@a=1,2'
+    ((@a = 1), '???');
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -e '! $a > 1 * $b && $c < 2 + 1'
+    (((!$a) > (1 * $b)) and ($c < 3));
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -e 'not $a > 1 * $b && $c < 2 + 1'
+    (not (($a > (1 * $b)) && ($c < 3)));
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -ne 'print'
+    LINE: while (defined(($_ = <ARGV>))) {
+        print($_);
+    }
+    -e syntax OK
+    
+    
+    $ perl -MO=Deparse,-p -pe 'print'
+    LINE: while (defined(($_ = <ARGV>))) {
+        print($_);
+    }
+    continue {
+        (print($_) or die("-p destination: $!\n"));
+    }
+    -e syntax OK
+
+
+
+우리는 어떻게 궐기하는가? - @JEEN_LEE
+--------------------------------------
+
+어제 이종격투기를 해가면서 국회에서 예산안이 통과되었습니다([기사1][news-1]).
+대부분 아마 격투에 집중하며, 다음 총선때 최홍만이냐 추성훈이냐 하며 
+푸념삼아서 얘기들 하셨을 겁니다.
+이 신발끈 풀어먹을 인간들이 4대강 한답시고 결식아동 지원이나
+영유아 예방접종비도 다 깎아버렸습니다([기사2][news-2], [기사3][news-3]).
+눈에 뵈는 게 없다는 거죠.
+
+우리는 언제까지 이런 꼬락서니를 지켜봐야 하는 건가요?
+
+자, 이런 현실에 분노하며 이제 조선말기의 동학농민운동을 떠올려 봅니다.
+그때 농민들은 참 더럽게 못살게 구는 군수 하나때문에 들고 일어났었죠.
+뭐 비슷합니다. 군수나 대통령이나 못 살게 굴면 그 밥에 그 나물이죠 뭐.
+
+그런 동학농민운동하면 무엇을 떠올리시나요? 전 항상 사발통문을 떠올립니다.
+자, 떠올렸습니다. 그럼 만들어야죠?
+
+[CPAN의 Acme::* 관련 모듈][search-cpan-acme]은 재미로 만든 모듈을
+총괄하는 이름 공간으로 공식적으로 장난스럽게 만든 모듈일 경우
+이 이름공간 하부에 만들 것을 권장하고 있습니다.
+[CPAN의 Acme::SaBalTongMun 모듈][cpan-acme-sabaltongmun]을 써보죠.
+`sabal.pl` 스크립트는 다음과 같습니다.
+
+    #!perl
+    use Acme::SaBalTongMun;
+    
+    my $sabal = Acme::SaBalTongMun->new(
+        radius    => 50,
+        font_size => 30,
+        font      => '/Library/Fonts/Arial.ttf', # Your Favorite Font
+        color     => '#000000',
+        people    => [ map { '@'.$_ } @ARGV ],
+    );
+    
+    my $image = $sabal->generate;
+    binmode STDOUT;
+    print $image->png;
+    
+자, 이제 우리의 분노를 보여봅니다! 동지들이여!! 모이시오!!
+
+    #!bash
+    $ perl sabal.pl \
+        keedi aer0 perlstudy saillinux aanoaa \
+        y0ngbin eeyees ainvyu gypark > sabal.png
+
+그 결과 아래처럼 동지들이 뜻을 모았습니다.
+
+![사발통문 그림][sabal-image]
+
+*Whisper : 주모자는 [@keedi][twitter-keedi] 입니다.* 전 쁘락치 =3
+
+
+
+슬픈소식 - @aer0
+-----------------
+
+    #!bash
+    $ perl -MDateTime -le 'print DateTime->new(year=>2013,month=>2,day=>25)->delta_days(DateTime->now)->in_units("days")'
+    809
+
+
+
+이런 우리에게 남은 희망은 - @aer0
+----------------------------------
+
+    #!bash
+    $ perl -MList::Util=shuffle -le 'print "@{[(shuffle 1..45)[0..5]]}"'
+    34 23 43 2 44 15
+
+
+
+[sabal-image]:              2010-12-10-1.png
+
+[aero-home]:                http://aero.sarang.net/
+[cpan-acme-sabaltongmun]:   http://search.cpan.org/perldoc?Acme::SaBalTongMun
+[jeen-home]:                http://jeen.tistory.com/
+[news-1]:                   http://www.mediatoday.co.kr/news/articleView.html?idxno=92554
+[news-2]:                   http://news.khan.co.kr/kh_news/khan_art_view.html?artid=201012092138405&code=990101
+[news-3]:                   http://news.khan.co.kr/kh_news/khan_art_view.html?artid=201012091418141&code=940601
+[search-cpan-acme]:         http://search.cpan.org/search?mode=module&query=acme
+[twitter-aer0]:             http://www.twitter.com/aer0/
+[twitter-jeen_lee]:         http://www.twitter.com/JEEN_LEE/
+[twitter-keedi]:            http://www.twitter.com/keedi/

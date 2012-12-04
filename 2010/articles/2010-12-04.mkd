@@ -1,0 +1,334 @@
+Title:    선물 세 가지 :-D
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark]
+- 개인 자료라고 믿기 어려울 정도의 방대한 Perl 자료를 제공하고 있는
+[gypark.pe.kr][gypark-home]의 주인장, Raymundo라는 닉을 사용하기도 한다.
+
+
+
+시작하며
+---------
+
+이 글에서는 범위연산자(range operator) `..`와 `...`가 스칼라 문맥에서
+사용될 때의 동작, 현재 개발 중인 Perl 5.14 버전에서 정규표현식에 새롭게
+추가되는 플래그, 트위터 계정에 글을 올리는 스크립트를 만드는 데 쓸 수 있는
+모듈 하나를 소개해 드리고자 합니다.
+도움이 되었으면 좋겠습니다.
+
+
+
+스칼라 문맥에서 사용하는 ".."와 "..."
+--------------------------------------
+
+`..` 연산자는 주로 목록 문맥(list context)에서 사용되며,
+좌변에서 우변까지 하나씩 증가하는 목록을 반환합니다.
+이것은 워낙 빈번하게 사용되니까 더 설명할 필요가 없겠지요.
+
+    #!perl
+    foreach ( 1 .. 10 ) {   # 1 부터 10까지
+        do_something();
+    }
+    
+    my @letters = ( 'A' .. 'Z' );   # A,B,C,...,Z
+
+그런데 이 연산자를 스칼라 문맥(scalar context)에서도 사용할 수 있습니다.
+이 때는 일종의 플립-플롭 회로처럼 동작하며, 참/거짓 중 하나의 상태를
+저장하고 있다가 호출될 때 반환합니다.
+둘 중 어느 값을 반환하는지는 다음 규칙에 의해 결정됩니다.
+
+* 기본값은 거짓
+* 좌변이 참이면 참을 반환하고, 이후에는 계속 참을 반환
+* 우변이 참이면 그 순간에는 참을 반환하고, 그 다음부터는 계속 거짓을 반환
+
+즉, 좌변과 우변은 각각 *켜는 스위치*와 *끄는 스위치*의 역할을 하게 됩니다.
+
+다음은 간단한 예제입니다.
+문자열을 읽어 들여서 `START`를 포함한 줄이 나오면 그 때부터 읽은 줄을 출력하고,
+`STOP`을 포함한 줄을 읽으면 그 다음 줄부터는 다시 출력하지 않고 지나칩니다.
+
+    #!perl
+    while ( <DATA> ) {
+        print $_ if ( /START/ .. /STOP/ );
+    }
+    
+    __END__
+    skip line 1
+    skip line 2
+    START
+    print line 3
+    print line 4
+    STOP
+    skip line 5
+    skip line 6
+
+앞의 예제를 실행한 결과는 다음과 같습니다.
+
+    #!plain
+    START
+    print line 3
+    print line 4
+    STOP
+
+
+`..`와 `...`의 차이는 이렇습니다.
+`..` 연산자는 좌변이 참이 되더라도, 우변을 마저 검사합니다.
+따라서 좌변과 우변 둘 다 참인 경우에는 상태가 참이 되었다가
+곧바로 다시 거짓이 될 수 있습니다.
+단, 이 때 반환하는 값은 참입니다.
+반면에 `...` 연산자는 좌변이 참인 경우에는
+우변을 검사하지 않고 즉시 참을 반환하고 끝납니다.
+
+두 연산자 모두, 현재 상태가 거짓인 동안에는
+좌변만 검사하고 우변은 검사하지 않습니다.
+반대로 현재 상태가 참인 동안에는
+우변만 검사하고 좌변은 검사하지 않습니다.
+조건 연산자의 단락 평가(short-circuit evaluation)과 같은 맥락으로 이해하면 됩니다.
+
+때로는 *몇 번이나 연속으로 참을 반환하고 있는가?*를 검사하고 싶은 경우가 있습니다.
+이런 경우 굳이 카운터 변수를 따로 사용할 필요가 없습니다.
+두 연산자는 참 또는 거짓을 반환한다고 했는데,
+그 반환값을 좀 더 자세히 살펴보면 다음과 같습니다.
+
+* 거짓을 반환할 때는 빈 문자열(empty string)을 반환합니다.
+* 좌변이 참이어서 상태가 거짓에서 참으로 바뀔 때는 1을 반환합니다.
+* 이후 수행될 때마다 이전에 반환한 숫자보다 1 증가한 숫자를 반환합니다.
+* 우변이 참이어서 상태가 참에서 거짓으로 바뀔 때는,
+  직전에 반환한 수보다 1 증가한 숫자에다가, 끝에 `E0`을 붙여서 반환합니다.
+
+설명만으로는 이해하기 어려우므로 예제를 통해 직접 확인해 보도록 하겠습니다.
+
+    #!perl
+    while ( <DATA> ) {
+        my $ret = ( /START/ .. /STOP/ );
+        print "[$ret] $_";
+    }
+    
+    __END__
+    skip line 1
+    skip line 2
+    START
+    print line 3
+    print line 4
+    STOP
+    skip line 5
+    skip line 6
+
+앞의 예제를 실행한 결과는 다음과 같습니다.
+
+    #!plain
+    [] skip line 1
+    [] skip line 2
+    [1] START           <-- 첫번째 참
+    [2] print line 3
+    [3] print line 4
+    [4E0] STOP          <-- 마지막 참
+    [] skip line 5
+    [] skip line 6
+
+따라서 반환값을 검사하면, 몇 번째로 참을 반환하고 있는지,
+또한 상태값이 다시 거짓으로 바뀌었는지의 여부를 알 수 있습니다.
+특히 상태값이 다시 거짓으로 바뀌는 "마지막 참"의 경우는
+반환값의 끝에 `E0`이 붙은 걸 보고 알 수 있으면서,
+`4E0`은 4의 지수 표기법이기 때문에
+다른 숫자들과 마찬가지로 다룰 수 있어서 편리합니다.
+
+
+
+
+/r 치환 플래그 (Perl 5.14)
+---------------------------
+
+현재 Perl 5 안정 버전은 5.12.2까지 나와 있고,
+5.13.* 버전이 개발되고 있습니다.
+안정화 되면 버전 번호 5.14.0으로 릴리즈되겠지요.
+
+5.14에서 Perl의 정규표현식과 관련해 추가된 기능 중, `/r` 치환플래그를 소개합니다.
+사용 예를 들어보죠.
+`$old` 변수에 들어 있는 문자열을 치환하여 `$new` 변수에 치환된 문자열을 저장하고자 합니다.
+기존 문자열을 보존하고 싶다면, 일단 새 변수에 기존 값을 담은 후에 새 변수의 내용을 치환해야 하겠죠.
+
+    #!perl
+    my $old = "hello";
+    my $new = $old;
+    
+    $new =~ s/h/H/;
+    print "$old $new";
+
+앞의 예제를 실행한 결과는 다음과 같습니다.
+
+    #!plain
+    hello Hello
+
+짧게 쓴다면 다음 예제처럼 작성할 수 있습니다.
+
+    #!perl
+    ( my $new = $old ) =~ s/h/H/;
+
+이 때 괄호를 생략하면 안 됩니다.
+`=~` 연산자의 우선순위가 `=`보다 높기 때문에 `$old`의 값이 치환되어 버리고,
+`$new`에는 치환이 발생한 횟수가 저장되어서 출력 결과는 다음과 같습니다.
+
+    #!plain
+    Hello 1
+
+`s///` 연산자 뒤에 `/r` 플래그가 붙게 되면,
+치환 연산을 할 때 원본 문자열을 훼손하지 않고,
+복제본을 만들어 그 복제본에 대하여 치환 연산을 수행한 후,
+(치환 횟수를 반환하는 것이 아니라) 치환된 복사본을 반환합니다.
+따라서, 이제는 불편하게 괄호를 사용하지 않아도 됩니다.
+
+    #!perl
+    use 5.013;
+    
+    my $old = "hello";
+    my $new = $old =~ s/h/H/r;   # /r 이 붙었습니다
+    
+    print "$old $new";
+
+많이 편해진 것 같지는 않다고요? :-)
+다음 두 코드를 비교해 봅시다.
+`map`의 블록 부분에 유의하세요.
+
+    #!perl
+    my @in  = qw( Bu1s5ter Mi6mi Roscoe Gin98ger El123la );
+    
+    # @in의 각 원소에서 숫자를 제거하여 @out 배열에 저장하고 싶다
+    my @out = map { my $s = $_; $s =~ s/\d+//g; $s } @in;
+    
+    print "in: @in\nout: @out\n";
+
+위 코드에서는 `map` 안에서 일일이 `$_` 변수의 값을 `$s`에 복사하고 있습니다.
+왜냐하면 `$_`는 `@in`의 각 원소의 별칭이므로,
+직접 치환할 경우 `@in`의 원소 자체가 치환되어버리기 때문입니다.
+
+`/r` 플래그를 쓴다면, 다음 예제처럼 직관적으로 작성할 수 있습니다.
+
+    #!perl
+    use 5.013;
+    
+    my @in  = qw( Bu1s5ter Mi6mi Roscoe Gin98ger El123la );
+    my @out = map { s/\d+//gr } @in;
+    
+    print "in: @in\nout: @out\n";
+
+덧붙이자면 `s///` 뿐 아니라 `tr///` 연산자에도
+역시 이 플래그를 사용할 수 있게 된다고 합니다.
+
+
+
+Net::Twitter::Lite 를 사용하여 트위터에 글 올리기
+--------------------------------------------------
+
+많은 분들이 트위터를 사용하고 계실텐데요.
+[CPAN의 Net::Twitter::Lite 모듈][cpan-net-twitter-lite]을 사용해
+트윗을 올리는 간단한 Perl 스크립트 예제를 소개합니다.
+
+사실 트윗을 올리는 것 자체는
+[Net::Twitter::Lite 모듈 문서의 SYNOPSIS 부분][cpan-net-twitter-lite-synopsis]의
+몇 줄만 봐도 쉽게 알 수 있습니다만, 정작 문제는 트위터에 로그인하는 인증방식입니다.
+모듈 문서의 기본 예제에서는 자신의 트위터 아이디와 암호를
+직접 스크립트에 인자로 주면서 객체를 생성하여 사용하고 있는데,
+현재는 트위터에서 그러한 방식의 인증을 허용하지 않고,
+[OAuth][wikipedia-oauth] 방식의 인증만을 허용하고 있습니다.
+따라서 먼저 자신의 아이디로 로그인하기 위한 키와 토큰을 발급받아야 합니다.
+다음과 같이 하시면 됩니다.
+
+* [트위터 개발자 사이트][twitter-dev] 사이트에 갑니다.
+* Perl 스크립트로 글을 올릴 때 사용할 계정으로 로그인합니다.
+* *2 Register an app*를 클릭합니다.
+* 여러 가지 항목을 채워 줍니다.
+  * *Application Name*: 적당히 지어줍니다.  여기 적은 이름이 트위터 홈페이지에서 각 트윗메시지 하단에 *via 클라이언트이름* 자리에 나옵니다.
+  * *Description*: 저는 적당히 *I'm using my own Perl script to post to my twitter account.*라고 적어주었습니다.
+  * *Application Website*: 여기 적은 주소가 *via 클라이언트이름* 자리에 링크가 걸립니다.
+  * *Organizaion*: 적당히 적어줍니다.
+  * *Application Type*: *Client* 선택
+  * *Default Access type*: *Read & Write* 선택
+  * 마지막에 CAPTCHA 적는 곳을 채워준 후 하단 *Register application* 버튼을 클릭합니다.
+* 방금 등록한 애플리케이션의 정보가 나오는데,
+  여기에서 *Consumer key*와 *Consumer secret*값을 메모해 둡니다.
+* 우측에 *My Access Token*을 클릭합니다.
+* 이 화면에서 *access token*과 *access token secret* 값을 메모해 둡니다.
+
+이제 인증을 위한 준비는 끝났습니다.
+
+자! 이제 트위터에 포스팅을 해보죠.
+다음은 포스팅을 하는 간단한 예제입니다.
+
+    #!perl
+    use Net::Twitter::Lite;
+    
+    my $nt = Net::Twitter::Lite->new(
+        # 위에서 메모해 둔 네 가지 필드값을
+        # 아래 네 줄에 변수들이 적힌 자리에 각각 적어줍니다.
+        consumer_key        => $consumer_key,
+        consumer_secret     => $consumer_secret,
+        access_token        => $access_token,
+        access_token_secret => $access_token_secret
+    );
+    
+    my $result = eval { $nt->update('Hello, World!') };
+    warn "$@\n" if $@;
+
+어때요, 참 쉽죠? :-)
+
+이 때, `update()` 함수의 인자에 한글 메시지가
+들어갈 경우 인코딩 문제를 신경써 주어야 합니다.
+경험적으로, `Net::Twitter::Lite` 모듈과,
+이 모듈이 의존하는 다른 모듈들의 버전에 따라서,
+인코딩을 해야 할지 말아야 할지가 달랐습니다.
+최신 모듈을 사용할 경우는 별다른 인코딩 없이,
+Perl 내부(internal) 문자열으로 디코드된 상태에서 그냥 인자로 넘기면 됩니다.
+이렇게 했는데도 트위터에 올라간 메시지에서 한글이 깨져서 보일 경우는,
+UTF-8로 명시적으로 인코딩을 한 후에 넘기도록 수정해 보세요.
+
+    #!perl
+    # 현재 $msg 는 일단 decode 된 상태
+    $msg = Encode::encode("UTF-8", $msg);
+
+만일 트위터 메시지에 URL이 포함되어 있다면,
+트위터의 140자 제한을 고려해서 URL의 길이를 줄여줄 필요가 있습니다.
+이 때는 [CPAN의 WWW::Shorten 모듈][cpan-www-shorten]을 사용해 길이를 줄일 수 있습니다.
+다음은 예제 코드입니다.
+
+    #!perl
+    use WWW::Shorten 'TinyURL';
+    
+    my $short_url = makeashorterlink( "http://very.very.very.long.url" );
+
+물론 `WWW::Shorten` 모듈이외에도 비슷한 기능을 제공하는 여러 모듈이 있습니다.
+자세한 것은 [CPAN][cpan-search]을 참고하세요.
+
+
+
+살펴볼 문서들
+--------------
+
+이 글을 작성하며 참고한 자료들입니다.
+놓치지 말고 꼭 읽어보세요. ;-)
+
+* [Perl operators and precedence, Range-Operators][perldoc-perlop-range-operator]
+* [Use the /r substitution flag to work on a copy][effective-perl-r-flag]
+* [Perl 5.14 introduces non-destructive transliteration][effective-perl-trans]
+* [Post to Twitter from Perl using a single access token][post-to-twitter]
+
+
+
+[cpan-net-twitter-lite-synopsis]:   http://search.cpan.org/perldoc?Net::Twitter::Lite#SYNOPSIS
+[cpan-net-twitter-lite]:            http://search.cpan.org/perldoc?Net::Twitter::Lite
+[cpan-search]:                      http://search.cpan.org
+[cpan-www-shorten]:                 http://search.cpan.org/perldoc?WWW::Shorten
+[effective-perl-r-flag]:            http://www.effectiveperlprogramming.com/blog/659
+[effective-perl-trans]:             http://www.effectiveperlprogramming.com/blog/791
+[gypark-home]:                      http://gypark.pe.kr
+[perldoc-perlop-range-operator]:    http://perldoc.perl.org/perlop.html#Range-Operators
+[post-to-twitter]:                  http://qscripts.blogspot.com/2010/05/post-to-twitter-from-perl-using-single.html
+[twitter-dev]:                      http://dev.twitter.com/
+[twitter-gypark]:                   http://twitter.com/#!/keedi
+[wikipedia-oauth]:                  http://en.wikipedia.org/wiki/OAuth

@@ -1,0 +1,293 @@
+Title:    Moose로 OOP하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aer0
+
+저자
+----
+
+[@aer0][twitter-aer0] - Seoul.pm, #perl-kr의 정신적 지주,
+Perl에 대한 근원적이면서 깊은 부분까지 놓치지 않고 다루는
+[홈페이지 및 블로그][aero-home]를 운영하고 있다.
+aero라는 닉을 사용하기도 한다.
+
+
+
+시작하며
+---------
+
+Perl은 1987년에 버전 1이 나오고 1994년도에 첫 5.대 버전이
+나왔으며 현재 안정버전은 5.12.2에 이르렀습니다(Perl 6와는 별도).
+비교적 후발주자 스크립트 언어인 Python, Ruby등이 나오면서
+OOP를 잘 지원한다는 것을 내세우며 Perl과 비교하지만
+그것이 결코 OOP에 있어 Perl보다 강력하다는 것을 뜻하는 것은 아닙니다.
+
+[Programming is Hard, Let's Go Scripting...][lets-go-scripting-url]에서 
+Perl의 창시자 Larry Wall은 이렇게 말했습니다.
+
+> I don't really know much about Python.
+> 
+> I only stole its object system for Perl 5.
+> 
+> I have since repented.
+
+Larry Wall의 말처럼 Perl은 5.x 버전부터 Python의 객체 구현의
+아이디어를 빌려 와서 OOP를 자체적으로 지원하기 시작했습니다.
+Perl의 기본적인 OOP구현 방법은 Python이나 Ruby와 비교하면 
+약간은 말이 많고 번거로워 보이는 건 사실입니다.
+
+하지만 이것은 펄 크리스마스 달력 14일자에 게재된
+[Perl로 하는 함수형 프로그래밍][seoulpm-advent-20101214]이란 기사에서
+볼 수 있다시피 다중 패러다임을 지향하는 Perl의 특성상
+관련 키워드를 간략화시켜 언어에 내장함으로써
+외형상으로 특정 패러다임에 적합해 보이고자 하기보다는
+그것을 최소한의 부분 집합으로 넣고 유연하게 확장할 수 있는
+구조를 택했기 때문이라고 볼 수 있습니다.
+
+그렇다고 Perl의 기본 OOP가 이해하기 어려운 것은 아닙니다.
+OOP가 실제 어떻게 내부적으로 구현되고 동작하는지를 이해하려면
+Perl의 OOP가 더 도움될 것입니다.
+그래서 일본의 유명한 Perl 해커인 Dan Kogai씨는
+[Perl as a Second Language][perl-as-2nd-language]라는 발표에서
+다음과 같은 말을 했습니다.
+
+> That's why you should learn perl if you want to learn OO!
+> 
+> You can learn how to make an object system, not just how to use it.
+
+
+
+use Moose;
+-----------
+
+요즘은 Perl OOP를 사용할 때는 앞에서 말한 유연한 Perl의 장점을 살려 
+기본적인 OOP구현을 강력하게 확장시킨 [Moose][moose-home]란
+모듈([CPAN의 Moose 모듈][cpan-moose] 문서도 확인하세요)을 많이 사용합니다.
+`Moose`는 Perl 6, CLOS(Lisp), Smalltalk, Java, BETA, OCaml, Ruby등의
+언어에서 좋은 점만 취해 만든 강력한 Perl 5용 OOP 프레임워크입니다.
+그럼 `Moose`를 사용한 코드는 어떤지 한번 볼까요?
+
+    #!perl
+    package Point;
+    use Moose;
+    
+    has 'x' => (is => 'rw', isa => 'Int');
+    has 'y' => (is => 'rw', isa => 'Int');
+    
+    sub clear {
+        my $self = shift;
+        $self->x(0);
+        $self->y(0);
+    }
+    
+    package Point3D;
+    use Moose;
+    
+    extends 'Point';
+    
+    has 'z' => (is => 'rw', isa => 'Int');
+    
+    after 'clear' => sub {
+        my $self = shift;
+        $self->z(0);
+    };
+    
+    package main;
+    
+    my $p = Point3D->new( x=>10, y=>20, z=>30 );
+    print $p->x," ",$p->y," ",$p->z,"\n";
+    $p->x(15);
+    print $p->x," ",$p->y," ",$p->z,"\n";
+    $p->clear;
+    print $p->x," ",$p->y," ",$p->z,"\n";
+
+앞의 예제를 실행시키면 결과는 다음과 같습니다.
+    
+    #!plain
+    10 20 30
+    15 20 30
+    0 0 0
+
+위 코드에서 `Point`는 2차원 좌표를 정의하는 클래스이고 이것을 상속/확장하여
+3차원 좌표를 지원하는 `Point3D`라는 클래스를 정의하였습니다.
+`Moose`는 멤버 변수의 속성(attribute)과 형(type)을 지정할 수 있으며,
+자동적으로 setter와 getter를 만들어 줍니다.
+또한 예제에서 볼 수 있는 `Point3D`의 `after`같은
+[메소드 변경자(method modifier)][cpan-moose-manual-methodmodifiers]를
+지원하므로 특정 메소드가 호출되었을 때 실행순서를 직관적으로 조정할 수 있습니다. 
+
+
+
+상속대신 role을 사용하자!
+--------------------------
+
+`Moose`의 기능은 이런 것들 이외에도 매우 많습니다만
+그 중에서도 role이란 것을 다루겠습니다.
+*role*은 [trait][wikipedia-trait]과 같은 개념으로 Ruby같은 언어에서
+지원하는 mixin과 비슷하지만 mixin은 상속에 의해 결합되는 것과 다르게
+role은 수평적으로 결합되므로 더욱 확장성이 크고 유연하며
+Java의 인터페이스와도 비슷해 보이지만 인터페이스와는 달리
+기본적인 메소드 동작을 정의할 수 있다는 점에서 `Moose`의
+메소드 변경자는 훨씬 강력합니다.
+
+그럼 이렇게 생각해봅시다.
+사람과 개가 있는데 둘은 모두 나이가 있습니다.
+그리고 학생은 사람이지만 다니는 학교가 있습니다.
+그리고 모두 나름대로의 방식으로 자기 나이를 말합니다.
+사람은 이름과 나이를 말하고, 학생은 이름과 나이에 학교까지 같이 말하며,
+개는 나이 만큼 짖어서 나이를 말한다고 합시다. 
+그러면 우선 `Age`라는 role을 정의해 보겠습니다.
+role은 생각해보면 당연하겠지만, 클래스가 아니라 클래스에 수평적으로 결합되어
+사용되는 것이기 때문에 독자적으로 인스턴스를 만들 수 없고 role 자체를
+상속할 수 없습니다.
+
+다음은 `Age.pm`의 소스입니다.
+
+    #!perl
+    package Age;
+    use Moose::Role;
+    
+    has birth_year=> ( is => 'ro', isa => 'Int' );
+    
+    requires qw/speak/;
+    
+    sub age {
+        my ($self) = @_;
+        my $current_year = 1900 + ( localtime() )[5];
+        return $current_year - $self->birth_year();
+    }
+    
+    1;
+
+보시는 바와 같이 role은 `birth_year` 같은 자체적인 속성과
+`age` 같은 자체적인 기본 메소드를 가질 수 있습니다.
+그리고 role을 사용하는 클래스에서 꼭 구현해야 할 메소드를
+`requires`로 지정할 수 있습니다.
+
+그럼 이제 `Age` role을 사용하는 `Person` 클래스와
+`Person` 클래스를 상속하는 `Student` 클래스,
+그리고 마찬가지로 `Age` role을 사용하는 `Dog` 클래스를 차례로 정의해보죠.
+
+다음은 `Person.pm` 모듈의 소스입니다.
+
+    #!perl
+    package Person;
+    use Moose;
+    with qw/Age/;  # Age role을 사용
+    
+    has name => ( is => 'ro', isa => 'Str' );
+    
+    sub speak {
+        my ($self) = @_;
+        print "I'm " . $self->name . ', age ' . $self->age. "\n";
+    }
+    
+    1;
+
+다음은 `Student.pm` 모듈의 소스입니다.
+
+    #!perl
+    package Student;
+    use Moose;
+    extends 'Person';
+    
+    has school => ( is => 'rw', isa => 'Str' );
+    
+    after speak => sub {
+        my ($self) = @_;
+        print ' and my school is ' . $self->school . "\n";
+    };
+    
+    1;
+
+다음은 `Dog.pm` 모듈의 소스입니다.
+
+    #!perl
+    package Dog;
+    use Moose;
+    with qw/Age/;
+    
+    sub speak {
+        my ($self) = @_;
+        print "Bark " x $self->age . "\n";
+    }
+
+    1;
+    
+이제 정의된 클래스들을 테스트하는 프로그램을 만들어보겠습니다.
+다음은 `main.pl` 프로그램의 소스입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    
+    use Person;
+    use Student;
+    use Dog;
+    
+    my $person = Person->new( name => 'Tom', birth_year => 1980 );
+    $person->speak;
+    
+    my $student = Student->new( name => 'John', birth_year => 1985, school => 'MIT' );
+    $student->speak;
+    
+    my $dog = Dog->new( birth_year => 2005 );
+    $dog->speak;
+
+`main.pl`의 실행 결과는 다음과 같습니다.
+
+    #!plain
+    I'm Tom, age 30
+    I'm John, age 25
+     and my school is MIT
+    Bark Bark Bark Bark Bark
+
+어떤가요? 모두 나름대로의 방식으로 나이를 말하는 것을 볼 수 있습니다.
+
+
+
+정리하며
+---------
+
+이렇게 `Moose`는 풍부한 기능과 role이란 개념을 바탕으로
+코드의 재사용성을 높여주며 유연하고 강력한 OOP를 가능하게 해줍니다.
+그래서 [Catalyst][catalyst-home]같은 웹 프레임워크나
+ORM 모듈인 [CPAN의 DBIx::Class 모듈][cpan-dbix-class]과 같은
+주요 프로젝트들도 요즘은 대부분 `Moose` 기반으로 넘어갔습니다.
+제한된 분량상 `Moose`의 모든 것을 알려 드릴 수 없어서 아쉬울 따름이네요.
+마지막으로 `Moose`에 대해 더 알고싶으신 분들을 위해
+추가로 참고할만한 링크를 남겨 놓습니다.
+
+그럼 즐Perl하세요! ;-)
+
+
+
+참고자료
+---------
+
+- [Wikipedia, Moose (Perl)][wikipedia-moose-perl]
+- [OO Perl with Moose][oo-perl-with-moose-nelo-onyiah]
+- [Moose][moose-doug-treder]
+- [Trait Moose::Role][trait-moose-role]
+- [OO Systems and Roles, Inheritance VS Roles][oo-systems-and-roles]
+
+
+
+[aero-home]:                            http://aero.sarang.net
+[catalyst-home]:                        http://www.catalystframework.org/
+[cpan-moose]:                           http://search.cpan.org/perldoc?Moose
+[cpan-dbix-class]:                      http://search.cpan.org/perldoc?DBIx::Class
+[cpan-moose-manual-methodmodifiers]:    http://search.cpan.org/perldoc?Moose::Manual::MethodModifiers
+[lets-go-scripting-url]:                http://www.perl.com/pub/2007/12/06/soto-11.html
+[moose-doug-treder]:                    http://www.slideshare.net/dtreder/moose-527243
+[moose-home]:                           http://moose.perl.org
+[oo-perl-with-moose-nelo-onyiah]:       http://www.slideshare.net/j1n3l0/oo-perl-with-moose
+[oo-systems-and-roles]:                 http://www.slideshare.net/Ovid/inheritance-versus-roles
+[perl-as-2nd-language]:                 http://www.dan.co.jp/~dankogai/yapcasia2008/psl.html
+[seoulpm-advent-20101214]:              http://advent.perl.kr/2010-12-14.html
+[trait-moose-role]:                     http://www.slideshare.net/hiratara/traitmooserole
+[twitter-aer0]:                         http://www.twitter.com/aer0
+[wikipedia-moose-perl]:                 http://en.wikipedia.org/wiki/Moose_(Perl)
+[wikipedia-trait]:                      http://en.wikipedia.org/wiki/Trait_(computer_science)

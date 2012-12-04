@@ -1,0 +1,227 @@
+Title:    HTTP 패킷을 까보자
+Package:  Seoul.pm
+Category: perl
+Category  Seoul.pm
+Author:   luzluna
+
+저자
+-----
+
+[@luzluna][twitter-luzluna] -
+Seoul.pm과 #perl-kr의 육아 전문 컨설턴트,
+사회적 기업을 꿈꾸는 커피 매니아자 백수,
+현재 제주와 서울을 오가며 몽거스 활동을 하고 있다.
+
+
+
+시작하며
+---------
+
+XML이나 JSON을 사용하는 프로그램을 작성하다보면 클라이언트에서
+어떻게 보냈을 때 서버가 어떤 값을 보내주는지 눈으로 봐가면서
+프로그램을 작성하면 좀더 쉬울 때가 있습니다.
+이런 경우 브라우저에 [Firebug][firebug-home] 같은 브라우져 플러그인을 설치해서
+확인하거나 좀 더 과격한 방법인 [tcpdump][tcpdump-home]나
+[Wireshark][wireshark-home]같은 툴을 사용해서 저수준에서 패킷을 캡쳐하는
+방법을 많이 사용하곤 합니다.
+하지만 Perl을 이용하면 콘솔에서 간편하게 패킷을 찍어보고 테스트할 수 있습니다.
+
+
+
+
+HTTP Request 살짝 까보기
+-------------------------
+
+간단히 트위터의 검색 API를 호출할 때의 요청과 응답을 살펴보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+    use LWP::UserAgent;
+    
+    $ua = LWP::UserAgent->new;
+    
+    $ua->add_handler("request_send",  sub { shift->dump; return });
+    $ua->add_handler("response_done", sub { shift->dump; return });
+    
+    $ua->get('http://search.twitter.com/search.atom?q=@JEEN_LEE');
+
+`Get`과 `User-Agent` 딱 두 줄의 요청을 보내는데
+어마어마한 양의 응답이 돌아옵니다.
+응답결과를 한번 보도록 하겠습니다.
+
+    #!perl
+    $ ./test.pl
+    GET http://search.twitter.com/search.atom?q=@JEEN_LEE
+    User-Agent: libwww-perl/5.837
+    
+    (no content)
+    HTTP/1.1 200 OK
+    Cache-Control: max-age=15, must-revalidate, max-age=1800
+    Connection: close
+    Date: Fri, 10 Dec 2010 07:01:44 GMT
+    Via: 1.1 varnish
+    Age: 0
+    Server: hi
+    Vary: Accept-Encoding
+    Content-Length: 21719
+    Content-Type: application/atom+xml; charset=utf-8
+    Expires: Fri, 10 Dec 2010 07:31:44 GMT
+    Client-Date: Fri, 10 Dec 2010 07:01:44 GMT
+    Client-Peer: 199.16.156.11:80
+    Client-Response-Num: 1
+    Status: 200 OK
+    X-Cache: MISS
+    X-Cache-Svr: slc1-aaf-36-sr1.prod.twitter.com
+    X-Runtime: 0.07108
+    X-Served-By: slc1-aaf-36-sr1.prod.twitter.com
+    X-Served-From: slc1-adf-25-sr1
+    X-Timeline-Cache-Hit: Hit
+    X-Varnish: 1489236086
+    
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns:google="http://base.google.com/ns/1.0" xml:lang="en-US" xmlns:openSe                                             arch="http://a9.com/-/spec/opensearch/1.1/" xmlns="http://www.w3.org/2005/Atom"                                              xmlns:twitter="http://api.twitter.com/">
+        <id>tag:search.twitter.com,2005:search/@JEEN_LEE</id>
+        <link type="text/html" rel="alternate" href="http://search.twitter.com/search?                                             q=%40JEEN_LEE"/>
+        <link type="application/atom+xml" rel="self" href="http://search.twitter.com/s                                             earch.atom?q=@JEEN_LEE"/>
+        <title>@JEE...
+    (+ 21207 more bytes not shown)
+
+그런데 헙...! `(+ 21207 more bytes not shown)`라고 나오네요?
+대충 짧은 컨텐츠 확인할땐 상관없겠지만 모든 메시지를
+확인할 때는 문제가 되겠죠?
+
+    #!perl
+    #!/usr/bin/env perl
+    use LWP::UserAgent;
+    
+    $ua = LWP::UserAgent->new;
+    
+    $ua->add_handler("request_send",  sub { print shift->as_string; return });
+    $ua->add_handler("response_done",  sub { print shift->as_string; return });
+    
+    $ua->get('http://search.twitter.com/search.atom?q=@JEEN_LEE');
+
+대충 위와 비슷한데 모두 다 출력 됩니다. 여기서는 너무 길어지니까 그냥 생략하도록 하겠습니다.
+
+
+
+Perl 모듈도 살짝 까보기
+------------------------
+
+앞의 방법을 활용하면 `LWP`를 사용하는 Perl 모듈들에서
+어떤 방식으로 통신을 주고 받는지 살펴볼 수 있습니다.
+이 방법은 제가 트위터나 페이스북 클라이언트를 만들 때 처음부터 문서를 읽고
+만들기는 번거로우니까 잘 돌아가는 예제를 보면서 하려고 쓰던 방법입니다.
+
+[CPAN의 Net::Twitter::Lite 모듈][cpan-net-twitter-lite]을 사용하는 트위터 모듈을 살짝 살펴보죠.
+
+
+    #!perl
+    #!/usr/bin/env perl
+    use Net::Twitter::Lite;
+    
+    my $user = 'test';
+    my $password = 'test';
+    my $nt = Net::Twitter::Lite->new(
+        username => $user,
+        password => $password
+    );
+    
+    my $friends = eval { $nt->friends() };
+
+최근 트위터가 *basic auth*를 막아버리면서 제대로 가져오지는 못하지만
+예제로 사용할만한 자료를 덤프하는데는 문제가 없습니다.
+일단 `Net::Twitter::Lite` 모듈 파일을 찾아봅니다.
+시스템마다 다르지만 `perldoc -l Net::Twitter::Lite` 명령을 실행시키면
+해당 모듈이 설치된 위치를 정확히 찾을 수 있습니다.
+모듈 파일을 열어서 보면 다음과 같은 부분이 보입니다.
+
+    #!perl
+    ...
+        @{$new}{qw/username password/} = $nrc->lpa;
+    }
+    
+    $new->{ua} ||= do {
+        eval "use $new->{useragent_class}";
+        croak $@ if $@;
+    
+        $new->{useragent_class}->new(%{$new->{useragent_args}});
+    };
+    
+    $new->{ua}->agent($new->{useragent});
+    $new->{ua}->default_header('X-Twitter-Client'         => $new->{clientname});
+    ...
+
+`ua`를 생성하네요.
+그럼 저기서 만들어진 `ua` 변수에 핸들러를 추가하면 되겠죠?
+
+    #!perl
+    $new->{ua}->add_handler("request_send",  sub { print shift->as_string; return });
+    $new->{ua}->add_handler("response_done",  sub { print shift->as_string; return });
+
+앞의 두 줄을 적당히 `$new->{ua}`가 생성된 다음 위치에 끼워넣습니다.
+나중에 제거하기 쉽게 주석도 앞뒤로 좀 달아놓구요.
+
+    #!perl
+    ...
+        @{$new}{qw/username password/} = $nrc->lpa;
+    }
+    
+    $new->{ua} ||= do {
+        eval "use $new->{useragent_class}";
+        croak $@ if $@;
+    
+        $new->{useragent_class}->new(%{$new->{useragent_args}});
+    };
+    # For Debug Temp Start
+    $new->{ua}->add_handler("request_send",  sub { print shift->as_string; return });
+    $new->{ua}->add_handler("response_done",  sub { print shift->as_string; return });
+    # For Debug Temp End
+    
+    $new->{ua}->agent($new->{useragent});
+    $new->{ua}->default_header('X-Twitter-Client'         => $new->{clientname});
+    ...
+ 
+이제 한번 실행해보도록 하겠습니다.
+
+    #!bash
+    $ ./test.pl
+    GET http://api.twitter.com/1/statuses/friends.json
+    Authorization: Basic dGVzdDp0ZXN0
+    User-Agent: Net::Twitter::Lite/0.10003 (Perl)
+    X-Twitter-Client: Net::Twitter::Lite
+    X-Twitter-Client-URL: http://search.cpan.org/dist/Net-Twitter-Lite/
+    X-Twitter-Client-Version: 0.10003
+    
+    HTTP/1.1 401 Unauthorized
+    Cache-Control: no-cache, max-age=300
+    Connection: close
+    Date: Fri, 10 Dec 2010 08:07:35 GMT
+    Server: hi
+    Vary: Accept-Encoding
+    WWW-Authenticate: Basic realm="Twitter API"
+    Content-Length: 63
+    Content-Type: application/json; charset=utf-8
+    Expires: Fri, 10 Dec 2010 08:12:35 GMT
+    Client-Date: Fri, 10 Dec 2010 08:07:35 GMT
+    Client-Peer: 128.242.245.157:80
+    Client-Response-Num: 1
+    Set-Cookie: k=112.155.238.14.1291968455525726; path=/; expires=Fri, 17-Dec-10 08:07:35 GMT; domain=.twitter.com
+    Set-Cookie: guest_id=129196845553039972; path=/; expires=Sun, 09 Jan 2011 08:07:35 GMT
+    Set-Cookie: _twitter_sess=BAh7CDoPY3JlYXRlZF9hdGwrCIMjUs8sAToHaWQiJWYyZjZhNWYwMDFmYzhl%250AZDE0MWMyOThiODc1NDg0MjZkIgpmbGFzaElDOidBY3Rpb25Db250cm9sbGVy%250AOjpGbGFzaDo6Rmxhc2hIYXNoewAGOgpAdXNlZHsA--60134459dd401b8f8191b8d49340f51edbea6528; domain=.twitter.com; path=/
+    Status: 401 Unauthorized
+    X-Runtime: 0.02616
+    
+    {"errors":[{"code":32,"message":"Could not authenticate you"}]}
+
+인증 실패 했다고 오류가 나네요.
+비밀번호를 정확하게 넣어도 *basic auth*는 지원하지 않아
+오류가 나니까 괜히 고민하지 마시구요. ;-)
+
+
+
+[cpan-net-twitter-lite]:        http://search.cpan.org/perldoc?Net::Twitter::Lite
+[firebug-home]:                 http://getfirebug.com/
+[tcpdump-home]:                 http://www.tcpdump.org/
+[twitter-luzluna]:              http://twitter.com/luzluna
+[wireshark-home]:               http://www.wireshark.org/

@@ -1,0 +1,321 @@
+Title:    나의 Catalyst 답사기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   JEEN_LEE
+
+저자
+-----
+
+[@JEEN_LEE][twitter-jeen_lee] -
+산간오지 자연청년, 도쿄에 살고있는 꽃청년 하지만 유부남,
+한 때 Drip에 일가견이 있던 리즈 시절이 있었다.
+[블로그인 이빨까기인형][jeen-home]을 운영하고 있으며,
+기술적이며, 현대적인 Perl 관련 글을 꾸준히 올리고 있다.
+주로 jeen이라는 닉을 사용한다.
+
+
+
+시작하며
+---------
+
+회사에서 주로 사용하는 웹 어플리케이션 프레임워크는
+[Catalyst][catalyst-home]([CPAN의 Catalyst 모듈][cpan-catalyst])입니다.
+회사에서 커스터마이즈를 거치고 거친 기존 프레임워크가 있었지만,
+3-4년 이상 방치되어 지속적 관리의 어려움도 있는 바,
+작년부터 시범적으로 사내서비스 위주로 Catalyst를 사용하기 시작했고
+올해부터는 대부분의 웹서비스 개발을 Catalyst 기반으로 진행하고 있습니다.
+ 
+하지만 회사에서 저 혼자 Catalyst를 사용한 웹 개발을 하는 것이 아니기에,
+각각 다른 이가 프로젝트를 진행함에 있어서 공통적으로 지켰으면 하는
+규칙이 있었으면 했습니다.
+그래서 오늘은 이 규칙에 대해 다뤄보고자 합니다.
+
+
+
+프로젝트의 이름공간은 ProjectName::Web 을 사용한다
+-----------------------------------------------------
+
+예를 들어 DogDrip이라는 프로젝트를 시작한다면
+다음 명령을 실행시켜 기본 구조를 자동 생성합니다.
+ 
+    #!bash
+    $ catalyst.pl DogDrip::Web 
+
+우선 `DogDrip::Web` 이름공간을 쓰는 것은
+웹서비스라고 해서 달랑 웹페이지를 구성하기 위한
+컨트롤러와 모델, 뷰만 존재하는 것은 아니기 때문입니다.
+상황에 따라서는 `DogDrip::Util`과 같이 웹 뿐만 아니라
+공용으로 사용할 메소드가 필요할 수도 있고,
+[DBIx::Class][cpan-dbix-class] 등의 ORM을 사용한다면,
+스키마 클래스를 `DogDrip::Schema`로 정의할 것입니다.
+그 외에도 배치 작업을 위한 `DogDrip::CLI` 이름공간이 필요할 때가 있습니다.
+ 
+MyApp 프로젝트라고 할 경우 실제 이름공간을 구분한다면 다음과 같을 것입니다.
+
+* `MyApp::API`
+* `MyApp::CLI`
+* `MyApp::Schema`
+* `MyApp::Util`
+* `MyApp::Web`
+
+이렇게 이름공간을 나눔으로써,
+`MyApp::Web`에는 웹서비스만을 위한 코드를 넣고
+`MyApp::CLI`에는 명령줄에서 실행하기 위한 코드를,
+`MyApp::Util`에는 공통적으로 사용하기 위한 코드를,
+`MyApp::API` 아래에는 로직을 기술해 중복된 코드를 반복해서
+쓰는 것을 방지할 수 있습니다.
+
+
+
+로그, 로그, 로그!
+------------------
+
+웹 서버의 접근/오류 로그와는 별도로 어플리케이션 서버 차원에서의 로그를 기록합니다.
+제 경우 [Catalyst::Log::Log4perl][cpan-catalyst-log-log4perl]을 사용합니다.
+ 
+다음은 `lib/MyApp/Web.pm`에서 로그 메소드를 정의하는 예제입니다.
+
+    #!perl
+    package MyApp::Web;
+    
+    #... blahblah
+    
+    use Catalyst::Log::Log4perl;
+    
+    #... blahblah
+    
+    __PACKAGE__->log(
+        Catalyst::Log::Log4perl->new('conf/log4perl.conf')
+    );
+    
+    #... blahblah
+
+다음은 `conf/log4perl.conf` 설정 파일의 예입니다.
+
+    #!plain
+    log4perl.logger = FILE, MAILER
+    log4perl.appender.FILE = Log::Log4perl::Appender::File
+    log4perl.appender.FILE.TZ = KST
+    log4perl.appender.FILE.layout = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.FILE.layout.ConversionPattern = [%d] [MyApp-Web] [%p] %m%n
+    log4perl.appender.FILE.utf8 = 1
+    log4perl.appender.FILE.filename = logs/myapp_web.log
+    log4perl.appender.MAILER = Log::Dispatch::Email::MailSend
+    log4perl.appender.MAILER.to = your@email.com
+    log4perl.appender.MAILER.subject = App Error
+    log4perl.appender.MAILER.layout  = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.MAILER.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} %F(%L) %M [%p] %m %n
+    log4perl.appender.MAILER.Threshold=ERROR
+
+어플리케이션 로그 관련 기본적인 설정은 앞의 예제와 같습니다.
+일반적으로 독립적(standalone)으로 Catalyst를 띄우고 어플리케이션
+내부를 여기저기 접속하면 각종 디버그 로그가 주루루룩 나오곤
+합니다(물론 이건 기본 Debug 모드에 한정됩니다만). 
+`logger = FILE` 옵션을 사용하면 이런 로그를 모아 파일에 저장합니다.
+
+컨트롤러에서는 다음처럼 호출해서 상황에 맞게 로그를 기록할 수 있습니다.
+
+    #!perl
+    $c->log->warn($msg)
+    $c->log->debug($msg)
+    $c->log->info($msg)
+    $c->log->error($msg)
+    $c->log->fatal($msg)
+
+이렇게 로그를 기록하다보면 가끔씩은 아주 특별한 상황이 생기기도 합니다.
+일반적이지 않은 그런 어플리케이션 오류가 발생하거나,
+외부 데몬과의 연결이 끊어지거나, 계속해서 비밀번호가 틀린다거나할 경우
+빠르게 대응해야 할 것입니다.
+이런 경우에는 파일에 기록하는 것만으로는 부족하기 때문에 메일로 보냅니다.
+
+다음 설정은 오류보다 높은 로그 수준(error, fatal)의 경우
+`your@email.com`에 지정해둔 메일로 즉시 에러 메일 보내줍니다.
+
+    #!plain
+    log4perl.logger = FILE, MAILER
+    ...
+    log4perl.appender.MAILER.to = your@email.com
+    ...
+    log4perl.appender.MAILER.Threshold=ERROR
+
+백업과 로깅은 개발자의 덕목이 아닐까요? (...사실 게으름입니다;;;)
+
+
+
+최소한의 플러그인 만을 사용한다
+--------------------------------
+
+Catalyst의 Best Practice 중 하나는 *플러그인을 쓰지 말라*입니다.
+의존 모듈을 과중하게 쓰는 것과 어플리케이션의 덩치가 커지는 것을
+지양하자는 것이 그것입니다.
+그리고 지속적으로 관리되지 않은 플러그인이 많아져서
+Catalyst의 버전 업그레이드 후에 문제가 생길 소지도 있습니다.
+또한 Catalyst가 [CPAN의 Moose 모듈][cpan-moose] 기반으로 옮겨가면서
+`ActionRole`을 사용하는 경향이 생기기도 했습니다.
+Catalyst가 `Moose` 체계로 옮겨가면서 플러그인 구조가 약간 변했는데
+2009년 9월 이후로 릴리스 내역이 없는 Catalyst 플러그인 모듈은
+플러그인 구조 변경에 대한 준비가 되어있지 않았다고 볼 수 있죠.
+
+다음은 어느 프로젝트에나 공통적으로 사용하는 플러그인 목록입니다.
+
+    #!perl
+    use Catalyst qw/
+        ConfigLoader
+        Unicode::Encoding
+        FormValidator::Simple
+        FillInForm
+        Session
+        Session::Store::FastMmap # 또는 Session::Store::DBIC
+        Session::State::Cookie
+        Authentication
+    /;
+
+사실 이것도 많이 쓰는 것일지도...;;;
+
+
+
+PSGI를 사용한다
+-----------------
+
+[PSGI][plack-home]를 사용하려면 우선 다음 명령을 이용해 `psgi` 파일을 생성합니다.
+
+    #!bash
+    $ ./script/myapp_web_create.pl PSGI
+
+이때는 [CPAN의 Catalyst::Engine::PSGI 모듈][cpan-catalyst-engine-psgi]이 필요합니다.
+물론 그 이전에 [CPAN의 Plack 모듈][cpan-plack]이 필요하지만
+최근은 Plack의 미들웨어인
+[CPAN의 Plack::Middleware::Debug 모듈][cpan-plack-middleware-debug]의 은총을 입어
+항상 Plack을 사용해서 Catalyst 어플리케이션을 띄우고 있습니다.
+
+다음처럼 개발환경에서 디버그 패널을 붙여서 사용하면 편리합니다.
+ 
+    #!perl
+    use Plack::Builder;
+    use MyApp::Web;
+    
+    MyApp::Web->setup_engine('PSGI');
+    my $app = sub { MyApp::Web->run(@_) };
+    
+    builder {
+        enable "Debug",
+            panels => [qw/DBITrace Response Timer Environment Profiler::NYTProf/];
+        $app;
+    };
+ 
+특히 [CPAN의 Devel::NYTProf 모듈][cpan-devel-nytprof]를 붙여서 띄웠을 때
+해당 웹 어플리케이션에 대한 프로파일 정보를 뽑아낼 수 있기 때문에
+어떤 부분이 병목인지 확인이 쉬워졌습니다. 
+하지만 [CPAN의 Plack::Middleware::Debug::Profiler::NYTProf 모듈][cpan-plack-middleware-debug-profiler-nytprof]을
+켜놓을 경우 매번 프로파일링을 하기 때문에 평상시에는 꺼놓는 것이 적절합니다.
+
+
+
+CLI 스크립트의 제대로 된 관리를!
+---------------------------------
+
+위에서 말했다시피 웹서비스는 브라우저를 지원했다고 문제가 끝나는 것이 아닙니다.
+서비스를 관리해나가는 동안 자료의 변동을 감시하고, 집계해서 보고서를 뽑아내고,
+자료를 보정해야 하기도 하고, 일괄적으로 등록하거나 삭제하는 등,
+여러가지 비/정기적인 작업이 필요합니다.
+5분 이상 걸리는 작업이라면 대개의 웹서버가 타임아웃이
+길지 않으므로 이런 류의 작업은 보통 명령줄에서 배치 처리를 합니다.
+ 
+여러분은 이런 스크립트를 어떻게 관리하나요?
+이전에 개발하던 리거시 프로젝트에서는 이런 배치처리 관련 스크립트만
+몇 백개 가까이 되어 어느 누구도 전체적인 흐름을 파악할 수 없어
+곤혹했던 적이 한두 번이 아니었습니다.
+
+그래서 지금은 [CPAN의 MooseX::App::Cmd 모듈][cpan-moosex-app-cmd]를 사용합니다.
+`MyApp::CLI`에서 `MooseX::App::Cmd`를 상속받고,
+`MyApp::CLI::Command::[command]`로 여러가지 배치 작업용 명령을 생성합니다.
+`MooseX::App::Cmd`의 경우 해당 명령의 모듈에서
+*POD* 형식을 이용해 체계적인 문서를 쉽게 만들 수 있습니다.
+해당 명령에 접근자를 지정해 명령의 옵션을 정의할 수 있고,
+`documentation`의 속성을 지정해서 해당 옵션의 역할도 쉽게 지정할 수 있습니다.
+ 
+중요한 것은 `MyApp::CLI::Command` 아래의 명령 모듈이 많아질 수록,
+그 모듈을 모두 메모리에 올려서 작업하기 때문에,
+초기화 속도면에서는 그렇게 빠르지 못한데
+이것은 [Moose][cpan-moose]의 결점이기도 합니다.
+특정 명령을 실행하려 하는데 해당 명령 모듈뿐만 아니라
+다른 모듈까지 같이 초기화하는 것은 아무리 생각해도 좀 쓸데없는 것 같긴합니다.
+현재는 이 부분을 신경 써야할 정도로 모듈 수가 많지는 않지만,
+모듈이 수백 개 이상이 되면 생각해 봐야할 문제일 것 같습니다.
+
+아니, 사실 그 전에 생각해둬야 할 것 같습니다.
+
+.... 어쩌지;;;
+
+
+
+한글은 UTF-8로!!
+-----------------
+
+뭐 양키들이 주체적으로 Catalyst를 만들어나가고 있기 때문에,
+*유니코드 쪽에 대한 배려는 없는 것이 아닌가?*하는 걱정도 합니다.
+어쨌든 항상 기본적으로 Catalyst에서 한글을 다룰 때는 다음 사항을 유의하세요.
+
+- [CPAN의 Catalyst::Plugin::Unicode::Encoding 모듈][cpan-catalyst-plugin-unicode-encoding]을 사용
+- 컨트롤러에서는 반드시 `use utf8` 프라그마를 기본적으로 사용
+- [CPAN의 Catalyst::View::TT 모듈][cpan-catalyst-view-tt]의
+  옵션으로 `ENCODING => utf8`을 지정,
+  ([CPAN의 Template 모듈][cpan-template],
+  [템플릿 툴킷 공식 홈페이지][template-toolkit-home]를 참고하세요.)
+- mysql 사용시 [DBD::mysql][cpan-dbd-mysql]을 제대로 설치
+- mysql 접속시의 옵션을 유니코드 환경에 맞게 부여
+- 상황에 맞게 인코드/디코드를 생활화
+
+Catalyst 모델로 `DBIx::Class`를 사용한다면
+[Catalyst::Model::DBIC][cpan-catalyst-model-dbic]의 옵션은 다음 예제를 참고하세요.
+
+    #!plain
+    connect_info:
+      - 'dbi:mysql:mydb:localhost'
+      - 'username'
+      - 'password'
+      - RaiseError: 1
+        AutoCommit: 1
+        mysql_enable_utf8: 1
+        on_connect_do
+          - SET NAMES utf8
+
+
+
+정리하며
+---------
+
+최근 Catalyst는 책(원서긴 하지만...)이 쏟아지고 있으니,
+한 권을 골라집어 맘편히 입문해도 되고,
+[CPAN의 Catalyst::Manual 문서][cpan-catalyst-manual]
+역시 훌륭하게 정리되어 있으므로 시작하는데 부족한 점은 없습니다.
+또한 간단한 Catalyst 사용 예제로 [@aer0][twitter-aer0]님의
+[Tweetalyst][github-tweetalyst]와 그 외 공개된 여러 Catalyst 프로젝트를
+참고하면 많은 도움이 될 것입니다.
+
+
+
+[catalyst-home]:                                http://www.catalystframework.org/
+[cpan-catalyst-engine-psgi]:                    http://search.cpan.org/perldoc?Catalyst::Engine::PSGI
+[cpan-catalyst-log-log4perl]:                   http://search.cpan.org/perldoc?Catalyst::Log::Log4perl
+[cpan-catalyst-manual]:                         http://search.cpan.org/perldoc?Catalyst::Manual
+[cpan-catalyst-model-dbic]:                     http://search.cpan.org/perldoc?Catalyst::Model::DBIC
+[cpan-catalyst-plugin-unicode-encoding]:        http://search.cpan.org/perldoc?Catalyst::Plugin::Unicode::Encoding
+[cpan-catalyst-view-tt]:                        http://search.cpan.org/perldoc?Catalyst::View::TT
+[cpan-catalyst]:                                http://search.cpan.org/perldoc?Catalyst
+[cpan-dbd-mysql]:                               http://search.cpan.org/perldoc?DBD::mysql
+[cpan-dbix-class]:                              http://search.cpan.org/perldoc?DBIx::Class
+[cpan-devel-nytprof]:                           http://search.cpan.org/perldoc?Devel::NYTProf
+[cpan-moose]:                                   http://search.cpan.org/perldoc?Moose
+[cpan-moosex-app-cmd]:                          http://search.cpan.org/perldoc?MooseX::App::Cmd
+[cpan-plack-middleware-debug-profiler-nytprof]: http://search.cpan.org/perldoc?Plack::Middleware::Debug::Profiler::NYTProf
+[cpan-plack-middleware-debug]:                  http://search.cpan.org/perldoc?Plack::Middleware::Debug
+[cpan-plack]:                                   http://search.cpan.org/perldoc?Plack
+[cpan-template]:                                http://search.cpan.org/perldoc?Template
+[github-tweetalyst]:                            https://github.com/aero/Tweetalyst
+[jeen-home]:                                    http://jeen.tistory.com/
+[template-toolkit-home]:                        http://template-toolkit.org/
+[twitter-aer0]:                                 http://www.twitter.com/aer0
+[twitter-jeen_lee]:                             http://www.twitter.com/JEEN_LEE
+[plack-home]:                                   http://plackperl.org/

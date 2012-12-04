@@ -1,0 +1,70 @@
+Title:     캡쳐의 극의
+Package:   Seoul.pm
+Category:  perl
+Category   Seoul.pm
+
+저자
+----
+
+JEEN - Cocoma Daddy, [@JEEN_LEE][twitter], jeen@perl.kr
+
+
+시작하며
+--------
+
+우리는 수많은 웹페이지들을 들락거리면서 정치인들의 뻘소리를 듣거나, 지인들의 되먹지 못한
+막말에 울컥하곤 합니다. 하지만 감정적 대응은 언제나 화를 자초하기 마련이이니 이 일을 어찌할꼬
+하니, 역시 선조들의 지혜에 유레카를 외치게 됩니다.
+
+![조선왕조실록][image-chosun]
+
+기록문화의 위대함을 떠올리며, 우리는 이들의 되먹지 못한 발언들을 조용히 기록하기 시작하면 됩니다.
+하지만 웹페이지에서 URL 을 기록해봐야, 언젠가 그 사이트 문 닫으면 큰일나는 지라,
+결론은 대놓고 웹페이지를 캡쳐뜰 수 밖에 없겠구나! 하고 생각하기 마련입니다.
+
+그럼 우리는 어떻게 뻘글들을 전자제품매장에서 카드긁어서 마일리지 쌓듯 차곡차곡 모을 수 있을까요?
+
+그래서 시작했습니다.
+
+
+그리고 거기에 Durl 이 있었다
+-------------------------
+ 
+Daum 에서 개발한 url 단축 서비스인 durl 이 있습니다.
+다른 단축형 url 서비스와는 달리 화면 캡쳐까지 해주죠.
+
+  $ cpan WWW::Shorten::Durl
+  
+우선 모듈 인스톨하고,
+ 
+  use WWW::Shorten::Durl;
+  use WWW::Shorten 'Durl';
+  use LWP::Simple;
+  
+  my $shorten_url = makeashorterlink('http://twitter.com/JEEN_LEE/status/10536157553106944');
+  
+  open my $fh, ">", "image.jpg";
+  print $fh LWP::Simple::get($shorten_url.'.image');
+  close $fh;
+ 
+위의 코드를 처럼 makeashorterlink 안에 캡쳐 뜨고픈 url 을 넣고 실행시키면 됩니다.
+
+ ![용사장이 캐리어우먼에게 껌뻑죽는 증언][ggumbbuk-image]
+ 
+하.지.만.
+Durl의 화면캡쳐가 바로되는 것이 아닌지라. 캡쳐한 파일이 없을 때는 image.jpg 는 만들어질 일이 없습니다.
+3-5초 이상의 대기시간을 두고 여유롭게 캡쳐를 해야되겠죠? 거기에 + 그림파일도 작습니다.
+
+   WWW::Shorten::Durl::get_image($url)
+ 
+그래서 그림파일은 어떻게 큰걸로 뽑을 수 있지만... 문제는 전체화면 캡쳐가 안된다는 문제가 있었습니다.
+ 
+
+그러면 어쩌냐?
+------------
+
+
+
+[twitter]:http://www.twitter.com/JEEN_LEE
+[image-chosun]:http://ojsfile.ohmynews.com/STD_IMG_FILE/2009/0810/IE001091412_STD.jpg
+[ggumbbuck-image]:ggumbbuck-image.jpg

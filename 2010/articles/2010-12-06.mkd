@@ -1,0 +1,284 @@
+Title:    나만의 E-Book으로 따뜻한 크리스마스를!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   eeyees
+
+저자
+-----
+
+[@eeyees][twitter-eeyees] - 인쇄기기 업계의 기린아,
+TAFKA_HoliK라는 닉을 사용하기도 한다.
+
+
+
+시작하며
+--------
+
+추운 겨울은 이제 싫어!
+언제나 내곁에 있는 레이싱걸들과 함께 따뜻한 크리스마스를!
+
+[![레이싱걸 갤러리][racing-girl-gallery]][racing-girl-gallery]
+
+Perl의 다양한 모듈을 이용하여 임의의
+*DCINSIDE 갤러리에서 원하는 사진을 추출*
+그리고 *EPUB으로의 변환*을 통해 E-book으로 만드는 과정을 소개 할까 합니다.
+스크립트는 이미지 추출 스크립트와 EPUB 생성 스크립트로 따로 나누며
+레이싱걸 갤러리를 이용합니다.
+
+
+
+이미지 추출
+------------
+
+DCINSIDE 갤러리에서 원하는 사진을 추출하는 작업에는
+[CPAN의 Web::Scraper 모듈][cpan-web-scraper]이 매우 도움이 되었습니다.
+`Web::Scraper`++
+
+혹여나 `Web::Scraper`가 설치되어있지 않다면 우선 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Web::Scraper
+
+DCINSIDE 갤러리에서 사진을 추출하는
+`get-images.pl` 스크립트는 다음과 같습니다.
+
+    #!perl
+    use strict;
+    use warnings;
+    use URI;
+    use LWP::UserAgent;
+    use Web::Scraper;
+    
+    my $browser = LWP::UserAgent->new( agent =>
+         'Mozilla/5.0'
+        .' (Windows; U; Windows NT 6.1; en-US; rv:1.9.2b1)'
+        .' Gecko/20091014 Firefox/3.6b1 GTB5'
+    );
+    my $file_num = 0;
+    my ( $start_page_num, $last_page_num ) = @ARGV;
+    $start_page_num ||= 1;
+    $last_page_num  ||= 3;
+    
+    # page scraper
+    my $page_scrap = scraper {
+        process "a", 'link[]' => '@href';
+    };
+    
+    # bbs scraper
+    my $bbs_scrap = scraper {
+        process 'img', 'imglink[]' => '@src';
+    };
+    
+    for my $current_page_num ( $start_page_num .. $last_page_num ) {
+        print "current page : $current_page_num" . "\n";
+        my $g_name = sprintf(
+            'http://gall.dcinside.com/list.php?id=racinggirl&page=%s',
+            $current_page_num,
+        );
+        my $links = get_image_links($g_name);
+    
+        # delete Notice :D
+        if ( $current_page_num == 1 ) {
+            shift( @{$links} ) for ( 1 .. 6 );
+        }
+        download($links);
+        sleep 5;
+    }
+    
+    sub get_image_links {
+        my $url = shift;
+        my @links;
+        my $response;
+        eval { $response = $page_scrap->scrape( URI->new($url) ); };
+        warn $@ if $@;
+    
+        for my $link ( @{ $response->{link} } ) {
+            next unless $link =~ /bbs=$/;
+            push @links, $link;
+        }
+    
+        return \@links;
+    }
+    
+    sub download {
+        my $links = shift;
+    
+        for my $article_link ( @{$links} ) {
+            my $response;
+            eval { $response = $bbs_scrap->scrape( URI->new($article_link) ); };
+            if ($@) {
+                warn $@;
+                next;
+            }
+            for my $img_link ( @{ $response->{imglink} } ) {
+                if ( $img_link =~ m|http://dcimg| ) {
+                    print $img_link . "\n";
+    
+                    my $ua = LWP::UserAgent->new();
+                    my $res;
+                    eval { $res = $ua->get($img_link); };
+                    if ($@) {
+                        warn $@;
+                        next;
+                    }
+    
+                    my $file = sprintf 'img_%04d.jpg', ++$file_num;
+                    open my $fh, ">", $file;
+                    binmode $fh;
+                    print $fh $res->content;
+                    close $fh;
+                }
+            }
+        }
+    }
+
+다음 명령을 이용해 작성한 스크립트를 실행합니다.
+
+    #!bash
+    $ perl get-images.pl 1 3
+
+첫번째 인수가 저장할 웹 페이지의 시작을,
+두번째 인수가 저장할 웹 페이지의 끝을 의미합니다.
+그래서 예제의 인수를 이용해서 실행하면 레이싱갤러리의
+1 페이지부터 3 페이지까지의 아리따운 그림(?)들을 뽑아냅니다.
+다음은 스크립트 실행 중 화면입니다.
+
+![스크립트 실행 장면][running-scraper]
+
+이렇게 스크립트를 실행하고 난 결과는 다음과 같습니다.
+
+[![스크립트 실행 결과][scraping-result]][scraping-result]
+
+사진이 저장되는걸 확인 하였다면 이제 이 사진을
+EPUB 형식으로 변환해 봅시다. :D
+
+
+
+EPUB으로 출판
+--------------
+
+지금까지 모은 그림파일을 EPUB으로 출판하는 `epub.pl` 스크립트를 작성합니다.
+EPUB 파일 생성에는 `EBook::EPUB` 를 필요로 합니다.
+우선 아래 스크립트에서 사용할 모듈들을 설치합니다.
+
+    #!bash
+    $ cpan EBook::EPUB Path::Class Image::Info Data::Section::Simple
+
+EPUB 생성스크립트는 아래와 같습니다.
+
+    #!perl
+    use strict;
+    use warnings;
+    use EBook::EPUB;
+    use Path::Class;
+    use Image::Info qw(image_info dim );
+    use Data::Section::Simple;
+    use File::Temp;
+    
+    my $title  = 'Girls';
+    my $author = '@eeyees';
+    my $epub   = EBook::EPUB->new;
+    $epub->add_title($title);
+    $epub->add_author($author);
+    $epub->add_language('ko');
+    $epub->add_identifier( '9999999999', 'ISBN' );
+    
+    my $dir = Path::Class::Dir->new('.');
+    my $idx = 0;
+    while ( my $elm = $dir->next ) {
+        next unless $elm =~ /(jpg|png)$/;
+        my $img_info   = image_info("$elm");
+        my ( $w, $h )  = dim($img_info);
+        my $image_path = 'image/' . $elm->basename;
+        my $id         = $epub->copy_image( $elm, $image_path, 'image/jpg' );
+        my $html       = generate_html(
+            {
+                title      => $title,
+                author     => $author,
+                fileid     => $id,
+                img        => $image_path,
+                img_width  => $w,
+                img_height => $h,
+            }
+        );
+        my ( $fh, $tmpfile ) = File::Temp::tempfile();
+        print $fh $html;
+        close $fh;
+        $epub->copy_xhtml( $tmpfile, ( sprintf 'page%04d.html', ++$idx ) );
+    }
+    
+    $epub->pack_zip('myebook.epub');
+    
+    sub generate_html {
+        my $obj = shift;
+    
+        my $html = Data::Section::Simple::get_data_section('page.html');
+        for my $key ( keys %{$obj} ) {
+            $html =~ s!<% $key %>!$obj->{$key}!g;
+        }
+        $html;
+    }
+    
+    __DATA__
+    
+    @@ page.html
+    <!DOCTYPE html PUBLIC
+      "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="title" content="<% title %>"/>
+    <meta name="creator" content="<% author %>"/>
+    <title><% fileid %></title>
+    </head>
+    <body style="margin: 0">
+    <table summary="" border="0" style="width: 100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+            <td align="center">
+                <img src="<% img %>"
+                     width="<% img_width %>"
+                     height="<% img_height %>"
+                     alt="<% fileid %>" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </body>
+    </html>
+
+위의 스크립트를 이미지 추출 스크립트로 생성된 그림파일들이
+듬뿍 담긴 디렉토리에서 실행합니다.
+
+    #!bash
+    $ perl epub.pl
+
+이로써 실행한 디렉토리에는 `mybook.epub` 파일이 생성됩니다.
+이렇게 생성된 EPUB 파일을 iTunes에서 동기화시켜서
+iBooks에서 읽어들인 결과는 다음과 같습니다.
+
+[![iPad에서의 실행화면 #1][screenshot-ipad-1]][screenshot-ipad-1]
+[![iPad에서의 실행화면 #2][screenshot-ipad-2]][screenshot-ipad-2]
+
+와우! 이제는 크리스마스가 두렵지 않습니다. :D
+
+
+끝으로
+-------
+
+Perl로 할 수 있는 다양한 경험은 저를 굉장히 즐겁게 합니다.
+이 글을 읽고 계시는 분들도 Perl을 통해
+제가 그런 것처럼 즐거운 경험을 하실 수 있었으면 좋겠습니다.
+
+
+
+[racing-girl-gallery]:  2010-12-06-1.jpg width=700px
+[running-scraper]:      2010-12-06-2.jpg
+[scraping-result]:      2010-12-06-3.jpg width=700px
+[screenshot-ipad-1]:    2010-12-06-4.jpg width=700px
+[screenshot-ipad-2]:    2010-12-06-5.jpg width=700px
+
+[cpan-web-scraper]:     http://search.cpan.org/perldoc?Web::Scraper
+[twitter-eeyees]:       http://www.twitter.com/eeyees/
