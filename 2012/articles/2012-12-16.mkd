@@ -6,7 +6,7 @@ Author:   sng2c
 
 ## 저자
 
-sng2c -
+[@sng2c](http://twitter.com/sng2c) - Perlmania, Perlmongers, 실용주의자, cross platform, 극진인
 
 
 ## gearman worker 운영
