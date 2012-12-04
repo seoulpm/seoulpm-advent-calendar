@@ -1,12 +1,17 @@
-## 일곱번째 날: .M3U Copier for Win32 (부제: 유니코드 파일명과의 전쟁)
+Title: 일곱번째 날: .M3U Copier for Win32 (부제: 유니코드 파일명과의 전쟁)
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: @owl0908
 
 ## 저자
 
-@owl0908 - 
+[@owl0908][author] - 
 Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 고시 준비생.
 10여년 전 개인 홈페이지를 Perl로 구현한 것이 계기가 되어, 슬럼프가 올 때마다 하라는 공부는 안하고 Perl 코딩을 한 결과, 이제는 자신의 정체성의 혼란을 겪고 있다.
 컴퓨터를 사용하면서 필요로 하는 도구를 직접 만들어 쓸 수 있다는 사실 자체가 즐거울 뿐인 평범한 Perl 유저.
-<a href="http://www.nightowl.pe.kr">부엉이의 나무구멍 속 작은 공간</a> 블로그를 운영하고 있다. webmaster _at_ nightowl.pe.kr
+
+[부엉이의 나무구멍 속 작은 공간][author] 블로그를 운영하고 있다. webmaster _at_ nightowl.pe.kr
 
 
 
@@ -224,16 +229,13 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
 
 
 
-<img src="article_image_01.png" alt="첫 번째 실행 결과." id="" width="700" />
-_그림 1._ 첫 번째 실행 결과.</a>
-
+![_그림 1._ 첫 번째 실행 결과][article_image_01.png]
 
 
 첫 번째 테스트부터 꼬이기 시작했습니다. .MP3 파일 복사 도중 실패하는 파일이 나타났고, 오류 메시지는 하나같이 "_그런 파일 없어 임마!_" 였습니다. 없기는 무슨?! 멀쩡히 존재하는데!
 
 
-<img src="article_image_02.png" alt="확인: 분명히 원본 파일은 존재합니다." id="" width="700" />
-_그림 2._ 확인: 분명히 원본 파일은 존재합니다.</a>
+![_그림 2._ 확인: 분명히 원본 파일은 존재합니다.][article_image_02.png]
 
 
 
@@ -295,9 +297,7 @@ _그림 2._ 확인: 분명히 원본 파일은 존재합니다.</a>
 
 또한, 파일이 존재하는지 확인하기 위한 파일 테스트 연산자 -e 대신에, `Win32::Unicode` 모듈에서 제공하는 `file_type e` 를 사용하여 유니코드 파일명을 가진 파일이라도 정상적으로 파일 존재 여부를 확인<sup id="tag_4"><a href="#sup_4">4)</a></sup>할 수 있게 했습니다. 그리고 동작시켜본 결과... 
 
-
-<img src="article_image_03.png" alt="오류가 발생하던 파일들이 모두 복사되어, 오류 메시지가 출력되지 않습니다." id="" width="700" />
-_그림 3._ 오류가 발생하던 파일들이 모두 복사되어, 오류 메시지가 출력되지 않습니다.</a>
+![_그림 3._ 오류가 발생하던 파일들이 모두 복사되어, 오류 메시지가 출력되지 않습니다.][article_image_03.png]
 
 
 유니코드 문자로 이루어진 파일들도 무사히 복사가 이루어졌습니다!
@@ -340,8 +340,7 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 이제 foreach 문 내부에는 루프에 넘어온 .MP3 파일의 비트레이트를 확인하여, 비트레이트 값이 192 초과라면 `mp3_enc_process()` 로, 이하라면 `mp3_copy_process()` 로 이동시키는 코드가 자리잡았습니다. 이제 현재 상태에서 테스트를 해 본다면, 비트레이트가 192Kbps 이하인 일부 .MP3 파일들은 복사가 될 것이고, 그 외 대부분의 .MP3 파일(목록 내 파일의 대부분은 320Kbps 의 고음질 .MP3 파일입니다)들은 `mp3_enc_process()` 서브루틴으로 넘어가는 결과 (아직 서브루틴이 작성되지 않아 비어 있으므로) 복사가 이루어지지 않아야 합니다. 그런데...
 
 
-<img src="article_image_04.png" alt="비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊고 있는 거 없니?" id="" width="700" />
-_그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊고 있는 거 없니?</a>
+![_그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊고 있는 거 없니?][article_image_04.png]
 
 
 테스트를 해 보니 비트레이트가 확인되지 않는 파일들이 속출합니다. 그러고 보면, 위 코드에는 심각한 문제가 있습니다. `MP3::Info` 역시 윈도우 (표준 ANSI) API를 사용하는 한, UTF-8 로 넘겨준 파일 이름을 핸들링할 수가 없습니다. 즉, _MP3::Info 모듈이 파일명을 제대로 인식하게 해 주려면 파일명을 CP949로 변환해서 넘겨줘야 한다_는 것입니다. 잠깐. 그러면, 아까 파일 복사 기능 구현할 때 부딪쳤던 문제하고 다시 맞닥뜨린 셈인데...? 게다가, 아직 코드를 작성하진 않았지만, `mp3_enc_process()` 서브루틴에서 lame.exe 에 파일명을 던져줄 때도, 콘솔에서 동작을 수행하는 한 넘겨줘야 하는 파일명의 인코딩은 CP949 여야 합니다. 오 마이 갓...
@@ -493,7 +492,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
 이렇게 해서, 부족하나마 .M3U 앨범 파일을 지정한 폴더로 복사해 주는 프로그램이 얼추 완성된 것 같습니다. 최소한 제 입장에서 필요한 최소한의 기능은 다 들어가 있는 것 같군요. 그런데 한 가지가 눈에 거슬립니다. 그것은 프로그램을 실행하는 데 필요한 두 개의 값인 _복사하려는 .M3U 파일의 경로/이름, 그리고 .MP3 파일이 복사되어 저장될 폴더를 직접 인자로 주어 실행해야 한다_는 것입니다. 영 불편합니다. 음. 프로그램을 실행하면 .M3U 파일과 대상 폴더를 선택하는 창이 떴으면 좋겠습니다. 뭔가 복잡할 것 같지만, 그동안 해 온 일에 비하면 일이라고 할 수도 없을 정도로 쉽습니다. :-) 물론, GUI 환경을 호출해 줄 CPAN 모듈이 필요합니다.
 
-만약 `Win32::GUI` 모듈이 설치되어 있다면, Win32::GUI 모듈에서 제공하는 `GetOpenFileName` 과 `BrowseForFolder` 메서드를 사용해도 됩니다. 그러나 Win32::GUI 에서 제공하는 BrowseForFolder 에서는 새 폴더를 만들기가 불가능하기 때문에, Win32::GUI 모듈 대신 <a href="http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm" target="_blank">Win32::FileOp</a> 라는 모듈을 사용하도록 하겠습니다. 이 모듈도 기본으로 설치되는 모듈은 아니므로 CPAN 에서 설치하셔야 합니다. `cpan Win32::FileOp` 를 입력하세요!
+만약 `Win32::GUI` 모듈이 설치되어 있다면, Win32::GUI 모듈에서 제공하는 `GetOpenFileName` 과 `BrowseForFolder` 메서드를 사용해도 됩니다. 그러나 Win32::GUI 에서 제공하는 BrowseForFolder 에서는 새 폴더를 만들기가 불가능하기 때문에, Win32::GUI 모듈 대신 [Win32::FileOp][win32-fileop] 라는 모듈을 사용하도록 하겠습니다. 이 모듈도 기본으로 설치되는 모듈은 아니므로 CPAN 에서 설치하셔야 합니다. `cpan Win32::FileOp` 를 입력하세요!
 
 	#!perl
 	
@@ -540,8 +539,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 - .MP3 파일을 복사할 폴더명의 지정은 역시 Win32::FileOp 모듈의 `BrowseForFolder` 를 사용합니다. 옵션으로 `BIF_USENEWUI` 를 주었기 때문에, 폴더 선택 과정에서 새 폴더를 만들어 그 폴더를 지정할 수도 있습니다. (실제 존재하는 폴더명만 넘어올 수 있기 때문에 폴더가 존재하는지 확인하여 없으면 없으면 `mkdir` 문을 사용해 폴더를 생성해 주던 코드도 필요가 없게 되었네요.)
 - 파일 및 폴더 선택 창에 _출력할 메시지는 모두 CP949 인코딩으로 출력_되어야 하므로, 각각의 출력 메시지 부분은 모두 `encode` 를 사용하여 묶었습니다. 사용자가 인자에 상대 경로를 사용할지 절대 경로를 사용할지 알 수 없기 때문에 필요했던, 위 코드 끝 부분의 `rel2abs` 메서드는, OpenDialog 함수와 BrowseForFolder 함수 모두 반환값이 절대 경로이기 때문에, 이 역시 필요가 없는 코드가 되었습니다.
 
-조금 더 욕심을 부린다면, 현재 콘솔 창으로 출력되고 있는 오류 메시지를 별도의 메시지 창으로 출력되도록 하고, 콘솔 창을 보이지 않게 만들어서 좀 더 뭔가 있어보이는 프로그램처럼 보일 수도 있겠네요. 메시지를 별도의 메시지 창으로 출력하기 위한 도구들은 `Win32::GUI` 모듈의 `MessageBox` 메서드 또는 `Win32` 모듈의 `Win32::MsgBox` 함수 등이 있겠지만, 이 부분은 독자분들의 몫으로 남겨두도록 하겠습니다. ^^ 콘솔 창을 숨기는 방법은 <a href="http://advent.perl.kr/2011/2011-12-07.html" target="_blank">2011년에 제가 썼던 Advent Calendar 기사</a>에 관련 내용이 있으므로 그쪽 글을 참고하시기 바랍니다. :-)
-
+조금 더 욕심을 부린다면, 현재 콘솔 창으로 출력되고 있는 오류 메시지를 별도의 메시지 창으로 출력되도록 하고, 콘솔 창을 보이지 않게 만들어서 좀 더 뭔가 있어보이는 프로그램처럼 보일 수도 있겠네요. 메시지를 별도의 메시지 창으로 출력하기 위한 도구들은 `Win32::GUI` 모듈의 `MessageBox` 메서드 또는 `Win32` 모듈의 `Win32::MsgBox` 함수 등이 있겠지만, 이 부분은 독자분들의 몫으로 남겨두도록 하겠습니다. ^^ 콘솔 창을 숨기는 방법은 [2011년에 제가 썼던 Advent Calendar 기사][2012-12-07]에 관련 내용이 있으므로 그쪽 글을 참고하시기 바랍니다. :-)
 
 
 
@@ -825,7 +823,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
 ## 에필로그
 
-이 글은, 제가 만들어서 공개한 Perl 프로그램인 <a href="http://www.nightowl.pe.kr/software/m3ucopier" target="_blank">.M3U Copier</a> 의 제작 과정을 되짚어가면서 쓴 것입니다. 실제 프로그램은 좀 더 GUI 스러운 인터페이스와 함께, 이 글에서 언급은 했지만 독자 여러분들의 몫으로 떠넘긴(..) 여러 가지 항목들에 대한 구현, 기타 개인적으로 필요하여 추가한 몇 가지 옵션 항목들을 포함하고 있습니다. 그러나 그런 기능들을 모두 이 글에서 설명한다는 것은 적절하지 않은 것 같아서, 이 프로그램을 작성할 때 특히 주안점을 두었던 부분인 _유니코드 파일명을 가진 파일들을 제대로 읽고 복사하는 것_을 중심으로 써 보았습니다.. 만 역시나 엄청나게 긴 글이 되어버렸습니다. 기존에 공개된 프로그램을 바탕으로 한 글이긴 하지만, 실제 모든 코드는 이 글을 쓰면서 새로 작성된 것입니다. 프로그램 공개 이후에 새로 알게 된 여러 가지 지식들도 포함했고요. 오히려 차후 제 프로그램을 업데이트 할 때는 이 글을 쓰면서 새로 작성한 스크립트를 Backport 해야 할 것 같네요. :-)
+이 글은, 제가 만들어서 공개한 Perl 프로그램인 [.M3U Copier][m3ucopier] 의 제작 과정을 되짚어가면서 쓴 것입니다. 실제 프로그램은 좀 더 GUI 스러운 인터페이스와 함께, 이 글에서 언급은 했지만 독자 여러분들의 몫으로 떠넘긴(..) 여러 가지 항목들에 대한 구현, 기타 개인적으로 필요하여 추가한 몇 가지 옵션 항목들을 포함하고 있습니다. 그러나 그런 기능들을 모두 이 글에서 설명한다는 것은 적절하지 않은 것 같아서, 이 프로그램을 작성할 때 특히 주안점을 두었던 부분인 _유니코드 파일명을 가진 파일들을 제대로 읽고 복사하는 것_을 중심으로 써 보았습니다.. 만 역시나 엄청나게 긴 글이 되어버렸습니다. 기존에 공개된 프로그램을 바탕으로 한 글이긴 하지만, 실제 모든 코드는 이 글을 쓰면서 새로 작성된 것입니다. 프로그램 공개 이후에 새로 알게 된 여러 가지 지식들도 포함했고요. 오히려 차후 제 프로그램을 업데이트 할 때는 이 글을 쓰면서 새로 작성한 스크립트를 Backport 해야 할 것 같네요. :-)
 
 작년 성탄절 달력에 이어서, 올해도 성탄절 달력에 참가하게 되었습니다. 지난 번 Korean Perl Workshop 에 제대로 참여를 못한 게 너무 아쉬워서, 성탄절 달력 공지를 보자마자 바로 하겠다고 @h0ney 님을 통해서 찔러넣었습니다만, 사실 찔러 놓고는 엄청 후회했습니다. orz 도대체 올해는 뭘 가지고 쓸 것인지... 정말 막막하더군요. 이래저래 머리를 굴리면서 여러 주제들이 뇌리를 스쳐갔습니다만, 결국 제가 쓸 수 있는 주제는 제 Perl 라이프와 떼 놓고는 생각할 수 없다는 것을 다시 한 번 느꼈습니다.
 
@@ -834,15 +832,13 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
 ## 참고 자료
 
-<ul>
-  - <a href="http://search.cpan.org/~xaicron/Win32-Unicode-0.38/lib/Win32/Unicode.pm" target="_blank">CPAN - Win32::Unicode 모듈</a>
-  - <a href="http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm" target="_blank">CPAN - Win32::FileOp 모듈</a>
-  - <a href="http://search.cpan.org/~jdb/Win32-0.45/Win32.pm" target="_blank">CPAN - Win32 모듈</a>
-  - <a href="http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm" target="_blank">CPAN - MP3::Info 모듈</a>
-  - <a href="http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm" target="_blank">CPAN - File::Spec 모듈</a>
-  - <a href="http://en.wikipedia.org/wiki/M3U" target="_blank">.M3U 파일 형식 (위키피디아)</a>
-  - <a href="http://www.nightowl.pe.kr/oblog/article/403" target="_blank">UTF-8 + BOM 문서를 decode 할 때 주의할 점 (졸고)</a>
-</ul>
+- [CPAN - Win32::Unicode][win32-unicode] 모듈
+- [CPAN - Win32::FileOp 모듈][win32-fileop]
+- [CPAN - Win32 모듈][win32]
+- [CPAN - MP3::Info 모듈][mp3-info]
+- [CPAN - File::Spec 모듈][file-spec]
+- [.M3U 파일 형식 (위키피디아)][m3u]
+- [UTF-8 + BOM 문서를 decode 할 때 주의할 점 (졸고)][bom]
 
 
 ## 주석
@@ -856,3 +852,15 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 <p id="sup_4">4) .M3U 파일을 여는 부분은 Win32::Unicode 모듈을 사용하지 않았는데, 현재 상태에서는 콘솔 창에서 인수가 넘어오는 결과 언제나 그 인코딩은 CP949 바이트스트림이라는 점 때문에 별도로 고려하지 않는 것입니다. 대상 폴더가 존재하는지 확인하는 부분에 file_type e 대신 파일 테스트 연산자 -e 를 그대로 사용한 이유 역시 같습니다. [<a href="#tag_4">▲</a>]
 
 <p id="sup_5">5) unpack 문을 이용하여 특정한 바이트스트림을 쉽게 16진수로 변경이 가능합니다. $str = unpack( "H*", $str ); 의 형태로 사용 가능합니다. [<a href="#tag_5">▲</a>]
+
+[author] : http://www.nightowl.pe.kr
+[win32-fileop] : http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
+[2011-12-07] : http://advent.perl.kr/2011/2011-12-07.html
+[m3ucopier] : http://www.nightowl.pe.kr/software/m3ucopier
+[win32-unicode] : http://search.cpan.org/~xaicron/Win32-Unicode-0.38/lib/Win32/Unicode.pm
+[bom] : http://www.nightowl.pe.kr/oblog/article/403
+[win32-fileop] : http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
+[win32] : http://search.cpan.org/~jdb/Win32-0.45/Win32.pm
+[mp3-info] : http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm
+[file-spec] : http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm
+[m3u][http://en.wikipedia.org/wiki/M3U]
