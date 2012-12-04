@@ -1,0 +1,1019 @@
+Title:    Gtk2 programming with DSL
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   am0c
+
+저자
+-----
+
+[@am0c][twitter-am0c] -
+Camel Univ.에 수석 합격한 Perl계의 신동.
+프로그래밍 언어를 가리지 않고 코드를 짜내는 코딩몬.
+Perl 6에 흠뻑 빠져있지만 다른 프로그래밍 언어에도 관심이 많다.
+프로그래밍 능력과 수능 성적은 꼭 정비례하는 것이 아님을
+스스로 증명하며 기존 교육체계에 짱돌을 던지고 있다.
+올해 수능을 삼수째 보면서 전 과목을 찍고 잠을 청한 경력이 있다.
+내년 *Seoul.pm 크리스마스 달력*의 *주편집자*로 내정되어 있다.
+am0c _at_ perl.kr
+
+
+
+시작하며
+---------
+
+Perl은 매우 유연하고 견고한 언어면서, 게다가 빠르기까지 합니다.
+하지만 Perl의 진짜 매력은 프로그래밍의 언어 구조를
+더욱 잘 이해할 수 있게 도와주는 점이 아닐까 합니다.
+Perl을 공부하다보면, 프로그래밍 언어를 효율적으로 다룰 수 있게되고,
+명료하고 아름다운 코드를 작성할 수 있게 되는 것 같습니다.
+GUI 프로그래밍의 경우 기본적으로 키보드로 입력해야 양이 많기 때문에
+[DSL(Domain Specific Language)][wikipedia-dsl] 기법을 도입하면
+꽤나 많은 양의 코드를 줄일 수 있습니다.
+문서에서는 Perl에서 DSL 기법을 도입하기 위해 필요한 기본 지식을
+간단하게 소개하고 이를 이용해서 어떻게 Gtk2와 연동을 하는지 설명합니다.
+
+
+
+알아두어야 할 내용
+-------------------
+
+Perl에는 DSL을 위해서만 만들어진 특별한 문법 따위는 없지만,
+Perl이 제공하는 몇가지 문법을 사용하면 DSL을 구현하는 것은 어렵지 않습니다.
+우선 DSL 기법을 적용하기 위해 알아두어야 할 내용은 다음과 같습니다.
+
+- 뚱뚱한 쉼표
+- 타입글로브 
+- 참조
+- 변수 범위
+- 심볼 테이블
+- 심볼 내보내기
+- 함수 프로토타입
+
+
+
+Perl로 GUI 어플도 만들 수 있나요?
+----------------------------------
+
+물론입니다. 사실 오늘의 주제이기도 합니다.
+Gtk2의 Perl 바인딩을 설치하고 나면 C의 Gtk2와 거의 유사하지만,
+더 간단하게 Gtk2 프로그래밍을 할 수 있습니다.
+Ubuntu 리눅스라면 다음 명령을 이용해서 간단히
+[CPAN의 Gtk2 모듈][cpan-gtk2]을 설치할 수 있습니다.
+
+    #!bash
+    $ sudo apt-get install libgtk2.0-dev
+    $ cpan Gtk2
+
+다음 예제는 윈도우와 버튼을 배치한 간단한 Gtk2 프로그램입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use Gtk2 -init;
+    
+    my $window = Gtk2::Window->new( 'toplevel' );
+    $window->set_title( 'Awesome App' );
+    $window->set_default_size( 200, 100 );
+    $window->set_position( 'center' );
+    $window->signal_connect(
+        delete_event => sub { Gtk2->main_quit }
+    );
+    
+    my $button = Gtk2::Button->new( 'Action' );
+    $button->signal_connect(
+        clicked => sub { print "Seoul Perl Mongers!\n"; }
+    );
+    
+    $window->add( $button );
+    $window->show_all;
+    
+    Gtk2->main;
+
+자, 실행을 시켜볼까요? 짜잔!
+
+![Awesome App][img-01]
+
+
+
+굳이 DSL을 써야할까요?
+-----------------------
+
+### 코드가 너무 복잡해요!
+
+Gtk2는 잘 설계된 모듈이긴 하지만 Glade와 같은 인터페이스 빌더의 도움을 받지않고
+GUI 프로그래밍을 하려면 굉장히 많은 양의 코드를 키보드로 입력해야 합니다.
+간단한 예제에서 보았듯이 위젯을 생성하고 그것을 또 다른 위젯에 담는 일을
+반복하다보면 코드가 복잡해져서 익숙하지 않을 경우 스파게티 코드처럼
+작성하게 될 것입니다.
+
+[Web::Scraper][cpan-web-scraper] 모듈은 [@eeyees][twitter-eeyees]님의
+[여섯째 날 기사][seoulpm-advent-20101206]에서도 소개되어 있는데
+DSL을 제공해서 깔끔하고 편리해서 저도 좋아하는 모듈입니다.
+이처럼 Gtk2 프로그래밍에도 DSL 기법을 적용해보면 어떨까요?
+
+
+### 그래서 DSL로 작성하면?
+
+역시 DSL로 작성했을 때의 코드를 미리 봐두는 편이 이해가 빠르겠죠?
+앞에서 살펴 본 예제 코드를 DSL 형식으로 바꾼다면 아마 이런 느낌일 것입니다.
+
+    #!perl
+    my $app = build {
+        has Window => with {
+            set title        => 'Awesome App';
+            set default_size => 200, 100;
+            set position     => 'center';
+            on delete_event  => sub { Gtk2->main_quit; };
+    
+            has Button => with {
+                set label  => 'Action';
+                on clicked => sub { say 'Seoul Perl Mongers!' };
+            };
+        };
+    };
+
+어때요? 꽤나 그럴듯하지 않나요?
+무엇보다 타이핑할 양이 줄어들었다는 것만은 확실합니다. ;-)
+
+
+
+설계
+-----
+
+### 이름 정하기
+
+우선 작성할 모듈 이름을 지어볼까요?
+[CPAN에서 Gtk2로 검색해보면][search-cpan-gtk2] Gtk2의 확장 모듈을 위한
+이름 공간으로 `Gtk2::Ex::*`를 사용하는 것을 확인할 수 있습니다.
+자 그러면 우리의 DSL 모듈은 `Gtk2::Ex::Builder` 정도가 적당하겠네요.
+
+
+
+### 뼈대 잡기
+
+하향(top-down) 개발 방식으로 접근해보죠.
+제공할 DSL의 기능 구현에 앞서 기본적인 문법을 먼저 정해보죠.
+이미 모듈이 완성되었다고 가정하면 DSL을 사용한 완전한 예제는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use Gtk2;
+    use Gtk2::Ex::Builder;
+    
+    my $app = build {
+        has Window => with {
+            set title        => 'Awesome App';
+            set default_size => 200, 100;
+            set position     => 'center';
+            on delete_event  => sub { Gtk2->main_quit; };
+    
+            has Button => with {
+                set label  => 'Action';
+                on clicked => sub { say 'Seoul Perl Mongers!' };
+            };
+        };
+    };
+    
+    $app->start;
+
+산뜻하지 않나요? ;-)
+미리 작성해본 예제는 `$app->start`를 호출하면
+최상위의 윈도우 위젯이 뜨는 것을 가정한 모습입니다.
+
+하지만 곰곰이 생각해보면 작성할 DSL 모듈은 GUI 인터페이스를 만드는데 집중하고
+나머지 세부적인 동작은 원래의 Gtk2 API를 자유롭게 사용할 수 있도록 하는 것이
+유지보수와 확장성을 고려했을때 더 적절할 것 같습니다.
+따라서 Gtk2를 초기화하고 실행하는 부분은 다루지 않도록 합니다.
+
+그렇다면 앞의 예제는 다음처럼 바뀔 것입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use Gtk2 -init;
+    use Gtk2::Ex::Builder;
+    
+    my $app = build {
+        has Window => with {
+            meta id           => 'window';
+            set  title        => 'Awesome App';
+            set  default_size => 200, 100;
+            set  position     => 'center';
+            on   delete_event => sub { Gtk2->main_quit; };
+    
+            has Button => with {
+                set label  => 'Action';
+                on clicked => sub { say 'Seoul Perl Mongers!' };
+            };
+        };
+    };
+    
+    $app->widget('window')->show_all;
+    Gtk2->main;
+
+완벽하군요! 
+이제 커피라도 한 잔 마시며 한 숨 돌린 후 본격적으로 모듈을 만들어 보죠. ;-)
+
+
+
+모듈 뼈대 만들기
+-----------------
+
+모듈 제작 및 설정, 컴파일, 테스트 모음의 뼈대를 제작해주는
+[CPAN의 Module::Starter 모듈][cpan-module-starter]을 사용해보죠.
+`Module::Starter`를 사용하면 기본적으로 `Makefile.PL`을 사용합니다.
+`perl Makefile.PL` 명령을 실행하면 `Makefile`이 생성되는데
+다시 `make`를 실행해서 모듈의 빌드를 진행합니다.
+또한 `make` 유틸리티의 의존성을 제거한
+[CPAN의 Module::Build 모듈][cpan-module-build]도 있는데
+`Module::Starter`에서 `Module::Build`를 이용하게 할 수도 있습니다.
+`Module::Starter`과 `Module::Build`를 설치하려면 다음 명령을 실행합니다.
+
+    #!bash
+    $ cpan Module::Starter Module::Build
+
+모듈 설치를 완료했다면 작업 디렉터리로 이동해서 모듈의 뼈대를 만듭니다.
+
+    #!bash
+    $ cd workspace
+    $ module-starter \
+        --module=Gtk2::Ex::Builder \
+        --builder=Module::Build \
+        --author='Hojung Yoon' \
+        --email='am0c@perl.kr'
+
+`tree` 명령을 이용해서 자동으로 만들어진 뼈대를 확인해보면 다음과 같습니다.
+
+    #!bash
+    $ tree Gtk2-Ex-Builder/
+    Gtk2-Ex-Builder/
+    ├── Build.PL
+    ├── Changes
+    ├── MANIFEST
+    ├── README
+    ├── ignore.txt
+    ├── lib
+    │   └── Gtk2
+    │       └── Ex
+    │           └── Builder.pm
+    └── t
+        ├── 00-load.t
+        ├── boilerplate.t
+        ├── manifest.t
+        ├── pod-coverage.t
+        └── pod.t
+    
+    4 directories, 11 files
+
+`Gtk2-Ex-Builder` 디렉터리로 이동해서 `Build` 파일을 생성해보죠.
+
+    #!bash
+    $ cd Gtk2-Ex-Builder
+    $ perl Build.PL
+
+한번 컴파일을 해볼까요?
+
+    #!bash
+    $ ./Build
+    Building Gtk2-Ex-Builder
+
+테스트를 하려면 다음 명령을 실행시킵니다.
+
+    #!bash
+    $ ./Build test
+    t/00-load.t ....... 1/1 # Testing Gtk2::Ex::Builder 0.01, Perl 5.012001
+    t/00-load.t ....... ok
+    t/boilerplate.t ... ok
+    t/manifest.t ...... skipped: Author tests not required for installation
+    t/pod-coverage.t .. ok
+    t/pod.t ........... ok
+    All tests successful.
+
+`Module::Starter`가 뼈대 생성시에 기본으로 만들어주는 몇가지의 테스트를
+수행하고 통과하는 것을 확인할 수 있습니다.
+모듈 개발시 `./Build`와 `./Build test` 명령을 수행하면서
+컴파일과 테스트를 수시로 확인하면서 기능 구현을 해나갈 수 있습니다.
+
+
+
+
+문법
+-----
+
+다음 코드 조각을 살펴보세요.
+
+    #!perl
+    use Gtk2::Ex::Builder;
+    
+    build {  };
+    build( sub {  } ); # build { }와 동일
+    
+    has 'Window';      # build 밖에서 호출하면 안됩니다.
+    build {
+        has 'Window'   # build 안에서 호출해야 합니다.
+    }
+
+사실 `build`는 코드 참조(code reference)를 인자로 받는 함수입니다.
+메소드가 아니라 함수라는 점을 유의하세요.
+`use Gtk2::Ex::Builder`를 호출하면 호출한 패키지에
+`build`와 `has`등의 함수, 즉 심볼을 들여오게(import) 됩니다.
+`build`와 `has` 모두 들여오는 심볼이지만 `has`는
+`build`의 코드 참조 안에 존재하고 그 안에서만 호출해야 한다는 점이 다릅니다.
+코드 참조 속에 있는 구문은 컴파일 시간에 바로 평가하지 않습니다.
+바로 평가하지 않는다는 것은 무슨 뜻일까요?
+다음 코드 조각을 살펴보세요.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    
+    my $func = sub { HI SUSAN Im am0c };
+
+`HI`, `SUSAN`, `Im`, `am0c`는 내장 함수도 아니고,
+그렇다고 다른 모듈이 제공하는 심볼도 아니기 때문에
+Perl 입장에서는 도통 이해할 수 없는 용어겠지만
+그럼에도 불구하고 앞의 예제는 오류가 발생하지 않습니다.
+익명 사용자 함수 내부의 `HI`, `SUSAN`, `Im`, `am0c`은
+코드가 실행되기 전까지는 문법이 틀린 것이 아닙니다.
+
+정리하면 다음과 같습니다.
+
+- `build`와 `has` 모두 모듈을 사용하는 곳에 심볼을 내보내야 함
+- `build` 함수는 코드 참조를 인자로 받는 함수
+- `has` 함수는 `build`의 인자인 코드 참조 안에서 존재하는 함수
+
+원하는대로 동작하게 하려면 코드는 다음과 같을 것입니다.
+
+    #!perl
+    use Exporter;
+    
+    our @ISA = qw( Exporter );
+    our @EXPORT = qw(
+        build
+        has
+    );
+    
+    # 직접 호출하면 경고한다.
+    sub has {
+        warn "You cannot call 'has' directly";
+    }
+    
+    # 메소드를 통해 CODEREF를 실행할 때
+    # has의 기능을 잠시 덮어쓴다.
+    sub build (&) {
+        my $code = shift;
+        ...
+        local *has = sub {
+            ...
+        };
+        ...
+        $code->();
+    }
+
+짧은 코드지만 꽤 많은 고급 문법을 사용하고 있습니다.
+크게 *심볼 내보내기*와 `has`, `build` 함수 세 부분으로
+구분해서 살펴보겠습니다.
+
+모듈을 사용하는 곳에 심볼을 내보내는 코드 조각은 다음과 같습니다.
+
+    #!perl
+    use Exporter;
+    
+    our @ISA = qw( Exporter );
+    our @EXPORT = qw(
+        build
+        has
+    );
+
+이 코드 조각은 Perl의 상속과 심볼 내보내기 기능을 이용합니다.
+수동으로 심볼을 내보낼 수도 있지만 `Exporter` 모듈을 사용하면
+쉽게 내보낼 심볼 목록을 결정할 수 있습니다.
+`@ISA`와 관련해서는 [@aer0][twitter-aer0]님의 [블로그 포스트][aero-isa]를 참고하세요.
+
+`has` 함수의 경우 `build` 내부에서만 실행되는 것이 맞으니
+`build` 외부에서 호출할 경우 사용자에게 경고를 해준다면
+사용자의 실수를 미연에 방지할 수 있겠죠.
+우선 `has` 함수를 정의해서 직접 호출하는 경우 경고를 발생시키도록 하죠.
+    
+    #!perl
+    # 직접 호출하면 경고한다.
+    sub has {
+        warn "You cannot call 'has' directly";
+    }
+
+이제 `build` 함수를 살펴보죠.
+    
+    #!perl
+    # 메소드를 통해 CODEREF를 실행할 때
+    # has의 기능을 잠시 덮어쓴다.
+    sub build (&) {
+        my $code = shift;
+        ...
+        no warnings 'redefine';
+        local *has = sub {
+            ...
+        };
+        ...
+        $code->();
+    }
+
+`build` 함수는 재미있는 기법을 많이 사용하고 있습니다.
+
+- 함수 프로토타입
+- 함수 재정의
+- `local` 변경자(modifier)
+- 심볼 테이블
+- 익명 사용자 함수
+
+Perl에서 사용자 함수를 정의하는 문법은 다음과 같습니다.
+
+    #!perl
+    sub NAME BLOCK
+    sub NAME (PROTO) BLOCK
+    sub NAME : ATTRS BLOCK
+    sub NAME (PROTO) : ATTRS BLOCK
+
+익명 사용자 함수의 경우 문법은 다음과 같습니다.
+
+    #!perl
+    sub BLOCK
+    sub (PROTO) BLOCK
+    sub : ATTRS BLOCK
+    sub (PROTO) : ATTRS BLOCK
+
+일반 익명 사용자 함수의 경우 함수의 이름을 정의하지 않으며
+표현식이므로 그 결과를 스칼라 변수에 저장할 수 있으며
+끝에 세미콜론을 붙여야 한다는 점에 유의하세요.
+
+`has` 사용자 함수의 심볼 테이블인 `*has`를 사용해서 접근한 후
+익명 사용자 함수를 정의해서 할당하는 함수 재정의 기법을 사용하는데
+이렇게 함으로써 `build` 함수를 호출한 시점에 `has` 함수의
+동작을 실행시점에 변경해서 `build` 내부에서만 `has`가 동작하도록 조정합니다.
+또한 안전하게 함수 이름(심볼)을 덮어쓰기 위해 `local`을 이용합니다.
+
+하지만 심볼 테이블을 덮어쓸 때는 주의할 것이 있습니다.
+`Gtk2::Ex::Builder`를 사용하는 스크립트에서 `use Gtk2::Ex::Builder`를 호출할 경우
+`local`을 수행하는 심볼의 패키지는 `Gtk2::Ex::Builder`지만 코드 참조 내부에서
+실행되는 `has`는 심볼을 들여온 스크립트의 `main` 패키지라는 점입니다.
+물론 심볼을 들여오는 패키지가 `main`일 경우 `local *has` 대신
+`local *::has`나 `local main::has`를 사용해서 이 문제를 해결할 수는 있습니다.
+하지만 자신의 모듈 이외의 패키지 심볼을 재정의하는 것은
+가능하면 피하는 것이 바람직하므로
+일단 `main` 패키지에 등록된 함수를 모듈 내부의 함수로 재지향시키고,
+재지향된 모듈 내부의 함수를 재정의하는 방향으로 작성합니다.
+
+다음은 함수를 재정의하는 일련의 과정을 표현한 그림입니다.
+
+![함수 재정의 전략][img-02]
+
+
+
+구현
+-----
+
+`Module::Starter`를 이용해서 생성된 `./lib/Gtk2/Ex/Builder.pm` 파일에는
+이미 모듈의 기본 뼈대와 POD문서가 포함되어 있습니다.
+일단은 `Builder.pm` 파일 안에 자동으로 생성된 코드를
+모두 지우고 하나씩 처음부터 작성하겠습니다.
+모듈에 대한 자세한 문서는 [perlmod][perldoc-perlmod] 문서를 참고하세요.
+
+    #!perl
+    package Gtk2::Ex::Builder;
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    our $VERSION = '0.01';
+    
+    1;
+
+형상관리 도구를 사용하고 있다면 지금이 처음 커밋을 수행할 시점입니다. :-)
+`$VERSION`에 대해 더 알고 싶다면 [chromatic][aero-person]의
+[블로그 포스트][version-confusion]를 참고하세요.
+
+모듈이 내보내야 할 심볼의 목록은 다음과 같습니다.
+
+- `build`
+- `has`
+- `meta`
+- `on`
+- `set`
+- `with`
+
+심볼을 내보내기 위해 `import` 함수를 직접 구현하지 않고
+`Exporter` 모듈을 사용합니다.
+
+    #!perl
+    package Gtk2::Ex::Builder;
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use base qw( Exporter );
+    
+    our $VERSION = '0.01';
+    our @EXPORT  = qw(
+        build
+        has
+        meta
+        on
+        set
+        with
+    );
+    
+    1;
+
+눈치챘듯이 `build`는 사실 `Gtk2::Ex::Builder` 모듈의 생성자입니다.
+`build` 함수는 코드 참조를 생성자의 인자로 받아냅니다.
+
+    #!perl
+    sub build (&) {
+        my $code = shift;
+    
+        my $self = bless {
+        }, __PACKAGE__;
+    
+        ... 
+    
+        $code->();
+    
+        return $self;
+    }
+
+펄의 고전적인 객체지향에 대해 더 자세히 알고 싶다면
+[kldp 문서][kldp-obj]를 참고하세요.
+
+`build`를 제외한 함수들은 앞의 그림처럼 내부의 진짜 함수들로 연결해 줍니다.
+내부 함수들은 기본적으로 `build` 외부에서 사용할 수 없다는 경고를 발생합니다.
+
+    #!perl
+    sub has   { goto &_has  }
+    sub meta  { goto &_meta }
+    sub on    { goto &_on   }
+    sub set   { goto &_set  }
+    
+    sub _has { warn "you cannot call 'has' directly" }
+    sub _set { warn "you cannot call 'set' directly" }
+    sub _on  { warn "you cannot call 'on' directly"  }
+    sub _get { warn "you cannot call 'get' directly" }
+
+경고 메시지에 해당하는 `you cannot call ...` 문자열이 중복되므로
+함수를 만드는 함수를 호출해서 코드 중복을 줄입니다.
+
+    #!perl
+    sub has   { goto &_has  }
+    sub meta  { goto &_meta }
+    sub on    { goto &_on   }
+    sub set   { goto &_set  }
+    
+    sub _warn {
+        my $syntax = shift;
+        sub { warn "you cannot call '${syntax}' directly" };
+    }
+    
+    *_has  = _warn 'has';
+    *_meta = _warn 'meta';
+    *_on   = _warn 'on';
+    *_set  = _warn 'set';
+
+이렇게 함수를 만드는 함수를 정의하는 이러한 방법을
+[currying][wikipedia-currying]이라고 합니다.
+
+이젠 `build` 함수에서 각각의 함수를 재정의할 차례입니다.
+
+    #!perl
+    sub build (&) {
+        my $code = shift;
+    
+        my $self = bless {
+        }, __PACKAGE__;
+    
+        no strict 'subs';
+        no warnings 'redefine';
+    
+        local *_has = sub {
+            my $class  = shift;
+            my $_code  = shift;
+            my @params = @_;
+    
+            local *_meta = sub {
+                my $key    = shift;
+                my @values = @_;
+                ...
+            };
+    
+            local *_on = sub ($&) {
+                my $signal = shift;
+                my $_code  = shift;
+                ...
+            };
+    
+            local *_set = sub {
+                my $attr = shift;
+                my @para = @_;
+                ...
+            };
+    
+            $_code->();
+            $self->_current_pop;
+        };
+    
+        $code->();
+    
+        return $self;
+    }
+
+`with` 함수의 경우 사실 아무 역할도 하지않고 `with`의 인자로 넘겨받은
+코드 참조를 그대로 넘겨주는 역할을 합니다.
+`has` 함수의 프로토 타입이 `$&`이므로 두 번째 인자인 코드 참조 부분에
+`with`를 사용하는 대신에 `sub { ... }`를 써서 직접 코드를 넘겨줄 수 있습니다.
+의미적으로 `sub`보다는 `with`가 기억하기에 더 낫기 때문에
+사용할 뿐 다른 의미는 없습니다.
+즉 `with`를 사용하는 부분은 다음처럼 `sub`를 사용해서 대체할 수 있습니다.
+
+    #!perl
+    my $app = build {
+        has Window => sub {
+            ...
+        };
+    };
+
+결국 `with` 함수는 다음처럼 간단히 정의합니다.
+
+    #!perl
+    sub with (&) { @_ }
+
+이 정도면 DSL을 정의하는데 필요한 요소는 모두 살펴본 셈입니다.
+
+
+
+전체 코드
+----------
+
+`Gtk2::Ex::Builder` 모듈의 전체 소스는 다음과 같습니다.
+
+    #!perl
+    package Gtk2::Ex::Builder;
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use base qw( Exporter );
+    
+    our $VERSION = '0.01';
+    our @EXPORT  = qw(
+        build
+        has
+        meta
+        on
+        set
+        with
+    );
+    
+    sub widget {
+        my $self   = shift;
+        my $id     = shift;
+        my $widget = shift;
+    
+        if ($widget) {
+            $self->{_widget}{$id} = $widget;
+        }
+    
+        return $self->{_widget}{$id};
+    }
+    
+    sub _current {
+        my $self = shift;
+        $self->{_current}[-1];
+    }
+    
+    sub _current_push {
+        my $self   = shift;
+        my $widget = shift;
+        push @{ $self->{_current} }, $widget;
+    }
+    
+    sub _current_pop {
+        my $self = shift;
+        pop @{ $self->{_current} };
+    }
+    
+    sub with (&) { @_ }
+    
+    sub build (&) {
+        my $code = shift;
+    
+        my $self = bless {
+            _meta    => {},
+            _widget  => {},
+            _current => [],
+        }, __PACKAGE__;
+    
+        no strict 'subs';
+        no warnings 'redefine';
+    
+        local *_has = sub ($&) {
+            my $class  = shift;
+            my $_code  = shift;
+            my @params = @_;
+    
+            given ($class) {
+                when ('SimpleList') {
+                    require Gtk2::SimpleList;
+                }
+                default {
+                }
+            }
+            my $widget = "Gtk2::$class"->new(@params);
+    
+            if ($self->_current && ref($self->_current) ne __PACKAGE__) {
+                given (ref $self->_current) {
+                    when (/Gtk2::VBox/) {
+                        $self->_current->pack_start($widget, 0, 0, 1);
+                    }
+                    when (/Gtk2::HBox/) {
+                        $self->_current->pack_start($widget, 0, 0, 1);
+                    }
+                    default {
+                        $self->_current->add($widget);
+                    }
+                };
+            }
+    
+            $self->_current_push( $widget );
+    
+            local *_meta = sub {
+                my $key    = shift;
+                my @values = @_;
+    
+                given ($key) {
+                    when ('id') {
+                        $self->widget($values[0], $self->_current);
+                    }
+                    default {
+                    }
+                }
+                $self->{_meta}{$key} = \@values;
+            };
+    
+            local *_on = sub ($&) {
+                my $signal = shift;
+                my $_code  = shift;
+    
+                if ($self->_current) {
+                    $self->_current->signal_connect( $signal => $_code );
+                }
+            };
+    
+            local *_set = sub {
+                my $attr = shift;
+                my @para = @_;
+    
+                my $method = "set_$attr";
+                if ($self->_current) {
+                    $self->_current->$method(@para);
+                }
+            };
+    
+            $_code->() if defined $_code;
+            $self->_current_pop;
+        };
+    
+        $code->();
+    
+        return $self;
+    }
+    
+    sub _warn {
+        my $syntax = shift;
+        sub { warn "you cannot call '$syntax' directly" };
+    }
+    
+    *_has  = _warn 'has';
+    *_meta = _warn 'meta';
+    *_on   = _warn 'on';
+    *_set  = _warn 'set';
+    
+    sub has  { goto &_has  }
+    sub meta { goto &_meta }
+    sub on   { goto &_on   }
+    sub set  { goto &_set  }
+    
+    1;
+
+내부에서 사용하는 함수는 `_` 접두어를 사용해서 표시합니다.
+`has` 함수는 실제 위젯을 생성하는 역할을 하며 첫 번째 인자는 Gtk2 위젯을 의미합니다. 
+생성할 위젯이 `Gtk2::Window`라면 `Window`를,
+`Gtk2::TreeView`라면 `TreeView`를 씁니다.
+`set` 함수는 위젯의 속성을 정의하는 역할을 하며 실제
+C API가 `gtk_button_set_label()`이라면 Perl API는 `$button->set_label`일테고,
+우리의 DSL에서는 `label`을 인자로 받습니다.
+즉 C API중 `gtk_*_set_*`에 해당한다면 DSL의 `set` 함수와 함께 사용할 수 있습니다.
+`on` 함수는 시그널 연결을 위해 사용하며
+Gtk2 API와 별개로 위젯 별로 저장하고 싶은 정보는 `meta` 함수를 이용합니다.
+현재 코드상에서 `meta id => 'my-window'`라고 정의하면 `widget` 메소드를 이용해서
+`$self->widget('my-window')` 해당 위젯을 불러올 수 있습니다.
+
+
+
+실행!
+------
+
+### 빌드와 테스트
+
+빌드와 테스트 후 모듈을 설치합니다.
+
+    #!bash
+    $ ./Build
+    $ ./Build test
+    $ ./Build install
+    Building Gtk2-Ex-Builder
+    Installing /home/am0c/.../5.12.1/Gtk2/Ex/Builder.pm
+    Installing /home/am0c/.../perl-5.12.1/man/man3/Gtk2::Ex::Builder.3
+
+
+### 조금 더 복잡한 예제
+
+후아! 이제 다 되었습니다.
+이번에는 시작할 때 제시했던 예제보다 조금은 더 복잡한 창을 한 번 생성해볼까요?
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use lib 'lib';
+    use 5.010;
+    use utf8;
+    use strict;
+    use warnings;
+    use autodie;
+    use Gtk2 -init;
+    use Gtk2::Ex::Builder;
+    
+    my $builder = build {
+        has Window => with {
+            meta id           => 'window';
+            set  title        => 'Gtk2::Ex::Builder';
+            set  position     => 'center';
+            on   delete_event => sub { Gtk2->main_quit };
+            has VBox => with {
+                has HBox => with {
+                    meta id => 'toggle-hbox';
+                    has Button => with {
+                        set  label   => "Hi!";
+                        on   clicked => sub { say 'Hi!' };
+                    };
+                    has Button => with {
+                        set  label   => "Hello";
+                        on   clicked => sub { say 'Hello' };
+                    };
+                    has Button => with {
+                        set  label   => "World";
+                        on   clicked => sub { say 'World' };
+                    };
+                };
+                has HBox => with {
+                    has ToggleButton => with {
+                        meta id      => 'button-toggle';
+                        set  label   => "show/hide";
+                        on   toggled => \&toggled;
+                    };
+                    has Button => with {
+                        set  label   => 'Quit';
+                        on   clicked => sub { Gtk2->main_quit };
+                    };
+                };
+                has HBox => with {
+                    has SimpleList => with {
+                        meta id => 'treeview';
+                    }, (
+                        id   => 'text',
+                        name => 'text',
+                    );
+                };
+            };
+        };
+    };
+    
+    my $treeview = $builder->widget('treeview');
+    @{$treeview->{data}} = (
+        [ 'keedi',     'Keedi Kim'    ],
+        [ 'practal78', 'Inkyung Park' ],
+        [ 'yuni',      'Kunho Kim'    ],
+        [ 'y0ngbin',   'Yongbin Yu'   ],
+        [ 'am0c',      'Hojung Yoon'  ],
+    );
+    
+    $builder->widget('window')->show_all;
+    
+    Gtk2->main;
+    
+    sub toggled {
+        my $self = shift;
+    
+        my $widget = $builder->widget('treeview');
+        $self->get_active ? $widget->show : $widget->hide;
+    }
+
+
+### 실행!
+
+짜잔! 실행되었습니다!
+
+![DSL을 사용한 Gtk2 예제][img-04]
+
+
+
+정리하며
+---------
+
+Perl은 특정 패러다임에 한정되어 있지 않은 다중 패러다임 언어입니다.
+섬세하게 설계된 덕에 굉장히 유연하기 때문에 최소한의 문법을 이용해서
+DSL과 같은 형식의 프로그래밍을 지원하는 모듈도 쉽게 만들 수 있습니다.
+Gtk2는 잘 설계된 라이브러리지만 특성상 많은 위젯을 생성하게 되면
+위젯간 패킹을 하기 위한 코드가 많아져서 작성하기 번거롭고
+또 자칫 잘못 작성하다가는 스파게티 코드가 되기 쉽상입니다.
+Perl의 유연함과 DSL 기법을 합치면 위젯을 생성하고 패킹을 하고
+기본적인 설정과 관련된 부분을 가독성 있는 형태로 만들 수 있기 때문에
+GUI 프로그래밍시 훨씬 효율이 높아집니다.
+
+
+
+더 나아가기
+------------
+
+지면 관계상 DSL 모듈을 만들기 위한 최소한의 기법과 코드에 대해서만 설명했습니다.
+다루지 못한 다음과 같은 부분은 여러분의 몫으로 남겨두겠습니다. ;-)
+
+- POD를 이용해서 문서 작성하기
+- 기능이 제대로 동작하는지 확인하는 테스트 모음을 추가하기
+- 여러 위젯(Gtk2::VBox와 Gtk2::HBox등)에 필요한 설정을 위한 문법 추가하기
+- 자신만의 DSL 모듈을 작성해보기
+- 완성한 모듈을 CPAN에 등록하기
+
+
+
+[img-01]:                   2010-12-24-1.png
+[img-02]:                   2010-12-24-2.png
+[img-03]:                   2010-12-24-3.png
+[img-04]:                   2010-12-24-4.png
+
+
+
+[aero-isa]:                 http://aero.sarang.net/blog/2010/03/use-base-use-parent.html
+[aero-person]:              http://aero.springnote.com/pages/159748
+[aero-ref]:                 http://aero.springnote.com/pages/994276
+[aero-scope]:               http://aero.springnote.com/pages/914354
+[camelbox]:                 http://code.google.com/p/camelbox/
+[cpan-data-dumper]:         http://search.cpan.org/perldoc?Data::Dumper
+[cpan-exporter]:            http://search.cpan.org/perldoc?Exporter
+[cpan-gtk2]:                http://search.cpan.org/perldoc?Gtk2
+[cpan-module-build]:        http://search.cpan.org/perldoc?Module::Build
+[cpan-module-starter]:      http://search.cpan.org/perldoc?Module::Starter
+[cpan-moosex-declare]:      http://search.cpan.org/perldoc?MooseX::Declare
+[cpan-web-scraper]:         http://search.cpan.org/perldoc?Web::Scraper
+[gypark-array]:             http://gypark.pe.kr/wiki/Perl/%EB%B0%B0%EC%97%B4
+[gypark-hash]:              http://gypark.pe.kr/wiki/Perl/%ED%95%B4%EC%89%AC
+[gypark-list]:              http://gypark.pe.kr/wiki/Perl/%EB%B0%B0%EC%97%B4#H_4
+[gypark-string]:            http://gypark.pe.kr/wiki/Perl/%EB%AC%B8%EC%9E%90%EC%97%B4
+[gypark-sub]:               http://gypark.pe.kr/wiki/Perl/%EC%84%9C%EB%B8%8C%EB%A3%A8%ED%8B%B4
+[gypark-typeglob]:          http://gypark.pe.kr/wiki/Perl/Typeglob
+[gypark-var]:               http://gypark.pe.kr/wiki/Perl/%EB%B3%80%EC%88%98
+[irc-freenode-perl-kr]:     http://webchat.freenode.net/?channels=perl-kr
+[kldp-obj]:                 http://kldp.org/node/77924
+[perl-kr]:                  http://perl.kr/
+[perldoc-func-import]:      http://perldoc.perl.org/functions/import.html
+[perldoc-func-require]:     http://perldoc.perl.org/functions/require.html
+[perldoc-func-use]:         http://perldoc.perl.org/functions/use.html
+[perldoc-perldsc]:          http://perldoc.perl.org/perldsc.html
+[perldoc-perllol]:          http://perldoc.perl.org/perllol.html
+[perldoc-perlmod]:          http://perldoc.perl.org/perlmod.html
+[perldoc-perlop]:           http://perldoc.perl.org/perlop.html
+[perldoc-perlop]:           http://perldoc.perl.org/perlop.html
+[perldoc-perlref]:          http://perldoc.perl.org/perlref.html
+[perldoc-perlsub]:          http://perldoc.perl.org/perlsub.html
+[perldoc-perltoc]:          http://perldoc.perl.org/perltoc.html
+[perldoc-perlvar]:          http://perldoc.perl.org/perlvar.html
+[search-cpan-gtk2]:         http://search.cpan.org/search?query=Gtk2&mode=all
+[search-cpan]:              http://search.cpan.org/
+[seoulpm-advent-20101206]:  2010-12-06.html
+[twitter-aer0]:             http://twitter.com/aer0
+[twitter-am0c]:             http://twitter.com/am0c
+[twitter-eeyees]:           http://twitter.com/eeyees
+[twitter-gypark]:           http://twitter.com/gypark
+[version-confusion]:        http://www.modernperlbooks.com/mt/2009/07/version-confusion.html
+[wikipedia-currying]:       http://en.wikipedia.org/wiki/Currying
+[wikipedia-dsl]:            http://en.wikipedia.org/wiki/Domain-specific_language

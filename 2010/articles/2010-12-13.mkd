@@ -1,0 +1,249 @@
+Title:    use me2day
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   dalinaum
+
+
+저자
+-----
+
+[@dalinaum][twitter-dalinaum] -
+커피를 좋아하는 지나친 감성주의자.
+Lindyhop dancer, Hacker, Perl, LISP, emacs 마니아,
+아이폰과 아이맥을 쓰지만 둘다 좋아하지 않는다.
+[Art of Dalinaum](http://dalinaum-kr.tumblr.com)을 운영하고 있다.
+
+
+
+뭘 할꺼에요?
+-------------
+
+이번 글의 목표는 펄을 사용해서 [미투데이][me2day]를 사용하는 겁니다.
+다 아실 것 같지만 미투데이를 모르는 분도 있을테니 설명이 필요할 것 같네요.
+미투데이는 일상 생활에 소소한 기록을 한줄로 남기는 서비스에요.
+여러 친구와 일상을 공유하고 공감을 하면 미투 버튼을 눌러
+공감의 표현을 하는 서비스입니다.
+
+[![아이유도 쓰고 있다고요.][even-iu-use-me2day]][even-iu-use-me2day]
+
+이제 미투데이는 다 아셨으니깐 미투데이 사용으로 넘어가야죠.
+사용에는 여러가지 의미가 있는데 지금은 글을 쓰는 것만으로 한정지을거에요.
+미투데이의 모든 기능을 다 만드는 것은
+지금 당장 필요하지도 않고 가능하지도 않다고 봐요.
+(API로 공개되지 않은 기능도 있으니까요.)
+쓰기가 있으니깐 읽기도 있으면 좋겠죠?
+아쉽지만 읽기 기능은 과제로 둘께요.
+
+
+
+어떻게 할꺼에요?
+-----------------
+
+비록 [me2day용 Perl API][me2day-peri-api]가 있지만
+이번에는 이 라이브러리를 사용하지 않고 me2day를 사용해봅시다.
+이미 잘 만들어진 라이브러리를 쓰는 것도 의의가 있지만
+라이브러리의 도움이 없이 해보는 과정에서도 배우는 것도 있을 거에요.
+어쩌면 재미있을 수도 있고요.
+바퀴를 재발명하는 일에 부담을 가질 필요는 없다고 봐요.
+바퀴는 언제나 재발명되는 거에요! (뭐 어때요. :)
+
+
+
+어디서 부터 시작할까요?
+------------------------
+
+어디서 부터 시작할까란게 가장 큰 문제인데요.
+*시작이 반*이란 말에는 시작하는 것이 중요하다는 의미도 있겠지만
+그만큼 시작이 어렵다는 의미도 있지 않나 생각해요.
+어떤 일을 시작할 때 저는 먼저 명세를 읽는 편이에요.
+어떤 명세를 읽으면 무엇을 해야할지 조금은 더 뚜렷한 느낌이 들거든요.
+역시 이번에도 [미투데이 명세][me2day-spec]를 먼저 봐야겠습니다.
+가끔 [옛날 주소][me2day-spec-old]로 링크되기도 하는데
+이 문서는 최신 문서가 아니니 참고하지 마세요.
+아직 새 주소가 검색엔진에서 잘 나오고 있진 않군요.
+
+* me2API 소개
+  1. me2API
+  2. 요청과 응답
+  3. 에러 응답
+  4. 문의 및 의견
+
+다 문서를 여신거죠?
+미투데이 API를 이용하면 우리가 원하는 것을 요청하고
+응답을 받는 방식으로 프로그래밍을 할 수 있겠구나라는 생각이 드네요.
+우리는 오류 처리, 문의는 안할거고요. 의견 제시는 말리지는 않을께요.
+저는 안할거에요. :) 중점적으로 읽을 것은 요청과 응답입니다.
+
+> me2API의 요청은 HTTP 요청방식을 사용합니다.
+> GET 또는 POST 메소드를 모두 사용할 수 있습니다.
+> 
+> 미투데이 서버로 파라미터를 전달하는 경우 파라미터는
+> HTML 폼의 기본 인코딩 방식인 `application/x-www-form-urlencoded`
+> 인코딩을 합니다. 이때 문자열의 인코딩은 UTF-8을 따릅니다.
+> 다만 파일을 업로드하는 경우에는 `multipart/form-data`로 인코딩합니다.
+> 
+> me2API 의 응답은 현재 XML 형식과 JSON 형식을 지원하고 있습니다.
+> 요청시 응답형식을 지정해 선호하는 형식을 사용할 수 있습니다.
+> 응답 형식을 지정하지 않는 경우 XML 형식이 지정됩니다.
+> XML 형식의 응답인 경우 XML 인코딩은 UTF-8을 따릅니다.
+> 
+> JSON 형식 호출시 callback 파라미터를 지정하는 경우
+> 지정한 콜백함수을 호출하는 형식으로 결과가 반환됩니다.
+> 즉 다음과 같은 URL로 요청을 한 경우,
+> `http://me2day.net/api/get_friends/rath.json?callback=my_func`
+> 응답 형식은 다음과 같습니다.
+> `my_func(<JSON 형식의 API 처리 결과>);`
+
+특이하게 콜백을 등록할 수 있게 되어 있네요.
+Javascript에서 추가적으로 무언가 처리할 수 있게 콜백을 주나봅니다.
+우리는 그냥 json으로 요청해서 json데이터를 바로 처리하기로 합니다.
+
+
+
+### 애플리케이션키
+
+다음으로 [애플리케이션키][app-key] 페이지를 확인하겠습니다.
+보통 웹 어플리케이션들은 대체로 어플리케이션마다 키를 줘서 관리를 하고 있고요.
+me2API역시 같은 방법을 택하고 있습니다.
+저는 [등록 페이지][app-key-regist]에 다음과 같이 입력했습니다.
+
+* 이름: use me2day demo
+* 설명: use me2day demo
+* 홈페이지: http://advent.perl.kr
+* 이메일: dalinaum@gmail.com
+
+신청 후에 바로 애플리케이션 키가 발급되고
+[확인 페이지][app-key-list]에서 알아볼 수 있어요.
+저는 `2d898e998535e80ab3407107e968ec85`로 발급받았는데 이 키를 사용할 겁니다.
+
+
+
+### 인증 방법 확인
+
+API를 사용하기 위해 인증이 필요할거에요.
+[인증][app-key-auth]을 확인하면 다음을 볼 수 있어요.
+
+> 인증키 => nonce + md5(nonce + user_key)
+
+인증키는 확인했고요.
+여기서 `user_key`가 나오는데 비밀번호가 아니에요.
+자신의 미투데이의 설정 페이지 `http://me2day.net/<아이디>/setting`에
+들어가면 환경설정에서 api사용자키를 볼 수 있어요.
+그 키를 잘 적어주고 다른 사람에게 보여주지는 마세요.
+혹시나 유출되었다면 새 키 발급을 이용해서 다시 발급받으세요.
+그 키는 개인을 증명하는 중요한 수단으로 쓰이기 때문에 꼭 보안에 유의하세요.
+
+    http://me2day.net/api/noop?uid=codian&ukey=XXXXXXXXXXXXXXXX&akey=XXXXXXXXXXXXXXXX
+
+그 아래 예제가 나오는데 `uid`에 아이디, `ukey`에 `nonce+md5(nonce + user_key)`,
+`akey`에 방금 발급받은 애플리케이션 키를 넣으면 되겠네요.
+md5를 사용하려면 [CPAN의 Digest::MD5 모듈][cpan-digest-md5]도 필요하겠군요.
+
+
+
+### 글 관련 API
+
+이제 드디어 [글 관련 API][me2day-post] 로 넘어왔어요. :)
+먼저 글 적기부터 나가도록 하죠.
+복잡한 속성이 많지만 글을 올릴때 가장 핵심적인 속성은 `post[body]`입니다.
+주소는 `http://me2day.net/api/create_post/[미투데이아이디].[응답형식]`
+형태입니다.
+
+글을 적을 때는 인증이 필요할테니 먼저 인증부터 처리합시다.
+제 유저키는 `75063533`이라서(키는 당연히 바꿀거에요. :)
+다음처럼 적었는데 여러분은 실제 사용할 키로 바꿔주세요.
+
+    #!perl
+    use Digest::MD5;
+    
+    my $md5 = Digest::MD5->new;
+    my $nonce = sprintf("%08x", rand(16 ** 8));
+    $md5->add($nonce . '75063533');
+    my $ukey = $nonce.$md5->hexdigest;
+    print $ukey;
+
+먼저 `ukey`를 만들었습니다.
+다음으로 이 `ukey`를 이용해서 HTTP 요청을 해야합니다.
+요청을 위해 [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]과
+[CPAN의 HTTP::Request 모듈][cpan-http-request]을 사용했습니다.
+
+    #!perl
+    use Digest::MD5;
+    use LWP::UserAgent;
+    use HTTP::Request;
+    
+    my $md5 = Digest::MD5->new;
+    my $nonce = sprintf("%08x", rand(16 ** 8));
+    $md5->add($nonce . '75063533');
+    my $ukey = $nonce.$md5->hexdigest;
+
+    my $ua = LWP::UserAgent->new; 
+    my $request = HTTP::Request->new(
+       "POST" => 'http://me2day.net/api/create_post/jokka.json'
+                . '?uid=jokka'
+                . '&ukey='.$ukey
+                . '&akey=2d898e998535e80ab3407107e968ec85'
+                . '&post[body]=Hello_World'
+    );
+    my $response = $ua->request($request);
+
+`uid`를 자신의 id로 `akey`를 발급받은 애플리케이션키로 바꿔주세요.
+`akey`를 그대로 써도 작동은 할거에요.
+자신의 미투데이를 확인하면 성공여부를 알 수 있습니다.
+
+[![Hello World!!][hello-world]][hello-world]
+
+빈 칸 대신 밑줄로 표기 했는데 썩 맘에 들지 않죠?
+`_`를 공백으로 바꾸려면 `_` 대신에 `%20`을 써주세요.
+당연히 이런 방법은 완벽한 해결책은 아닙니다.
+조금 더 나은 방법은 URL 인코딩을 하는 거에요.
+[CPAN의 URI::Escape 모듈][cpan-uri-escape]을 사용한 예제는 다음과 같습니다.
+
+    #!perl
+    use Digest::MD5;
+    use LWP::UserAgent;
+    use HTTP::Request;
+    use URI::Escape;
+    
+    my $md5 = Digest::MD5->new;
+    my $nonce = sprintf("%08x", rand(16 ** 8));
+    $md5->add($nonce . '75063533');
+    my $ukey = $nonce.$md5->hexdigest;
+    
+    my $msg = 'Hello World';
+    
+    my $ua = LWP::UserAgent->new; 
+    my $request = HTTP::Request->new(
+       "POST" => 'http://me2day.net/api/create_post/jokka.json'
+                . '?uid=jokka'
+                . '&ukey='.$ukey
+                . '&akey=2d898e998535e80ab3407107e968ec85'
+                . '&post[body]='.URI::Escape::uri_escape($msg)
+    );
+    my $response = $ua->request($request);
+
+이제 Hello World를 제대로 올리는데 성공했습니다.
+Good job! :)
+
+
+
+[even-iu-use-me2day]:           2010-12-13-1.png width=700px
+[hello-world]:                  2010-12-13-2.png width=700px
+
+
+
+[app-key-auth]:                 http://dev.naver.com/openapi/apis/me2day/me2api_intro#metwo3
+[app-key-list]:                 http://me2day.net/me2/app/key/list
+[app-key-regist]:               http://me2day.net/api/front/appkey)
+[app-key]:                      http://dev.naver.com/openapi/apis/me2day/me2api_intro#metwo2
+[cpan-digest-md5]:              http://search.cpan.org/perldoc?Digest::MD5
+[cpan-http-request]:            http://search.cpan.org/perldoc?HTTP::Request
+[cpan-lwp-useragent]:           http://search.cpan.org/perldoc?LWP::UserAgent
+[cpan-uri-escape]:              http://search.cpan.org/perldoc?URI::Escape
+[me2day-peri-api]:              http://code.google.com/p/me2day-perl-api/
+[me2day-post]:                  http://dev.naver.com/openapi/apis/me2day/post_api
+[me2day-spec-old]:              http://codian.springnote.com/pages/86001
+[me2day-spec]:                  http://dev.naver.com/openapi/apis/me2day/me2api_intro
+[me2day]:                       http://me2day.net
+[twitter-dalinaum]:             http://twitter.com/#!/dalinaum

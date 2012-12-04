@@ -1,0 +1,144 @@
+Title:    Net::Google::Calendar 를 이용한 무료 SMS알림이 만들기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   ainvyu
+
+저자
+-----
+
+[@ainvyu][twitter-ainvyu] - envi, 프로백수,
+S/W Engineer, Server-side programming, Native C++ Speaker,
+Perl Monger, Otaku(?), I love beer., ainvyu _at_ gmail.com
+
+
+
+시작하며
+---------
+
+컴퓨터를 하는 사람이라면 긴 시간이 걸리는 작업을 걸어놓고
+딴짓을 하거나 컴을 켜놓고 잠드는 경험을 한번쯤을 해봤을 것이다.
+이때 작업이 끝날때를 맞춰 알람이 울리거나 Growl 같은 것을 이용해
+notify 를 날리게 만들면 언제까지고 끝나기를 기다리는 일은 없을 것이다.
+이런 것을 요즘 같은 때는 시대의 첨단을 달리는 MUST HAVE 아이템!
+스마트폰을 가지고 있는 유저라면 이메일이나 트위터를 이용해서
+쉽게 알림을 받을 수 있다.
+
+하지만 스마트폰이 없다면?
+
+지금부터 스마트폰이라는 문명의 이기를 거부한(?)
+피쳐폰 사용자용 무료 SMS알림이를 만들어보자.
+시중에는 SMS를 이용한 알림 서비스가 존재하지만
+개인 서비스에 비용을 지불하고 쓰긴 아깝다.
+건당 내야되는 돈이 은근히 부담된다.
+그러나! 구글 캘린더 SMS 알림 서비스를 이용하면
+비스무리한 서비스를 무료로 간단히 이용할 수 있다.
+
+
+
+준비물
+-------
+
+우선 캘린더 설정을 하자.
+Google 아이디는 이미 있다고 가정한다.
+
+![구글 캘린더 설정 #1][img-01]
+
+[구글 캘린더][google-calendar]로 이동해
+우측 상단의 메뉴에서 *Calendar Setting*으로 이동한다.
+
+![구글 캘린더 설정 #2][img-02]
+
+*Mobile Setup*으로 이동하여 핸드폰 인증을 받는다.
+그 후 *Private Address*를 확보한다.
+메인화면에서 아래와 같은 메뉴로 들어간다.
+
+![구글 캘린더 설정 #3][img-03]
+
+*Private Address*에서 XML 버튼을 눌러 나오는 주소를 저장해놓는다.
+
+![구글 캘린더 설정 #4][img-04]
+
+이제 Perl로 Google Calendar에 접근 하기위해
+[Net::Google::Calendar][net-google-calendar] 모듈을 설치하자.
+
+    #!bash
+    $ cpan Net::Google::Calendar
+
+
+
+
+이제 만들어보자!
+-----------------
+
+다음과 같은 펄스크립트를 작성한다.
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+    
+    use DateTime;
+    use Net::Google::Calendar;
+    
+    sub notify {
+        my ($msg) = @_;
+
+        # 아까 저장해놓은 Private Addess 주소를 넣는다.
+        my $cal = Net::Google::Calendar->new(url => Private URL);
+
+        # Google 아이디와 패스워드.
+        $cal->login("your id", "your password");
+
+        my $entry = Net::Google::Calendar::Entry->new();
+        $entry->title('notify');
+        $entry->content($msg);
+        $entry->location('Seoul, Korea');
+
+        $entry->status('confirmed');
+        $entry->when(
+            DateTime->now() + DateTime::Duration->new( minutes => 2 ),
+            DateTime->now() + DateTime::Duration->new( minutes => 1 ),
+        );
+        $entry->reminder('sms', 'minutes', 1);
+
+        my $author = Net::Google::Calendar::Person->new();
+        $author->name('your name');
+        $author->email('foo@bar.com');
+
+        $entry->author($author);
+        $cal->add_entry($entry);
+    }
+
+
+
+락앤롤!
+--------
+
+이제 필요한 부분에 이 함수를 넣고 문자로 날라올
+메세지를 매개변수로 넣어 `notify()` 함수를 호출하면 된다.
+
+    #!perl
+    if (does_test_fail()) {
+        notify('너 임마 큰일났다 - yours Susan');
+    }
+
+![전송결과][img-05]
+
+이 방법은 Google Calendar 서비스의 제한 때문에
+호출한 순간 즉각즉각 SMS가 날아오는 친절함은 없다.
+대략 1분 후에(운이 안좋으면 2분 후에도 날아온다. 기도해라.)
+날라오기도 하지만 그럭저럭 써먹을 만하다.
+
+그럼 Enjoy Perl!
+
+
+
+[google-calendar]:      http://www.google.com/calendar
+[img-01]:               2010-12-02-1.jpg
+[img-02]:               2010-12-02-2.jpg
+[img-03]:               2010-12-02-3.jpg
+[img-04]:               2010-12-02-4.jpg
+[img-05]:               2010-12-02-5.png
+[net-google-calendar]:  http://search.cpan.org/~simonw/Net-Google-Calendar
+[twitter-ainvyu]:       http://twitter.com/#!/ainvyu

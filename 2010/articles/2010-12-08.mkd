@@ -1,0 +1,266 @@
+Title:    산간오지 청년의 '작은 CPAN' 이야기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   JEEN_LEE
+
+저자
+-----
+
+[@JEEN_LEE][twitter-jeen_lee] -
+산간오지 자연청년, 도쿄에 살고있는 꽃청년 하지만 유부남,
+한 때 Drip에 일가견이 있던 리즈 시절이 있었다.
+[블로그인 이빨까기인형][jeen-home]을 운영하고 있으며,
+기술적이며, 현대적인 Perl 관련 글을 꾸준히 올리고 있다.
+주로 jeen이라는 닉을 사용한다.
+
+
+
+나의 살던 고향은 꽃피는 산골
+-----------------------------
+
+이번 주 금요일을 기해 도쿄에서 잠깐 동안 떠나 집으로 가게 되었습니다.
+당연히 집에서는 "아이고 우리 막내 왔나~" 하면서 반겨주겠지만,
+저는 일거리를 싸매고 집으로 가야할 형편이네요.
+집에 가서 소 매니큐어 발라주고, 저녁에는 맥북을 열어
+일거리를 해치워야 하는 현실, 인터넷 연결이 원활하지 못하다는
+전제를 깔아두고, 오프라인 환경에서의 개발환경 준비를 서두르기로 했습니다.
+
+
+
+CPAN 이 필요해요!
+------------------
+
+> *Perl*은 *CPAN*을 사용하기 위한 툴에 불과하다.
+
+이런 말이 전해질 만큼 [CPAN][search-cpan]은 없어서는 안될 존재입니다.
+특히 제 일이 주로 [Catalyst][catalyst-home]를 이용한 웹서비스 개발이라
+이런 일은 CPAN 모듈에 대한 의존성이 특히나 더 높습니다.
+
+다음은 제가 일하는 회사에서 진행한 한 프로젝트의 `Makefile.PL`의 일부입니다.
+
+    #!bash
+    ....
+    requires 'XMLRPC::Lite';
+    requires 'XML::LibXML';
+    requires 'Text::Xslate';
+    requires 'Mouse';
+    requires 'Archive::Zip';
+    requires 'MooseX::App::Cmd';
+    requires 'Data::Pageset';
+    ....
+    
+    $ cat Makefile.PL | grep requires | wc
+      47     108    1698
+ 
+어림잡아 명시적으로 사용하는 의존 모듈만 해도 무려 40개를 넘습니다.
+`lib/`나 `extlib/` 디렉터리 아래에 넣어둔 여러 자작 모듈도 있고하니,
+의존 모듈의 개수는 더 많겠지요.
+아무튼 이런 모듈을 사용함에 있어 어떤 문제에 봉착했을 때,
+결국은 CPAN 문서를 참고해야 하는 경우가 발생합니다. 
+하지만 어떻게 해요. 꽃피는 산골에는 인터넷이 없다는데...
+
+그런 경우에 한 줄기 빛이 되는 것이 바로
+[CPAN의 CPAN::Mini 모듈][cpan-cpan-mini]의 존재입니다.
+
+
+
+미러링, 그까이꺼!
+------------------
+
+> CPAN::Mini - create a minimal mirror of CPAN
+
+말 그대로 CPAN의 쬐그만 미러를 만드는 것입니다.
+그럼 한번 만들어보지요. :-)
+우선 `CPAN::Mini` 를 설치합니다.
+
+    #!bash
+    $ cpan CPAN::Mini
+    
+`CPAN::Mini`설치가 끝나면 `minicpan`이라는 실행 파일이 생깁니다.
+그냥 아무런 설정없이 냉큼 실행하면 오류가 발생하므로
+홈 디렉터리 아래에 `.minicpanrc` 파일을 생성해서
+다음과 같은 내용으로 채워넣습니다.
+
+    #!plain
+    local:        /Users/jeen/Fun/minicpan/
+    remote:       http://ftp.jaist.ac.jp/pub/CPAN/
+    exact_mirror: 1
+
+그리고 명령줄에서 `minicpan`을 실행합니다.
+
+    #!bash
+    $ minicpan
+    Using config from /Users/jeen/.minicpanrc
+    Updating /Users/jeen/Fun/minicpan/
+    Mirroring from http://ftp.jaist.ac.jp/pub/CPAN/
+    ===============================================================
+    authors/01mailrc.txt.gz ... updated
+    modules/02packages.details.txt.gz ... updated
+    modules/03modlist.data.gz ... updated
+    mkdir /Users/jeen/Fun/minicpan/authors
+    mkdir /Users/jeen/Fun/minicpan/authors/id
+    ....
+    
+이제 `.minicpanrc` 설정 파일에서 `local` 항목으로
+설정한 경로에 자신만의 CPAN 미러가 만들어집니다. 
+이 CPAN 미러가 차지하는 용량은 과연 얼마나 될까요?
+`du` 명령을 이용해서 한 번 확인해보죠.
+
+    #!bash
+    $ du -h
+    .....
+    148K    ./authors/id/J/JE/JEEN
+    .....
+    1.4G    .
+
+대략 1.4G 정도의 용량을 소모합니다.
+요즘 같은 상황이라면 노트북이라 할지라도 그렇게 부담 될 용량은 아닐 겁니다.
+
+> RT @saillinux minicpan 으로 미러 하나 만드는 게 낫냐? 야동 하나 지우는 게 낫냐?
+> - [트위터 링크][saillinux-comment]
+
+판단은 각자에게 맡기겠습니다.
+
+
+
+미러링한 저장소 사용하기
+-------------------------
+
+이렇게 그냥 파일 당겨왔다고 끝나는 것은 아닙니다.
+미러링한 CPAN을 사용하게끔 `cpan` 설정을 해줘야합니다.
+
+    #!bash
+    $ cpan
+    ....
+    cpan> o conf urllist unshift file:///Users/jeen/Fun/minicpan
+    cpan> o conf commit
+
+이렇게 설정하고 난 후 `cpan`에서 모듈을 설치하려하면,
+로컬의 CPAN 미러를 우선적으로 참고합니다.
+물론 한 번만 미러링하고 끝나는 것도 아니고,
+당연히 지속적으로 CPAN은 갱신되기 때문에 `minicpan` 명령을 실행해
+갱신되는 CPAN의 항목을 로컬로 끌어와야합니다.
+
+    #!bash
+    $ minicpan
+    
+푹~ 묵혀뒀다가 실행하게 되면 한 번에 대량의 모듈을 받아오기도 하고,
+모듈 설치시 철 지난 버전의 모듈을 설치하게 될 확률도 있으므로
+정기적으로 실행해서 갱신시킬 필요가 있습니다.
+`crontab`을 사용하면 간단하겠죠? :-)
+
+
+
+하지만 모듈 검색은?
+--------------------
+
+하지만 항상 웹을 통해 접속하는 [CPAN 검색][search-cpan]은
+오프라인에서 포기할 수 밖에 없는 걸까요?
+매번 터미널에서 칙칙한 화면으로 문서를 확인해야 하는 운명일까요?
+
+    #!bash
+    $ perldoc [Module]
+
+심지어 이 방법은 설치한 모듈의 문서만 확인할 수 있다는 단점까지 있습니다.
+그래서 필요한 것이 바로
+[CPAN의 CPAN::Mini::Webserver 모듈][cpan-cpan-mini-webserver] 입니다.
+다음 명령으로 `CPAN::Mini::Webserver` 모듈을 설치합니다.
+
+    #!bash
+    $ cpan CPAN::Mini::Webserver
+
+`CPAN::Mini::Webserver`를 설치하면 `minicpan_webserver`라는
+실행 파일이 생깁니다.
+한 번 실행해보죠.
+
+    #!bash
+    $ minicpan_webserver
+    Using config from /Users/jeen/.minicpanrc
+    CPAN::Mini::Webserver: You can connect to your server at http://localhost:2963/
+
+터미널에 출력하는 메시지에 나오는 주소로 브라우저를 이용해서 접속해보세요.
+다음은 실제로 브라우저로 접속한 화면입니다.
+
+![minicpan_webserver 화면][minicpan-webserver]
+
+음... 사실 미려한 구성은 아닙니다만,
+'나름 이거라도...'라는 심정이라면, 이 정도라도 꽤 쓸만합니다.
+지금 우리는 오프라인이잖아요.
+
+
+
+Modern MiniCPAN-ing
+---------------------
+
+사실 전 `cpan`을 버리고 `cpanm`으로 옮긴 지 꽤 시간이 지났습니다.
+거기에 최근의 1.1 버전의 `cpanm`은 미러 옵션이 생겼습니다.
+다음 명령을 이용하면 `cpanm`에서 사용할 미러를 지정해서 설치할 수 있습니다.
+
+    #!bash
+    $ cpanm --mirror file:///Users/jeen/Fun/minicpan --mirror-only Plack
+
+물론 이렇게 사용하는 것은 너무 번거롭기 때문에
+BASH와 같은 쉘을 사용한다면 `alias`로 설정해 간편하게 사용합니다.
+
+    #!bash
+    alias minicpanm='cpanm --mirror file:///Users/jeen/Fun/minicpan --mirror-only'
+    
+이렇게 별칭을 설정하고 난 후 `cpanm`과 `minicpanm`을
+상황에 맞게 적절하게  사용하면 편합니다.
+
+    #!bash
+    $ minicpanm Plack
+
+`cpanm`에 미러 옵션이 추가되자 마찬가지로
+`cpan-outdated`에도 미러옵션을 추가되었네요.
+다음 명령을 이용해서 미러링한 CPAN을 사용할 수 있습니다.
+
+    #!bash
+    $ cpan-oudated --mirror file:///Users/jeen/Fun/minicpan | minicpanm
+
+이렇게 간단하게 `minicpan`의 설정이 끝났습니다. 어때요? 참 쉽죠?
+
+`cpanm`에 대한 자세한 정보는
+[CPAN의 App::cpanminus 모듈][cpan-app-cpanminus]을,
+`cpan-outdated`에 대한 자세한 정보는
+[CPAN의 App::cpanoutdated 모듈][cpan-app-cpanoutdated]을 확인하세요.
+
+
+
+정리하며
+---------
+
+이제 남은 작업은 회사의 분산 버전 관리 저장소에서 이번 한국 휴가 중
+작업할 것들을 적당하게 복제해서 갈 일만 남았습니다.
+그러고 보니 이제 이틀 남았군요. :-)
+
+역시... 사람은 휴가 때 고생하지 않으려면 일을 제깍제깍 끝내야 됩니다. Phew-
+
+
+
+참고자료
+---------
+
+- [CPAN의 CPAN::Mini 모듈][cpan-cpan-mini]
+- [CPAN의 CPAN::Mini::Webserver 모듈][cpan-cpan-mini-webserver]
+- [CPAN의 App::cpanminus 모듈][cpan-app-cpanminus]
+- [CPAN의 App::cpanoutdated 모듈][cpan-app-cpanoutdated]
+- [Perlの開発環境構築メモ][perl-devel-env]
+- [cpanm 1.1 hearts minicpan and darkpan][cpanm-1.1]
+
+
+
+[minicpan-webserver]:       2010-12-08-1.png
+
+[catalyst-home]:            http://www.catalystframework.org/
+[cpan-app-cpanminus]:       http://search.cpan.org/perldoc?App::cpanminus
+[cpan-app-cpanoutdated]:    http://search.cpan.org/perldoc?App::cpanoutdated
+[cpan-cpan-mini-webserver]: http://search.cpan.org/perldoc?CPAN::Mini::Webserver
+[cpan-cpan-mini]:           http://search.cpan.org/perldoc?CPAN::Mini
+[cpanm-1.1]:                http://bulknews.typepad.com/blog/2010/11/cpanm-11-hearts-minicpan-and-darkpan.html
+[jeen-home]:                http://jeen.tistory.com/
+[perl-devel-env]:           http://blog.hide-k.net/archives/2010/11/perl_3.php
+[saillinux-comment]:        http://twitter.com/JEEN_LEE/status/12178938067423232
+[search-cpan]:              http://search.cpan.org/
+[twitter-jeen_lee]:         http://www.twitter.com/JEEN_LEE
