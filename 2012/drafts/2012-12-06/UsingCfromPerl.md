@@ -80,7 +80,7 @@ Moran이라는 이름으로 extension 파일들이 만들어집니다.
 
 생성된 Makefile로 간단히 ‘make’ 명령을 내리면, 내용이 비어있는 Moran.xs로부터 Moran.c, Moran.so 라이브러리가 생성됩니다.
 
-	#!bash">
+	#!bash
 	$ ls Moran.c
 	$ ls blib/arch/auto/Moran.so
 
