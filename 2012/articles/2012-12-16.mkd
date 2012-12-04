@@ -13,20 +13,26 @@ sng2c -
 
 용빈님의 gearman기초덕에 요점만 쓸수 있게 되어서 기쁩니다^^ 용빈님++.
 
-## Gearman 
+
+## Gearman
+
 Worker
 기어맨을 본격적으로 도입하셨나요?
 손쉽고 깔끔하게 RPC와 맵리듀스를 구현한 뒤에 찾아오는 워커관리 지옥을 겪어보셨나요?
 저는 그 지옥을 보았습니다. 그래서 그 지옥에서 탈출하는 방법을 만들었고 공유드리고자 합니다.
 
+
 ## 기어맨 워커 운영 시 겪는 워커 문제들
+
    - 너무 많은 워커
    - 너무 적은 워커
    - 중복되는 코드
    - 메모리릭
    - 워커 프로세스의 종료
 
+
 ## Gearman::SlotManager
+
 위 문제들을 한꺼번에 해결하기 위해
 [Gearman::SlotManager](https://metacpan.org/module/Gearman::SlotManager) 을 작성하였습니다.
 슬롯을 미리 확보해놓고 해당 슬롯의 워커를 spawn하는 방식으로 작동합니다.
@@ -36,6 +42,7 @@ Worker
   * 워커의 Time to live 관리.
   * AnyEvent 루프내장.
 
+
 ## 모듈 설치
 
     cpan install Gearman::SlotManager
@@ -43,6 +50,8 @@ Worker
     cpanm Gearman::SlotManager
 
 로 설치하시면 됩니다.
+
+
 
 ## 워커의 작성
 
@@ -83,6 +92,7 @@ SlotManager를 작성해서 모듈만 명시해주면 바로 사용할 수 있�
 와 같이 실행을 해서 gearman 데몬을 하나 띄워줍니다.
 
 물론 [binary gearmand](http://gearman.org/doku.php) 도 사용가능 합니다.
+
 
 ## SlotManager 의 작성 및 기동
 
@@ -129,6 +139,7 @@ https://metacpan.org/source/KHS/Gearman-SlotManager-0.3/testManager.pl 를 참�
 그렇지만 잘 뜯어보면 아주 간략합니다.
 
 부분부분 살펴봅시다.
+
 
 ### 모듈 로드 ####
 
@@ -225,6 +236,7 @@ Ctrl+C 를 받으면 $cv, AnyEvent의 CondVar에 메세지를 던져서 루프�
 프로세스 목록을 보면 child프로세스들이 후루룩 떠있는걸 목격하실텐데,
 testManger.pl 의 프로세스만 ctrl+c로 종료시켜주면 샤라락 사라지니 걱정않으셔도 됩니다.
 
+
 ## SlotWorker 에서의 AnyEvent
 
 SlotWorker는 Slot클래스에 의해 직접 별도의 프로세스로 실행됩니다.
@@ -243,6 +255,7 @@ TestWorker 에다가 아래와 같이 써서, "TestWorker::wait"를 호출해도
     }
 
 게다가 workleft를 설정해놓으면, Worker 프로세스를 완전히 중지시키고 새 Worker프로세스를 시작시키기 때문에, 사용하는 모듈에 Memory-Leak이 있다고 하더라도 마음놓고 돌릴 수 있답니다. ^^
+
 
 ## 마치며 #
 
