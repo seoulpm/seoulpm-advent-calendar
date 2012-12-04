@@ -11,14 +11,13 @@ sng2c -
 
 ## gearman worker 운영
 
-용빈님의 gearman기초덕에 요점만 쓸수 있게 되어서 기쁩니다^^ 용빈님++.
+용빈님의 gearman 기초 덕에 요점만 쓸 수 있게 되어 기쁩니다^^ `용빈님++`.
 
 
-## Gearman
+## Gearman Worker
 
-Worker
 기어맨을 본격적으로 도입하셨나요?
-손쉽고 깔끔하게 RPC와 맵리듀스를 구현한 뒤에 찾아오는 워커관리 지옥을 겪어보셨나요?
+손쉽고 깔끔하게 RPC와 맵리듀스를 구현한 뒤에 찾아오는 워커 관리 지옥을 겪어보셨나요?
 저는 그 지옥을 보았습니다. 그래서 그 지옥에서 탈출하는 방법을 만들었고 공유드리고자 합니다.
 
 
@@ -34,9 +33,11 @@ Worker
 ## Gearman::SlotManager
 
 위 문제들을 한꺼번에 해결하기 위해
-[Gearman::SlotManager](https://metacpan.org/module/Gearman::SlotManager) 을 작성하였습니다.
-슬롯을 미리 확보해놓고 해당 슬롯의 워커를 spawn하는 방식으로 작동합니다.
-최소슬롯수만큼 워커를 띄우고 띄워진 모든 워커가 작업중이라면 워커를 최대슬롯수만큼 띄우게 끔 했습니다. 노는 워커가 있다면 최소슬롯수 까지 하나씩 줄입니다.
+[Gearman::SlotManager](https://metacpan.org/module/Gearman::SlotManager)을 작성하였습니다.
+슬롯을 미리 확보해놓고 해당 슬롯의 워커를 _spawn_하는 방식으로 작동합니다.
+최소 슬롯 수만큼 워커를 띄우고,
+띄워진 모든 워커가 작업중이면 워커를 최대 슬롯 수만큼 띄우도록 했습니다.
+노는 워커가 있다면 최소 슬롯 수까지 하나씩 줄입니다.
 
   * Flexible한 워커풀의 관리.
   * 워커의 Time to live 관리.
@@ -45,99 +46,104 @@ Worker
 
 ## 모듈 설치
 
-    cpan install Gearman::SlotManager
-    또는
-    cpanm Gearman::SlotManager
+아래와 같이 `cpan` 또는 `cpanm` 도구를 이용하여 설치합니다.
 
-로 설치하시면 됩니다.
-
+    #!bash
+    $ cpan Gearman::SlotManager
+    # 또는
+    $ cpanm Gearman::SlotManager
 
 
 ## 워커의 작성
 
 Gearman::SlotManager는 [Gearman::SlotWorker](https://metacpan.org/module/Gearman::SlotWorker)를 이용하도록 되어 있습니다.
 
+    #!perl
     package TestWorker; # 패키지명을 꼭 명시
     use Any::Moose; # Any::Moose를 이용합니다.
     extends 'Gearman::SlotWorker'; # Gearman::SlotWorker를 상속
-     
-    sub reverse{ # 'TestWorker::reverse' 로 Gearman에 등록됩니다.
+    
+    # TestWorker::reverse로 Gearman에 등록됩니다.
+    sub reverse{ 
         my $self = shift;
         my $data = shift;
         return reverse($data);
     }
-     
-    sub _private{  # '_' 로 시작하면 등록되지 않습니다.
+
+    # '_'로 시작하면 등록되지 않습니다.
+    sub _private {
         my $self = shift;
         my $data = shift;
         return $data;
     }
-     
-    sub NOTVISIBLE{ # 전체대문자 역시 등록되지 않습니다.
-        #...
+
+    # 전체 대문자 역시 등록되지 않습니다.
+    sub NOTVISIBLE{
+        ...
     }
 
-데이터를 받아서 reverse함수의 리턴값을 되돌려주는 크게 쓸모는 없는 워커를 만들었습니다.
+데이터를 받아서 `reverse` 함수의 리턴값을 되돌려주는, 크게 쓸모는 없는 워커를 만들었습니다.
+메소드를 추가하면 `PACKAGE_NAME::METHOD_NAME`으로 Gearman 데몬에 등록이 되구요.
+SlotManager를 작성해 모듈만 명시해주면 바로 사용할 수 있게 됩니다.
 
-메소드를 추가하면 PACKAGE_NAME::METHOD_NAME 으로 Gearman Daemon에 등록이 되구요.
+## gearmand의 기동
 
-SlotManager를 작성해서 모듈만 명시해주면 바로 사용할 수 있게 됩니다.
+이 모듈을 성공적으로 설치했다면, Perl로 구현된 `gearmand`가 설치되어 있을 것입니다.
+아래와 같이 실행하여 Gearman 데몬을 하나 띄워줍니다.
 
-## gearmand 의 기동
+    #!bash
+    $ gearmand -p 9955 -d
 
-이 모듈을 성공적으로 설치했다면, perl로 구현된 gearmand 가 설치되어 있을 것입니다.
-
-    gearmand -p 9955 -d
-
-와 같이 실행을 해서 gearman 데몬을 하나 띄워줍니다.
-
-물론 [binary gearmand](http://gearman.org/doku.php) 도 사용가능 합니다.
+물론 [binary gearmand](http://gearman.org/doku.php)도 사용할 수 있습니다.
 
 
-## SlotManager 의 작성 및 기동
+## SlotManager의 작성 및 기동
 
-[Gearman::SlotManager](https://metacpan.org/module/Gearman::SlotManager) 를 이용하여 시동스크립트를 작성해봅시다.
+[Gearman::SlotManager](https://metacpan.org/module/Gearman::SlotManager)를 이용하여 시동 스크립트를 작성해봅시다.
+Gearman::SlotManager 모듈에 포함된
+[testManager.pl](https://metacpan.org/source/KHS/Gearman-SlotManager-0.3/testManager.pl) 스크립트를
+참고하여 작성해 봅시다.
 
-https://metacpan.org/source/KHS/Gearman-SlotManager-0.3/testManager.pl 를 참고하여 작성해 봅시다.
-
+    #!perl
     #!/usr/bin/perl
     
     use AnyEvent;
     use Gearman::SlotManager;
        
     my $cv = AE::cv;
-     
-    my $sig = AE::signal 'INT'=> sub{ # 데몬종료를 위한 SIGNAL 처리
+
+    # 데몬종료를 위한 SIGNAL 처리
+    my $sig = AE::signal 'INT' => sub {
         $cv->send;
     };
      
     my $slotman = Gearman::SlotManager->new(
-        config=>
+        config =>
         {
-            slots=>{
-                'TestWorker'=>{ # 워커의 패키지명
-                job_servers=>["localhost:9955"], # gearmand 의 port
-                libs=>['.'], # worker가 있는 경로
-                min=>2, # child 최소갯수, 기본값 1
-                max=>5, # child 최대갯수, 기본값 2
-                workleft=>10, # child 당 처리 횟수, 기본값 0.
+            slots => {
+                'TestWorker' => { # 워커의 패키지명
+                job_servers => ["localhost:9955"], # gearmand 의 port
+                libs => ['.'],  # worker가 있는 경로
+                min => 2,       # child 최소갯수, 기본값 1
+                max => 5,       # child 최대갯수, 기본값 2
+                workleft => 10, # child 당 처리 횟수, 기본값 0.
                 }
             }
         },
-        port=>55522, # child 상태조회용 port. 여러개의 SlotManager를 띄울경우 겹치지 않게 설정.
+        port => 55522, # child 상태조회용 port.
+                       # 여러개의 SlotManager를 띄울 경우 겹치지 않게 설정.
     );
      
     $slotman->start; # 데몬 시작 준비 (child process 생성)
     
     my $res = $cv->recv; # 이벤트루프 시작(데몬시작)
     
-    $slotman->stop; # SlotManager 중지 (child process 제거)
+    $slotman->stop;  # SlotManager 중지 (child process 제거)
     undef($slotman); # SlotManager 삭제
-    undef($sig); #시그널 핸들러 삭제
+    undef($sig);     # 시그널 핸들러 삭제
 
-좀 길어 보이죠? 
+좀 길어 보이죠?
 그렇지만 잘 뜯어보면 아주 간략합니다.
-
 부분부분 살펴봅시다.
 
 
