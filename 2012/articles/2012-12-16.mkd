@@ -1,3 +1,9 @@
+Title:    Perl and Gearman
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   sng2c
+
 # gearman worker 운영 #
 
 용빈님의 gearman기초덕에 요점만 쓸수 있게 되어서 기쁩니다^^ 용빈님++.
