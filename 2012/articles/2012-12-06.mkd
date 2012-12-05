@@ -402,7 +402,7 @@ FCGI를 사용하기 위해서는 [CGI::Fast][cpan-cgi-fast] 패키지가 설치
             Options +ExecCGI
             Allow from all
         </Directory>
-        AppClass /home/trunk/wrapper/perl/www/fcgi.pl
+        AppClass /home/wrapper/perl/www/fcgi.pl
     </IfModule>
 
 
