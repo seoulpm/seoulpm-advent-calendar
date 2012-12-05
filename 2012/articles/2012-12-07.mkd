@@ -39,188 +39,188 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
 
 처음엔 가볍게 시작했습니다. 우선 인코딩 부분은 잠시 제쳐두고, 동작 테스트도 할 겸, 뼈대와 함께 핵심 코드가 될 파일을 읽어서 대상 폴더로 복사하는 부분까지만 작성했습니다. 여기까지 사용된 모듈은 대부분의 경우 자동으로 설치되는 기본 모듈들이므로 별도로 설치할 CPAN 모듈은 없습니다. 단, 스크립트 상단에 `use utf8;` 이 선언되어 있으므로, 스크립트를 복사해가며 따라오실 분께서는 반드시 스크립트 파일을 _UTF-8 인코딩으로 저장_하신 후 실행해 주시기 바랍니다.
 
-	#!perl
-	
-	#!/usr/bin/perl
-	use strict;
-	use warnings;
-	use utf8;
-	use File::Spec;
-	use File::Copy;
-	use Encode;
-	use Encode::Guess;
-	
-	#
-	# SOURCE FILE / TARGET FOLDER 받기 (@ARGV 인수)
-	#
-	
-	my $SOURCE_M3U_FILENAME = $ARGV[0] || "";
-	my $TARGET_FOLDER       = $ARGV[1] || "";
-	
-	if ( !$SOURCE_M3U_FILENAME || !$TARGET_FOLDER ) {
-	    print "Error: Source file and/or target folder not defined!\n";
-	    exit;
-	}
-	
-	if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
-	    $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
-	}
-	if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
-	    $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
-	}
-	
-	#
-	# .M3U/.M3U8 파일을 읽어온다.
-	#
-	
-	my $M3U_RAW_DATA;
-	
-	if ( -e "$SOURCE_M3U_FILENAME" ) {
-	
-	    open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
-	    binmode $fHandle;
-	    while(<$fHandle>){
-	        $M3U_RAW_DATA .= $_;
-	    }
-	    close $fHandle;
-	    undef $fHandle;
-	}
-	else {
-	    print "Error: Source file is not exist!\n";
-	    exit;
-	}
-	
-	#
-	# 가져온 데이터의 인코딩 확인 : CP949 / UTF-8?
-	#
-	
-	my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
-	
-	if ( ref($enc) ) {
-	
-	    $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
-	
-	    if ( $enc->name eq "utf8" ) {
-	        if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
-	            $M3U_RAW_DATA =~ s/\x{FEFF}//g;
-	        }
-	    }
-	}
-	else {
-	    print "Error: Cannot guess encoding(Neither CP949 nor UTF-8)! \n";
-	    exit;
-	}
-	
-	undef $enc;
-	
-	#
-	# 파일 목록을 만들기
-	#
-	
-	my @MP3_LIST = split( /\r\n/, $M3U_RAW_DATA );
-	
-	undef $M3U_RAW_DATA;
-	
-	#
-	# 대상 폴더 확인 및 파일 복사
-	#
-	
-	unless ( -e "$TARGET_FOLDER" ) {
-	    mkdir( "$TARGET_FOLDER" );
-	}
-	
-	foreach my $s_filename ( @MP3_LIST ) {
-	
-	    if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
-	
-	    $s_filename = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
-	
-	    mp3_copy_process( $s_filename, $TARGET_FOLDER );
-	}
-	
-	print "\nTask(s) finished.\n";
-	exit;
-	
-	#
-	# 실제 복사가 이루어지는 서브루틴
-	#
-	
-	sub mp3_copy_process {
-	
-	    my $s_filename = $_[0];
-	    my $t_folder   = $_[1];
-	    my $t_filename;
-	    my $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
-	
-	    if ( !Encode::is_utf8( $t_folder ) ) {
-	        $t_folder = decode( "cp949", $t_folder );
-	    }
-	
-	    $s_filename = encode( "cp949", "$s_filename" );
-	    $t_filename = encode( "cp949", "$t_folder/$filename" );
-	
-	    if ( -e "$s_filename" ) {
-	        copy( "$s_filename", "$t_filename" )
-	            or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
-	    }
-	    else {
-	        print "Warning: File is not exist!\n   $s_filename\n\n";
-	    }
-	
-	    undef $s_filename;
-	    undef $t_filename;
-	    undef $filename;
-		undef $t_folder;
-	}
-	
-	#
-	# 실제 인코딩이 이루어지는 서브루틴
-	#
-	
-	sub mp3_enc_process {
-	
-	    # yada yada...
-	}
-	
-	#
-	# .M3U 파일 내에 .MP3 파일이 상대경로로 저장된 경우 절대경로로 변환
-	#
-	
-	sub mp3_abs_path {
-	
-	    my $mp3_file_path = $_[0];
-	    my $m3u_file_path = $_[1];
-	
-	    if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
-	
-	        my $t_drive;
-	        my $t_folders;
-	
-	        ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
-	        $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
-	
-	        undef $t_drive;
-	        undef $t_folders;
-	
-	        $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
-	    }
-	
-	    undef $m3u_file_path;
-	    return $mp3_file_path;
-	}
+    #!perl
+    
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use utf8;
+    use File::Spec;
+    use File::Copy;
+    use Encode;
+    use Encode::Guess;
+    
+    #
+    # SOURCE FILE / TARGET FOLDER 받기 (@ARGV 인수)
+    #
+    
+    my $SOURCE_M3U_FILENAME = $ARGV[0] || "";
+    my $TARGET_FOLDER       = $ARGV[1] || "";
+    
+    if ( !$SOURCE_M3U_FILENAME || !$TARGET_FOLDER ) {
+        print "Error: Source file and/or target folder not defined!\n";
+        exit;
+    }
+    
+    if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
+        $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
+    }
+    if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
+        $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
+    }
+    
+    #
+    # .M3U/.M3U8 파일을 읽어온다.
+    #
+    
+    my $M3U_RAW_DATA;
+    
+    if ( -e "$SOURCE_M3U_FILENAME" ) {
+    
+        open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
+        binmode $fHandle;
+        while(<$fHandle>){
+            $M3U_RAW_DATA .= $_;
+        }
+        close $fHandle;
+        undef $fHandle;
+    }
+    else {
+        print "Error: Source file is not exist!\n";
+        exit;
+    }
+    
+    #
+    # 가져온 데이터의 인코딩 확인 : CP949 / UTF-8?
+    #
+    
+    my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
+    
+    if ( ref($enc) ) {
+    
+        $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
+    
+        if ( $enc->name eq "utf8" ) {
+            if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
+                $M3U_RAW_DATA =~ s/\x{FEFF}//g;
+            }
+        }
+    }
+    else {
+        print "Error: Cannot guess encoding(Neither CP949 nor UTF-8)! \n";
+        exit;
+    }
+    
+    undef $enc;
+    
+    #
+    # 파일 목록을 만들기
+    #
+    
+    my @MP3_LIST = split( /\r\n/, $M3U_RAW_DATA );
+    
+    undef $M3U_RAW_DATA;
+    
+    #
+    # 대상 폴더 확인 및 파일 복사
+    #
+    
+    unless ( -e "$TARGET_FOLDER" ) {
+        mkdir( "$TARGET_FOLDER" );
+    }
+    
+    foreach my $s_filename ( @MP3_LIST ) {
+    
+        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+    
+        $s_filename = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
+    
+        mp3_copy_process( $s_filename, $TARGET_FOLDER );
+    }
+    
+    print "\nTask(s) finished.\n";
+    exit;
+    
+    #
+    # 실제 복사가 이루어지는 서브루틴
+    #
+    
+    sub mp3_copy_process {
+    
+        my $s_filename = $_[0];
+        my $t_folder   = $_[1];
+        my $t_filename;
+        my $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
+    
+        if ( !Encode::is_utf8( $t_folder ) ) {
+            $t_folder = decode( "cp949", $t_folder );
+        }
+    
+        $s_filename = encode( "cp949", "$s_filename" );
+        $t_filename = encode( "cp949", "$t_folder/$filename" );
+    
+        if ( -e "$s_filename" ) {
+            copy( "$s_filename", "$t_filename" )
+                or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
+        }
+        else {
+            print "Warning: File is not exist!\n   $s_filename\n\n";
+        }
+    
+        undef $s_filename;
+        undef $t_filename;
+        undef $filename;
+        undef $t_folder;
+    }
+    
+    #
+    # 실제 인코딩이 이루어지는 서브루틴
+    #
+    
+    sub mp3_enc_process {
+    
+        # yada yada...
+    }
+    
+    #
+    # .M3U 파일 내에 .MP3 파일이 상대경로로 저장된 경우 절대경로로 변환
+    #
+    
+    sub mp3_abs_path {
+    
+        my $mp3_file_path = $_[0];
+        my $m3u_file_path = $_[1];
+    
+        if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
+    
+            my $t_drive;
+            my $t_folders;
+    
+            ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
+            $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
+    
+            undef $t_drive;
+            undef $t_folders;
+    
+            $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
+        }
+    
+        undef $m3u_file_path;
+        return $mp3_file_path;
+    }
 
 
 .M3U 파일의 경로, 파일을 복사할 대상 폴더의 경로를 인수로 받게 되며, 받은 경로는 `File::Spec` 모듈의 `file_name_is_absolute` 메서드를 이용하여 절대 경로인지 여부를 검사하고, 만약 상대 경로라면 `rel2abs` 메서드를 이용하여 절대 경로로 변환하여 혹시라도 발생할 수 있는 문제를 예방하였습니다. .M3U 파일의 인코딩이 CP949일지 UTF-8일지 알 수 없기 때문에, .M3U 파일을 읽어들인 후 인코딩을 확인하고 내부 UTF-8 인코딩으로 저장하여 배열로 .MP3 파일 목록을 저장해 둡니다. 참고로,
 
-	#!perl
-	
-	if ( $enc->name eq "utf8" ) {
-		if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
-			$M3U_RAW_DATA =~ s/\x{FEFF}//g;
-		}
-	}
+    #!perl
+    
+    if ( $enc->name eq "utf8" ) {
+        if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
+            $M3U_RAW_DATA =~ s/\x{FEFF}//g;
+        }
+    }
 
 
 위 코드는 혹시라도 UTF-8 인코딩으로 저장된 .M3U8 파일이 <a href="http://en.wikipedia.org/wiki/Byte_order_mark" target="_blank">Byte-Order Mark(BOM)</a> 문자를 포함하고 있을 경우 이를 삭제할 수 있도록 집어넣은 것입니다. 읽어들이는 텍스트가 UTF-8 이고, BOM 문자가 붙어있지 않다고 확신할 수 없는 경우에는 내부 인코딩으로 읽어들인 후 이 코드에 통과시켜 주는 것이 안전합니다.
@@ -254,43 +254,43 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
 아 참, Win32::Unicode 는 최신의 Strawberry Perl 5.16 에서도 기본 모듈로 설치되어 있지 않기 때문에, CPAN 을 통하여 설치를 해야 합니다. `cpan Win32::Unicode` 를 입력하시면 됩니다.
 
 
-	#!perl
-	#
-	# 실제 복사가 이루어지는 서브루틴
-	#
-	
-	sub mp3_copy_process {
-	
-	    use Win32::Unicode;
-	
-	    my $s_filename = $_[0]; # UTF-8
-	    my $t_folder   = $_[1]; # CP949
-	    my $t_filename;
-	    my $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
-	
-	    if ( !Encode::is_utf8( $t_folder ) ) {
-	        $t_folder = decode( "cp949", $t_folder );
-	    }
-	    if ( !Encode::is_utf8( $filename ) ) {
-	        $filename = decode( "utf8", $filename );
-	    }
-	    $t_filename = "$t_folder/$filename";    # UTF-8
-	
-	    if ( file_type e => "$s_filename" ) {
-	        copyW( "$s_filename", "$t_filename" )
-	            or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
-	    }
-	    else {
-	        print "Warning: File is not exist!\n   $s_filename\n\n";
-	    }
-	
-	    undef $s_filename;
-	    undef $t_filename;
-	    undef $filename;
-	    undef $t_folder;
-	}
+    #!perl
+    #
+    # 실제 복사가 이루어지는 서브루틴
+    #
+    
+    sub mp3_copy_process {
+    
+        use Win32::Unicode;
+    
+        my $s_filename = $_[0]; # UTF-8
+        my $t_folder   = $_[1]; # CP949
+        my $t_filename;
+        my $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
+    
+        if ( !Encode::is_utf8( $t_folder ) ) {
+            $t_folder = decode( "cp949", $t_folder );
+        }
+        if ( !Encode::is_utf8( $filename ) ) {
+            $filename = decode( "utf8", $filename );
+        }
+        $t_filename = "$t_folder/$filename";    # UTF-8
+    
+        if ( file_type e => "$s_filename" ) {
+            copyW( "$s_filename", "$t_filename" )
+                or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
+        }
+        else {
+            print "Warning: File is not exist!\n   $s_filename\n\n";
+        }
+    
+        undef $s_filename;
+        undef $t_filename;
+        undef $filename;
+        undef $t_folder;
+    }
 
 
 첫 번째 소스와 달라진 부분은 위 서브루틴 부분 뿐입니다. `Win32::Unicode` 모듈을 사용하도록 use 문을 넣어 주었고, 시스템에 넘기기 위해 파일명을 CP949 인코딩으로 변환하던 부분을 모두 없앴습니다. `Win32::Unicode` 모듈을 사용하여 파일을 복사할 때는 파일명을 UTF-8 인코딩으로 직접 넘겨줄 수 있기 때문입니다.
@@ -309,30 +309,30 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
 
 이제 요구성능의 첫 번째 조건은 완수했고, 두 번째 조건을 달성해야 합니다. MP3 비트레이트를 확인하는 것은 <a href="http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm" target="_blank">CPAN의 MP3::Info 모듈</a>을 사용하면 되는 매우 간단한 일입니다. 문제는 비트레이트가 192Kbps 보다 큰 경우 MP3 파일을 192Kbps 로 인코딩하여 복사하는 것입니다. 여러 가지 방법을 찾아보았으나, 가장 편리한 방법은 쉽게 구할 수 있는 <a href="http://www.free-codecs.com/Lame_Encoder_download.htm" target="_blank">Lame MP3 Encoder (lame.exe)</a> 를 사용하여 재인코딩하는 것이어서, 그 방법을 사용하기로 했습니다. 우선 비트레이트 확인을 위해 foreach 문 내부를 다음과 같이 수정해 봅시다.
 
-	#!perl
-	use MP3::Info;
-	
-	foreach my $s_filename ( @MP3_LIST ) {
-	
-	    if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
-	
-	    $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
-	
-	    my $mp3_info = get_mp3info( $s_filename );
-	
-	    if ( !$mp3_info->{BITRATE} ) {
-	        print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
-	    }
-	    elsif ( $mp3_info->{BITRATE} > 192 ) {
-	        mp3_enc_process( $s_filename, $TARGET_FOLDER );
-	    }
-	    else {
-	        mp3_copy_process( $s_filename, $TARGET_FOLDER );
-	    }
-	
-	    undef $mp3_info;
-	    undef $s_filename;
-	}
+    #!perl
+    use MP3::Info;
+    
+    foreach my $s_filename ( @MP3_LIST ) {
+    
+        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+    
+        $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
+    
+        my $mp3_info = get_mp3info( $s_filename );
+    
+        if ( !$mp3_info->{BITRATE} ) {
+            print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
+        }
+        elsif ( $mp3_info->{BITRATE} > 192 ) {
+            mp3_enc_process( $s_filename, $TARGET_FOLDER );
+        }
+        else {
+            mp3_copy_process( $s_filename, $TARGET_FOLDER );
+        }
+    
+        undef $mp3_info;
+        undef $s_filename;
+    }
 
 
 MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므로 CPAN 에서 설치를 해 주세요. `cpan MP3::Info` 하시면 됩니다.
@@ -357,34 +357,34 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 
 여기서 생각난 것이 바로 _윈도우의 8.3 파일명(짧은 파일명)_입니다. 과거 MS-DOS 시절에나 쓰이던 것이지만, 하위 호환성의 유지를 위해 지금도 존재하고 있죠. 만약 윈도우의 풀 파일명을 가지고 8.3 파일명을 얻을 수 있다면 문제가 깔끔하게 해결될 수 있습니다. 찾아보니, Win32 모듈에서 제공하는 `GetANSIPathName` 이라는 함수를 사용하면 짧은 파일명을 구할 수 있었습니다.
 
-	#!perl
-	
-	use Win32;
-	use MP3::Info;
-	
-	foreach my $s_filename ( @MP3_LIST ) {
-	
-	    if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
-	
-	    $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
-	
-	    my $shortName = Win32::GetANSIPathName( $s_filename );
-	    my $mp3_info  = get_mp3info( $shortName );
-	
-	    if ( !$mp3_info->{BITRATE} ) {
-	        print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
-	    }
-	    elsif ( $mp3_info->{BITRATE} > 192 ) {
-	        mp3_enc_process( $s_filename, $TARGET_FOLDER );
-	    }
-	    else {
-	        mp3_copy_process( $s_filename, $TARGET_FOLDER );
-	    }
-	
-	    undef $mp3_info;
-	    undef $s_filename;
-	    undef $shortName;
-	}
+    #!perl
+    
+    use Win32;
+    use MP3::Info;
+    
+    foreach my $s_filename ( @MP3_LIST ) {
+    
+        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+    
+        $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
+    
+        my $shortName = Win32::GetANSIPathName( $s_filename );
+        my $mp3_info  = get_mp3info( $shortName );
+    
+        if ( !$mp3_info->{BITRATE} ) {
+            print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
+        }
+        elsif ( $mp3_info->{BITRATE} > 192 ) {
+            mp3_enc_process( $s_filename, $TARGET_FOLDER );
+        }
+        else {
+            mp3_copy_process( $s_filename, $TARGET_FOLDER );
+        }
+    
+        undef $mp3_info;
+        undef $s_filename;
+        undef $shortName;
+    }
 
 
 
@@ -397,92 +397,92 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 
 다만, 코드 작성에 있어서 한 가지 주의할 점은, 어떠한 경우라도 콘솔에서 lame.exe 를 실행하는 과정에서 넘겨주는 _인자(파일명)의 인코딩은 반드시 CP949 여야 한다_는 점입니다. 따라서, 여기서도 앞에서 한 번 사용한 바 있었던 "짧은 이름"을 사용하여 lame.exe 를 호출하는 방법으로 코드를 설계할 것입니다. 대신 인코딩이 완료된 후에는 원래의 긴 이름으로 바꿔 주어야 하겠지요. 유니코드 파일명이 있다는 점에 대비하여 파일명 변경에는 `Win32::Unicode` 의 `renameW` 를 사용합니다.
 
-	#!perl
-	
-	sub mp3_enc_process {
-	
-	    my $s_filename = $_[0]; # UTF-8
-	    my $t_folder   = $_[1]; # CP949
-	
-	    my $shortName  = Win32::GetANSIPathName( $s_filename );
-	    my $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $shortName );
-	
-	    my $t_filename = "$t_folder/$filename";  # CP949!
-	
-	    if ( -e "$shortName" ) {
-	
-	        my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
-	        my $errorlevel  = system( $commandline );
-	    }
-	    else {
-	        print "Warning: File is not exist!\n   $s_filename\n\n";
-	    }
-	
-	    undef $shortName;
-	    undef $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
-	
-	    if ( !Encode::is_utf8( $t_filename ) ) {
-	        $t_filename = decode( "cp949", $t_filename );
-	    }
-	    if ( !Encode::is_utf8( $t_folder ) ) {
-	        $t_folder = decode( "cp949", $t_folder );
-	    }
-	
-	    my $tt_filename = "$t_folder/$filename";  # UTF-8!
-	
-	    use Win32::Unicode;
-	
-	    renameW( "$t_filename", "$tt_filename" );
-	
-	    undef $tt_filename;
-	    undef $t_filename;
-	    undef $s_filename;
-	    undef $t_folder;
-	}
+    #!perl
+    
+    sub mp3_enc_process {
+    
+        my $s_filename = $_[0]; # UTF-8
+        my $t_folder   = $_[1]; # CP949
+    
+        my $shortName  = Win32::GetANSIPathName( $s_filename );
+        my $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $shortName );
+    
+        my $t_filename = "$t_folder/$filename";  # CP949!
+    
+        if ( -e "$shortName" ) {
+    
+            my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
+            my $errorlevel  = system( $commandline );
+        }
+        else {
+            print "Warning: File is not exist!\n   $s_filename\n\n";
+        }
+    
+        undef $shortName;
+        undef $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
+    
+        if ( !Encode::is_utf8( $t_filename ) ) {
+            $t_filename = decode( "cp949", $t_filename );
+        }
+        if ( !Encode::is_utf8( $t_folder ) ) {
+            $t_folder = decode( "cp949", $t_folder );
+        }
+    
+        my $tt_filename = "$t_folder/$filename";  # UTF-8!
+    
+        use Win32::Unicode;
+    
+        renameW( "$t_filename", "$tt_filename" );
+    
+        undef $tt_filename;
+        undef $t_filename;
+        undef $s_filename;
+        undef $t_folder;
+    }
 
 
 참고로, 이 코드를 실행할 때에는 _반드시 lame.exe 파일이 스크립트와 같은 폴더에 있어야_ 합니다. PATH 환경 변수 내에 지정된 다른 폴더에 존재하더라도 실행되지 않습니다. (윈도우의 PATH 폴더 목록은 `$ENV{'PATH'}` 에 저장되어 있습니다만, `File::Spec` 모듈의 `path` 메서드를 사용하면 쉽게 PATH 폴더 목록을 리스트 형태로 얻을 수 있습니다. 이를 이용하여 만약 현재 폴더에 lame.exe 가 존재하지 않는다면 PATH 로 지정된 폴더들에서 lame.exe 를 찾아 보도록 개선할 수도 있을 것입나다. 이 부분의 개선 역시 독자분들께 맡깁니다.^^)
 
 각설하고, 테스트 결과, 코드를 구상할 때에는 전혀 예상하지 못했던 문제가 발생했습니다. 몇몇 파일에서, 분명 lame.exe 에 파일명을 넘겨줄 때 짧은 이름으로 넘겨줬는데, 지 멋대로 긴 이름으로 바꿔서 받고는 파일을 읽을 수 없다는 오류를 발생시켰습니다. 이해가 안 되는 현상인데, 시스템의 문제가 아닌 lame.exe 의 문제로 판단되어서(Perl 에서는 문제 없이 파일을 읽을 수 있기 때문에..), 이 부분의 직접적인 디버깅은 회피하고, 다만 인코딩 실패 시 원본 파일을 임시 폴더로 복사한 후 인코딩을 실행하는 보조 루틴을 추가하는 선에서 마무리를 짓겠습니다. 아래 코드는 관련 부분을 보강한 코드입니다. `mp3_enc_process()` 서브루틴 내의 `if ( -e "$shortName" ) { } ~ else { }` 부분을 대체합니다.
 
-	#!perl
-	
-	if ( -e "$shortName" ) {
-	
-		my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
-		my $errorlevel  = system( $commandline );
-	
-		if ( $errorlevel > 0 ) {
-	
-			my $temp_filename = "$t_folder/temp_".time.".mp3";
-	
-			use File::Copy;
-			copy( "$shortName", "$temp_filename" );
-	
-			$commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
-			$errorlevel  = system( $commandline );
-	
-			if ( $errorlevel > 0 ) {
-				print "Error: Failed to encode .MP3!\n   $s_filename\n\n";
-				$t_filename = $temp_filename;
-			}
-			else {
-				unlink $temp_filename;
-			}
-	
-			undef $temp_filename;
-		}
-	
-		undef $errorlevel;
-		undef $commandline;
-	}
-	else {
-		print "Warning: File is not exist!\n   $s_filename\n\n";
-	}
+    #!perl
+    
+    if ( -e "$shortName" ) {
+    
+        my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
+        my $errorlevel  = system( $commandline );
+    
+        if ( $errorlevel > 0 ) {
+    
+            my $temp_filename = "$t_folder/temp_".time.".mp3";
+    
+            use File::Copy;
+            copy( "$shortName", "$temp_filename" );
+    
+            $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
+            $errorlevel  = system( $commandline );
+    
+            if ( $errorlevel > 0 ) {
+                print "Error: Failed to encode .MP3!\n   $s_filename\n\n";
+                $t_filename = $temp_filename;
+            }
+            else {
+                unlink $temp_filename;
+            }
+    
+            undef $temp_filename;
+        }
+    
+        undef $errorlevel;
+        undef $commandline;
+    }
+    else {
+        print "Warning: File is not exist!\n   $s_filename\n\n";
+    }
 
 
 인코딩 오류 발생시 동작하는 `if ( $errorlevel > 0 ) { }` 조건문을 추가했습니다. `system()` 문은 그 자신이 실행한 코드가 실행이 종료될 때까지 기다렸다가 그 종료 코드(오류 코드)를 돌려주기 때문에, 실행한 프로그램이 오류 코드를 돌려준다면 작업이 성공했는지 실패했는지를 바로 알 수 있습니다. 만약 `$errorlevel` 값이 0이 아니라면(즉, 무언가 문제가 생겼다면), 프로그램은 원본 .MP3 파일을 이름을 바꾸어(temp_ 뒤에 현재의 타임 스탬프를 추가합니다) 대상 폴더로 복사한 후 다시 인코딩을 시도합니다. 성공한다면 복사했던 임시 파일은 삭제되고 다음 작업으로 넘어가지만, 이번에도 실패한다면 오류 메시지를 출력하고 복사되었던 임시 파일을 남겨 두어 다음 작업에 사용하게 합니다. 즉, 인코딩이 실패한다면 그냥 원본 파일을 그대로 복사하는 것과 같은 효과를 보게 되는 거죠.
@@ -494,43 +494,43 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 
 만약 `Win32::GUI` 모듈이 설치되어 있다면, Win32::GUI 모듈에서 제공하는 `GetOpenFileName` 과 `BrowseForFolder` 메서드를 사용해도 됩니다. 그러나 Win32::GUI 에서 제공하는 BrowseForFolder 에서는 새 폴더를 만들기가 불가능하기 때문에, Win32::GUI 모듈 대신 [Win32::FileOp][win32-fileop] 라는 모듈을 사용하도록 하겠습니다. 이 모듈도 기본으로 설치되는 모듈은 아니므로 CPAN 에서 설치하셔야 합니다. `cpan Win32::FileOp` 를 입력하세요!
 
-	#!perl
-	
-	#
-	# SOURCE FILE / TARGET FOLDER 받기
-	#
-	
-	use Win32::FileOp;
-	
-	my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
-	    -title => encode( "CP949", "복사할 .M3U 또는 .M3U8 파일을 선택하십시오." ),
-	    -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
-	    -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
-	    -dir => File::Spec->rel2abs( "." ),
-	);
-	
-	if ( !$SOURCE_M3U_FILENAME ) {
-	    print "Error: Source file is not defined!\n";
-	    exit;
-	}
-	
-	my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
-	    encode( "CP949", "복사할 폴더를 선택하세요." ),
-	    CSIDL_DRIVES,
-	    BIF_USENEWUI,
-	);
-	
-	if ( !$TARGET_FOLDER ) {
-	    print "Error: Target folder is not defined!\n";
-	    exit;
-	}
-	
-	if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
-	    $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
-	}
-	if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
-	    $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
-	}
+    #!perl
+    
+    #
+    # SOURCE FILE / TARGET FOLDER 받기
+    #
+    
+    use Win32::FileOp;
+    
+    my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
+        -title => encode( "CP949", "복사할 .M3U 또는 .M3U8 파일을 선택하십시오." ),
+        -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
+        -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
+        -dir => File::Spec->rel2abs( "." ),
+    );
+    
+    if ( !$SOURCE_M3U_FILENAME ) {
+        print "Error: Source file is not defined!\n";
+        exit;
+    }
+    
+    my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
+        encode( "CP949", "복사할 폴더를 선택하세요." ),
+        CSIDL_DRIVES,
+        BIF_USENEWUI,
+    );
+    
+    if ( !$TARGET_FOLDER ) {
+        print "Error: Target folder is not defined!\n";
+        exit;
+    }
+    
+    if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
+        $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
+    }
+    if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
+        $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
+    }
 
 
 코드의 제일 앞에 있던, SOURCE FILE / TARGET FOLDER 받기 부분을 위 코드로 교체합니다. 이제, 별도로 명령 프롬프트에 귀찮게 인자를 입력할 필요 없이, 단순히 스크립트를 실행하기만 하면, 알아서 .M3U 파일과 복사할 폴더를 물어오는 창을 출력합니다. 물론 둘 중 하나라도 입력하지 않는다면 오류를 발생시키면서 프로그램의 실행이 중단됩니다. 코드를 잠깐 뜯어보면...
@@ -547,278 +547,278 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 
 이제 조각조각 붙여온 모듈들을 하나로 합쳐 봅시다. 갖고 계신 .MP3 파일로 .M3U 파일 앨범을 만들어서, 잘 돌아가는지 한번 테스트도 해 보세요. 이왕이면 유니코드 문자가 낀 .MP3 파일을 가지고 테스트를 해 보는 것이 고생한 보람이 있지 않을까 싶네요. :-) 바로 위에서 지적했던, 필요 없어졌다고 말씀드렸던 코드들은 삭제하지 않았습니다.
 
-	#!perl
-	#!/usr/bin/perl
-	use strict;
-	use warnings;
-	use utf8;
-	use File::Spec;
-	use File::Copy;
-	use Encode;
-	use Encode::Guess;
-	
-	#
-	# SOURCE FILE / TARGET FOLDER 받기 (@ARGV 인수)
-	#
-	
-	use Win32::FileOp;
-	
-	my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
-	    -title => encode( "CP949", "복사할 .M3U 또는 .M3U8 파일을 선택하십시오." ),
-	    -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
-	    -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
-	    -dir => File::Spec->rel2abs( "." ),
-	);
-	
-	if ( !$SOURCE_M3U_FILENAME ) {
-	    print "Error: Source file is not defined!\n";
-	    exit;
-	}
-	
-	my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
-	    encode( "CP949", "복사할 폴더를 선택하세요." ),
-	    CSIDL_DRIVES,
-	    BIF_USENEWUI,
-	);
-	
-	if ( !$TARGET_FOLDER ) {
-	    print "Error: Target folder is not defined!\n";
-	    exit;
-	}
-	
-	if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
-	    $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
-	}
-	if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
-	    $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
-	}
-	
-	#
-	# .M3U/.M3U8 파일을 읽어온다.
-	#
-	
-	my $M3U_RAW_DATA;
-	
-	if ( -e "$SOURCE_M3U_FILENAME" ) {
-	
-	    open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
-	    binmode $fHandle;
-	    while(<$fHandle>){
-	        $M3U_RAW_DATA .= $_;
-	    }
-	    close $fHandle;
-	    undef $fHandle;
-	}
-	else {
-	    print "Error: Source file is not exist!\n";
-	    exit;
-	}
-	
-	#
-	# 가져온 데이터의 인코딩 확인 : CP949 / UTF-8?
-	#
-	
-	my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
-	
-	if ( ref($enc) ) {
-	
-	    $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
-	
-	    if ( $enc->name eq "utf8" ) {
-	        if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
-	            $M3U_RAW_DATA =~ s/\x{FEFF}//g;
-	        }
-	    }
-	}
-	else {
-	    print "Error: Cannot guess encoding(Neither CP949 nor UTF-8)! \n";
-	    exit;
-	}
-	
-	undef $enc;
-	
-	#
-	# 파일 목록을 만들기
-	#
-	
-	my @MP3_LIST = split( /\r\n/, $M3U_RAW_DATA );
-	
-	undef $M3U_RAW_DATA;
-	
-	#
-	# 대상 폴더 확인 및 파일 복사
-	#
-	
-	unless ( -e "$TARGET_FOLDER" ) {
-	    mkdir( "$TARGET_FOLDER" );
-	}
-	
-	use Win32;
-	use MP3::Info;
-	
-	foreach my $s_filename ( @MP3_LIST ) {
-	
-	    if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
-	
-	    $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
-	
-	    my $shortName = Win32::GetANSIPathName( $s_filename );
-	    my $mp3_info  = get_mp3info( $shortName );
-	
-	    if ( !$mp3_info->{BITRATE} ) {
-	        print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
-	    }
-	    elsif ( $mp3_info->{BITRATE} > 192 ) {
-	        mp3_enc_process( $s_filename, $TARGET_FOLDER );
-	    }
-	    else {
-	        mp3_copy_process( $s_filename, $TARGET_FOLDER );
-	    }
-	
-	    undef $mp3_info;
-	    undef $s_filename;
-	    undef $shortName;
-	}
-	
-	print "\nTask(s) finished.\n";
-	exit;
-	
-	#
-	# 실제 복사가 이루어지는 서브루틴
-	#
-	
-	sub mp3_copy_process {
-	
-	    use Win32::Unicode;
-	
-	    my $s_filename = $_[0]; # UTF-8
-	    my $t_folder   = $_[1]; # CP949
-	    my $t_filename;
-	    my $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
-	
-	    if ( !Encode::is_utf8( $t_folder ) ) {
-	        $t_folder = decode( "cp949", $t_folder );
-	    }
-	    if ( !Encode::is_utf8( $filename ) ) {
-	        $filename = decode( "utf8", $filename );
-	    }
-	    $t_filename = "$t_folder/$filename";    # UTF-8
-	
-	    if ( file_type e => "$s_filename" ) {
-	        copyW( "$s_filename", "$t_filename" )
-	            or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
-	    }
-	    else {
-	        print "Warning: File is not exist!\n   $s_filename\n\n";
-	    }
-	
-	    undef $s_filename;
-	    undef $t_filename;
-	    undef $filename;
-	    undef $t_folder;
-	}
-	
-	#
-	# 실제 인코딩이 이루어지는 서브루틴
-	#
-	
-	sub mp3_enc_process {
-	
-	    my $s_filename = $_[0]; # UTF-8
-	    my $t_folder   = $_[1]; # CP949
-	
-	    my $shortName  = Win32::GetANSIPathName( $s_filename );
-	    my $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $shortName );
-	
-	    my $t_filename = "$t_folder/$filename";  # CP949!
-	
-	    if ( -e "$shortName" ) {
-	
-	        my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
-	        my $errorlevel  = system( $commandline );
-	
-	        if ( $errorlevel > 0 ) {
-	
-	            my $temp_filename = "$t_folder/temp_".time.".mp3";
-	
-	            use File::Copy;
-	            copy( "$shortName", "$temp_filename" );
-	
-	            $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
-	            $errorlevel  = system( $commandline );
-	
-	            if ( $errorlevel > 0 ) {
-	                print "Error: Failed to encode .MP3!\n   $s_filename\n\n";
-	                $t_filename = $temp_filename;
-	            }
-	            else {
-	                unlink $temp_filename;
-	            }
-	
-	            undef $temp_filename;
-	        }
-	
-	        undef $errorlevel;
-	        undef $commandline;
-	    }
-	    else {
-	        print "Warning: File is not exist!\n   $s_filename\n\n";
-	    }
-	
-	    undef $shortName;
-	    undef $filename;
-	
-	    (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
-	
-	    if ( !Encode::is_utf8( $t_filename ) ) {
-	        $t_filename = decode( "cp949", $t_filename );
-	    }
-	    if ( !Encode::is_utf8( $t_folder ) ) {
-	        $t_folder = decode( "cp949", $t_folder );
-	    }
-	
-	    my $tt_filename = "$t_folder/$filename";  # UTF-8!
-	
-	    use Win32::Unicode;
-	
-	    renameW( "$t_filename", "$tt_filename" );
-	
-	    undef $tt_filename;
-	    undef $t_filename;
-	    undef $s_filename;
-	    undef $t_folder;
-	}
-	
-	#
-	# .M3U 파일 내에 .MP3 파일이 상대경로로 저장된 경우 절대경로로 변환
-	#
-	
-	sub mp3_abs_path {
-	
-	    my $mp3_file_path = $_[0];
-	    my $m3u_file_path = $_[1];
-	
-	    if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
-	
-	        my $t_drive;
-	        my $t_folders;
-	
-	        ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
-	        $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
-	
-	        undef $t_drive;
-	        undef $t_folders;
-	
-	        $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
-	    }
-	
-	    undef $m3u_file_path;
-	    return $mp3_file_path;
-	}
+    #!perl
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use utf8;
+    use File::Spec;
+    use File::Copy;
+    use Encode;
+    use Encode::Guess;
+    
+    #
+    # SOURCE FILE / TARGET FOLDER 받기 (@ARGV 인수)
+    #
+    
+    use Win32::FileOp;
+    
+    my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
+        -title => encode( "CP949", "복사할 .M3U 또는 .M3U8 파일을 선택하십시오." ),
+        -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
+        -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
+        -dir => File::Spec->rel2abs( "." ),
+    );
+    
+    if ( !$SOURCE_M3U_FILENAME ) {
+        print "Error: Source file is not defined!\n";
+        exit;
+    }
+    
+    my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
+        encode( "CP949", "복사할 폴더를 선택하세요." ),
+        CSIDL_DRIVES,
+        BIF_USENEWUI,
+    );
+    
+    if ( !$TARGET_FOLDER ) {
+        print "Error: Target folder is not defined!\n";
+        exit;
+    }
+    
+    if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
+        $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
+    }
+    if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
+        $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
+    }
+    
+    #
+    # .M3U/.M3U8 파일을 읽어온다.
+    #
+    
+    my $M3U_RAW_DATA;
+    
+    if ( -e "$SOURCE_M3U_FILENAME" ) {
+    
+        open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
+        binmode $fHandle;
+        while(<$fHandle>){
+            $M3U_RAW_DATA .= $_;
+        }
+        close $fHandle;
+        undef $fHandle;
+    }
+    else {
+        print "Error: Source file is not exist!\n";
+        exit;
+    }
+    
+    #
+    # 가져온 데이터의 인코딩 확인 : CP949 / UTF-8?
+    #
+    
+    my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
+    
+    if ( ref($enc) ) {
+    
+        $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
+    
+        if ( $enc->name eq "utf8" ) {
+            if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
+                $M3U_RAW_DATA =~ s/\x{FEFF}//g;
+            }
+        }
+    }
+    else {
+        print "Error: Cannot guess encoding(Neither CP949 nor UTF-8)! \n";
+        exit;
+    }
+    
+    undef $enc;
+    
+    #
+    # 파일 목록을 만들기
+    #
+    
+    my @MP3_LIST = split( /\r\n/, $M3U_RAW_DATA );
+    
+    undef $M3U_RAW_DATA;
+    
+    #
+    # 대상 폴더 확인 및 파일 복사
+    #
+    
+    unless ( -e "$TARGET_FOLDER" ) {
+        mkdir( "$TARGET_FOLDER" );
+    }
+    
+    use Win32;
+    use MP3::Info;
+    
+    foreach my $s_filename ( @MP3_LIST ) {
+    
+        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+    
+        $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
+    
+        my $shortName = Win32::GetANSIPathName( $s_filename );
+        my $mp3_info  = get_mp3info( $shortName );
+    
+        if ( !$mp3_info->{BITRATE} ) {
+            print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
+        }
+        elsif ( $mp3_info->{BITRATE} > 192 ) {
+            mp3_enc_process( $s_filename, $TARGET_FOLDER );
+        }
+        else {
+            mp3_copy_process( $s_filename, $TARGET_FOLDER );
+        }
+    
+        undef $mp3_info;
+        undef $s_filename;
+        undef $shortName;
+    }
+    
+    print "\nTask(s) finished.\n";
+    exit;
+    
+    #
+    # 실제 복사가 이루어지는 서브루틴
+    #
+    
+    sub mp3_copy_process {
+    
+        use Win32::Unicode;
+    
+        my $s_filename = $_[0]; # UTF-8
+        my $t_folder   = $_[1]; # CP949
+        my $t_filename;
+        my $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
+    
+        if ( !Encode::is_utf8( $t_folder ) ) {
+            $t_folder = decode( "cp949", $t_folder );
+        }
+        if ( !Encode::is_utf8( $filename ) ) {
+            $filename = decode( "utf8", $filename );
+        }
+        $t_filename = "$t_folder/$filename";    # UTF-8
+    
+        if ( file_type e => "$s_filename" ) {
+            copyW( "$s_filename", "$t_filename" )
+                or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
+        }
+        else {
+            print "Warning: File is not exist!\n   $s_filename\n\n";
+        }
+    
+        undef $s_filename;
+        undef $t_filename;
+        undef $filename;
+        undef $t_folder;
+    }
+    
+    #
+    # 실제 인코딩이 이루어지는 서브루틴
+    #
+    
+    sub mp3_enc_process {
+    
+        my $s_filename = $_[0]; # UTF-8
+        my $t_folder   = $_[1]; # CP949
+    
+        my $shortName  = Win32::GetANSIPathName( $s_filename );
+        my $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $shortName );
+    
+        my $t_filename = "$t_folder/$filename";  # CP949!
+    
+        if ( -e "$shortName" ) {
+    
+            my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
+            my $errorlevel  = system( $commandline );
+    
+            if ( $errorlevel > 0 ) {
+    
+                my $temp_filename = "$t_folder/temp_".time.".mp3";
+    
+                use File::Copy;
+                copy( "$shortName", "$temp_filename" );
+    
+                $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
+                $errorlevel  = system( $commandline );
+    
+                if ( $errorlevel > 0 ) {
+                    print "Error: Failed to encode .MP3!\n   $s_filename\n\n";
+                    $t_filename = $temp_filename;
+                }
+                else {
+                    unlink $temp_filename;
+                }
+    
+                undef $temp_filename;
+            }
+    
+            undef $errorlevel;
+            undef $commandline;
+        }
+        else {
+            print "Warning: File is not exist!\n   $s_filename\n\n";
+        }
+    
+        undef $shortName;
+        undef $filename;
+    
+        (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
+    
+        if ( !Encode::is_utf8( $t_filename ) ) {
+            $t_filename = decode( "cp949", $t_filename );
+        }
+        if ( !Encode::is_utf8( $t_folder ) ) {
+            $t_folder = decode( "cp949", $t_folder );
+        }
+    
+        my $tt_filename = "$t_folder/$filename";  # UTF-8!
+    
+        use Win32::Unicode;
+    
+        renameW( "$t_filename", "$tt_filename" );
+    
+        undef $tt_filename;
+        undef $t_filename;
+        undef $s_filename;
+        undef $t_folder;
+    }
+    
+    #
+    # .M3U 파일 내에 .MP3 파일이 상대경로로 저장된 경우 절대경로로 변환
+    #
+    
+    sub mp3_abs_path {
+    
+        my $mp3_file_path = $_[0];
+        my $m3u_file_path = $_[1];
+    
+        if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
+    
+            my $t_drive;
+            my $t_folders;
+    
+            ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
+            $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
+    
+            undef $t_drive;
+            undef $t_folders;
+    
+            $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
+        }
+    
+        undef $m3u_file_path;
+        return $mp3_file_path;
+    }
 
 
 ## 에필로그
