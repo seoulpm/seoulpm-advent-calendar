@@ -1,4 +1,4 @@
-gTitle: Using C from Perl
+Title: Using C from Perl
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
