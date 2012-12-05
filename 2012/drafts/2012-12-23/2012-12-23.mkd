@@ -1,4 +1,4 @@
-Title: 초심자를 위해 남긴 초보의 비망록 - Dancer, DBI, DBD::MySQL
+Title: 보다 나은 Perl 개발 환경 for Vim
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -55,7 +55,7 @@ vimana 혹은 vundle을 사용하면 됩니다.
 
 ## 정리하며
 
-**치명적인 단점** : 주석 처리나 블럭 자동 닫기 등 다양한 기능을 제공하기 때문에, 한 번 맛들이면 perl-suport.vim 없는 vim에서 Perl 개발이 매우 어색하고 불편할 지경에 이르게 됩니다.
+**치명적인 단점** : 주석 처리나 블럭 자동 닫기 등 다양한 기능을 제공하기 때문에, 한 번 맛들이면 perl-support.vim 없는 vim에서 Perl 개발이 매우 어색하고 불편할 지경에 이르게 됩니다.
 
 ## 참조
 
