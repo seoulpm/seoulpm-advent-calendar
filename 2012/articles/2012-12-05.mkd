@@ -105,6 +105,7 @@ To prove Kennedy's Lemma, we assume that we can parse Perl. In particular this m
 케네디의 부명제를 증명하기 위해, 우리가 펄의 구문을 분석할 수 있다고 가정합니다.
 이 가정을 통해, 특히 우리는 [랜달 슈와츠](wiki-randal)가 고안해 낸 다음의 악마같은 코드 조각도 이해할 수 있다고 생각할 수 있습니다.
 
+    #!perl
     whatever  / 25 ; # / ; die "this dies!"; 
 
 <!--
@@ -154,6 +155,7 @@ Now we write a routine, call it halts(), which takes the description of a Turing
 그런 다음 `is_whatever_nullary()`에게 인자를 받지 않는 원형의 `whatever` 함수가 만들어졌는지 물어봅니다.
 우리의 `halts()` 루틴은 아래와 같을 것입니다.
 
+    #!perl
     sub halts {
         my $machine = shift;
         my $input = shift;
