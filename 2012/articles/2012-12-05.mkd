@@ -190,15 +190,15 @@ So, given the assumption that we can parse Perl, halts() returns true if and onl
 따라서, 우리가 펄의 구문을 분석할 수 있다고 가정한 것에 의해 `halts()`는
 튜링 기계인 `$machine`이 `$input` 입력으로 멈추는 필요충분한 경우에만 참을 반환합니다.
 다르게 말하면, `halts()`는 정지 문제를 해결합니다.
-케네디의 추측은, 펄의 구문을 분석할 수 있으면 정지 문제를 풀 수 있다는 것이었습니다.
-이것으로 케네디의 추측이 증명됩니다.
+케네디의 부명제는, 펄의 구문을 분석할 수 있으면 정지 문제를 풀 수 있다는 것이었습니다.
+이것으로 케네디의 부명제가 증명됩니다.
 
 <!--
 It's well known that the Halting Problem cannot be solved. Kennedy's Lemma establishes that if we can parse Perl 5, we can solve the Halting Problem. Therefore we cannot parse Perl 5.
 -->
 
 정지 문제는 판정할 수 없다는 것은 잘 알려진 사실입니다.
-케네디의 추측은 펄의 구문을 분석할 수 있으면 정지 문제를 판정할 수 있다는 것이 됩니다.
+케네디의 부명제가 펄의 구문을 분석할 수 있으면 정지 문제를 판정할 수 있다는 것이 됩니다.
 따라서 우리는 펄의 구문을 분석할 수 없습니다.
 
 <!--
@@ -217,7 +217,7 @@ _QED_
 조금 역사적인 의미가 더 크다고 할 수 있습니다.
 저자는 이후에 [Perl Review에 총 3 파트로 나누어][perlreview-undecidability]
 더 조밀하고 깊게 다루었습니다.
-perlmonks를 통해 저자에게 해당 노드를 번역하여 달력 기사에 쓸 것은 허락받았습니다만
+perlmonks를 통해 저자에게 해당 노드를 번역하여 달력 기사에 쓸 것은 허락받았습니다.
 더 자세한 내용은 원문과 Perl Review의 글을 참고해 주세요.
 
 
