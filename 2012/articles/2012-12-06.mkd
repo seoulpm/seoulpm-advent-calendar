@@ -52,16 +52,16 @@ Moran이라는 이름으로 extension 파일들이 만들어집니다.
     # See lib/ExtUtils/MakeMaker.pm for details of how to influence
     # the contents of the Makefile that is written.
     WriteMakefile(
-        NAME =&> 'Moran',
-        VERSION_FROM =&> 'lib/Moran.pm', # finds $VERSION
-        PREREQ_PM =&> {}, # e.g., Module::Name =&> 1.1
-        ($] &>= 5.005 ? ## Add these new keywords supported since 5.005
-            (ABSTRACT_FROM =&> 'lib/Moran.pm', # retrieve abstract from module            AUTHOR =&> 'yourname &<yourname@gmail.com&>') : ()),
-        LIBS =&> [$MORAN_LIB], # e.g., '-lm'
-        DEFINE =&> '', # e.g., '-DHAVE_SOMETHING'
-        INC =&> "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
+        NAME => 'Moran',
+        VERSION_FROM => 'lib/Moran.pm', # finds $VERSION
+        PREREQ_PM => {}, # e.g., Module::Name => 1.1
+        ($] >= 5.005 ? ## Add these new keywords supported since 5.005
+            (ABSTRACT_FROM => 'lib/Moran.pm', # retrieve abstract from module            AUTHOR => 'yourname <yourname@gmail.com>') : ()),
+        LIBS => [$MORAN_LIB], # e.g., '-lm'
+        DEFINE => '', # e.g., '-DHAVE_SOMETHING'
+        INC => "$MORAN_INC", # e.g., '-I. -I/usr/include/other'
     # Un-comment this if you add C files to link with later:
-    # OBJECT =&> '$(O_FILES)', # link all the C files too
+    # OBJECT => '$(O_FILES)', # link all the C files too
     );
 	
 편집을 마친 이후, 아래 명령으로 Makefile을 생성합니다.
@@ -224,7 +224,7 @@ Moran.xs에 정의된 서브루틴들을 다시한번 Perl에서 사용하기 �
 	# This allows declaration use Moran ':all';
 	# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 	# will save memory.
-	our %EXPORT_TAGS = ( 'all' =&> [ qw(
+	our %EXPORT_TAGS = ( 'all' => [ qw(
 	        ) ] );
 	our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 	# export할 서브루틴의 이름을 기술합니다.
@@ -357,15 +357,15 @@ FCGI를 사용하기 위해서는 CGI::Fast 패키지가 설치되어 있어야�
 	#!plain
 	# FCGI
 	LoadModule fastcgi_module modules/mod_fastcgi.so
-	&<IfModule mod_fastcgi.c&>
+	<IfModule mod_fastcgi.c>
 	    Alias /fcgi/ /home/wrapper/perl/www/
-	    &<Directory /home/wrapper/perl/www/&>
+	    <Directory /home/wrapper/perl/www/>
 	        SetHandler fastcgi-script
 	        Options +ExecCGI
 	        Allow from all
-	    &</Directory&>
+	    </Directory>
 	    AppClass /home/trunk/wrapper/perl/www/fcgi.pl
-	&</IfModule&>
+	</IfModule>
 
 
 ## 마침
