@@ -1,4 +1,4 @@
-Title:    펄의 구문은 분석될 수 없다: 형식적인 증명
+Title:    펄은 파싱할 수 없다: 형식적인 증명
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -11,7 +11,7 @@ Author:   Jeffrey Kegler
 [Jeffrey Kegler](http://www.perlmonks.org/?node_id=641652)
 
 
-펄의 구문은 분석될 수 없다: 형식적인 증명
+펄은 파싱할 수 없다: 형식적인 증명
 -----------------------------------------
 
 <!--
