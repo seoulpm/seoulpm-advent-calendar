@@ -43,9 +43,7 @@ vimana 혹은 vundle을 사용하면 됩니다.
 
 ### vimana
 
-`Vimana` 모듈을 설치하면 vimana란 실행 명령어가 생깁니다. update, search, install.. 등의 옵션을 사용. 문서 참조
-
-[vimana](https://www.metacpan.org/module/vimana)
+`Vimana` 모듈을 설치하면 vimana란 실행 명령어가 생깁니다. update, search, install.. 등의 옵션을 사용. [Vimana](https://www.metacpan.org/module/vimana) 문서 참조
 
 ### vundle
 
