@@ -26,7 +26,7 @@ Author: JellyPooo
 `\h`를 입력하면 현재 커서가 있는 곳의 단어에 해당하는 perldoc을 엽니다.
 
 !(binmode가 뭐야?!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
-!(커서를 binmode에 둔채 '\h' 입력. 짜잔! perldoc binmode가 출력됨)(http://cfile29.uf.tistory.com/image/15798E3550BEAAF405699F)
+!(커서를 binmode에 둔채 `\h` 입력. 짜잔! perldoc binmode가 출력됨)(http://cfile29.uf.tistory.com/image/15798E3550BEAAF405699F)
 
 ### \rr : 현재 파일 실행
 
@@ -34,6 +34,24 @@ Author: JellyPooo
 
 !(아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
 !(\rr을 누르면 바로 실행 된다고 친구)(http://cfile10.uf.tistory.com/image/204B163350BEAC150DF0D9)
+
+그 외 실행 관련 단축키
+
+- `\rs` : 파일 저장, 문법 검사(실행은 않음)
+- `\ra` : 인자 설정. 이후 \rr 실행시 설정된 인자 넘김.
+
+### 주석(Comments) 관련
+
+- `\cc` : 현재 줄 혹은 선택한 줄 # 주석 처리 <-> 주석 삭제
+- `\cb` : 선택한 줄 블럭 코멘트 처리. 이 명령으로 만든 블럭 코멘트 안에 커서 넣고 `\cub`로 해제.
+
+### 구문, Idioms 입력
+
+자주 쓰는 구문이나 Idioms를 빠르게 만들어준다.
+
+- `\sfe` : `foreach my $ () { }` 를 입력, 커서는 _\$_ 뒤에 위치
+- `\si` : `if ( ) { }`를 입력, 커서는 _( )_ 안에 위치
+- `\id` : `my $;`를 입력, 커서는 _\$;_의 사이에 위치
 
 ## 뱀발 vim 플러그인 스크립트를 관리하는 방법 두 가지
 
@@ -51,6 +69,11 @@ vimana 혹은 vundle을 사용하면 됩니다.
 
 [KLDP Vim Editor](http://wiki.kldp.org/wiki.php/VimEditor) 내용 참고
 
+## 그 외 팁
+
+- `gg=G` : vim에서 보이는 그대로 입력하면 현재 파일 코드 정렬. 
+- [perltidy][perltidy] : 코드 자동 정렬 툴. vim에서 gg=G 명령이 들여쓰기 정도만 정리한다면, 이쪽은 Perl Best Practice 에서 권고한 코딩 가이드라인에 맞춘 세부적인 설정 가능.
+
 ## 정리하며
 
 **치명적인 단점** : 주석 처리나 블럭 자동 닫기 등 다양한 기능을 제공하기 때문에, 한 번 맛들이면 perl-support.vim 없는 vim에서 Perl 개발이 매우 어색하고 불편할 지경에 이르게 됩니다.
@@ -63,3 +86,4 @@ vimana 혹은 vundle을 사용하면 됩니다.
 
 [emacs] : http://www.gnu.org/software/emacs/
 [ps] : http://www.vim.org/scripts/script.php?script_id=556
+[perltity] : http://perltidy.sourceforge.net/
