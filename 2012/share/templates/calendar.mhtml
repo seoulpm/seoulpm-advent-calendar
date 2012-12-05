@@ -50,6 +50,14 @@
         popup.css("top", offset.top - 168 + 6);
         $("#popup_text .title").text($(".title", this).text());
         $("#popup_text .author").text($(".author", this).text());
+
+        if ( $(".title", this).text().length > 25 ) {
+          $("#popup_text .title").addClass("title_small");
+        }
+        else {
+          $("#popup_text .title").removeClass("title_small");
+        }
+
         popup.css("display", "block");
       }, function() {
         $("#popup").css("display", "none");
