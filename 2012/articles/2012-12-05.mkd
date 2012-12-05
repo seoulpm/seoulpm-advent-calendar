@@ -71,7 +71,7 @@ Static parsing of Perl 5 is of a lot more than academic interest, as Adam Kenned
 The proof which follows meets the current level of rigor in Theory of Computation, but is written using Perl and Perl notation. That would make the following unacceptable to a math journal, but they wouldn't take it anyway, because the theorem is a very straightforward consequence of Rice's Theorem. 
 -->
 
-아래의 증명은 현대의 컴퓨팅 이론 수준에 달하는 내용입니다.
+아래의 증명은 엄격한 계산이론 수준에 달하는 내용입니다.
 하지만 펄을 사용하고 펄의 표기법을 사용했습니다.
 따라서 수학 저널에 등재할 수는 없을 것입니다.
 사실, 그들은 어쨌든 이 글을 받지 않을 겁니다.
