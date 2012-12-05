@@ -863,4 +863,4 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 [win32]: http://search.cpan.org/~jdb/Win32-0.45/Win32.pm
 [mp3-info]: http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm
 [file-spec]: http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm
-[m3u][http://en.wikipedia.org/wiki/M3U]
+[m3u]: http://en.wikipedia.org/wiki/M3U
