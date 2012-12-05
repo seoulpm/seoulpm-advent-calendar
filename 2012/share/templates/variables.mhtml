@@ -57,6 +57,7 @@ return {
         'eeyees'       => 'profile_eeyees.jpg',
         'empty'        => 'profile_empty.jpg',
         'gypark'       => 'profile_gypark.jpg',
+        'hazzling'     => 'profile_hazzling.jpg',
         'ja3ck'        => 'profile_ja3ck.jpg',
         'JEEN_LEE'     => 'profile_JEEN_LEE.jpg',
         'keedi'        => 'profile_keedi.jpg',
