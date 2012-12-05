@@ -40,7 +40,6 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
 처음엔 가볍게 시작했습니다. 우선 인코딩 부분은 잠시 제쳐두고, 동작 테스트도 할 겸, 뼈대와 함께 핵심 코드가 될 파일을 읽어서 대상 폴더로 복사하는 부분까지만 작성했습니다. 여기까지 사용된 모듈은 대부분의 경우 자동으로 설치되는 기본 모듈들이므로 별도로 설치할 CPAN 모듈은 없습니다. 단, 스크립트 상단에 `use utf8;`이 선언되어 있으므로, 스크립트를 복사해가며 따라오실 분께서는 반드시 스크립트 파일을 _UTF-8 인코딩으로 저장_하신 후 실행해 주시기 바랍니다.
 
     #!perl
-    
     #!/usr/bin/perl
     use strict;
     use warnings;
@@ -76,7 +75,6 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     my $M3U_RAW_DATA;
     
     if ( -e "$SOURCE_M3U_FILENAME" ) {
-    
         open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
         binmode $fHandle;
         while(<$fHandle>){
@@ -97,7 +95,6 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
     
     if ( ref($enc) ) {
-    
         $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
     
         if ( $enc->name eq "utf8" ) {
@@ -168,11 +165,6 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
         else {
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
-    
-        undef $s_filename;
-        undef $t_filename;
-        undef $filename;
-        undef $t_folder;
     }
     
     #
@@ -180,8 +172,7 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     #
     
     sub mp3_enc_process {
-    
-        # yada yada...
+        ...
     }
     
     #
@@ -189,33 +180,25 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     #
     
     sub mp3_abs_path {
-    
         my $mp3_file_path = $_[0];
         my $m3u_file_path = $_[1];
     
         if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
-    
             my $t_drive;
             my $t_folders;
     
             ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
             $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
     
-            undef $t_drive;
-            undef $t_folders;
-    
             $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
         }
     
-        undef $m3u_file_path;
         return $mp3_file_path;
     }
-
 
 M3U 파일의 경로, 파일을 복사할 대상 폴더의 경로를 인수로 받게 되며, 받은 경로는 `File::Spec` 모듈의 `file_name_is_absolute` 메서드를 이용하여 절대 경로인지 여부를 검사하고, 만약 상대 경로라면 `rel2abs` 메서드를 이용하여 절대 경로로 변환하여 혹시라도 발생할 수 있는 문제를 예방하였습니다. M3U 파일의 인코딩이 CP949일지 UTF-8일지 알 수 없기 때문에, M3U 파일을 읽어들인 후 인코딩을 확인하고 내부 UTF-8 인코딩으로 저장하여 배열로 MP3 파일 목록을 저장해 둡니다. 참고로,
 
     #!perl
-    
     if ( $enc->name eq "utf8" ) {
         if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
             $M3U_RAW_DATA =~ s/\x{FEFF}//g;
@@ -258,11 +241,9 @@ M3U 파일의 경로, 파일을 복사할 대상 폴더의 경로를 인수로 �
     #
     # 실제 복사가 이루어지는 서브루틴
     #
+    use Win32::Unicode;
     
     sub mp3_copy_process {
-    
-        use Win32::Unicode;
-    
         my $s_filename = $_[0]; # UTF-8
         my $t_folder   = $_[1]; # CP949
         my $t_filename;
@@ -285,11 +266,6 @@ M3U 파일의 경로, 파일을 복사할 대상 폴더의 경로를 인수로 �
         else {
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
-    
-        undef $s_filename;
-        undef $t_filename;
-        undef $filename;
-        undef $t_folder;
     }
 
 
@@ -329,9 +305,6 @@ M3U 파일의 경로, 파일을 복사할 대상 폴더의 경로를 인수로 �
         else {
             mp3_copy_process( $s_filename, $TARGET_FOLDER );
         }
-    
-        undef $mp3_info;
-        undef $s_filename;
     }
 
 
@@ -358,7 +331,6 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 여기서 생각난 것이 바로 _윈도우의 8.3 파일명(짧은 파일명)_입니다. 과거 MS-DOS 시절에나 쓰이던 것이지만, 하위 호환성의 유지를 위해 지금도 존재하고 있죠. 만약 윈도우의 풀 파일명을 가지고 8.3 파일명을 얻을 수 있다면 문제가 깔끔하게 해결될 수 있습니다. 찾아보니, Win32 모듈에서 제공하는 `GetANSIPathName` 이라는 함수를 사용하면 짧은 파일명을 구할 수 있었습니다.
 
     #!perl
-    
     use Win32;
     use MP3::Info;
     
@@ -380,13 +352,7 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
         else {
             mp3_copy_process( $s_filename, $TARGET_FOLDER );
         }
-    
-        undef $mp3_info;
-        undef $s_filename;
-        undef $shortName;
     }
-
-
 
 짧은 파일명을 사용한 테스트 결과, 모든 파일에 대해서 비트레이트 확인이 정상적으로 이루어졌습니다. 이제 MP3 인코딩 루틴인 `mp3_enc_process()` 서브루틴만 완성하면 되겠네요. 위에서 이야기한 대로, 인코딩 작업 자체는 공개된 MP3 파일 인코딩 툴인 lame.exe 를 이용할 것입니다.
 
@@ -398,9 +364,9 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 다만, 코드 작성에 있어서 한 가지 주의할 점은, 어떠한 경우라도 콘솔에서 lame.exe 를 실행하는 과정에서 넘겨주는 _인자(파일명)의 인코딩은 반드시 CP949 여야 한다_는 점입니다. 따라서, 여기서도 앞에서 한 번 사용한 바 있었던 "짧은 이름"을 사용하여 lame.exe 를 호출하는 방법으로 코드를 설계할 것입니다. 대신 인코딩이 완료된 후에는 원래의 긴 이름으로 바꿔 주어야 하겠지요. 유니코드 파일명이 있다는 점에 대비하여 파일명 변경에는 `Win32::Unicode` 의 `renameW` 를 사용합니다.
 
     #!perl
-    
+    use Win32::Unicode;
+
     sub mp3_enc_process {
-    
         my $s_filename = $_[0]; # UTF-8
         my $t_folder   = $_[1]; # CP949
     
@@ -412,16 +378,12 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
         my $t_filename = "$t_folder/$filename";  # CP949!
     
         if ( -e "$shortName" ) {
-    
             my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
             my $errorlevel  = system( $commandline );
         }
         else {
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
-    
-        undef $shortName;
-        undef $filename;
     
         (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
     
@@ -434,14 +396,7 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
     
         my $tt_filename = "$t_folder/$filename";  # UTF-8!
     
-        use Win32::Unicode;
-    
         renameW( "$t_filename", "$tt_filename" );
-    
-        undef $tt_filename;
-        undef $t_filename;
-        undef $s_filename;
-        undef $t_folder;
     }
 
 
@@ -450,9 +405,9 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 각설하고, 테스트 결과, 코드를 구상할 때에는 전혀 예상하지 못했던 문제가 발생했습니다. 몇몇 파일에서, 분명 lame.exe 에 파일명을 넘겨줄 때 짧은 이름으로 넘겨줬는데, 지 멋대로 긴 이름으로 바꿔서 받고는 파일을 읽을 수 없다는 오류를 발생시켰습니다. 이해가 안 되는 현상인데, 시스템의 문제가 아닌 lame.exe 의 문제로 판단되어서(Perl 에서는 문제 없이 파일을 읽을 수 있기 때문에..), 이 부분의 직접적인 디버깅은 회피하고, 다만 인코딩 실패 시 원본 파일을 임시 폴더로 복사한 후 인코딩을 실행하는 보조 루틴을 추가하는 선에서 마무리를 짓겠습니다. 아래 코드는 관련 부분을 보강한 코드입니다. `mp3_enc_process()` 서브루틴 내의 `if ( -e "$shortName" ) { } ~ else { }` 부분을 대체합니다.
 
     #!perl
-    
+    use File::Copy;
+
     if ( -e "$shortName" ) {
-    
         my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
         my $errorlevel  = system( $commandline );
     
@@ -460,7 +415,6 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
     
             my $temp_filename = "$t_folder/temp_".time.".mp3";
     
-            use File::Copy;
             copy( "$shortName", "$temp_filename" );
     
             $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
@@ -473,12 +427,7 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
             else {
                 unlink $temp_filename;
             }
-    
-            undef $temp_filename;
         }
-    
-        undef $errorlevel;
-        undef $commandline;
     }
     else {
         print "Warning: File is not exist!\n   $s_filename\n\n";
@@ -495,7 +444,6 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 만약 `Win32::GUI` 모듈이 설치되어 있다면, Win32::GUI 모듈에서 제공하는 `GetOpenFileName` 과 `BrowseForFolder` 메서드를 사용해도 됩니다. 그러나 Win32::GUI 에서 제공하는 BrowseForFolder 에서는 새 폴더를 만들기가 불가능하기 때문에, Win32::GUI 모듈 대신 [Win32::FileOp][win32-fileop] 라는 모듈을 사용하도록 하겠습니다. 이 모듈도 기본으로 설치되는 모듈은 아니므로 CPAN 에서 설치하셔야 합니다. `cpan Win32::FileOp` 를 입력하세요!
 
     #!perl
-    
     #
     # SOURCE FILE / TARGET FOLDER 받기
     #
