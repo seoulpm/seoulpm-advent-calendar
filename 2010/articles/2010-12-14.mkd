@@ -1,0 +1,304 @@
+Title:    Perl로 하는 함수형 프로그래밍 
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   corund
+
+저자
+-----
+
+[@corund][twitter-corund] -
+컴퓨터 프로그래머, Java, Perl, Scala, Common Lisp 마니아.
+대용량 자료 처리와 분산 컴퓨팅에 관심을 갖고 있다.
+[블로그 '점프와 쉼없는 나아감'][blog-corund]에서
+Perl은 물론 개발과 관련한 여러가지 이야기를 연재하고 있다.
+
+
+
+Perl로 하는 함수형 프로그래밍 
+------------------------------
+
+물론 Perl은 함수형 언어는 아닙니다.
+함수형 프로그래밍에서 중시하는 부수효과(side effect)가
+없는 함수를 사용하도록 강제할 수도 없습니다.
+하지만 함수형 언어에서 사용하는 여러 개념들이 구현되어 있어서
+함수형 프로그래밍 방식을 사용할 수 있습니다.
+여기서는 그 중 몇가지를 보여보겠습니다.
+
+
+
+Tail Recursion
+---------------
+
+함수형 언어에서는 반복문보다 재귀호출(recursion)을 즐겨 사용합니다.
+재귀호출은 호출 이후 되돌아오기 위한 스택 정보를 유지해야 하기 때문에
+재귀가 깊어지면 스택 메모리와 관련한 문제가 생길 수 있습니다.
+다만 특별한 형태인 *tail recursion*인 경우 스택 정보를
+유지할 필요가 없기 때문에 보통의 반복문으로 고칠 수 있습니다.
+함수형 언어는 이런 *tail recursion*에 대해 언어 차원에서 최적화를 수행합니다.
+
+그러면 Perl에서는 어떨까요?
+Perl에서도 재귀호출을 사용할 수 있습니다.
+다음은 유명한 유클리드 호제법에 의한
+GCD를 구하는 함수를 재귀호출로 구현한 것입니다.
+
+    #!perl
+    sub gcd {
+        my ($a, $b) = @_;
+        return $a if 0 == $b;
+        return gcd($b, $a % $b);
+    }
+
+이는 *tail recursion*입니다.
+하지만 Perl은 이를 자동으로 최적화하지 않습니다.
+수동으로 최적화를 하려면 다음처럼 하면 됩니다.
+
+    #!perl
+    sub gcd {
+        my ($a, $b) = @_;
+        return $a if 0 == $b;
+        @_ = ($b, $a % $b);
+        goto &gcd;
+    }
+
+하지만 이런 식이라면 굳이 재귀호출을 쓰지않고 그냥 반복문을 쓰는 편이 나을 겁니다.
+자, 이 작업을 대신해 주는 모듈이 [Sub::Call:Tail][cpan-sub-call-tail]입니다.
+재귀호출을 하는 함수 호출 앞에 tail을 붙여주면 위의 최적화를 수행합니다.
+
+    #!perl
+    use Sub::Call::Tail;
+    
+    sub gcd {
+        my ($a, $b) = @_;
+        return $a if 0 == $b;
+        return tail gcd($b, $a % $b);
+    }
+
+
+
+Function as the First-Class Object
+-----------------------------------
+
+함수형 언어에서는 함수가 일급 객체(First-Class Object)입니다.
+즉, 함수를 변수에 할당하거나 다른 함수의 인자로 넘기거나
+함수의 반환값으로 받을 수 있습니다.
+Perl에서도 이것이 가능합니다.
+함수 참조를 이용해 함수를 변수에 저장하고
+이것을 다른 함수에 인자로 넘길 수 있습니다.
+
+    #!perl
+    sub func {
+        print "I am func\n";
+    }
+    
+    sub outer {
+        my $f = shift;
+    
+        print "I am outer\n";
+        $f->();
+    }
+    
+    outer(\&func);
+
+마찬가지로 함수를 반환하는 함수도 만들 수 있습니다.
+`sub { ... }` 구문으로 익명함수를 만들어
+함수를 반환하는 함수를 만들 수 있습니다.
+
+    #!perl
+    sub make_counter {
+        my $val = shift;
+        return sub {
+            print "$val\n";
+            $val++;
+        }
+    }
+    
+    my $f = make_counter(10);
+    my $g = make_counter(50);
+    
+    $f->();
+    $g->();
+    $f->();
+    $g->();
+
+위에서 주목할 것은 반환되는 함수가 그 함수가 정의되는
+시점의 변수값 `$val`을 계속 가지고 있다는 점입니다.
+이것을 *lexical closure*라고 합니다.
+
+
+
+Higher Order Function
+----------------------
+
+함수를 인자로 받아 어떤 처리를 하는 함수를 *higher order function*이라고 합니다.
+함수형 언어에서는 객체 지향 언어에서
+전략 패턴(Strategy Pattern)에 해당하는 경우에 사용합니다.
+Perl은 함수를 인자로 받을 수 있기 때문에
+*higher order function*을 사용할 수 있습니다.
+
+다음은 목록의 각 요소에 인자로 받은 함수를
+적용한 결과 목록을 리턴하는 `map` 함수입니다.
+
+    #!perl
+    sub my_map {
+        my $func = shift;
+        my @ret = ();
+        for my $elem ( @_ ) {
+            push @ret, $func->($elem);
+        }
+        return @ret;
+    }
+    
+    my @list = my_map sub { 2 * $_[0] }, (0..10);
+
+여기서 함수를 호출하는 부분인 `my_map sub { ... }`, `...` 을
+조금 더 간결하게 `sub`와 쉼표(`,`)를 생략하게 할 수 있습니다.
+Perl의 프로토타입을 이용해서 `my_map`의 정의에 다음을 추가합니다.
+
+    #!perl
+    sub my_map (&;@) {
+        my $func = shift;
+        my @ret = ();
+        push @ret, $func->($_) for @_;
+        return @ret;
+    }
+    
+    my @list = my_map { 2 * $_[0] } (0..10);
+
+실제 Perl에 기본 내장되어 있는 `map`, `grep`, `sort` 등의
+함수가 위와 같은 *higher order function*입니다.
+
+
+
+Currying
+---------
+
+여러 개의 인자를 가진 함수의 일부 인자를 기억하는 함수를
+만드는 *currying*을 Perl에서도 할 수 있습니다.
+이를 위한 모듈도 여러가지가 있습니다.
+[Sub::Curry][cpan-sub-curry] 모듈은 다음과 같이 사용합니다.
+
+    #!perl
+    use Sub::Curry qw/curry/;
+
+    sub func {
+      my ($first, $second) = @_;
+      print "$first and $second are supplied\n";
+    }
+
+    my $f = curry(\&func, '1st');
+    $f->('2nd'); # same as func('1st', '2nd');
+
+[Sub::Curried][cpan-sub-curried] 모듈은 다음과 같이 사용합니다.
+`sub` 대신 `curry` 키워드를 써서 함수를 정의하는 것과 같은 형태로 사용합니다.
+
+    #!perl
+    use Sub::Curried;
+    
+    curry func ($first, $second) {
+        print "$first and $second are suppied\n";
+    }
+    
+    func('first', 'second'); # call as normal sub routine
+    
+    my $f = func('1st');
+    $f->('2nd'); # same as func('1st', '2nd');
+
+이밖에 `Sub::Curry`와 비슷하지만 인자의 위치를 수동으로 지정해서
+사용하는 [Data::Util::Curry][cpan-data-util-curry] 모듈도 있고
+`Attribute`를 이용하는 [Attribute::Curried][cpan-attribute-curried]
+모듈도 있으며, Perl 6의 문법을 쓸 수 있는
+[Perl6::Currying][cpan-perl6-currying] 모듈도 있습니다.
+Perl의 모토인 *TIMTOWTDI*(There's more than one way to do it)인 셈이죠.
+
+
+
+Lazy Evaluation
+----------------
+
+Perl에서는 함수 인자값의 `lazy evaluation`을 구현하는 여러가지 모듈이 있습니다.
+그 중 [Scalar::Lazy][cpan-scalar-lazy] 모듈을 쓰면
+다음처럼 *lazy evaluation*을 쓸 수 있습니다.
+다음과 같은 클래스가 있다고 해보죠.
+
+    #!perl
+    package Simple;
+    
+    sub new {
+      my ($class, $name) = @_;
+      my $self = { name => $name };
+      bless $self, $class;
+      return $self;
+    }
+    
+    sub expensive {
+        my $self = shift;
+        print "Expensive method is invoked!\n";
+        return $self->{name};
+    }
+    
+    1;
+
+[Scalar::Lazy][cpan-scalar-lazy] 모듈을 이용한
+`lazy evaluation`은 다음과 같습니다.
+
+    #!Perl
+    use Scalar::Lazy;
+    
+    sub func {
+        my ($val, $log) = @_;
+        print "Logged: $val\n" if $log;
+    }
+    
+    my $simple = Simple->new('simple');
+    func($simple->expensive, 0);          # eager evaluation. print invoked message
+    func(lazy { $simple->expensive }, 0); # lazy evaluation. not print invoked message
+
+그 외에도 *lazy evaluation*을 구현하는 모듈은 [Scalar::Defer][cpan-scalar-defer],
+[Data::Thunk][cpan-data-thunk], [Data::Lazy][cpan-data-lazy]등이 있습니다.
+
+
+
+기타
+-----
+
+이외에도 *memoize*, *infinite*, *stream*, *list*를
+함수형 스타일로 다루는 모듈 등도 있습니다.
+
+
+
+정리하며
+---------
+
+함수형 언어는 최근 들어 인기를 얻어가고 있습니다.
+그래서인지 순수 함수형 언어가 아니더라도 트렌디한 언어들은
+함수형 프로그래밍의 요소들을 자신들이 지원하는 것을 강조하면서
+섹시(sexy)함을 부각시키고 있습니다.
+하지만 Perl은 어떤 트렌디한 언어보다도
+*함수형 프로그래밍 요소를 더 잘 지원*하고 있습니다.
+즉, Perl과 같은 멀티 패러다임 언어에게 이런
+*함수형 프로그래밍 패러다임은 그저 선택과 기호의 문제일 뿐*입니다. ;-)
+
+
+
+참고자료
+---------
+
+- [High Order Perl][high-order-perl] - 함수형 프로그래밍에 관심있는 Perl 개발자의 필독서(온라인 버전은 공개되어 있음)
+
+
+
+
+[blog-corund]:                  http://corund.net/blog
+[cpan-attribute-curried]:       http://search.cpan.org/perldoc?Attribute::Curried
+[cpan-data-lazy]:               http://search.cpan.org/perldoc?Data::Lazy
+[cpan-data-thunk]:              http://search.cpan.org/perldoc?Data::Thunk
+[cpan-data-util-curry]:         http://search.cpan.org/perldoc?Data::Util
+[cpan-perl6-currying]:          http://search.cpan.org/perldoc?Perl6::Currying
+[cpan-scalar-defer]:            http://search.cpan.org/perldoc?Scalar::Defer
+[cpan-scalar-lazy]:             http://search.cpan.org/perldoc?Scalar::Lazy
+[cpan-sub-call-tail]:           http://search.cpan.org/perldoc?Sub::Call::Tail
+[cpan-sub-curried]:             http://search.cpan.org/perldoc?Sub::Curried
+[cpan-sub-curry]:               http://search.cpan.org/perldoc?Sub::Curry
+[high-order-perl]:              http://hop.perl.plover.com/
+[twitter-corund]:               http://twitter.com/corund

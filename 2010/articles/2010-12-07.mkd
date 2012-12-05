@@ -1,0 +1,170 @@
+Title:    매일매일 네이버 카페 출석 체크하기!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   perlstudy
+
+저자
+-----
+
+[@perlstudy][twitter-perlstudy] -
+[네이버 Perl 카페][naver-perl-cafe] 운영자,
+[홈페이지][honey-perl]에는 Perl과 관련한 유용한 정보를 종종 올리고 있다.
+한 때 보안업계에 몸담았던 언더그라운드 Perler.
+호네이, h0ney라는 닉을 사용하기도 한다.
+
+
+
+시작하며
+--------
+
+현재 저는 운영하고 있는 [네이버 Perl 카페][naver-perl-cafe]외에도
+인터넷상의 많은 카페에 가입해서 활동을 하고 있습니다.
+꼭 프로그래밍에 관련된 카페 뿐만 아니라
+자격증, 게임, 한예슬 팬클럽 등등 다양한 분야의 카페에 가입해서
+원하는 정보를 얻고있으며, 사람들과 교류하는 것을 즐깁니다.
+
+하지만 자신있는 분야가 아닌 경우,
+괜시리 소심해져 글하나 못쓰고 눈팅만 하게 되는데
+그래도 카페 사람들과 친해지기 위해서는 *적극적인 활동*을 해야합니다.
+이 때 가장 만만한 활동이 바로 *출석 체크*인데 매일 꾸준하게
+출석체크를 하는 것만으로 커뮤니티 사람들에게 인정을 받을 수 있으며
+카페에 인지도 있는 사람으로 거듭나기도 합니다.
+
+하지만 사람은 컴퓨터가 아니기 때문에 가입한 수많은 카페에
+하루하루 출석 체크에 신경쓴다는 것은 굉장히 소모적일 뿐만 아니라
+심하면 스트레스까지 유발됩니다.
+하지만 게으른 우리에겐 Perl이 있죠!
+몇 줄 되지 않는 간단한 Perl 코드를 이용하면
+가입한 수많은 네이버 카페에 출석하는 것 쯤은 간단하게 처리할 수 있답니다. :)
+
+
+
+준비물
+------
+
+카페에 출석을 체크하려면 당연히 로그인을 해야합니다.
+아이디와 비밀번호를 입력하고, 로그인 버튼을 누르는 과정이 있어야합니다.
+Perl에는 이런 까다로운 작업을 해주는 엄청난 모듈이 존재합니다.
+바로 [CPAN의 WWW::Mechanize 모듈][cpan-www-mechanize]인데
+이 모듈은 웹 자동화 모듈로 세계적으로 널리 사용되며
+세션 유지가 가능한 것이 특징입니다.
+
+이런 류의 모듈을 사용할 때 항상 자동화하려는 페이지의 HTML을
+분석하는 것이 우선되어야 합니다.
+다음은 네이버 로그인 페이지의 HTML 코드 조각입니다.
+
+![네이버 로그인][naver-login]
+
+HTML 코드 조각을 보면 로그인과 관련한 Form의 이름은 `frmNIDLogin`입니다.
+여기서 아이디와 패스워드를 입력받는 input 타입의 이름을 알 수 있습니다.
+이 정보를 이용해 네이버에 로그인하는 코드는 다음과 같습니다.
+
+    #!perl
+    my $url = 'http://nid.naver.com/nidlogin.login';
+    my $mech = WWW::Mechanize->new();
+    $mech->get($url);
+    my $res = $mech->submit_form(
+        form_name => 'frmNIDLogin',
+        fields    => {
+            id => '사용자아이디',
+            pw => '사용자패스워드'
+        },
+    );
+
+이제는 가입한 카페의 출석체크 URL을 확인합니다.
+다음은 출석체크 URL입니다.
+
+[![네이버 카페 출석체크 URL][naver-cafe-attend-url]][naver-cafe-attend-url]
+
+출석체크 URL 정보를 이용해서 실제로 출석체크를 수행하는
+Perl 코드는 다음과 같습니다.
+
+    #!perl
+    my $check_url
+        = 'http://cafe.naver.com/AttendanceView.nhn'
+        . '?search.clubid=18062050&search.menuid=6';
+    $mech->get($check_url);
+    $mech->field('content','Check! :)');
+    $mech->submit();
+
+짜잔!! 다음은 출석이 완료된 화면입니다!
+
+![스크린샷 #3][naver-cafe-attend-completed]
+
+여기까지 성공했다면 이제 거의 끝난 것이나 다름없습니다.
+펄의 배열과 반복문을 이용하면 가입한 여러 카페의 출석체크를
+한 번에 할 수 있겠죠?
+다음은 `@check_url` 배열 변수를 이용해 기존의 예제를 확장했습니다.
+
+    #!perl
+    use strict;
+    use warnings;
+    use WWW::Mechanize;
+    
+    my $id     = 'your_naver_id';
+    my $passwd = 'your_naver_password';
+    my $reply  = 'Check!  :)';
+    chomp($reply);
+    
+    my $url = 'http://nid.naver.com/nidlogin.login';
+    my $mech = WWW::Mechanize->new();
+    $mech->get($url);
+    my $res = $mech->submit_form(
+        form_name => 'frmNIDLogin',
+        fields    => {
+            id => $id,
+            pw => $passwd
+        },
+    );
+    
+    my $base_url = 'http://cafe.naver.com/AttendanceView.nhn';
+    my @check_urls = (
+        "$base_url?search.clubid=18062050&search.menuid=6",   # 네이버 펄 카페
+        "$base_url?search.clubid=10586415&search.menuid=108", # 한예슬 홈페이지
+    );
+    
+    for my $check_url (@check_urls){
+        $mech->get($check_url);
+        $mech->field('content', $reply);
+        $mech->submit();
+    }
+
+
+
+예약 작업
+----------
+
+출석체크는 하루에 한 번 실행하는 것이 적당하며
+자정이 지난 시점에 출석체크를 해야 의미가 있으므로
+이 시점에 실행되도록 Perl 스크립트를 예약합니다.
+
+![예약된 작업][windows-schedule-screenshot]
+
+윈도우즈의 경우 [예약된 작업][windows-schedule] 설정을 통해
+Perl 스크립트가 실행되도록 등록했습니다.
+리눅스와 같은 유닉스 계열의 운영체제라면 `crontab`을 사용하면 됩니다.
+
+
+
+정리하며
+---------
+
+예전에 회원수가 꽤 많은 카페에서 석 달정도 출석체크를 돌렸더니
+카페 회원들이 알아봐 줬으며 *12시의 전설*이라는 별명까지 붙을 정도로
+착실한 회원으로 인정을 받았습니다. ^_^)b
+웹상의 여러 활동들을 자동화할 수 있는
+[WWW::Mechanize 모듈][cpan-www-mechanize] 많이 사랑해주세요! :)
+
+
+
+[naver-cafe-attend-completed]:  2010-12-07-3.png
+[naver-cafe-attend-url]:        2010-12-07-2.png width=700
+[naver-login]:                  2010-12-07-1.png
+
+[cpan-www-mechanize]:           http://search.cpan.org/perldoc?WWW::Mechanize
+[honey-perl]:                   http://honeyperl.tistory.com
+[naver-perl-cafe]:              http://cafe.naver.com/perlstudy
+[twitter-perlstudy]:            http://twitter.com/#!/perlstudy
+[windows-schedule-screenshot]:  2010-12-07-4.png
+[windows-schedule]:             http://support.microsoft.com/kb/308569/ko

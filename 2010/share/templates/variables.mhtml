@@ -1,0 +1,105 @@
+<%init>
+  return {
+    title          => 'Seoul.pm 펄 크리스마스 달력',
+    title_en       => 'Seoul.pm Perl Advent Calendar 2010',
+    css            => 'style.css',
+    articles_total => 24,
+    base_uri       => 'http://advent.perl.kr/',
+    copyright      => 'Articles by Seoul.pm members, Designed by Hojung Yoon, Jeonggyu Kang &amp; Keedi Kim, Edited by Keedi Kim &amp; Jeen Lee &amp; Yongbin Yu',
+    korean_day     => sub {
+        my $day = shift;
+        my %table = (
+            1  => '첫째',
+            2  => '둘째',
+            3  => '셋째',
+            4  => '넷째',
+            5  => '다섯째',
+            6  => '여섯째',
+            7  => '일곱째',
+            8  => '여덟째',
+            9  => '아홉째',
+            10 => '열번째',
+            11 => '열한번째',
+            12 => '열두번째',
+            13 => '열세번째',
+            14 => '열네번째',
+            15 => '열다섯번째',
+            16 => '열여섯번째',
+            17 => '열일곱번째',
+            18 => '열여덟번째',
+            19 => '열아홉번째',
+            20 => '스무번째',
+            21 => '스물한번째',
+            22 => '스물두번째',
+            23 => '스물세번째',
+            24 => '스물네번째',
+            25 => '스물다섯번째',
+            26 => '스물여섯번째',
+            27 => '스물일곱번째',
+            28 => '스물여덟번째',
+            29 => '스물아홉번째',
+            30 => '서른번째',
+            31 => '서른한번째',
+        );
+        return $table{$day};
+    },
+    links => [
+      {
+        title => 'perl.kr',
+        url   => 'http://perl.kr/',
+      },
+      #{
+      #  title => 'Seoul.pm',
+      #  url   => 'http://seoul.pm.org',
+      #},
+      {
+        title => '펄마니아',
+        url   => 'http://perlmania.or.kr/drupal/',
+      },
+      {
+        title => '네이버 펄 카페',
+        url   => 'http://cafe.naver.com/perlstudy.cafe',
+      },
+      {
+        title => 'IRC #perl-kr 채팅',
+        url   => 'http://webchat.freenode.net/?channels=perl-kr',
+      },
+      {
+        title => '한국펄워크샵 2008',
+        url   => 'http://event.perl.kr/kpw2008/',
+      },
+      {
+	title => 'Perl Advent Calendar',
+	url   => 'http://perladvent.pm.org/2010/',
+      },
+      {
+	title => 'Perl 6 Advent Calendar',
+	url   => 'http://perl6advent.wordpress.com/',
+      },
+      {
+	title => 'Catalyst Advent Calendar',
+	url   => 'http://www.catalystframework.org/calendar/2010',
+      },
+      {
+	title => 'RJBS Advent Calendar',
+	url   => 'http://advent.rjbs.manxome.org/2010/',
+      },
+      {
+	title => 'Dancer Advent Calendar',
+	url   => 'http://advent.perldancer.org/2010',
+      },
+      {
+	title => 'Perl-uwe Advent Calendar',
+	url   => 'http://www.perl-uwe.com/2010_12_01_archive.html',
+      },
+      {
+	title => 'Japan Perl Advent Calendar',
+	url   => 'http://perl-users.jp/articles/advent-calendar/2010/',
+      },
+      {
+	title => 'Perl 中文 Advent Calendar',
+	url   => 'http://fayland.github.com/advent.perlchina.org/',
+      },
+    ],
+  };
+</%init>

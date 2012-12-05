@@ -1,0 +1,370 @@
+Title:    File::Map을 이용한 메모리맵 파일 접근
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후, keedi.k _at_ gmail.com
+
+
+
+시작하며
+---------
+
+Perl로 텍스트 파일을 처리하는 것은 일상적인 일입니다.
+하지만 대용량 파일을 다뤄야 할 때는 어떻하시나요?
+물론 Perl은 내재된 한계 따윈 없는 멋진 녀석이긴 하지만
+우리의 시스템은 메모리라는 한계를 가지고 있습니다.
+대용량 파일을 그것도 순차적이 아니라 임의의 위치에
+접근해야 한다면, 그리고 심지어 값을 변경하기까지 해야한다면
+조금은 다른 방법으로 스크립트를 작성해야 할 것입니다.
+
+
+
+준비물
+-------
+
+우선 10000x10000 행렬(1억개 요소)을 준비합니다.
+행렬에 들어가는 자료는 0에서 499사이의 정수형 값을 무작위로 집어넣되
+열에서 각 항목은 빈 칸으로 구분하고 행은 줄바꿈 문자로 구분합니다.
+이와 같은 행렬을 자동으로 생성하는 Perl 스크립트(`gen-matrix.pl`)는
+다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    use Readonly;
+    
+    Readonly my $NCOLS => 10000;
+    Readonly my $NROWS => 10000;
+    Readonly my $MAX   => 500;
+    
+    for ( 1 .. $NROWS ) {
+        print int(rand $MAX), ' ' for 1 .. $NCOLS;
+        print "\n";
+    }
+
+가독성을 위해 [CPAN의 Readonly 모듈][cpan-readonly]을 사용합니다.
+`Readonly` 모듈이 없을 경우 다음 명령을 이용해 설치합니다.
+
+    #!bash
+    $ cpan Readonly
+
+`gen-matrix.pl`에 실행권한을 추가합니다.
+
+    #!bash
+    $ chmod 755 gen-matrix.pl
+
+명령줄에서 다음 명령을 실행해서 1000x1000 행렬 데이터를
+담을 `matrix.asc`를 만듭니다.
+
+    #!bash
+    $ ./gen-matrix.pl > matrix.asc
+
+
+
+단순하게, 평범하게?
+--------------------
+
+행렬이 준비되었다면 이제 각각의 요소에 접근해보죠.
+행열인만큼 `row_idx`, `col_idx`값을 이용해서 접근하도록 합니다.
+접근할 위치를 `(row_idx, col_idx)`로 나타낸다고 할 때 `(0, 0)`은
+행렬의 1행 1열에 해당하는 요소를 접근하는 것을 의미합니다.
+
+*'Simple is the Best'*란 구호에 맞게
+행렬의 특정 요소로 접근하는 함수를 `matrix()`라고 할 때
+`standard-access.pl` Perl 스크립트는 다음과 같을 것입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use autodie;
+    use FindBin '$Script';
+    use Readonly;
+    
+    Readonly my $NCOLS => 10000;
+    Readonly my $NROWS => 10000;
+    
+    die "Usage: $Script <matrix ascii file>\n"
+      unless @ARGV == 1;
+    my $file = shift;
+    
+    open my $fh, '<', $file;
+    
+    say matrix(0, 0);
+    say matrix(1, 1);
+    say matrix(10, 5);
+    #
+    # ... go ahead ...
+    #
+    
+    close $fh;
+    
+    sub matrix {
+        my ( $row_idx, $col_idx ) = @_;
+    
+        $row_idx = $row_idx < 0 ? 0 : $row_idx;
+        $col_idx = $col_idx < 0 ? 0 : $col_idx;
+    
+        $row_idx = $row_idx < $NROWS ? $row_idx : $NROWS - 1;
+        $col_idx = $col_idx < $NCOLS ? $col_idx : $NCOLS - 1;
+    
+        my $row_cnt;
+        seek $fh, 0, 0;
+        while (<$fh>) {
+            next if $row_cnt++ < $row_idx;
+            return (split)[$col_idx];
+        }
+        return;
+    }
+
+
+
+문제점
+-------
+
+`standard-access.pl` 스크립트는 정리하면 다음과 같은 형태를 가집니다.
+
+    #!perl
+    open my $fh, '<', $file;
+    
+    #
+    # call matrix()
+    #
+    
+    close $fh;
+    
+    sub matrix {
+        my ( $row_idx, $col_idx ) = @_;
+    
+        #
+        # 인자 검사
+        #
+    
+        seek $fh, 0, 0;
+        while (<$fh>) {
+            next if $row_cnt++ < $row_idx;
+            return (split)[$col_idx];
+        }
+        return;
+    }
+
+이렇게 작성할 경우 매번 `matrix()` 함수를 호출하는 시점마다
+파일의 처음으로 포인터를 이동해서 줄 단위로 순차적 이동을 해야합니다.
+파일의 크기가 점점 커지고 뒷쪽의 행렬 요소를 읽어들여야 한다면
+심각한 성능 저하가 일어납니다.
+또한 특정 열로 이동하기 위해 한 줄을 다 읽어 들여야 하는데
+물론 Perl은 개의치 않고 여러분이 원하는대로 최선을 다해
+읽어들이겠지만 행의 너비가 점점 길어진다면 이것도 큰 문제는
+아니지만 낭비이긴 합니다.
+
+하지만 무엇보다 가장 큰 문제는 쓰기가 번거롭다는 것입니다.
+각 항목의 데이터가 가변적이기 때문에 값을 변경해야 할 경우
+최악의 경우 변경되는 요소가 있는 항목 이후의 모든 값을
+다 새로 써야합니다.
+
+
+
+빠르게, 더 빠르게, 쉽게 더 쉽게
+--------------------------------
+
+간단하게 작성한 순차적 방식의 접근 방법에서
+다음 세 가지 사항을 고려해서 코드를 수정해보겠습니다.
+
+- 읽기뿐만 아니라 쓰기까지 지원
+- 행렬의 크기와 상관없이 일정하면서 납득할 만한 속도 유지
+- 유지보수가 쉬울 것
+
+
+
+### 이진 파일로 변경
+
+쓰기를 지원하면서 일정한 속도를 내려면 우선 행렬을
+저장하는 파일 형식을 변경해야 합니다.
+임의 위치에 접근이 용이하려면 각각의 항목이 일정한 크기를 유지해서
+특정 행의 특정 열에 접근할 때 수식적으로 위치를 파악할 수 있어야 합니다.
+이 문제를 해결하기 위해 `matrix.asc`를 이진 형식으로 변경합니다.
+물론 굳이 이진 형식이 아니라도 각각의 항목이 고정폭을 가지는
+행렬로 변경할 수 있지만 이진 파일로 변경할 경우 파일의 크기를
+줄일 수 있는 장점이 있습니다.
+
+현재 예제에서 숫자는 0에서 499사이의 정수 값이므로
+16비트 부호있는 정수형 값이면 충분합니다.
+이 값은 `pack`의 `s`형을 이용해서 저장할 수 있습니다.
+현재 우리가 가지고 있는 행렬을 각각의 요소가 2바이트를 차지하는
+이진 행렬으로 변경하는 것은 간단합니다.
+명령줄에서 다음 명령을 실행해 `matrix.bin` 파일을 생성합니다.
+
+    #!bash
+    perl -ne 'print pack "s*", split' matrix.asc > matrix.bin
+
+윈도우즈의 경우 `print`시 `\n`만 출력하는 것이 아니라
+`0A` 바이트를 출력할 때마다 `0D0A`로 캐리지 리턴을 추가해서 출력합니다.
+그러므로 `binmode` 함수를 사용해서 바이너리 모드로 출력해야합니다.
+
+    #!bash
+    perl -ne 'binmode STDOUT; print pack "s*", split' matrix.asc > matrix.bin
+
+물론 이진 파일로 변경할 경우 한 행이 몇 개의 열을 가지는지
+모르기 때문에 스크립트에서 전체 행의 개수와 전체 열의 개수에
+대한 정보를 가지고 있어야할 것입니다.
+이렇게 한 항목이 2바이트를 가지게 할 경우
+특정 `(row_idx, col_idx)`에 해당하는 행렬의 요소를 찾아가려면
+다음 공식을 사용하면 됩니다.
+
+    #!perl
+    my $offset = ( $NCOLS * $row_idx + $col_idx ) * $ITEM_SIZE;
+    my $item   = unpack 's', substr( $full_string, $offset, $ITEM_SIZE );
+
+앞의 공식에서 `$NCOLS`는 한 행에 포함한 열의 개수를,
+`$ITEM_SIZE`는 행렬 하나의 요소의 바이트 크기를 의미합니다.
+
+
+
+### 메모리맵 파일
+
+메모리맵 파일(memory-mapped file)은 일반 파일을
+메모리 영역인 주소 공간에 연결하는 것입니다.
+일반 파일도 정보를 저장하고 읽고 쓸 수 있으므로
+메모리맵 파일은 이런 이론에 기반해 하드 디스크에 존재하는
+파일의 내용을 프로세스의 주소 공간에 연결(Map)하는 기법입니다.
+요약하면 파일을 마치 메모리인 것처럼 사용하는 기법입니다.
+자세한 내용은 [위키피디아의 Memory-mapped file 문서][wikipedia-mmapfile]를
+참고하세요.
+
+[CPAN의 File::Map 모듈][cpan-file-map]을 사용하면
+빠르면서도 안전하게, 메모리맵 파일을 사용할 수 있으며
+코드를 간결하게 만들어 유지보수 역시 쉬워집니다.
+다음 명령을 실행해서 `File::Map` 모듈을 설치합니다.
+
+    #!bash
+    $ cpan File::Map
+
+명령행 인자로 입력받은 파일을 `File::Map`을 사용해서
+메모리맵 파일로 사용하는 것은 매우 쉽습니다.
+
+    #!perl
+    use File::Map 'map_file';
+    
+    die "Usage: $Script <matrix binary file>\n"
+      unless @ARGV == 1;
+    my $file = shift;
+    
+    map_file my ($map), $file;
+
+기본적으로 읽기 전용으로 열리지만 원한다면 쓰기 전용으로 열 수도 있습니다.
+`open` 함수에서 사용하는 파일 열기 모드를 동일하게 사용하면 됩니다.
+
+    #!perl
+    map_file my ($map), $file, '>';
+
+읽기 쓰기 모드로 여는 것 역시 가능합니다.
+
+    #!perl
+    map_file my ($map), $file, '+<';
+
+전체 `random-access.pl` 스크립트는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use 5.010;
+    use strict;
+    use warnings;
+    use autodie;
+    use FindBin '$Script';
+    use Readonly;
+    use File::Map 'map_file';
+    
+    Readonly my $NCOLS     => 10000;
+    Readonly my $NROWS     => 10000;
+    Readonly my $ITEM_SIZE => 2;
+    
+    die "Usage: $Script <matrix binary file>\n"
+      unless @ARGV == 1;
+    my $file = shift;
+    
+    map_file my ($map), $file, '+<';
+    
+    say matrix(0, 0);
+    say matrix(1, 1);
+    say matrix(10, 5);
+    #
+    # ... go ahead ...
+    #
+    
+    sub matrix {
+        my ( $row_idx, $col_idx, $value ) = @_;
+    
+        $row_idx = $row_idx < 0 ? 0 : $row_idx;
+        $col_idx = $col_idx < 0 ? 0 : $col_idx;
+    
+        $row_idx = $row_idx < $NROWS ? $row_idx : $NROWS - 1;
+        $col_idx = $col_idx < $NCOLS ? $col_idx : $NCOLS - 1;
+    
+        my $offset = ( $NCOLS * $row_idx + $col_idx ) * $ITEM_SIZE;
+    
+        if ( defined $value ) {
+            my $short = pack( 's', $value );
+            substr( $map, $offset, $ITEM_SIZE, $short );
+        }
+    
+        return unpack 's', substr( $map, $offset, $ITEM_SIZE );
+    }
+
+새로 작성한 `matrix()` 함수는 이제 쓰기도 지원합니다.
+
+    #!perl
+    sub matrix {
+        # ...
+    
+        if ( defined $value ) {
+            my $short = pack( 's', $value );
+            substr( $map, $offset, $ITEM_SIZE, $short );
+        }
+    
+        # ...
+    }
+
+
+
+정리하며
+---------
+
+Perl 스크립트라고 해서 사람이 읽을 수 있는 텍스트 파일만
+처리할 수 있는 것은 아닙니다.
+`File::Map`과 같은 잘 만들어진 모듈을 사용하면
+대용량의 파일도 간편하면서도 빠르게 그리고 안전하게 읽고 쓸 수 있습니다.
+Perl은 `pack`과 `substr`이라는 강력한 저수준 함수를 제공합니다.
+이런 함수를 사용한다면 C언어와 같은 저수준 언어와 비교했을때도
+떨어지지 않는 성능을 보장합니다.
+
+Enjoy Your Perl! ;-)
+
+
+
+쪽지시험
+---------
+
+`File::Map`(메모리맵 파일)을 쓰지 않고 Perl에서 제공하는
+`seek`를 이용해서 이진 파일로 저장한 행렬의 각각의 요소에
+접근하는 `matrix()` 함수를 구현해보세요.
+직접 구현한 경우와 `File::Map`을 사용한 경우와 성능 차이는 얼마나 날까요?
+[CPAN의 Devel::NYTProf 모듈][cpan-devel-nytprof]을 사용해서
+한번 확인해보세요. ;-)
+
+
+
+[cpan-devel-nytprof]:   http://search.cpan.org/perldoc?Devel::NYTProf
+[cpan-file-map]:        http://search.cpan.org/perldoc?File::Map
+[cpan-readonly]:        http://search.cpan.org/perldoc?Readonly
+[twitter-keedi]:        http://twitter.com/#!/keedi
+[wikipedia-mmapfile]:   http://en.wikipedia.org/wiki/Memory-mapped_file

@@ -1,0 +1,186 @@
+Title:    윈도우즈 환경에서 Perl은 어디에 써먹을 수 있을까?
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   crowdy
+
+저자
+-----
+
+[@crowdy][twitter-crowdy] - Technology Enthusiast, IT Guy in Japan, 현재 [gmo.jp][gmojp]에서 근무하고 있다.
+
+
+
+시작하며
+---------
+
+Perl이 좋다고는 하지만,
+여러분이 다음과 같은 상황이라면
+Perl이 그다지 매력이 없을지도 모릅니다.
+
+* 윈도우즈를 사용하며 명령줄(`cmd`)에서 명령하기를 그다지 즐기지 않는다면...
+* 윈도우즈를 사용하는데 입력을 매개변수로 전달하거나 파일로 한다면...
+* 윈도우즈를 사용하는데 출력까지도 콘솔이나 파일에 한다면...
+
+
+여기에 *"윈도우즈라면 Perl을 이렇게 사용할 수도 있다!"*에 대한 내용으로,
+다음과 같이 3가지 질문에 대한 나름대로의 답변 형식으로 정리해 보았습니다.
+
+
+
+그런데 윈도우즈에서 Perl 쓸 일이 뭐 있나요?
+--------------------------------------------
+
+> Perl을 배워두면 좋다라고 하더군요.
+> 또 윈도우즈에서 Perl을 쓸 수 있다는 것은 알겠는데,
+> 그런데 윈도우즈에서 Perl 쓸 일이 뭐 있나요?
+> 전 이미 다른 언어를 사용할 줄 안다구요.
+> *그리고 요즘 멀티 플랫폼 언어라면 대세는 xxx아닌가요?*
+
+사실 제가 예전에 하던 말들입니다. ^^;
+
+작성된 Perl 코드를 실행하는 방법으로는
+Perl 해석기가 실행된 개체를 통해 코드의 내용을 실행하는 것이 일반적입니다.
+Perl 해석기를 실행하는 방법은 다음과 같습니다.
+
+* 콘솔에서 직접 실행하기
+* 쉘의 쉬뱅(shebang)을 사용하기
+* [CPAN의 PAR 모듈][cpan-par]로 함께 패키징하기
+
+그런데 윈도우즈라면 옵션으로 *ActiveX*를 통해 실행하는
+또 다른 한가지의 실행방법이 주어집니다.
+
+
+
+엥? ActiveX??!!
+----------------
+
+*ActiveX*를 통해 실행한다는 말은 무엇이고,
+또 어떻게 실행한다는 것인가요?
+
+윈도우즈에서 사용할 수 있는 Perl은 여러 가지가 있습니다만,
+그 중 [Activestate][activestate]사에서 나온
+[Activestate Perl][as-perl]이라는 것이 있습니다.
+
+윈도우즈의 스크립트언어로 등록해 사용하는 *ActiveX*의
+`ScriptControl`의 인터페이스를 구현해 제공한다는 것이
+*Activestate Perl*의 특징입니다.
+
+ActiveX `ScriptControl`의 인터페이스를 구현했다는 말은
+*ActiveX를 생성하는 방식으로 Perl 해석기를 실행할 수 있다*는 뜻입니다.
+즉, Activestate Perl이 설치되어 있는 윈도우즈 환경이라면
+다음과 같은 4줄의 jscript 코드를 사용할 수 있습니다.
+
+    #!javascript
+    var sc = new ActiveXObject("ScriptControl");
+    sc.Language = "PerlScript";
+    sc.AddObject("Shell", new ActiveXObject("WScript.Shell"));
+    sc.ExecuteStatement("$Shell->Popup('hello');");
+
+![실행예제 #1][img-01]
+
+실전용으로 예외처리를 넣고
+일부러 오류를 발생시키는 코드로 만들면 다음과 같습니다.
+
+    #!javascript
+    try {
+        var sc = new ActiveXObject("ScriptControl");
+        sc.Language = "PerlScript";
+        sc.AddObject("Shell", new ActiveXObject("WScript.Shell"));
+        sc.ExecuteStatement("eval{$ShellX->Popup('hello');};$Shell->Popup($@) if $@;");
+    } catch(e) {
+        WScript.Echo((e.number & 0xFFFF)+":"+e.description+"\n");
+    }
+
+![실행예제 #2][img-02]
+
+
+
+ActiveX로 Perl 해석기를 실행해서 어쩌자는거죠?
+-----------------------------------------------
+
+> ActiveX를 통해서 Perl 해석기를 실행해서 뭘 어쩔 수 있다는 거죠?
+> 만들었다면 일부러 js 로 감싸 실행할 이유가 없잖아요?!
+> 또 전 js 따위는 관심도 없다구요!!
+
+윈도우즈에서 *ActiveX*를 사용해 Perl 코드를 실행하면,
+입출력때 Perl 코드에 전달하고 결과를 받는 것으로 기존의 것은 물론,
+다른 *ActiveX* 컨트롤을 사용하는 것이 가능해집니다.
+말 그대로 Perl로 할 수 있는 것 들이 더 풍부해진답니다.
+예를 들면 다음과 같습니다.
+
+* Perl 코드의 입력을 윈도우즈의 타블렛용 ActiveX를 사용해
+  타블렛이나 마우스의 움직임을 이용할 수도 있죠.
+* Perl 코드의 출력을 윈도우즈의 SAPI를 이용해
+  목소리로 출력하게 할 수 있어요.
+* 윈도우즈용 게임 등에서 몹들의 움직임들을 결정하는 로직으로,
+  Perl 스크립트를 로드해 그대로 움직이게 하는 것도 생각해볼 수 있답니다.
+  (상용이라면 라이센스에 대해서도 좀 고려해야겠지만요. :-)
+
+윈도우즈에서는 ActiveX를 생성해 Perl 코드를 실행할 수 있는 환경으로,
+js 파일로 만들어서 실행하는 방법 이외에도
+다음과 같은 여러가지 방법이 있습니다.
+
+* 자기 컴퓨터에서 실행하는 HTML의 Javascript 부분에
+  `language="jscript"`로 하고 앞의 코드를 사용할 수도 있습니다.
+* VBS도 `CreateObject`를 통해서 COM을 만들수 있으므로
+  위와 유사한 코드를 실행할 수 있습니다.
+* MS-Word, Excel, Powerpoint, Outlook, Visio와 같은
+  오피스 프로그램들도 VBA를 통해 `CreateObject`를 실행할 수 있습니다.
+* Visual Basic 6에서도 `CreateObject` 명령이 있습니다.
+* Visual C++에서도 `::CoInitialize`라는 함수를 통해 COM을 만들 수 있습니다.
+* 최근에 나온 윈도우즈의 Powershell에서도 COM을 만들 수 있습니다.
+* Visual Studio도 매크로를 VB.Net으로 작성합니다.
+  여기에서도 이미 작성해둔 Perl 코드를 활용할 수 있습니다.
+* 닷넷 프레임워크를 사용하는 프로젝트에서도 *Reference 추가* 메뉴에서
+  *COM Components* 탭으로부터 *ScriptControl*을 추가해서 사용할 수 있습니다.
+* 그 외에도 ActiveX를 사용할 수 있는 여러 환경들이 있습니다.
+  C++Builder, MathLab, Delphi, LabView, AutoIt(자동화툴),
+  AutoHotKey(자동화툴), Emeditor(에디터), Poderosa(터미널에뮬), ...
+
+이미 이렇게 많은 윈도우즈 프로그램들을
+Perl 코드를 실행해 적절히 조작하고 제어하는 것이 가능합니다.
+*적절히 조작하고 제어*라고 썼지만,
+이미 이미 공개된 Perl의 방대한 라이브러리들의 기능을
+쉽게 붙여서 활용한는 것은 정말 대단한 매력입니다.
+그렇다면 좀 더 관심이 가지 않을까요?
+
+이쯤해서 여러분이 가지게 될 다음 질문은 아마도
+*"어떤 기능을 쉽게 붙여 써먹을 수 있나요?"*겠죠?
+이미 [서울 펄몽거스 펄 크리스마스 달력][seoulpm-advent-calendar]에
+연재 중인 내용을 활용할 수도 있고,
+또는 [CPAN][search-cpan]에 있는 수 많은 모듈일 수도 있겠죠. ;-)
+
+
+
+덧붙임
+-------
+
+실은 다른 언어들도 `ScriptControl`의 인터페이스를 구현하고 있습니다.
+
+    #!javascript
+    sc.Language = "PerlScript";
+
+적절한 프로그램들이 설치되어 있다면 앞의 예제에 있는
+`PerlScript` 대신 다음 문자열을 사용해보는 것도 재미있을 것입니다.
+
+* VBScript
+* JScript
+* PHPScript
+* Python
+* RubyScript
+
+또한 매개변수와 결과값을 여러 언어들간에
+주고받는 것도 가능하답니다.
+
+
+
+[activestate]:              http://www.activestate.com/
+[as-perl]:                  http://www.activestate.com/activeperl
+[cpan-par]:                 http://search.cpan.org/perldoc?PAR
+[gmojp]:                    http://gmo.jp
+[img-01]:                   2010-12-05-1.png
+[img-02]:                   2010-12-05-2.png
+[search-cpan]:              http://search.cpan.org/
+[seoulpm-advent-calendar]:  http://advent.perl.kr
+[twitter-crowdy]:           http://www.twitter.com/crowdy/

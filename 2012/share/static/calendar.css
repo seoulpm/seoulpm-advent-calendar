@@ -15,7 +15,7 @@
     padding-top: 30px;
     width: 576px;
     height: 370px;
-    background: url("head.bmp") no-repeat scroll 0 30px transparent;
+    background: url("head.png") no-repeat scroll 0 30px transparent;
 }
 #cont {
     margin-top: 14px;
@@ -29,7 +29,7 @@
     display: block;
     margin-left: 25px;
     margin-bottom: 10px;
-    background: url("num.bmp") no-repeat scroll 0 0 transparent;
+    background: url("num.png") no-repeat scroll 0 0 transparent;
     width: 70px;
     height: 80px;
 }

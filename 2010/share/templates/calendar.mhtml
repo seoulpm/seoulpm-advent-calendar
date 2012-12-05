@@ -1,0 +1,64 @@
+<& header.mhtml, global => $global &>
+<script type="text/javascript">
+$(function () {
+  $("#cal a").each(function (idx, elm) {
+    if ($(elm).attr('title')) {
+      $(elm).cooltipbox($(elm).attr('title'));
+    }
+  });
+});
+</script>
+<div id="content-wrapper">
+<div id="content" class="fix">
+<div class="calendar" id="cal">
+  <div class="title"><h3><% $year %>년 <% $month->{1}->month %>월</h3></div>
+  <table>
+    <thead>
+      <tr> <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th> </tr>
+    </thead>
+    <tbody>
+% for my $week ( @$calendar ) {
+      <tr>
+%   for my $day ( @$week ) {
+%     if ( $day && $day <= $global->{articles_total} ) {
+%       my $key = sprintf("%4d-%02d-%02d", $year, $month->{1}->month, $day);
+%       if ( $articles->{$key} ) {
+%         if (     $today->year  == $year
+%               && $today->month == $month->{1}->month
+%               && $today->day   == $day ) {
+        <td class="col selectable today"><a href="<% $key.'.html' %>" title="<% $articles->{$key}->title %> - <% $articles->{$key}->author %>"><% $day %></a></td>
+%         }
+%         else {
+        <td class="col selectable"><a href="<% $key.'.html' %>" title="<% $articles->{$key}->title %> - <% $articles->{$key}->author %>"><% $day %></a></td>
+%         }
+%       }
+%       else {
+        <td class="col"><a href="#"><% $day %></a></td>
+%       }
+%     }
+%     else {
+        <td><a href="#"><% $day %></a></td>
+%     }
+%   }
+      </tr>
+% }
+    </tbody>
+  </table>
+</div>
+</div>
+<& sidebar.mhtml, global => $global, type => "fix", article => undef &>
+</div>
+<& footer.mhtml, global => $global &>
+
+<%init>
+  my $global = $m->comp('variables.mhtml');
+  $global->{location} = '';
+</%init>
+
+<%args>
+  $today
+  $year
+  $month
+  $calendar
+  $articles
+</%args>

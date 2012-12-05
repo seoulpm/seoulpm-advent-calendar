@@ -1,0 +1,70 @@
+/*
+ *  CoolTipBox Plugin for JQuery
+ *  Examples and documentation at: http://www.visusgroup.com.br/labs.php?red=cooltipbox
+ *
+ *  Copyright 2010, Bruno Bruck
+ *  Released under the MIT license (http://www.opensource.org/licenses/mit-license.php)
+ *
+ *  Version 1.1.7 (03-NOV-2010)
+ *
+ *  Author website: http://www.visusgroup.com.br
+ */
+
+.cool-tip-box{
+    display:block;
+    position:absolute;
+    z-index:5000;
+}
+
+.cool-tip-box .cool-tip-box-content{
+    background-color:#393939;
+    color:#fff;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:11px;
+    position:absolute;
+    text-align:left;
+    width:150px;
+}
+
+.cool-tip-box .cool-tip-box-v-arrow, .cool-tip-box .cool-tip-box-h-arrow{
+    margin:-2px 0 0 15px;
+    position:absolute;
+    text-align:center;
+    width:15px;
+    z-index:5002;
+}
+
+.cool-tip-box .cool-tip-box-v-arrow div, .cool-tip-box .cool-tip-box-h-arrow div{
+    background:#393939;
+    display:block;
+    font-size:0;
+    margin:0 auto;
+    z-index:5002;
+}
+
+.cool-tip-box .cool-tip-box-v-arrow div{height:1px;}
+
+.cool-tip-box .cool-tip-box-h-arrow div{
+    float:left;
+    position:relative;
+    width:1px;
+}
+
+
+.cool-tip-box .cool-tip-box-v-arrow .part1{width:15px;}
+.cool-tip-box .cool-tip-box-v-arrow .part2{width:13px;}
+.cool-tip-box .cool-tip-box-v-arrow .part3{width:11px;}
+.cool-tip-box .cool-tip-box-v-arrow .part4{width:9px;}
+.cool-tip-box .cool-tip-box-v-arrow .part5{width:7px;}
+.cool-tip-box .cool-tip-box-v-arrow .part6{width:5px;}
+.cool-tip-box .cool-tip-box-v-arrow .part7{width:3px;}
+.cool-tip-box .cool-tip-box-v-arrow .part8{width:1px;}
+
+.cool-tip-box .cool-tip-box-h-arrow .part1{height:15px;top:0;}
+.cool-tip-box .cool-tip-box-h-arrow .part2{height:13px;top:1px;}
+.cool-tip-box .cool-tip-box-h-arrow .part3{height:11px;top:2px;}
+.cool-tip-box .cool-tip-box-h-arrow .part4{height:9px;top:3px;}
+.cool-tip-box .cool-tip-box-h-arrow .part5{height:7px;top:4px;}
+.cool-tip-box .cool-tip-box-h-arrow .part6{height:5px;top:5px;}
+.cool-tip-box .cool-tip-box-h-arrow .part7{height:3px;top:6px;}
+.cool-tip-box .cool-tip-box-h-arrow .part8{height:1px;top:7px;}

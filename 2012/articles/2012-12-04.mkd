@@ -347,7 +347,7 @@ config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부�
 - 미리 만들어둔 크롤러로 이미지를 모으고, DB에 파일명을 저장합니다.
 - 방문자가 주소를 통해 1번째부터 30번째 이미지를 보여달라고 요청합니다.
 - mysql에 접속해 1 번째, 30 번째를 인자로 넘겨 1 .. 30 까지 파일 이름 배열을 받습니다.
-- 배열에 이미지 경로를 덧붙이고, 다시 &lt;IMG&gt; 태그를 씌워서 보여주면 끝!!
+- 배열에 이미지 경로를 덧붙이고, 다시 `<IMG>` 태그를 씌워서 보여주면 끝!!
 
 이걸 Dancer 시점에서 볼까요?
 
@@ -357,7 +357,7 @@ config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부�
   - 위 주소를 Dancer용으로 바꾼다면 이렇게 될 수 있습니다.
     http://localhost/hello/2/11
   - `/` 가 디렉토리 구분이 아닌, 인자 구분용이라는 것이 일반적인 웹 데몬 사용자가 Dancer를 접했을 때 이해가 잘 안되는 부분인데, Dancer에서 사용하는 URL이 서버쪽 경로랑 일치하지 않는 다는 것을 이해하면 됩니다.
-- mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -&gt; SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -&gt; 템플릿 엔진으로 넘깁니다.
+- mysql에 접속해서 배열을 얻는 것은 control 영역이네요. lib/my.pm 에서 해결합니다. 1이랑 30을 각각 변수에 넣고 -> SQL문으로 만들어 결과를 다시 Perl 배열로 받아 -> 템플릿 엔진으로 넘깁니다.
 - view 영역입니다. 앞서 넘겨 받은 배열을 템플릿 엔진에서 처리하고요. 템플릿 엔진에서도 Perl 비슷한 문법으로 프로그래밍 가능합니다.
 
 
@@ -388,7 +388,7 @@ config.yml에서 `auto_reload: 1` 설정과 `./lib/MyApp.pm` 모듈 로딩 부�
     # sql 작성
     my $sql_time = time_p();
     my $sql = "insert into md5_list ( saveTime, name ) values ( \"$sql_time\", \"$file_name\")";
-    my $sth = $dbh-&gt;prepare($sql);
+    my $sth = $dbh->prepare($sql);
     $sth->execute or die "$DBI::errstr\n";
 
 입력된 데이터는 다음과 같습니다(아래 스크린샷의 프로그램은 [App::AltSQL](https://www.metacpan.org/module/App::AltSQL)입니다.)
@@ -535,33 +535,33 @@ DBI 모듈을 써야 합니다. mysql 설정 및 DB 생성은 생략합니다.
 ### view : result.tt 내용
 
     #!plain
-    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt;
-    [% IF (start - img_num * 2) &gt; 0 %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+    <a href="/[% site %]">최근 이미지 보기</a>
+    [% IF (start - img_num * 2) > 0 %]
+    <a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]">[% start - img_num * 2 %]</a> 
     [% END %]
     [% start - img_num %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt;
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
-    &lt;ol&gt;
+    <a href="/[% site %]/[% img_num %]/[% start %]">[% start %]</a>
+    <a href="/[% site %]/[% img_num %]/[% start + img_num %]">[% start + img_num %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]">[% start + img_num * 2 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]">[% start + img_num * 3 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]">[% start + img_num * 4 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% end_page - 30 %]">[% end_page - 30 %]</a> 
+    <ol>
         [% FOREACH file IN images %]
-        &lt;li&gt;&lt;img src="/[% site %]/[% file %]" /&gt;&lt;/li&gt;
+        <li><img src="/[% site %]/[% file %]" /></li>
         [% END %]
-    &lt;/ol&gt;
-    &lt;a href="/[% site %]"&gt;최근 이미지 보기&lt;/a&gt;
-    [% IF (start - img_num * 2) &gt; 0 %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]"&gt;[% start - img_num * 2 %]&lt;/a&gt; 
+    </ol>
+    <a href="/[% site %]">최근 이미지 보기</a>
+    [% IF (start - img_num * 2) > 0 %]
+    <a href="/[% site %]/[% img_num %]/[% start - img_num * 2%]">[% start - img_num * 2 %]</a> 
     [% END %]
     [% start - img_num %]
-    &lt;a href="/[% site %]/[% img_num %]/[% start %]"&gt;[% start %]&lt;/a&gt;
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num %]"&gt;[% start + img_num %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]"&gt;[% start + img_num * 2 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]"&gt;[% start + img_num * 3 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]"&gt;[% start + img_num * 4 %]&lt;/a&gt; 
-    &lt;a href="/[% site %]/[% img_num %]/[% end_page - 30 %]"&gt;[% end_page - 30 %]&lt;/a&gt; 
+    <a href="/[% site %]/[% img_num %]/[% start %]">[% start %]</a>
+    <a href="/[% site %]/[% img_num %]/[% start + img_num %]">[% start + img_num %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 2 %]">[% start + img_num * 2 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 3 %]">[% start + img_num * 3 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% start + img_num * 4 %]">[% start + img_num * 4 %]</a> 
+    <a href="/[% site %]/[% img_num %]/[% end_page - 30 %]">[% end_page - 30 %]</a> 
 
 ### 결과
 ![썸네일][img-resize-04]

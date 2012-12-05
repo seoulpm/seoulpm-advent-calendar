@@ -1,0 +1,152 @@
+<html>
+  <title></title>
+  <head>
+    <style>
+      * { padding: 0; margin: 0; color: white; border: 0;
+      font-family:돋음,UnDotum,Arial;
+      }
+      body {
+      background: url(bg.gif) repeat-x scroll 0 0 #1a1a1a;
+      }
+      #head {
+      position: relative;
+      margin-bottom: 24px; margin-left: 44px; }
+      #rside {
+      position: absolute;
+      top: 0;
+      padding-left: 610px;
+      margin-top: 80px;
+      }
+      #rside li {
+      list-style: none;
+      line-height: 2em;
+      
+      }
+      #rside a {
+      text-decoration: none !important; 
+      }
+      #rside a:hover {
+      text-decoration: underline !important;
+      }
+      #twit {
+      top-margin: 400px;
+      }
+      #cont {
+      width: 780px; margin-left: 50px; }
+      #foot {
+      margin-left: 40px;
+      margin-top: 80px;
+      font-size: 15px;
+      color: #777;
+      }
+      #foot em, b, strong { color: #aaa }
+      h1 { display: none; }
+      h2 { font-size: 37px; }
+      h3 { font-size: 26px; margin-bottom: 24px; }
+      
+      .calendar{overflow:hidden;width:570px;
+      }
+      .calendar .title{margin:17px 11px 26px 11px;text-align:center;font-family:돋음,UnDotum; }
+      .calendar .title h3{font-size: 25px; color: #ddd}
+      .calendar a{text-decoration: none !important; color: #666}
+      .calendar table thead{display: none}
+      .calendar table{width:500px; margin: 0 auto 26px; border: 0}
+      .calendar table td{padding:0;border:0}
+      .calendar table td.col {border:#444 solid 2px;color:#666}
+      .calendar table td.selectable a{border:#aaa solid 2px;color:#ccc;font-weight: bold;}
+      .calendar table td.today a{background:blue}
+      .calendar table td a{display:block;width:70px;padding:12px 0 12px;
+      text-align:center;letter-spacing:-1px;}
+      #doc {
+      margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="head">
+      <h1>서울 펄 몽거스 | 펄 크리스마스 달력</h1>
+      <img src="title.gif" />
+      <div class="calendar">
+	<div class="title">
+	  <h3>2010년 12월</h3>
+	</div>
+	<table>
+	  <thead>
+	    <tr>
+	      <th>일</th><th>월</th>
+	      <th>화</th><th>수</th>
+	      <th>목</th><th>금</th>
+	      <th>토</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr>
+	      <td><a href="#">28</a></td>
+	      <td><a href="#">29</a></td>
+	      <td><a href="#">30</a></td>
+	      <td class="col selectable"><a href="#">1</a></td>
+	      <td class="col"><a href="#">2</a></td>
+	      <td class="col"><a href="#">3</a></td>
+	      <td class="col"><a href="#">4</a></td>
+	    </tr>
+	    <tr>
+	      <td class="col"><a href="#">5</a></td>
+	      <td class="col"><a href="#">6</a></td>
+	      <td class="col"><a href="#">7</a></td>
+	      <td class="col"><a href="#">8</a></td>
+	      <td class="col"><a href="#">9</a></td>
+	      <td class="col"><a href="#">10</a></td>
+	      <td class="col"><a href="#">11</a></td>
+	    </tr>
+	    <tr>
+	      <td class="col"><a href="#">12</a></td>
+	      <td class="col"><a href="#">13</a></td>
+	      <td class="col"><a href="#">14</a></td>
+	      <td class="col"><a href="#">15</a></td>
+	      <td class="col"><a href="#">16</a></td>
+	      <td class="col"><a href="#">17</a></td>
+	      <td class="col"><a href="#">18</a></td>
+	    </tr>
+	    <tr>
+	      <td class="col"><a href="#">19</a></td>
+	      <td class="col"><a href="#">20</a></td>
+	      <td class="col"><a href="#">21</a></td>
+	      <td class="col"><a href="#">22</a></td>
+	      <td class="col"><a href="#">23</a></td>
+	      <td class="col"><a href="#">24</a></td>
+	      <td><a href="#">25</a></td>
+	    </tr>
+	    <tr>
+	      <td><a href="#">26</a></td>
+	      <td><a href="#">27</a></td>
+	      <td><a href="#">28</a></td>
+	      <td><a href="#">29</a></td>
+	      <td><a href="#">30</a></td>
+	      <td><a href="#">31</a></td>
+	      <td><a href="#">1</a></td>
+	    </tr>
+	  </tbody>
+	</table>
+      </div>
+      <div id="rside">
+	<ul>
+	  <li><a href="http://twitter.com/seoulpm" target="_blank"><img id="twit" src="twit.gif"></a></li>
+	  <li><a href="http://perl.kr/" target="_blank">perl.kr</a></li>
+	  <li><a href="#">Seoul.pm</a></li>
+	  <li><a href="http://perlmania.or.kr/drupal/" target="_blank">perlmania.org</a></li>
+	  <li><a href="http://cafe.naver.com/perlstudy.cafe" target="_blank">perlstudy.cafe</a></li>
+	  <li><a href="http://webchat.freenode.net/?channels=perl-kr" target="_blank">IRC #perl-kr 채팅</a></li>
+	  <li><a href="http://event.perl.kr/kpw2008/" target="_blank">Korean Perl Workshop 2008</a></li>
+	</ul>
+      </div>
+    </div>
+    <div id="cont">
+      <div id="doc">
+	<h2>내용</h2>
+      </div>
+    </div>
+    <div id="foot">
+      perl.kr
+    </div>
+  </body>
+</html>

@@ -1,0 +1,323 @@
+Title:    두렵기만 한 정규표현식은 가라!!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
+저자
+-----
+
+[@luzluna][twitter-luzluna] -
+Seoul.pm과 #perl-kr의 육아 전문 컨설턴트,
+사회적 기업을 꿈꾸는 커피 매니아자 백수,
+현재 제주와 서울을 오가며 몽거스 활동을 하고 있다.
+
+
+
+시작하며
+---------
+
+정규표현식!
+Perl을 처음 배우기 시작할때 가장 넘어서기 어려운 벽중 하나가 정규표현식입니다.
+다른 언어에선 문자열 제공하는 문자열 함수의 대부분은
+Perl에서 정규표현식으로 충분히 처리할 수 있기 때문에
+Perl의 강력한 문자열 처리능력을 발휘하려면 정규표현식을 익혀야만 합니다.
+또한 정규식을 한번 잘 익혀두면 꼭 Perl이 아니라 하더라도
+[PCRE(Perl Compatible Regular Expressions)][pcre-home]와 같은
+라이브러리에서도 정규표현식을 쓸 수 있으므로 편리합니다.
+
+하지만! 역시 정규표현식은 어렵죠...
+
+올해 [Perl 크리스마스 달력][perl-advent-calendar]를 여는 첫 번째 글에서는
+정규표현식을 쉽게 배울 수 있도록 도와주는 멋진 도구가 소개하고 있습니다.
+간단하게 이 기사를 번역해서 소개하는 수준으로 기고하려 했지만
+너무 날로먹는 것 같아 양심의 가책을 느껴 평소 사용하는
+팁 몇 가지를 같이 소개하겠습니다.
+
+
+
+날로 먹는 Perl 크리스마스 달력 첫째 날 번역
+--------------------------------------------
+
+### 저자
+
+제라드 피어스(Jerrad Pierce)
+
+### 원문
+
+[Perl 크리스마스 달력: 2010년 12월 1일][perl-advent-calendar-2010-12-01]
+
+### 번역
+
+꼬끼오~ 신문왔습니다~!
+
+우리는 능숙한 Perl 해커의 게으름에 도움이 될만한 누군가의
+게으름의 산물로 올해의 캘린더를 시작해보려고 합니다.  
+[CPAN의 YAPE::Regex::Explain 모듈][cpan-yape-regex-explain]은 `YAPE`에
+속한 패키지로 Perl 크리스마스 트리의 조명을 밝혀줄만한 모듈입니다.
+(크리스마스 트리의 조명을 밝힌다는 이야기는 
+[Perl 크리스마스 달력][perl-advent-calendar] 디자인이
+크리스마스 트리 모양이기 때문에 나온 이야기입니다.)
+`YAPEREE`(`YAPE::Regex::Explain`)는 정규표현식의 암호같은 내용을
+평범한 영어로 바꿔줍니다.
+
+다음과 같은 정규 표현식이 있다고 해보죠.
+
+    #!perl
+    <([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>
+
+명령줄에서 `YAPEREE`를 이용해서 다음처럼 실행해보세요.
+
+    #!bash
+    $ perl -MYAPE::Regex::Explain \
+        -e 'print YAPE::Regex::Explain->new(' \
+        -e '    qr%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%' \
+        -e ')->explain'
+
+실행 결과는 다음과 같습니다.
+
+    #!plain
+    The regular expression:
+    
+    (?-imsx:<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>)
+    
+    matches as follows:
+      
+    NODE                     EXPLANATION
+    ----------------------------------------------------------------------
+    (?-imsx:                 group, but do not capture (case-sensitive)
+                             (with ^ and $ matching normally) (with . not
+                             matching \n) (matching whitespace and #
+                             normally):
+    ----------------------------------------------------------------------
+      <                        '<'
+    ----------------------------------------------------------------------
+      (                        group and capture to \1:
+    ----------------------------------------------------------------------
+        [^\s>]+                  any character except: whitespace (\n,
+                                 \r, \t, \f, and " "), '>' (1 or more
+                                 times (matching the most amount
+                                 possible))
+    ----------------------------------------------------------------------
+      )                        end of \1
+    ----------------------------------------------------------------------
+      (?:                      group, but do not capture (optional
+                               (matching the most amount possible)):
+    ----------------------------------------------------------------------
+        \s+                      whitespace (\n, \r, \t, \f, and " ") (1
+                                 or more times (matching the most amount
+                                 possible))
+    ----------------------------------------------------------------------
+        [^>]*?                   any character except: '>' (0 or more
+                                 times (matching the least amount
+                                 possible))
+    ----------------------------------------------------------------------
+      )?                       end of grouping
+    ----------------------------------------------------------------------
+      (?:                      group, but do not capture:
+    ----------------------------------------------------------------------
+        /                        '/'
+    ----------------------------------------------------------------------
+       |                        OR
+    ----------------------------------------------------------------------
+        >                        '>'
+    ----------------------------------------------------------------------
+        .*?                      any character except \n (0 or more times
+                                 (matching the least amount possible))
+    ----------------------------------------------------------------------
+        </                       '</'
+    ----------------------------------------------------------------------
+        \1                       what was matched by capture \1
+    ----------------------------------------------------------------------
+      )                        end of grouping
+    ----------------------------------------------------------------------
+      >                        '>'
+    ----------------------------------------------------------------------
+    )                        end of grouping
+    ----------------------------------------------------------------------
+
+꽤 멋진것 같지만, 덕지덕지 붙은 설명들은 Perl에는 쓸 수없는 부담일 뿐입니다.
+그래서 훨씬 유용한 `regexp`옵션을 사용하면
+`/x` 옵션 스타일의 정규표현식을 사용할 수 있습니다.
+
+    #!bash
+    $ perl -MYAPE::Regex::Explain \
+        -e 'print YAPE::Regex::Explain->new(' \
+        -e '    qr%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%' \
+        -e ')->explain("regex")'
+
+또한 잘못 이름지어진것 같아보이는...
+조용한 모드(silent mode)를 사용하면 다음 결과처럼
+예쁘게 출력되는 것을 볼 수 있습니다.
+
+    #!bash
+    $ perl -MYAPE::Regex::Explain \
+        -e 'print YAPE::Regex::Explain->new(' \
+        -e '    qr%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%' \
+        -e ')->explain("silent")'
+    
+    (?x-ims:
+      <
+      (
+        [^\s>]+
+      )
+      (?x:
+        \s+
+        [^>]*?
+      )?
+      (?x:
+        /
+       |
+        >
+        .*?
+        </
+        \1
+      )
+      >
+    )
+
+POD 노트에 의하면 일반 정규표현식을 그냥 문자열로 받을 수 있다고 
+되어있습니다만 실패할 수 있으므로 가능하면 `qr//`을 이용하는 것이 좋습니다.
+정규표현식을 영어로 읽을 수 있도록 해주는 이 모듈의 현재 버전의
+가장 큰 문제점은 5.6버전 이후에 나온 최신 정규식 기능들은 처리하지 
+못한다는 점입니다.
+즉 아래와 같은 기능들은 사용이 불가능합니다. 
+
+* 이름있는 캡쳐(Named Captures) - `(?<yada>...)` -
+  캡쳐된 내용을 `$1`, `$2`로 접근하지 않고 `$yada`로 접근할 수 있는 기능
+* `Regexp::Keep` - `\K...` - 이제는 코어 모듈에 포함됨
+* 재귀패턴 - `(?No...)`
+
+하지만 감사하게도 `Explain` 패키지는 착각하기 쉬운
+긍정/부정 일치(positive/negative match)
+또는 앞으로/뒤로 일치(look ahead/behind match)를
+쉽게 알 수 있도록 도와줍니다.
+예를 들면 뒤로 일치(behind match)가 포함된
+`/(?<!foo)bar(?=quz)/` 정규식은 다음과 같이 설명됩니다. 
+
+    #!perl
+    (?x-ims:               # group, but do not capture (disregarding
+                           # whitespace and comments) (case-sensitive)
+                           # (with ^ and $ matching normally) (with . not
+                           # matching \n):
+      (?<!                   # look behind to see if there is not:
+        foo                    # 'foo'
+      )                      # end of look-behind
+      bar                    # 'bar'
+      (?=                    # look ahead to see if there is:
+        quz                    # 'quz'
+      )                      # end of look-ahead
+    )                      # end of grouping
+
+
+
+덤1: use re 'debug';
+---------------------
+
+귀찮고 길게 번역을 했지만 사실 `YAPEREE` 모듈 없이도 프로그래머라면
+그럭저럭 이해할만한 설명을 간단하게 뽑아보는 방법도 있습니다. 
+
+    #!bash
+    $ perl -e 'use re "debug"; qr%(?<!foo)bar(?=quz)%'
+    Compiling REx "(?<!foo)bar(?=quz)"
+    Final program:
+       1: UNLESSM[-3] (7)
+       3:   EXACT <foo> (5)
+       5:   SUCCEED (0)
+       6: TAIL (7)
+       7: EXACT <bar> (9)
+       9: IFMATCH[0] (15)
+      11:   EXACT <quz> (13)
+      13:   SUCCEED (0)
+      14: TAIL (15)
+      15: END (0)
+    anchored "bar" at 0 (checking anchored) minlen 3
+    Freeing REx: "(?<!foo)bar(?=quz)"
+
+하핫! 다시 보니 썩 이해할만하진 않군요.
+
+    #!bash
+    perl -e 'use re "debug"; qr%(?<yada>aaa)%'
+    Compiling REx "(?<yada>aaa)"
+    Final program:
+       1: OPEN1 'yada' (3)
+       3:   EXACT <aaa> (5)
+       5: CLOSE1 'yada' (7)
+       7: END (0)
+    anchored "aaa" at 0 (checking anchored) minlen 3
+    Freeing REx: "(?<yada>aaa)"
+
+하지만 `re "debug"`의 경우 비교적 최신의 정규식 기능들까지
+폭넓게 지원하는 것이 장점입니다.
+
+
+
+덤2. 이름있는 캡쳐(Named Captures)
+-----------------------------------
+
+정규표현식에서 캡쳐된 데이타를 사용하려면
+`$1`, `$2` 같이 기억 변수(memory variable)를 사용합니다.
+예를 들어 `2010:12:17` 같은 형태의 날짜 형식에서
+년, 월, 일을 숫자로 뽑아내려면 다음처럼 코드를 작성해야 합니다.
+
+    #!perl
+    my $string = '2010:12:17';
+    $string =~ m/(\d\d\d\d):(\d\d):(\d\d)/;
+    print "YEAR:$1 MONTH:$2 DAY:$3\n";
+
+하지만 `$1`, `$2` 같은 기억 변수를 사용하면 아무래도 가독성이 떨어지고
+일치해야 하는 항목이 10여개가 넘는다면 그 개수를 일일이 세는 것도
+만만한 일이 아닐겁니다.
+그래서 Perl 6부터는 `$1`, `$2` 같은 모호한 이름대신
+이름있는 캡쳐(Named Capture) 방식을 이용해서
+명시적으로 이름을 지정해줄 수 있습니다.
+
+
+
+#### Perl 6 예제
+
+문법은 다음과 같습니다.
+
+    #!perl
+    $<capture_name>:=(capture pattern)
+
+예제는 다음과 같습니다.
+
+    #!perl
+    my $text = 'I am 500 years old.';
+    $text ~~ /I am $<age>:=(\d+)/;
+    say "You are $<age> years old?!";  # You are 500 years old?!
+
+명시적이고 좋아보이네요.
+
+
+
+### Perl 5는?
+
+Perl 6의 이름 있는 캡쳐 기능이 부럽다보니
+Perl 5.10.0 버전에도 이 기능을 백포트했습니다.
+Perl 5.10 이후의 버전에서는 이름있는 캡쳐를 사용할 수 있습니다.
+
+Perl 6와 비교해서 문법은 조금 다릅니다.
+
+    #!perl
+    (?<capture_name>capture pattern)
+
+동일한 예제입니다.
+
+    #!perl
+    my $text = 'I am 500 years old.';
+    $text ~~ /I am (?<age>\d+)/;
+    print "You are $+{age} years old?!\n";
+
+문법이 조금 다르고, 결과과 `$age`로 나오는 것이 아니라
+해시 변수 `%+`에 저장되는 차이가 있습니다.
+그래도 없는것보단 낫겠죠? :-)
+
+
+
+[twitter-luzluna]:                  http://twitter.com/luzluna
+[pcre-home]:                        http://www.pcre.org/
+[perl-advent-calendar]:             http://perladvent.pm.org/
+[perl-advent-calendar-2010-12-01]:  http://perladvent.pm.org/2010/1/
+[cpan-yape-regex-explain]:          http://search.cpan.org/perldoc?YAPE::Regex::Explain

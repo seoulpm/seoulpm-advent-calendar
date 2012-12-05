@@ -1,0 +1,257 @@
+Title:    use Android;
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   elixir
+
+
+
+저자
+-----
+
+[@elixir_][twitter-elixir_] -
+PLUS, 언더그라운드 및 웹, 스마트폰 해커.
+Perl보다 *무려* 3년이나 늦게 태어난 젊은 피!
+
+
+
+대세는 스마트폰!
+-----------------
+
+요즘 길거리를 돌아다니다 보면, 많은 분들이 스마트폰을 들고 계시더군요.
+스마트폰 해커로써 더 많은 사람들의 정보를 캐낼 수 있다는 것이 즐겁지만(?),
+다함께 손에 손잡고 경찰서에 가긴 저도 싫고 여러분도 싫으실테니...
+오늘은 (건전하게) 자신만의 Android 앱을 *Perl로 쉽게* 만드는 방법을 익혀봅시다!
+
+
+
+앱을 '쉽게' 만든다고요?
+------------------------
+
+네, 그렇습니다.
+
+> - "간단한 Android 앱을 이 포스팅만 보고도 만들 수 있다고?"
+> - "Java도 배워야하고, 객체지향도 다 알아야 가능한 거 아닌가?"
+
+위와 같이 생각하시는 분들도 분명 계실 겁니다.
+하지만, Perl의 모토인 TIMTOWTDI처럼
+Android 앱도 매우 다양한 방법으로 구현할 수 있습니다.
+
+우리가 원하는 기능을 Perl 스크립트로 작성 후 *SL4A*에서 작성한 스크립트를
+실행시키면 마치 하나의 앱을 만든 것과 동일하게 작동을 하게됩니다.
+그 말인즉 Perl을 사용하면 원하는 기능 혹은 앱을 *훨씬 짧고 간단하게*
+구현할 수 있다는 것입니다.
+
+간단한 예를 하나 보여드리죠.
+앱을 실행시키면 *Hello, World*가 적힌 Toast를 하나 실행시키는 앱을 만들어보죠.
+Java로 일반적인 Android 앱을 만든다면 코드는 다음과 같을 것입니다.
+
+    #!java
+    package advent.example.java;
+    
+    import android.app.Activity;
+    import android.content.Context;
+    import android.os.Bundle;
+    import android.widget.Toast;
+    
+    public class helloToast extends Activity {
+        /** Called when the activity is first created. */
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+    
+            Context context = getApplicationContext();
+            CharSequence text = "Hello, World!";
+            int duration = Toast.LENGTH_SHORT;
+    
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+    }
+
+간단한 toast를 하나 띄우려는데 `import`해야하는 파일은 넘쳐나고,
+코드는 또 왜 이렇게 긴지~
+이걸 Perl로 짜면 어떻게 될까요?
+
+    #!perl
+    use strict;
+    use warnings;
+    use Android;
+    
+    my $device = Android->new();
+    $device->makeToast("Hello, World!");
+
+못 믿으시겠다고요?
+두 파일의 실행화면을 비교해보죠.
+다음은 Java로 작성한 앱을 실행한 화면입니다.
+
+![Java 버전][app-java]
+
+다음은 Perl로 작성한 앱을 실행한 화면입니다.
+
+![Perl 버전][app-perl]
+
+어때요, 참 쉽죠?
+
+
+
+SL4A?
+------
+
+*SL4A*란 *Scripting Layer for Android*의 약자로써,
+Android에서 스크립트 언어를 사용 가능하게 도와주는 도구입니다.
+사실 처음에는 Perl을 지원하지는 않았습니다.
+
+* [Issue 32 - android-scripting - Add Perl support][sl4a-forum]
+
+하지만 [@aer0][twitter-aer0]님께서 요청하신 Android 환경의 Perl 지원에
+대한 청원이 많은 개발자들의 지지를 받게되면서 결국 Perl도 SL4A에
+추가되었습니다. [@aer0][twitter-aer0]++
+
+SL4A는 마치 PC에서 돌리는 일반적인 Perl 스크립트와 마찬가지로
+Android에서 Perl 코드를 실행할 수 있게 해줍니다.
+Android를 처음 켰을때 매번 SL4A를 통해 스크립트를 실행시켜야 한다는 점이
+조금 귀찮기는 하지만 한 번만 실행시켜놓으면 계속 후면작업(background)
+스크립트로도 돌릴 수 있기 때문에 조금 더 편한 개발을 위해서라면
+이정도는 눈감아 줄 만한 부분입니다 :)
+
+mod_perl이 Perl과 Apache의 연동을 도와주는 것처럼,
+SL4A는 Perl에서 Android 기기를 다룰 수 있도록 `Android.pm`을 제공합니다.
+즉 Android 기기와 연관된 것을 사용하기 위한 모든 코드들은
+항상 다음 구문으로 시작합니다.
+
+    #!perl
+    use Android;
+
+`Android` 모듈이 제공하는 함수로는 어떤 것이 있을까요?
+
+앞에서 본 예제인 기초적인 `makeToast` 외에도 폰의 진동, 배터리, wifi 등
+휴대폰과 관련된 모든 설정에도 접근이 가능합니다.
+또한 다른 액티비티(activity)와 상호 호출도 할 수 있습니다.
+즉, SL4A를 통해서 굳이 Java를 배우지 않고도 Perl로도
+Android 앱을 만들 수 있다는 것입니다!
+
+SL4A가 제공하는 함수들과 사용법은
+[SL4A API 레퍼런스 문서][sl4a-api-reference]를 참고하세요.
+
+
+
+SL4A 설치하기
+--------------
+
+앞에서도 말했듯이 Android에서 Perl 스크립트를 실행시키려면 SL4A를 설치해야합니다.
+안타깝지만 현재 SL4A는 개발자를 대상으로 배포중이기 때문에
+마켓을 통해 검색하거나 설치할 수는 없습니다.
+다음 QR 코드를 스캔하거나 [SL4A 공식 홈페이지][sl4a-home]에서
+apk를 다운받아서 설치해야 합니다.
+
+[![SL4A QR 코드][sl4a-qrcode]][sl4a-qrcode]
+
+SL4A를 설치하면 기본적으로 Bash만 설치가 되고,
+자신이 사용할 언어의 인터프리터를 설치해야 합니다.
+Perl을 설치하려면 다음 순서대로 따라하면 Android용으로
+컴파일 된 Perl을 다운받을 수 있으며, 실행하면 Perl 인터프리터가 설치됩니다.
+
+1. SL4A 실행
+2. View
+3. Interpreters
+4. Add
+5. Perl 5.x.x
+
+다음은 설치 과정을 갈무리한 화면입니다.
+
+![SL4A 설치 과정 #1][sl4a-install-step1]
+![SL4A 설치 과정 #2][sl4a-install-step2]
+
+약간은 귀찮을 수 있는 과정들을 거치면,
+이제 여러분의 스마트폰에서 Perl을 즐길 수 있습니다.
+
+![SL4A위에서 돌아가는 Perl!][running-perl-on-sl4a]
+
+이제는 직접 `Android` 모듈을 활용하는 스크립트를 짜서,
+스마트폰에 업로드 후 실행시키면 됩니다!
+
+
+
+Android 폰에 Perl 스크립트 업로드 & 실행
+-----------------------------------------
+
+Android 폰은 기기마다 각각의 파일시스템 구조가 조금씩 다릅니다.
+지금은 *Galaxy S*를 기준으로 설명하겠습다.
+가장 간단한 방법은 컴퓨터와 Android를 연결해서,
+Android를 *USB 이동식 디스크*로 설정한 후 SL4A 폴더에 복사하는 것입니다.
+
+GUI를 그닥 좋아하지 않는다면,
+`adb`를 이용해 명령줄을 통해 파일을 올릴 수도 있습니다.
+`adb`는 *Android Debug Bridge*의 약자로써, Android 에뮬레이터나
+장치간 통신을 직접적으로 할 수 있도록 도와주는 도구입니다.
+Galaxy S를 컴퓨터에 USB로 연결하고,
+명령줄에 다음과 같이 입력하면 연결된 장치의 목록이 나옵니다.
+
+    #!bash
+    $ adb devices
+    List of devices attached
+    M110XXXXXXXX    device
+    emulator-5554   device
+
+*M110XXXXXXXX* 부분은 휴대폰의 고유번호로써,
+숫자와 영문 알파벳으로 이루어져 있습니다.
+
+이제 작성한 스크립트를 Android에 전송해야겠죠?
+SL4A는 스크립트가 `/mnt/sdcard/sl4a/scripts/*`에 위치하고 있다고
+가정하므로 처음에 나온 `makeToast.pl`를
+`/mnt/sdcard/sl4a/scripts/makeToast.pl` 위치로 전송합니다.
+`adb`를 이용해 장치에 파일을 넣으려면 명령줄에서 다음 명령을 실행합니다.
+
+    #!bash
+    $ adb -s M110???????? push /home/elixir/makeToast.pl /mnt/sdcard/sl4a/scripts/makeToast.pl
+    0 KB/s (115 bytes in 0.348s)
+
+전송이 완료되면, 이제 휴대폰의 SL4A에서 방금 전송한
+스크립트를 실행시킬 수 있습니다.
+
+![Running makeToast.pl on SL4A][running-script-on-sl4a]
+
+
+
+더 나아가서...
+---------------
+
+지금까지 Android에 SL4A를 설치하고, `Android` 모듈을 활용해
+Android 앱을 만들어 사용하는 법을 익혔습니다.
+하지만 여전히 다음과 같은 생각이 들 것입니다.
+
+> 그래, makeToast로 toast를 만들 수 있어.
+> 그런데 이런 간단한 걸로 앱을 만들 수 있다고?
+
+이 질문에 대한 대답이자 더 공부할 거리로 이런 것을 해보면 어떨까요?
+
+- Android로 FTP나 웹서버처럼 오랜 시간동안 실행되는 앱 작성해보기
+- SL4A Perl에서 CPAN 모듈을 사용할 수 있게 구축해보기
+
+
+
+참고자료
+---------
+
+- [Android Developers][android-developers]
+- [SL4A][sl4a-home]
+- [PerlDroid][perl-droid]
+
+
+
+[app-java]:                 2010-12-16-1.png
+[app-perl]:                 2010-12-16-2.png
+[sl4a-qrcode]:              2010-12-16-3.png
+[sl4a-install-step1]:       2010-12-16-4.png
+[sl4a-install-step2]:       2010-12-16-5.png
+[running-perl-on-sl4a]:     2010-12-16-6.png
+[running-script-on-sl4a]:   2010-12-16-7.png
+
+[android-developers]:       http://developer.android.com
+[perl-droid]:               http://code.google.com/p/perldroid
+[sl4a-api-reference]:       http://code.google.com/p/android-scripting/wiki/ApiReference
+[sl4a-forum]:               http://code.google.com/p/android-scripting/issues/detail?id=32
+[sl4a-home]:                http://code.google.com/p/android-scripting/
+[twitter-elixir_]:          http://twitter.com/#!/elixir_
+[twitter-aer0]:             http://twitter.com/#!/aer0

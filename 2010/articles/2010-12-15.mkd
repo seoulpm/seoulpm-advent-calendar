@@ -1,0 +1,368 @@
+Title:    XML-RPC 프록시 서버
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aanoaa
+
+저자
+-----
+
+[@aanoaa][twitter-aanoaa] -
+Perl, 야구, 자전거, 낙타, 돌고래, 포청천 마니아.
+최신 휴대폰에 관심은 없지만 요일별로 스마트 폰을 바꿔가며 들고다닌다.
+YAPC::Asia를 다녀온 후 현재 넥서스 원과 갤럭시 탭, 노트북의 바탕화면은 Larry Wall.
+현재 안드로이드 앱 개발에 매진 중이다.
+
+
+
+시작하며
+---------
+
+HTTP 메세지는 크게 header와 entity-body부로 나뉩니다.
+entity-body가 XML로 되어 있는 POST 요청이 있을때 적절한 XML로 응답하면
+이를 XML-RPC 스타일 아키텍처를 사용하는 웹서비스라고 합니다.
+
+*안드로이드* 같은 모바일기기에서 XML-RPC와 같은 서비스를 이용하면
+요청과 응답에 대한 생짜 XML 문자열을 눈으로 확인하는 것은 어려운 일입니다.
+다음 명령을 이용하면 어느정도 필터링이 가능은 합니다.
+
+    #!bash
+    $ adb logcat <filter>
+
+이렇게 실행할 경우 출력은 다음과 같습니다.
+
+    #!xml
+    <?xml version="1.0" encoding="utf-8"?><methodCall><methodName>method_name_here</methodName><params><param><value><string>yours susan</string></value></param></params></methodCall>
+
+하지만 XML 데이터를 들여쓰기하지 않기 때문에
+직접 눈으로 읽기에는 여전히 어려움이 있습니다.
+다음처럼 들여쓰기한 XML 결과물을 볼 수 있다면 디버깅하기 더 수월하지 않을까요?
+
+    #!xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <methodCall>
+        <methodName>method_name_here</methodName>
+        <params>
+            <param>
+                <value>
+                    <string>yours susan</string>
+                </value>
+            </param>
+        </params>
+    </methodCall>
+
+
+
+준비물
+-------
+
+### XML 파싱용 C 라이브러리 개발용 킷
+
+[CPAN의 XML::Twig 모듈][cpan-xml-twig]은
+[CPAN의 XML::LibXML 모듈][cpan-xml-libxml]에 대해 의존성을 가지는데
+`XML::LibXML` 또한 C 라이브러리를 사용하는 XS 모듈이라서
+XML 파싱용 C 라이브러리 개발용 킷이 필요합니다.
+사용하는 운영체제마다 차이가 있지만 우분투를 기준으로
+[expat1-dev 패키지][ubuntu-expat]가 필요합니다.
+명령줄에서 다음 명령을 실행해서 설치할 수 있습니다.
+
+    #!bash
+    $ sudo apt-get install libexpat1-dev
+
+
+
+### Perl 모듈
+
+
+* [CPAN의 Task::Plack 모듈][cpan-task-plack] -
+  PSGI용 어플리케이션이 동작할 수 있게 도와주는 필수 유틸리티입니다.
+  자세한 내용은 [CPAN의 Plack 모듈][cpan-plack]을 확인하세요.
+* [XML::Twig][cpan-xml-twig] -
+  로그를 이쁘게 보여주기 위해서 사용합니다.
+* [File::Slurp][cpan-file-slurp] -
+  파일연산을 쉽게 다룰 수 있게 해주는 모듈입니다.
+
+명령줄에서 다음 명령을 실행해서 설치할 수 있습니다.
+
+    #!bash
+    $ cpan Task::Plack XML::Twig File::Slurp
+
+
+
+프록시 서버
+------------
+
+지금부터 만들어보고자 하는 프록시 서버가 하는 역할은
+
+1. 미리 지정한 호스트로 POST 요청을 대신 수행합니다.
+   이때, 매개변수 키는 `xml_param`을 씁니다.
+2. 요청/응답의 entity-body 에 들어있는 XML 코드를
+   이쁘게 들여쓰기해서 `latest.log`에 덮어 씁니다.
+3. 웹으로 접근할 수 있도록 합니다.
+
+이제 코드를 살펴보죠.
+
+
+
+구현
+-----
+
+특별한 설정이 없을 경우 `Plack`은 기본적으로 `app.psgi` 파일에 대해 동작(다른
+파일을 사용하겠다면 `plackup`을 사용시 `-a`를 이용합니다)합니다.
+우리가 만들 `app.psgi` 파일은 다음과 같습니다.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    use XML::Twig;
+    use Plack::Request;
+    use LWP::UserAgent;
+    use File::Basename qw/dirname/;
+    use File::Slurp qw/slurp/;
+    
+    my $xml_twig_style = [qw(none nsgmls nice indented record record_c)];
+    my $twig = new XML::Twig(pretty_print => $xml_twig_style->[3]);
+    
+    sub pretty_xml {
+        my $xml = shift;
+        eval { $twig->parse($xml) };
+        if ($@) {
+            warn "xml parse failed: $@";
+            return $xml;
+        } else {
+            return $twig->sprint;
+        }
+    }
+    
+    my $app = sub {
+        my $req = Plack::Request->new(@_);
+        given ($req->path_info) {
+            when ('/favicon.ico') {
+                open my $fh, "<:raw", dirname(__FILE__) . '/favicon.ico' or die $!;
+                return [ 200, ['Content-Type' => 'image/x-icon'], $fh ];
+            }
+            when ('/proxy') {
+                my $ua   = LWP::UserAgent->new;
+                my $res  = $ua->post("http://api.example.com/", [
+                    'xml_param' => $req->param('xml_param'), 
+                ]);
+        
+                my $res_content = $res->is_success ? $res->content : $res->status_line;
+                open(my $fh, '>', 'latest.log') or die "Couldn't open latest.log";
+                print $fh pretty_xml($req->param('xml_param')), '=' x 50 . "\n", pretty_xml($res_content);
+
+                return [ 200, [ 'Content-Type', 'text/xml' ], [ $res_content ] ];
+            }
+            when ('/log') {
+                return [ 200, [ 'Content-Type', 'text/plain' ], [ slurp 'latest.log' ] ];
+            }
+            default  {
+                return [ 404, [], [ 'not found' ] ];
+            }
+        };
+    };
+
+코드를 조각조각 분리해서 하나씩 살펴보죠.
+우선 필요한 모듈을 `use`를 이용해서 미리 선언합니다.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    use XML::Twig;
+    use Plack::Request;
+    use LWP::UserAgent;
+    use File::Basename qw/dirname/;
+    use File::Slurp qw/slurp/;
+
+XML 코드를 이쁘게 표현하기 위해 `XML::Twig` 개체를 만들어야겠죠.
+이때, 들여쓰기 스타일도 함께 지정합니다.
+가능한 스타일의 목록은 다음과 같습니다.
+
+- `none`
+- `nsgmls`
+- `nice`
+- `indented`
+- `record`
+- `record_c`
+
+지금은 `nice`를 고르도록 합니다.
+
+    #!perl
+    my $xml_twig_style = [qw(none nsgmls nice indented record record_c)];
+    my $twig = new XML::Twig(pretty_print => $xml_twig_style->[3]);
+
+XML을 변형하는 부분을 코드 중복을 막기 위해
+`pretty_xml` 사용자 함수로 정의합니다.
+
+    #!perl
+    sub pretty_xml {
+        ...
+    }
+
+이제 URL 디스패치를 수행할 경로를 정의합니다.
+
+- `/favicon.ico`
+  요즘 웹브라우저는 URL 경로와 상관없이 호스트별로 `/favicon.ico`을 요청합니다.
+  불필요한 404 오류 로그를 보지않기 위해 추가해 주었습니다.
+- `/proxy`
+
+        #!perl
+        my $res  = $ua->post("http://api.example.com/", [
+            'xml_param' => $req->param('xml_param'), 
+        ]);
+
+  프록시 서버를 사용하지 않는다면 클라이언트는 직접
+  `http://api.example.com/`으로 POST 요청을 할 것입니다.
+
+        #!perl
+        write_file('latest.log', pretty_xml($req->param('xml_param')), '=' x 50 . "\n", pretty_xml($res_content));
+        return [ 200, [ 'Content-Type', 'text/xml' ], [ $res_content ] ];
+
+  `latest.log` 파일에 요청/응답 XML 코드를 기록합니다.
+  요청과 응답을 쉽게 구분하기 위해 사이에 `==== ... ====\n` 문자열을 넣습니다.
+- `/log`
+  /proxy 를 거쳐 저장된 로그파일을 웹클라이언트 통해 볼 수 있도록 합니다.
+  `slurp` 함수는 `File::Slurp::read_file` 함수의 별칭(alias)입니다.
+
+        #!perl
+        return [ 200, [ 'Content-Type', 'text/plain' ], [ slurp 'latest.log' ] ];
+
+URL 디스패치를 수행하는 익명 함수의 반환 값은 배열참조입니다.
+이 배열은 다음 항목을 담고 있습니다.
+
+- 상태 코드(status code)
+- 헤더의 키와 값을 쌍으로 담은 배열참조
+- 내용(content)을 담은 배열참조
+
+지금까지 살펴본 것이 바로 PSGI 인터페이스입니다.
+더 자세한 내용은 [CPAN의 PSGI 문서][cpan-psgi]를 참고하세요.
+
+
+
+테스트
+------
+
+이제 제대로 동작하는지 테스트를 해보죠.
+테스트를 하려면 `content-type`을 `text/xml`로 응답해주는 웹서비스가 필요합니다.
+지금은 *Daum 영한사전 API*를 이용하겠습니다.
+
+    #!bash
+    $ curl "http://apis.daum.net/dic/endic?apikey=DAUM_DIC_DEMO_APIKEY&kind=WORD&output=xml&q=susan"
+    <?xml version="1.0" encoding="UTF-8"?>
+    <apierror><code>040</code><message><![CDATA[access denied]]></message><dcode>41</dcode><dmessage><![CDATA[valid api call but traffic overed]]></dmessage></apierror>
+
+다음 영한 사전 API를 이용해서 *susan*을 검색했더니
+오류 메세지가 나오긴 했지만 XML 코드응답을 받았습니다.
+사실 이것으로 충분합니다.
+
+테스트를 위해서 앞의 예제 코드의 내용 중 `POST` 방식으로
+요청하는 부분을 `GET` 방식으로 요청하도록 수정하겠습니다.
+요청 방식이야 어쨋든 XML 코드를 응답해주는 웹서비스가 필요한 것이니까요. :-)
+
+    #!diff
+    -my $res = $ua->post("http://api.example.com/", [
+    -    'xml_param' => $req->param('xml_param'), 
+    -]);
+    +my $res = $ua->get("http://apis.daum.net/dic/endic?apikey=DAUM_DIC_DEMO_APIKEY&kind=WORD&output=xml&q=susan");
+
+이제 `plackup` 유틸리티로 웹서버를 띄우고 URL을 디스패치 해보겠습니다.
+
+    #!bash
+    $ plackup --server HTTP::Server::Simple --app app.psgi
+    HTTP::Server::Simple::PSGI: Accepting connections at http://0:5000/
+
+Apache와 PHP에 익숙한 사용자라면 어리둥절 할것입니다.
+사실 이런 웹 어플리케이션을 실행시 *Perl로 구현된 PSGI 호환 HTTP 서버*가
+존재하기 때문에 반드시 Apache와 같은 웹서버가 필요하지는 않습니다.
+지금은 [CPAN의 HTTP::Server::Simple::PSGI 모듈][cpan-http-server-simple-psgi]을 이용했습니다.
+이뿐만이 아닙니다.
+`Starman`, `Starlet`, `Twiggy` 등 다양한 경량 웹서버가 오픈소스로 제공됩니다.
+`--server` 옵션을 이용하면 웹서버를 교체할 수도 있습니다.
+
+사실은 `plackup`은 기본적으로 `5000`번 포트를 사용하고
+`app.psgi` 파일을 이용하기 때문에 더 간단하게 동작시킬 수도 있습니다.
+
+    #!bash
+    $ plackup
+    HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+이야기가 잠시 딴길로 새어버렸군요. :-)
+이제 클라이언트 스크립트 코드인 `client.pl`을 살펴보겠습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use RPC::XML;
+    use LWP::UserAgent;
+    
+    $RPC::XML::ENCODING = 'utf-8';
+    my $req = RPC::XML::request->new(
+        'method_name_here', 
+        RPC::XML::string->new("yours susan"),
+    );
+    
+    my $ua  = LWP::UserAgent->new;
+    my $res = $ua->post(
+        "http://localhost:5000/proxy",
+        [
+            'xml_param' => $req->as_string,
+        ]
+    );
+    
+    print $res->is_success ? $res->content : $res->status_line;
+
+[CPAN의 RPC::XML 모듈][cpan-rpc-xml]의 도움을 받으면 XML을 쉽게 작성할 수 있습니다.
+
+이제 결과물을 보도록 하죠
+
+    #!bash
+    % perl client.pl
+    <?xml version="1.0" encoding="UTF-8"?>
+    <apierror><code>040</code><message><![CDATA[access denied]]></message><dcode>41</dcode><dmessage><![CDATA[valid api call but traffic overed]]></dmessage></apierror>
+
+다음은 이클립스에서 볼 수 있는 로그와 터미널을 통해 출력되는 화면입니다.
+
+[![이클립스 로그캣 화면][eclipse-logcat]][eclipse-logcat]
+
+[![터미널 로그 화면][terminal-log]][terminal-log]
+
+무언가 결과가 나왔지만, 들여쓰기가 되어있지 않기 때문에 한 눈에 들어오지 않죠?
+그래서 웹으로 접근할 수 있도록 `/log`를 열어두었습니다.
+브라우저를 열고 `http://localhost:5000/log`로 접속해볼까요?
+
+![프록시 서버를 통해 브라우저로 출력되는 로그 화면][browser-log]
+
+콘솔창에서 봐야했던 로그가 이렇게 *멋지게* 바뀌었습니다. ;-)
+게다가 웹으로도 볼 수 있습니다.
+예제라서 간단했지만 실제로 사용되는 복잡한 XML 코드를 상상해보세요 으으.. :-(
+
+
+
+정리하며
+--------
+
+`app.psgi` *하나의 파일*만으로 간단한 프록시 서버를 만들어 보았습니다.
+이젠 클립보드로 복사조차 되지 않는 이클립스의 로그캣 화면을,
+들여쓰기도 되지 않아 뚫어져라 쳐다봐야하는 터미널 로그 화면을
+더이상 들여다보지 않아도 됩니다.
+적어도 여러분이 Perl을 쓰는 안드로이드 개발자라면요! :D
+
+
+
+[eclipse-logcat]:               2010-12-15-1.jpg width=700px
+[terminal-log]:                 2010-12-15-2.jpg width=700px
+[browser-log]:                  2010-12-15-3.jpg
+
+[cpan-file-slurp]:              http://search.cpan.org/perldoc?File::Slurp
+[cpan-http-server-simple-psgi]: http://search.cpan.org/perldoc?HTTP::Server::Simple::PSGI
+[cpan-plack]:                   http://search.cpan.org/perldoc?Plack
+[cpan-psgi]:                    http://search.cpan.org/perldoc?PSGI
+[cpan-rpc-xml]:                 http://search.cpan.org/perldoc?RPC::XML
+[cpan-task-plack]:              http://search.cpan.org/perldoc?Task::Plack
+[cpan-xml-libxml]:              http://search.cpan.org/perldoc?XML::LibXML
+[cpan-xml-twig]:                http://search.cpan.org/perldoc?XML::Twig
+[twitter-aanoaa]:               http://twitter.com/aanoaa
+[ubuntu-expat]:                 http://packages.ubuntu.com/hardy/libexpat1-dev

@@ -1,0 +1,263 @@
+Title:    Fey, Fey, Fey
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   y0ngbin
+
+저자
+-----
+[@y0ngbin][twitter-y0ngbin] - aka 용사장 / 솔로주제에30 / Minivelo++ / 맞춤법 전문가
+
+SQL
+----
+
+12월 커플들이 즐비한 시내 한복판을 헤쳐나가는 것 만큼이나
+짜증나는 일이 한가지 있다면 그것은 SQL을 다루는 일입니다.
+태초부터 인간과 함께하고 있는 바퀴벌레처럼 아주 오래전부터
+SQL과 함께 지내고 있지만 대부분의 개발자들에게 SQL은 바퀴벌레만큼이나
+별로 환영받지 못하는 것 같습니다.
+
+사실 저는 SQL을 아주 좋아합니다.
+물론 SQL에는 제가 마음에 들지 않는 면도 많이 있고,
+어떤 이는 SQL이 [잘못 설계된 언어][sql-is-not-relational]라는
+의견을 피력하기도 하지만 SQL은 이미 그 자체로서 충분한 표현력을
+가지고 있기 때문에 자신의 의사를 시스템에 전달하는데
+크게 부족함이 없다고 생각합니다.
+
+그런데도 사람들이 SQL을 싫어하는 것은
+SQL 그 자체가 싫다기 보다 SQL을 사용하는 프로그램을 작성할 때
+*프로그램과 어울리지 못하는 거대한 SQL 문자열 덩어리*
+때문이 아닐까 조심스레 추측해봅니다.
+
+
+
+ORM
+----
+
+종종 이런 푸념을 늘어놓으면 대부분의 사람들은 ORM을 사용하라는 조언을 합니다.
+하지만 아쉽게도 제가 보기에 ORM은 우리에게 목적과 수단을 혼란스럽게 하는 것을
+제외하고 별로 큰 이득을 주는것 같지는 않습니다.
+DB를 사용하는 1차적인 목적은 질의(query)를 보내고 그 결과를 받는것입니다.
+하지만 어느 순간부터 DB에 대해 여러가지 생각을 입히고
+실제로 DB는 전혀 이해할수 없는 우리 나름의 틀을 통해
+DB의 행동을 정의하고 싶어합니다.
+
+여기서 안타까운 사실은 우리가 기울이는 많은 노력에도 불구하고
+DB는 그런 노력에 별로 관심이 없다는 점입니다.
+궁극적으로 최대한 사용해야할 대상은 DB지  ORM이 아닙니다.
+즉 DB를 위해 ORM이 존재하는 것이지
+ORM을 위해 DB가 존재하는 것이 아니라고 생각합니다.
+따라서 이런 관점에서는 결국 DB가 진심으로 이해할수 있는 언어는
+좋든 싫든 현실적으로 SQL밖에 없기 때문에 DB를 완전히 새롭게 정의하기 위해서
+ORM(혹자는 [NAERM][jeens-drip]이라고 부릅니다)은 SQL 자체에 대해서도
+완전히 이해하고 SQL로 말할 수 있는 구조를 가져야 한다고 생각합니다.
+ORM이 그렇지 못한다면 결국 반 쪽짜리 DB를 쓰면서
+그 책임을 ORM에게 떠 넘기고 문제를 더 어려운 방식으로 해결해야 할 것입니다.
+
+다시 SQL
+---------
+
+당연히 비슷한 생각을 하는 사람들이 세상에 많기 때문에
+Perl 진영만 하더라도 SQL 추상화를 위한 노력의 산물은 꽤 많습니다.
+대표적으로 CPAN에는 [SQL::Abstract][cpan-sql-abstract],
+[DBIx::Abstract][cpan-dbix-abstract], [Rose::DB][cpan-rose-db],
+[Alzabo][cpan-alzabo]등 많은 모듈이 있습니다.
+
+하지만 SQL 추상화는 그렇게 간단한 작업이 아닙니다.
+우선 SQL(특히 `SELECT`문)은 아주 조합적인 언어기 때문에
+그 형식이 전형적이지 않습니다.
+따라서 scott/tiger가 보내는 `select * from emp` 같은 질의보다
+조금만 더 복잡한 질의를 추상화하려 한다면 상당한 각오와 노력이 필요합니다.
+다음으로 [여러가지 복잡한 이유][wikipedia-sql]로 인해
+동일한 의미를 가지는 상황에 따른 여러 종류의 SQL문이 존재합니다.
+이는 SQL 추상화시 그 질의가 *의미하는 바*와
+그 질의를 *표현하는 방법*을 분리해야 함을 의미합니다.
+
+
+
+Fey
+----
+
+[Fey][cpan-fey]는 [Dave Rolsky][author-cpan-drolsky]가 작성한 SQL 추상화 모듈입니다.
+Dave Rolsky는 현대적인 Perl(modern perl)을 쓴다면 놓치지 말아야 할
+[CPAN의 DateTime 모듈][cpan-datetime]을 작성한 것으로 유명합니다.
+`Fey` 바로 이전에는 [CPAN의 Alzabo 모듈][cpan-alzabo]을 작성하다가
+설계적인 한계를 느끼고 다시 `Fey`를 작성하기 시작해서
+2008년에 첫 릴리스 이후 꾸준히 릴리스 되고 있습니다.
+
+`Fey`는 SQL 추상 모듈이므로 `Fey`를 사용해서 얻는
+최종 결과물은 단순한 문자열인 SQL입니다.
+하지만 문제는 단순한 그 문자열을 어떻게 만들어내느냐입니다.
+`Fey`가 가진 장점을 한마디로 말하자면 *Fey는 스스로 SQL 그 자체*라는 점입니다.
+먼저 `Fey`로 간단한 SQL문을 생성하는 예제를 살펴보죠.
+
+    #!perl
+    my $user  = $schema->table('User');
+    my $group = $schema->table('Group')
+    
+    my $select = Fey::SQL->new_select();
+    
+    my $func = Fey::Literal::Function->new( 'LCASE', $user->column('username') );
+    
+    $select->select( $user->columns( 'user_id', 'username' ) )
+           ->from( $user, $group )
+           ->where( $group->group_id, 'IN', 1, 2, 3 )
+           ->and  ( $func, 'LIKE', 'smith%' );
+    
+    print $select->sql($dbh);
+
+여기서 우리가 주목해야 할 부분은 두가지 입니다.
+
+* `select`에 인자로 전달하는 컬럼명인 `user_id`, `username`가
+  단순 문자열이 아니라 해당 스키마의 컬럼 객체라는 점
+* 실제 `$select->sql`은 단순히 문자열을 출력할 뿐이지만
+  `$dbh`를 인자로 받는다는 점입니다.
+
+즉, `Fey`는 SQL을 원자적으로 가장 작은 조각까지 나누고 객체로 모델링해서
+`Fey` 스스로가 SQL 그 자체로 동작할 수 있도록 설계되어 있습니다.
+또 실제 작성된 SQL 구문이 의미하는 바와 그 SQL 구문을
+각 DB에서 표현하는 방식을 분리해서 처리하고 있습니다.
+
+다음은 간단한 테이블 3개를 연결하는 SQL 질의입니다.
+
+    #!sql
+    SELECT address,name_kor,comment
+    FROM
+        IpTable ip
+        INNER JOIN AllowRange ar ON ip.id = ar.IpTable_id
+        INNER JOIN Member m ON ar.Member_id = m.id
+    WHERE ar.status='enable'
+
+앞의 질의를 `Fey`를 사용해서 표현하면 다음과 같습니다.
+
+    #!perl
+    my $t_ip    = $schema->table('IpTable');
+    my $t_range = $schema->table('AllowRange');
+    my $t_member= $schema->table('Member');
+    my $sql     = Fey::SQL->new_select();
+    
+    $sql
+        ->select( $t_ip->columns(qw/address comment/),$t_member->columns('name_kor') )
+        ->from($t_ip)
+        ->from($t_range)
+        ->from($t_member)
+        ->where($t_range->columns('status'),'=','enable');
+
+`Fey::Loader`를 이용해서 대상 스키마의 정보를 자동으로 생성하거나
+`Fey::FK`를 직접 정의해서 테이블 간의 외래키 관계를 지정해 두면
+`Fey`는 복수의 `from` 절에서 자동으로 필요한 `join` 연결 질의를 만듭니다.
+
+다음은 최근 업무 때문에 `Fey`와 `Fey::ORM`을 이용해서 작성한 코드의 일부분입니다.
+
+    #!perl
+    my $schema = MedDRA::Model::Schema->Schema();
+    my $table = $schema->table( $class->Table->name );
+    my $select
+        = MedDRA::Model::Schema
+            ->SQLFactoryClass()
+            ->new_select()
+            ->select( $table )
+            ->from( $table )
+            ->order_by( $table->column('id'), 'ASC' );
+    
+    foreach my $arg (@args) {
+        $select->and(
+            $table->columns($arg->[0]),
+            '=',
+            Fey::Placeholder->new()
+        );
+    }
+
+직접 작성한 `MedDRA::Model::Schema`는 `Fey::ORM::Schema`를 사용하고 있는데
+`Fey::ORM::Schema`에서 제공하는 `SQLFactoryClass`를 이용하면
+손쉽게 스키마정보를 이용해 `Fey` 형식으로 질의를 만들어 그 질의를 모델에
+함수 형식으로 붙이거나, 필요한 위치에서 간단하게 만들어서 사용할 수 있습니다.
+또 가변적으로 들어오는 `@args`에 대한 `where`절 조건을 중첩시키는 질의를
+매번 추가하는 경우에도 `select->and` 함수가 열거하는 `WHERE`절 조건을
+상황에 따라 적절하게 연결해주고 있습니다.
+
+물론 앞서 살펴본 코드 조각은 단순한 문제를 아주 복잡하게 푸는 방법일 수 있습니다.
+상황에 따라서 그냥 단순히 질의를 문자열로 전달하는 것이
+더 적절하고 효율적일 수 있습니다.
+하지만 어떤 이유에서건 SQL 질의를 객체로 연결 하겠다고 마음을 먹었다면,
+꼭 *끝까지*, *제대로* 연결해야 합니다.
+
+기존에 제가 사용했던 SQL 추상화 관련 모듈은 어느 수준까지는
+추상화가 되어 있었지만, 끝까지 추상화가 되어있는 경우는 없었던 것 같습니다.
+따라서 고려한 수준까지는 제대로 동작하지만 예상한 패턴을 넘어선 질의를
+제대로 처리할 수 없었고 결국
+[어중간하게 SQL 추상계층의 인자로 SQL 문자열을 전달하는 방식][join-table-sql-abstract]으로
+처리하는 방법 밖에 없었습니다.
+하지만 `Fey`의 경우 스스로 `join`이나 복잡한 `where`절 연산,
+괄호에 의한 우선순위, 컬럼 별칭(column alias), 서브 질의(sub query)
+같은 사항을 모두 *제대로 이해*하고 있었습니다.
+바로 이 점이 `Fey`를 처음 만나고 설레였던 이유입니다.
+
+
+
+마치며
+------
+
+약 한 달 전 우연히 [한 블로그 포스트][sql-its-data]를 통해 `Fey`를 처음 접한 뒤로
+지금까지 아주 즐거운 마음으로 `Fey`와 `Fey::ORM`을 익히며 사용 중입니다.
+`Fey`는 그동안 SQL을 사용해 오면서 늘 마음 속 한 켠에
+찝찝하게 남아있던 불편함을 말끔하게 해소해 주었습니다.
+이 글을 읽고 `Fey`와 `Fey::ORM`에 흥미를 느꼈다면 다음에 소개하는 문서를 읽어보세요.
+
+그럼 즐거운 성탄절 보내시길 바랍니다. ;-)
+
+
+
+참고할만한 CPAN 모듈
+---------------------
+
+* [CPAN의 Fey::ORM 모듈][cpan-fey-orm] - A Fey-based ORM (If you like SQL, you might like `Fey::ORM`)
+* [CPAN의 Fey::ORM::Manual::Intro 모듈][cpan-fey-orm-manual-intro] - Introduction to `Fey::ORM`
+* [CPAN의 Fey::Test 모듈][cpan-fey-test] - `Fey::ORM::Manual::Intro`의 예제를 이해하는데 도움이 되는 소스
+* [CPAN의 Fey::Loader 모듈][cpan-fey-loader] - `Fey::Schema`를 동적으로 생성
+* [CPAN의 SQL::Maker 모듈][cpan-sql-maker] - `SQL::Abstract`와 흡사한 SQL 동적 생성 
+* [CPAN의 DBIx::Simple 모듈][cpan-dbix-simple] - `SQL::Abstract`와 함께 간단한게 사용가능한 DBI 헬퍼
+* [CPAN의 DBIx::Skinny 모듈][cpan-dbix-skinny] - Simple DBI wrapper/ORMapper
+* [CPAN의 DBIx::Class 모듈][cpan-dbix-class] - Major ORM in perl
+* [CPAN의 DBIx::DBIx::ObjectMapper 모듈][cpan-dbix-objectmapper] - implement Data Mapper pattern stolen by SQLAlchemy
+
+
+
+참고자료
+---------
+
+* [SQL – It’s data, not a string][sql-its-data]
+* [What is a Data Model?; The Relational Model; SQL is not Relational][sql-is-not-relational]
+* [Fey, Another Freakin' ORM][fey-another-freaking-orm]
+* [DBIx::Class vs Class::DBI vs Rose::DB::Object vs Fey::ORM][perl-orm-war]
+* [좋은 ORM 프레임워크의 조건은?][good-orm-framework]
+* [Object-Relation Mapping: 실패한 대안?][orm-is-not-good]
+
+
+
+[author-cpan-drolsky]:          http://search.cpan.org/~drolsky/
+[cpan-alzabo]:                  http://search.cpan.org/perldoc?Alzabo
+[cpan-datetime]:                http://search.cpan.org/perldoc?DateTime
+[cpan-dbix-abstract]:           http://search.cpan.org/perldoc?DBIx::Abstract
+[cpan-dbix-class]:              http://search.cpan.org/perldoc?DBIx::Class
+[cpan-dbix-simple]:             http://search.cpan.org/perldoc?DBIx::Simple
+[cpan-dbix-skinny]:             http://search.cpan.org/perldoc?DBIx::Skinny
+[cpan-dbix-objectmapper]:       http://search.cpan.org/perldoc?DBIx::ObjectMapper
+[cpan-fey-loader]:              http://search.cpan.org/perldoc?Fey::Loader
+[cpan-fey-orm-manual-intro]:    http://search.cpan.org/perldoc?Fey::ORM::Manual::Intro
+[cpan-fey-orm]:                 http://search.cpan.org/perldoc?Fey::ORM
+[cpan-fey-test]:                http://search.cpan.org/perldoc?Fey::Test
+[cpan-fey]:                     http://search.cpan.org/perldoc?Fey
+[cpan-rose-db]:                 http://search.cpan.org/perldoc?Rose::DB
+[cpan-sql-abstract]:            http://search.cpan.org/perldoc?SQL::Abstract
+[cpan-sql-maker]:               http://search.cpan.org/perldoc?SQL::Maker
+[fey-another-freaking-orm]:     http://www.houseabsolute.com/presentations/fey-yaform/index.html
+[good-orm-framework]:           http://langdev.net/post/49
+[jeens-drip]:                   http://twitter.com/#!/JEEN_LEE/status/9599538457223168
+[join-table-sql-abstract]:      http://www.perlmonks.org/index.pl?node_id=691501
+[orm-is-not-good]:              http://ageldama.egloos.com/3198027
+[perl-orm-war]:                 http://blog.afoolishmanifesto.com/archives/822
+[sql-is-not-relational]:        http://www.houseabsolute.com/presentations/sql-is-not-relational/start.html
+[sql-its-data]:                 http://acidcycles.wordpress.com/2010/04/03/sql-its-data-not-a-string/
+[twitter-y0ngbin]:              http://twitter.com/y0ngbin
+[wikipedia-sql]:                http://en.wikipedia.org/wiki/SQL#Cross-vendor_portability
