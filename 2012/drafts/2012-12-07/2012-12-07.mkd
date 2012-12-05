@@ -843,24 +843,24 @@ MP3::Info 모듈 역시 기본적으로 설치되어 있지 않은 모듈이므�
 
 ## 주석
 
-<p id="sup_1">1) 이미 이런 상황을 겪고 계신다면, 이 문제를 해결하기 위한 좋은 해결책이 2010년 Perl Advent Calendar 에 있습니다: <a href="http://advent.perl.kr/2010/2010-12-23.html">스물세번째 날: 중복된 MP3 파일 찾아서 정리하기</a> [<a href="#tag_1">▲</a>]
+<p id="sup_1">1) 이미 이런 상황을 겪고 계신다면, 이 문제를 해결하기 위한 좋은 해결책이 2010년 Perl Advent Calendar 에 있습니다: <a href="http://advent.perl.kr/2010/2010-12-23.html">스물세번째 날: 중복된 MP3 파일 찾아서 정리하기</a> <a href="#tag_1">▲</a>
 
-<p id="sup_2">2) 그 외 예외상황으로 파일 경로가 아닌 폴더 경로가 존재하는 경우, 로컬 경로가 아닌 http:// 나 mms:// 경로가 존재하는 경우 등의 예외상황이 있지만, 이 프로그램상에서는 이를 별도로 고려하지 않았습니다. 공백 줄이 끼어 있는 경우도 고려하지 않았네요. (프로그램이 자동으로 작성한 정상적인 .M3U 파일이라면 공백 줄이 있을 수가 없습니다.) .M3U 파일에 대한 자세한 내용은 참고 자료의 링크를 아울러 읽어 보시기 바랍니다. [<a href="#tag_2">▲</a>]
+<p id="sup_2">2) 그 외 예외상황으로 파일 경로가 아닌 폴더 경로가 존재하는 경우, 로컬 경로가 아닌 http:// 나 mms:// 경로가 존재하는 경우 등의 예외상황이 있지만, 이 프로그램상에서는 이를 별도로 고려하지 않았습니다. 공백 줄이 끼어 있는 경우도 고려하지 않았네요. (프로그램이 자동으로 작성한 정상적인 .M3U 파일이라면 공백 줄이 있을 수가 없습니다.) .M3U 파일에 대한 자세한 내용은 참고 자료의 링크를 아울러 읽어 보시기 바랍니다. <a href="#tag_2">▲</a>
 
-<p id="sup_3">3) 오해를 막기 위하여 덧붙이자면, Perl 에서 readdir 을 사용하여 파일 목록을 읽을 때에는 위와 같은 문제가 발생하지 않습니다. Win32 환경에서 Perl 이 readdir 을 수행하는 경우, 만약 그 과정에서 유니코드 문자가 포함된 파일명을 발견했을 때에는 자동으로 짧은 파일명(8.3 파일명) 으로 읽어오기 때문입니다. 이 8.3 파일명은 CP949 인코딩으로 이루어져 있기 때문에(하위 호환성을 위한 것이므로), 해당 파일명을 읽고 쓰는 데 전혀 문제가 없습니다. 따라서 오류도 발생하지 않죠. 그러나, 최소한 윈도우 XP 이후에 작성된, 유니코드를 완벽히 지원하는 많은 MP3 관리/재생 프로그램들은 이런 고려를 전혀 하지 않고, 8.3 파일명 대신 원래의 파일명을 그대로 저장합니다. 그 결과 이들 프로그램이 만든 목록 파일들을 Perl 에서 읽어서 사용할 수가 없는 것이지요. 문제의 원인은 여기에 있습니다. [<a href="#tag_3">▲</a>]
+<p id="sup_3">3) 오해를 막기 위하여 덧붙이자면, Perl 에서 readdir 을 사용하여 파일 목록을 읽을 때에는 위와 같은 문제가 발생하지 않습니다. Win32 환경에서 Perl 이 readdir 을 수행하는 경우, 만약 그 과정에서 유니코드 문자가 포함된 파일명을 발견했을 때에는 자동으로 짧은 파일명(8.3 파일명) 으로 읽어오기 때문입니다. 이 8.3 파일명은 CP949 인코딩으로 이루어져 있기 때문에(하위 호환성을 위한 것이므로), 해당 파일명을 읽고 쓰는 데 전혀 문제가 없습니다. 따라서 오류도 발생하지 않죠. 그러나, 최소한 윈도우 XP 이후에 작성된, 유니코드를 완벽히 지원하는 많은 MP3 관리/재생 프로그램들은 이런 고려를 전혀 하지 않고, 8.3 파일명 대신 원래의 파일명을 그대로 저장합니다. 그 결과 이들 프로그램이 만든 목록 파일들을 Perl 에서 읽어서 사용할 수가 없는 것이지요. 문제의 원인은 여기에 있습니다. <a href="#tag_3">▲</a>
 
-<p id="sup_4">4) .M3U 파일을 여는 부분은 Win32::Unicode 모듈을 사용하지 않았는데, 현재 상태에서는 콘솔 창에서 인수가 넘어오는 결과 언제나 그 인코딩은 CP949 바이트스트림이라는 점 때문에 별도로 고려하지 않는 것입니다. 대상 폴더가 존재하는지 확인하는 부분에 file_type e 대신 파일 테스트 연산자 -e 를 그대로 사용한 이유 역시 같습니다. [<a href="#tag_4">▲</a>]
+<p id="sup_4">4) .M3U 파일을 여는 부분은 Win32::Unicode 모듈을 사용하지 않았는데, 현재 상태에서는 콘솔 창에서 인수가 넘어오는 결과 언제나 그 인코딩은 CP949 바이트스트림이라는 점 때문에 별도로 고려하지 않는 것입니다. 대상 폴더가 존재하는지 확인하는 부분에 file_type e 대신 파일 테스트 연산자 -e 를 그대로 사용한 이유 역시 같습니다. <a href="#tag_4">▲</a>
 
-<p id="sup_5">5) unpack 문을 이용하여 특정한 바이트스트림을 쉽게 16진수로 변경이 가능합니다. $str = unpack( "H*", $str ); 의 형태로 사용 가능합니다. [<a href="#tag_5">▲</a>]
+<p id="sup_5">5) unpack 문을 이용하여 특정한 바이트스트림을 쉽게 16진수로 변경이 가능합니다. $str = unpack( "H*", $str ); 의 형태로 사용 가능합니다. <a href="#tag_5">▲</a>
 
-[author] : http://www.nightowl.pe.kr
-[win32-fileop] : http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
-[2011-12-07] : http://advent.perl.kr/2011/2011-12-07.html
-[m3ucopier] : http://www.nightowl.pe.kr/software/m3ucopier
-[win32-unicode] : http://search.cpan.org/~xaicron/Win32-Unicode-0.38/lib/Win32/Unicode.pm
-[bom] : http://www.nightowl.pe.kr/oblog/article/403
-[win32-fileop] : http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
-[win32] : http://search.cpan.org/~jdb/Win32-0.45/Win32.pm
-[mp3-info] : http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm
-[file-spec] : http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm
+[author]: http://www.nightowl.pe.kr
+[win32-fileop]: http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
+[2011-12-07]: http://advent.perl.kr/2011/2011-12-07.html
+[m3ucopier]: http://www.nightowl.pe.kr/software/m3ucopier
+[win32-unicode]: http://search.cpan.org/~xaicron/Win32-Unicode-0.38/lib/Win32/Unicode.pm
+[bom]: http://www.nightowl.pe.kr/oblog/article/403
+[win32-fileop]: http://search.cpan.org/~jenda/Win32-FileOp-0.16.00-withoutworldwriteables/FileOp.pm
+[win32]: http://search.cpan.org/~jdb/Win32-0.45/Win32.pm
+[mp3-info]: http://search.cpan.org/~daniel/MP3-Info-1.24/Info.pm
+[file-spec]: http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm
 [m3u][http://en.wikipedia.org/wiki/M3U]
