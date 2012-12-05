@@ -35,7 +35,7 @@
   <script type="text/javascript" src="shBrushDiff.js"></script>
   <script type="text/javascript" src="shBrushJava.js"></script>
   <script type="text/javascript" src="shBrushCpp.js"></script>
-  <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css"></script>
+  <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css">
   <link type="text/css" rel="stylesheet" href="shCore.css">
   <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">
   <script type="text/javascript">
