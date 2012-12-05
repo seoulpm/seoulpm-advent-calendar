@@ -114,6 +114,9 @@
     word-break: keep-all;
     text-align: center;
 }
+#popup_text .title_small {
+    font-size: 0.8em;
+}
 #popup_text .author {
     margin-top: 0.8em;
     margin-right: 0.8em;
