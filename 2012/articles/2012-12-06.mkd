@@ -1,11 +1,11 @@
-Title: Using C from Perl
+gTitle: Using C from Perl
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
 Author: hazzling
 
 ## 저자
-[@hazzling][author] - 초야에 있던 고수, XS를 사용 중인 모습이 Perl 커뮤니티에 포착, 섭외되어 기사를 작성하게 되었다.
+[@hazzling][author] - 자연어 개발자, XS를 사용 중인 모습이 Perl 커뮤니티에 포착, 섭외되어 기사를 작성하게 되었다.
 
 
 ## 시작하며
