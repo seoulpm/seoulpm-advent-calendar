@@ -1,0 +1,67 @@
+Title: 초심자를 위해 남긴 초보의 비망록 - Dancer, DBI, DBD::MySQL
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: JellyPooo
+
+## 저자
+
+[@JellyPooo](http://twitter.com/JellyPooo) -  4일에 이어 다시 등장한 시스템 관리자
+
+## 시작하며
+
+손에 맞는 개발환경은 보다 나은 효율을 약속합니다(꼭 그렇지만은 않습니다. 본말이 전도되어 개발환경을 위한 개발을 하게 되는 [eOOOs][emacs] 같은 에디터도 있습니다. ...전 emacs 적응하지 못한 패배자입니다 T_T).
+
+편집과 실행용 창을 각각 띄우고, 문서 참고를 위해 또 검색하고 하다보면 원래 목적을 잊고 인터넷 서핑을 자신을 발견합니다. 개발에 집중하기 위한 환경, 그중에서도 vim을 사용할 때 쓸 수 있는 플러그인을 소개합니다.
+
+## perl-support.vim
+[perl-support.vim][ps]는 Perl IDE를 표방하는 vim 플러그인입니다.
+
+설치하고 나면 .pl 파일 등 Perl 관련 파일을 열 때 자동으로 동작하며, 새 파일 만들 때도 템플릿을 참조하여 기본 뼈대를 만들어줍니다.
+
+사용 방법을 간략히 소개하자면...
+
+### \h : 커서가 위치한 단어의 perldoc 읽기
+
+`\h`를 입력하면 현재 커서가 있는 곳의 단어에 해당하는 perldoc을 엽니다.
+
+!(binmode가 뭐야?!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
+!(커서를 binmode에 둔채 '\h' 입력. 짜잔! perldoc binmode가 출력됨)(http://cfile29.uf.tistory.com/image/15798E3550BEAAF405699F)
+
+### \rr : 현재 파일 실행
+
+`\rr`를 입력하면 현재 파일을 저장/실행을 합니다.
+
+!(아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
+!(\rr을 누르면 바로 실행 된다고 친구)(http://cfile10.uf.tistory.com/image/204B163350BEAC150DF0D9)
+
+## 뱀발 vim 플러그인 스크립트를 관리하는 방법 두 가지
+
+그런데, vim 플러그인 스크립트를 그냥 설치하려면 여간 불편한게 아닙니다. 스크립트 업데이트 되면 수동으로 일일히 업데이트 해줘야 하고... 해결책은?
+
+vimana 혹은 vundle을 사용하면 됩니다.
+
+### vimana
+
+`Vimana` 모듈을 설치하면 vimana란 실행 명령어가 생깁니다. update, search, install.. 등의 옵션을 사용. 문서 참조
+
+[vimana](https://www.metacpan.org/module/vimana)
+
+### vundle
+
+원래는 vundle을 소개하려고 쓴 글이었는데, a3r0 님이 Vimana를 소개해주시는 바람에 뒤로 밀림..
+
+[KLDP Vim Editor](http://wiki.kldp.org/wiki.php/VimEditor) 내용 참고
+
+## 정리하며
+
+**치명적인 단점** : 주석 처리나 블럭 자동 닫기 등 다양한 기능을 제공하기 때문에, 한 번 맛들이면 perl-suport.vim 없는 vim에서 Perl 개발이 매우 어색하고 불편할 지경에 이르게 됩니다.
+
+## 참조
+
+다음의 문서를 읽으시면 여기 설명 안 된 기능에 대해 알 수 있습니다.
+[The help file online](http://lug.fh-swf.de/vim/vim-perl/perlsupport.html)
+[The key mappings of this plugin (PDF)](http://lug.fh-swf.de/vim/vim-perl/perl-hot-keys.pdf)
+
+[emacs] : http://www.gnu.org/software/emacs/
+[ps] : http://www.vim.org/scripts/script.php?script_id=556
