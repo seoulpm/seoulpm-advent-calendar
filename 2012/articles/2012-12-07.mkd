@@ -131,8 +131,8 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     }
     
     foreach my $s_filename ( @MP3_LIST ) {
-    
-        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+
+        next if substr( $s_filename, 0, 1 ) eq "#";
     
         $s_filename = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
     
@@ -153,7 +153,7 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
         my $t_filename;
         my $filename;
     
-        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
+        ( undef, undef, $filename ) = File::Spec->splitpath($s_filename);
     
         if ( !Encode::is_utf8( $t_folder ) ) {
             $t_folder = decode( "cp949", $t_folder );
@@ -184,16 +184,14 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     #
     
     sub mp3_abs_path {
-        my $mp3_file_path = $_[0];
-        my $m3u_file_path = $_[1];
+        my $mp3_file_path = shift;
+        my $m3u_file_path = shift;
     
         if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
-            my $t_drive;
-            my $t_folders;
     
-            ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
+            my ( $t_drive, $t_folders ) = File::Spec->splitpath($m3u_file_path);
+            
             $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
-    
             $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
         }
     
@@ -249,12 +247,12 @@ _그림 2._ 확인: 분명히 원본 파일은 존재합니다. ([원본][img-2]
     use Win32::Unicode;
     
     sub mp3_copy_process {
-        my $s_filename = $_[0]; # UTF-8
-        my $t_folder   = $_[1]; # CP949
+        my $s_filename = shift; # UTF-8
+        my $t_folder   = shift; # CP949
         my $t_filename;
         my $filename;
     
-        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
+        ( undef, undef, $filename ) = File::Spec->splitpath($s_filename);
     
         if ( !Encode::is_utf8( $t_folder ) ) {
             $t_folder = decode( "cp949", $t_folder );
@@ -293,8 +291,8 @@ _그림 3._ 오류가 발생하던 파일들이 모두 복사되어, 오류 메�
     use MP3::Info;
     
     foreach my $s_filename ( @MP3_LIST ) {
-    
-        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+
+        next if substr( $s_filename, 0, 1 ) eq "#";
     
         $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
     
@@ -339,8 +337,8 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     use MP3::Info;
     
     foreach my $s_filename ( @MP3_LIST ) {
-    
-        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
+
+        next if substr( $s_filename, 0, 1 ) eq "#";
     
         $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
     
@@ -371,13 +369,13 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     use Win32::Unicode;
 
     sub mp3_enc_process {
-        my $s_filename = $_[0]; # UTF-8
-        my $t_folder   = $_[1]; # CP949
+        my $s_filename = shift; # UTF-8
+        my $t_folder   = shift; # CP949
     
         my $shortName  = Win32::GetANSIPathName( $s_filename );
         my $filename;
     
-        (undef,undef,$filename) = File::Spec->splitpath( $shortName );
+        ( undef, undef, $filename ) = File::Spec->splitpath($shortName);
     
         my $t_filename = "$t_folder/$filename";  # CP949!
     
@@ -389,12 +387,12 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
     
-        (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
+        ( undef, undef, $filename ) = File::Spec->splitpath($s_filename); # UTF-8
     
-        if ( !Encode::is_utf8( $t_filename ) ) {
+        if ( !Encode::is_utf8($t_filename) ) {
             $t_filename = decode( "cp949", $t_filename );
         }
-        if ( !Encode::is_utf8( $t_folder ) ) {
+        if ( !Encode::is_utf8($t_folder) ) {
             $t_folder = decode( "cp949", $t_folder );
         }
     
@@ -411,32 +409,30 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     #!perl
     use File::Copy;
 
-    if ( -e "$shortName" ) {
-        my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
-        my $errorlevel  = system( $commandline );
-    
-        if ( $errorlevel > 0 ) {
-    
-            my $temp_filename = "$t_folder/temp_".time.".mp3";
-    
-            copy( "$shortName", "$temp_filename" );
-    
-            $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
-            $errorlevel  = system( $commandline );
-    
-            if ( $errorlevel > 0 ) {
-                print "Error: Failed to encode MP3!\n   $s_filename\n\n";
-                $t_filename = $temp_filename;
-            }
-            else {
-                unlink $temp_filename;
-            }
-        }
-    }
-    else {
+    if ( ! -e "$shortName" ) {
         print "Warning: File is not exist!\n   $s_filename\n\n";
     }
+    
+    my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
+    my $errorlevel = system( $commandline );
 
+    if ( $errorlevel > 0 ) {
+
+        my $temp_filename = "$t_folder/temp_" . time . ".mp3";
+
+        copy( "$shortName", "$temp_filename" );
+
+        $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
+        $errorlevel = system( $commandline );
+
+        if ( $errorlevel > 0 ) {
+            print "Error: Failed to encode MP3!\n   $s_filename\n\n";
+            $t_filename = $temp_filename;
+        }
+        else {
+            unlink $temp_filename;
+        }
+    }
 
 인코딩 오류 발생시 동작하는 `if ( $errorlevel > 0 ) { }` 조건문을 추가했습니다. `system()` 함수는 그 자신이 실행한 코드가 실행이 종료될 때까지 기다렸다가 그 종료 코드(오류 코드)를 돌려주기 때문에, 실행한 프로그램이 오류 코드를 돌려준다면 작업이 성공했는지 실패했는지를 바로 알 수 있습니다. 만약 `$errorlevel` 값이 0이 아니라면(즉, 무언가 문제가 생겼다면), 프로그램은 원본 MP3 파일을 이름을 바꾸어(`temp_` 뒤에 현재의 타임 스탬프를 추가합니다) 대상 폴더로 복사한 후 다시 인코딩을 시도합니다. 성공한다면 복사했던 임시 파일은 삭제되고 다음 작업으로 넘어가지만, 이번에도 실패한다면 오류 메시지를 출력하고 복사되었던 임시 파일을 남겨 두어 다음 작업에 사용하게 합니다. 즉, 인코딩이 실패한다면 그냥 원본 파일을 그대로 복사하는 것과 같은 효과를 보게 되는 거죠.
 
@@ -455,10 +451,12 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     use Win32::FileOp;
     
     my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
-        -title => encode( "CP949", "복사할 M3U 또는 M3U8 파일을 선택하십시오." ),
+        -title => encode(
+            "CP949", "복사할 M3U 또는 M3U8 파일을 선택하십시오."
+        ),
         -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
-        -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
-        -dir => File::Spec->rel2abs( "." ),
+        -options => OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
+        -dir     => File::Spec->rel2abs("."),
     );
     
     if ( !$SOURCE_M3U_FILENAME ) {
@@ -466,7 +464,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
         exit;
     }
     
-    my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
+    my $TARGET_FOLDER = Win32::FileOp::BrowseForFolder(
         encode( "CP949", "복사할 폴더를 선택하세요." ),
         CSIDL_DRIVES,
         BIF_USENEWUI,
@@ -501,25 +499,30 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
     #!perl
     #!/usr/bin/perl
+    use utf8;
     use strict;
     use warnings;
-    use utf8;
-    use File::Spec;
-    use File::Copy;
+    
     use Encode;
     use Encode::Guess;
+    use Win32;
+    use MP3::Info;
+    use File::Spec;
+    use File::Copy;
+    use Win32::FileOp;
+    use Win32::Unicode;
     
     #
     # SOURCE FILE / TARGET FOLDER 받기 (@ARGV 인수)
     #
     
-    use Win32::FileOp;
-    
     my $SOURCE_M3U_FILENAME = Win32::FileOp::OpenDialog(
-        -title => encode( "CP949", "복사할 M3U 또는 M3U8 파일을 선택하십시오." ),
+        -title => encode(
+            "CP949", "복사할 M3U 또는 M3U8 파일을 선택하십시오."
+        ),
         -filters => [ 'M3U(8) File' => '*.m3u;*.m3u8' ],
-        -options => OFN_FILEMUSTEXIST|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST,
-        -dir => File::Spec->rel2abs( "." ),
+        -options => OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST,
+        -dir     => File::Spec->rel2abs("."),
     );
     
     if ( !$SOURCE_M3U_FILENAME ) {
@@ -527,22 +530,22 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
         exit;
     }
     
-    my $TARGET_FOLDER       = Win32::FileOp::BrowseForFolder(
+    my $TARGET_FOLDER = Win32::FileOp::BrowseForFolder(
         encode( "CP949", "복사할 폴더를 선택하세요." ),
         CSIDL_DRIVES,
         BIF_USENEWUI,
     );
-    
+
     if ( !$TARGET_FOLDER ) {
         print "Error: Target folder is not defined!\n";
         exit;
     }
     
-    if ( !File::Spec->file_name_is_absolute( $SOURCE_M3U_FILENAME ) ) {
-        $SOURCE_M3U_FILENAME = File::Spec->rel2abs( $SOURCE_M3U_FILENAME );
+    if ( !File::Spec->file_name_is_absolute($SOURCE_M3U_FILENAME) ) {
+        $SOURCE_M3U_FILENAME = File::Spec->rel2abs($SOURCE_M3U_FILENAME);
     }
-    if ( !File::Spec->file_name_is_absolute( $TARGET_FOLDER ) ) {
-        $TARGET_FOLDER = File::Spec->rel2abs( $TARGET_FOLDER );
+    if ( !File::Spec->file_name_is_absolute($TARGET_FOLDER) ) {
+        $TARGET_FOLDER = File::Spec->rel2abs($TARGET_FOLDER);
     }
     
     #
@@ -555,11 +558,10 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     
         open my $fHandle, "<", "$SOURCE_M3U_FILENAME";
         binmode $fHandle;
-        while(<$fHandle>){
+        
+        while (<$fHandle>) {
             $M3U_RAW_DATA .= $_;
         }
-        close $fHandle;
-        undef $fHandle;
     }
     else {
         print "Error: Source file is not exist!\n";
@@ -571,11 +573,11 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     #
     
     my $enc = guess_encoding( $M3U_RAW_DATA, qw/cp949 utf8/ );
-    
+
     if ( ref($enc) ) {
-    
+
         $M3U_RAW_DATA = decode( $enc->name, $M3U_RAW_DATA );
-    
+
         if ( $enc->name eq "utf8" ) {
             if ( $M3U_RAW_DATA =~ /\x{FEFF}/ ) {
                 $M3U_RAW_DATA =~ s/\x{FEFF}//g;
@@ -586,15 +588,15 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
         print "Error: Cannot guess encoding(Neither CP949 nor UTF-8)! \n";
         exit;
     }
-    
+
     undef $enc;
-    
+
     #
     # 파일 목록을 만들기
     #
     
     my @MP3_LIST = split( /\r\n/, $M3U_RAW_DATA );
-    
+
     undef $M3U_RAW_DATA;
     
     #
@@ -605,18 +607,15 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
         mkdir( "$TARGET_FOLDER" );
     }
     
-    use Win32;
-    use MP3::Info;
-    
-    foreach my $s_filename ( @MP3_LIST ) {
-    
-        if ( substr( $s_filename, 0, 1 ) eq "#" ) { next; }
-    
-        $s_filename  = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
-    
-        my $shortName = Win32::GetANSIPathName( $s_filename );
-        my $mp3_info  = get_mp3info( $shortName );
-    
+    foreach my $s_filename (@MP3_LIST) {
+
+        next if substr( $s_filename, 0, 1 ) eq "#";
+
+        $s_filename = mp3_abs_path( $s_filename, $SOURCE_M3U_FILENAME );
+
+        my $shortName = Win32::GetANSIPathName($s_filename);
+        my $mp3_info  = get_mp3info($shortName);
+
         if ( !$mp3_info->{BITRATE} ) {
             print "Warning: Failed to get MP3 bitrate!\n   $s_filename\n\n";
         }
@@ -626,10 +625,6 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
         else {
             mp3_copy_process( $s_filename, $TARGET_FOLDER );
         }
-    
-        undef $mp3_info;
-        undef $s_filename;
-        undef $shortName;
     }
     
     print "\nTask(s) finished.\n";
@@ -641,35 +636,28 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     
     sub mp3_copy_process {
     
-        use Win32::Unicode;
-    
-        my $s_filename = $_[0]; # UTF-8
-        my $t_folder   = $_[1]; # CP949
+        my $s_filename = shift; # UTF-8
+        my $t_folder   = shift; # CP949
         my $t_filename;
         my $filename;
-    
-        (undef,undef,$filename) = File::Spec->splitpath( $s_filename );
-    
-        if ( !Encode::is_utf8( $t_folder ) ) {
+        
+        ( undef, undef, $filename ) = File::Spec->splitpath($s_filename);
+
+        if ( !Encode::is_utf8($t_folder) ) {
             $t_folder = decode( "cp949", $t_folder );
         }
-        if ( !Encode::is_utf8( $filename ) ) {
+        if ( !Encode::is_utf8($filename) ) {
             $filename = decode( "utf8", $filename );
         }
         $t_filename = "$t_folder/$filename";    # UTF-8
-    
+
         if ( file_type e => "$s_filename" ) {
             copyW( "$s_filename", "$t_filename" )
-                or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
+              or die "Error: Failed to copy!\n   $s_filename\n   ($!)\n\n";
         }
         else {
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
-    
-        undef $s_filename;
-        undef $t_filename;
-        undef $filename;
-        undef $t_folder;
     }
     
     #
@@ -677,72 +665,50 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     #
     
     sub mp3_enc_process {
-    
-        my $s_filename = $_[0]; # UTF-8
-        my $t_folder   = $_[1]; # CP949
+        my $s_filename = shift; # UTF-8
+        my $t_folder   = shift; # CP949
     
         my $shortName  = Win32::GetANSIPathName( $s_filename );
-        my $filename;
-    
-        (undef,undef,$filename) = File::Spec->splitpath( $shortName );
-    
-        my $t_filename = "$t_folder/$filename";  # CP949!
-    
-        if ( -e "$shortName" ) {
-    
-            my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
-            my $errorlevel  = system( $commandline );
-    
-            if ( $errorlevel > 0 ) {
-    
-                my $temp_filename = "$t_folder/temp_".time.".mp3";
-    
-                use File::Copy;
-                copy( "$shortName", "$temp_filename" );
-    
-                $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
-                $errorlevel  = system( $commandline );
-    
-                if ( $errorlevel > 0 ) {
-                    print "Error: Failed to encode MP3!\n   $s_filename\n\n";
-                    $t_filename = $temp_filename;
-                }
-                else {
-                    unlink $temp_filename;
-                }
-    
-                undef $temp_filename;
-            }
-    
-            undef $errorlevel;
-            undef $commandline;
-        }
-        else {
+        my ( undef, undef, $filename ) = File::Spec->splitpath($shortName);
+
+        my $t_filename = "$t_folder/$filename";    # CP949!
+
+        if ( ! -e "$shortName" ) {
             print "Warning: File is not exist!\n   $s_filename\n\n";
         }
-    
-        undef $shortName;
-        undef $filename;
-    
-        (undef,undef,$filename) = File::Spec->splitpath( $s_filename ); # UTF-8
-    
-        if ( !Encode::is_utf8( $t_filename ) ) {
+        
+        my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
+        my $errorlevel = system( $commandline );
+
+        if ( $errorlevel > 0 ) {
+        
+            my $temp_filename = "$t_folder/temp_" . time . ".mp3";
+            copy( "$shortName", "$temp_filename" );
+
+            $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$temp_filename" "$t_filename"};
+            $errorlevel = system( $commandline );
+
+            if ( $errorlevel > 0 ) {
+                print "Error: Failed to encode MP3!\n   $s_filename\n\n";
+                $t_filename = $temp_filename;
+            }
+            else {
+                unlink $temp_filename;
+            }
+        }
+
+        ( undef, undef, $filename ) =
+          File::Spec->splitpath($s_filename);    # UTF-8
+
+        if ( !Encode::is_utf8($t_filename) ) {
             $t_filename = decode( "cp949", $t_filename );
         }
-        if ( !Encode::is_utf8( $t_folder ) ) {
+        if ( !Encode::is_utf8($t_folder) ) {
             $t_folder = decode( "cp949", $t_folder );
         }
-    
-        my $tt_filename = "$t_folder/$filename";  # UTF-8!
-    
-        use Win32::Unicode;
-    
+
+        my $tt_filename = "$t_folder/$filename";    # UTF-8!
         renameW( "$t_filename", "$tt_filename" );
-    
-        undef $tt_filename;
-        undef $t_filename;
-        undef $s_filename;
-        undef $t_folder;
     }
     
     #
@@ -751,24 +717,16 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
     
     sub mp3_abs_path {
     
-        my $mp3_file_path = $_[0];
-        my $m3u_file_path = $_[1];
+        my ($mp3_file_path, $m3u_file_path) = @_;
     
         if ( !File::Spec->file_name_is_absolute( $mp3_file_path ) ) {
-    
-            my $t_drive;
-            my $t_folders;
-    
-            ($t_drive,$t_folders,undef) = File::Spec->splitpath( $m3u_file_path );
+        
+            my ( $t_drive, $t_folders ) = File::Spec->splitpath($m3u_file_path);
+            
             $m3u_file_path = File::Spec->catpath($t_drive,$t_folders,undef);
-    
-            undef $t_drive;
-            undef $t_folders;
-    
             $mp3_file_path = File::Spec->rel2abs( $mp3_file_path, $m3u_file_path );
         }
-    
-        undef $m3u_file_path;
+        
         return $mp3_file_path;
     }
 
