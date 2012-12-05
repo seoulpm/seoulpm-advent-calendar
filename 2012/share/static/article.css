@@ -136,6 +136,16 @@ h3 {
 #cont img {
     display: block;
 }
+#cont blockquote {
+    background-color: #f4f4f4;
+    margin-left: 1em;
+    margin-bottom: 1.6em;
+    padding: 6px;
+}
+#cont blockquote p {
+    margin-bottom: 0.6em;
+    margin-left: 0.4em;
+}
 .hidden {
     width: 0;
     height: 0;
