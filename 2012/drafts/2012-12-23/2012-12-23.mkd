@@ -25,15 +25,15 @@ Author: JellyPooo
 
 `\h`를 입력하면 현재 커서가 있는 곳의 단어에 해당하는 perldoc을 엽니다.
 
-!(binmode가 뭐야?!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
-!(커서를 binmode에 둔채 `\h` 입력. 짜잔! perldoc binmode가 출력됨)(http://cfile29.uf.tistory.com/image/15798E3550BEAAF405699F)
+![binmode가 뭐야?!][img-1-rz]([원본][img-1])
+![커서를 binmode에 둔채 `\h` 입력. 짜잔! perldoc binmode가 출력됨][img-2-rz]([원본][img-2])
 
 ### \rr : 현재 파일 실행
 
 `\rr`를 입력하면 현재 파일을 저장/실행을 합니다.
 
-!(아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!!)(http://cfile10.uf.tistory.com/image/162E8D3B50BEAAF3019B66)
-!(\rr을 누르면 바로 실행 된다고 친구)(http://cfile10.uf.tistory.com/image/204B163350BEAC150DF0D9)
+![아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!!][img-1-rz]([원본][img-1])
+![\rr을 누르면 바로 실행 된다고 친구][img-3-rz]([원본][img-3])
 
 그 외 실행 관련 단축키
 
@@ -89,3 +89,11 @@ vimana 혹은 vundle을 사용하면 됩니다.
 [emacs]: http://www.gnu.org/software/emacs/
 [ps]: http://www.vim.org/scripts/script.php?script_id=556
 [perltity]: http://perltidy.sourceforge.net/
+
+[img-1]: 2012-12-23-01.png
+[img-2]: 2012-12-23-02.png
+[img-3]: 2012-12-23-03.png
+[img-1-rs]: 2012-12-23-01-rs.png
+[img-2-rs]: 2012-12-23-02-rs.png
+[img-3-rs]: 2012-12-23-03-rs.png
+
