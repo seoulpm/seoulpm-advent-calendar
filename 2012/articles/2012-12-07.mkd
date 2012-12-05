@@ -2,7 +2,7 @@ Title: 일곱번째 날: .M3U Copier for Win32 (부제: 유니코드 파일명�
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author: @owl0908
+Author: owl0908
 
 ## 저자
 
