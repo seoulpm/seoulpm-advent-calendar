@@ -143,12 +143,6 @@ moran.so에서 필요한 헤더 파일을 적당히 위치시키고 `MODULE = Mo
 
 `ST(0)` 즉, Perl에서 `initialize_moran_xs()` 서브루틴을 호출할 때 넘기는 배열의 첫번째 값에 대해서 저장되어 있는 실제 값을 `(char*)`로 넘겨 받는다는 의미입니다. Moran.xs를 코딩할때는 이런 부분을 상세하게 알아야하겠지만, C 코드처럼 작성해도 자동변환이 된다는 것을 알 수 있습니다.
 
-
-- 참고
- - 메모리 주소를 리턴하는 방법은 [perlguts][perlguts] 문서를 참조하면 됩니다.
- - `IV`: signed integer value (integer 뿐만 아니라 메모리 주소를 저장한 만한 충분한 공간)
- - `initialize_moran()`으로 얻어진 메모리 주소값을 IV에 저장하고 이를 Perl로 리턴
-
     #!cpp
     SV*
     initialize_moran_xs(dictionary_path)
@@ -159,6 +153,11 @@ moran.so에서 필요한 헤더 파일을 적당히 위치시키고 `MODULE = Mo
             RETVAL = newSViv(addr_holder);
     OUTPUT:
     RETVAL
+
+
+- 메모리 주소를 리턴하는 방법은 [perlguts][perlguts] 문서를 참조하면 됩니다.
+- `IV`: signed integer value (integer 뿐만 아니라 메모리 주소를 저장한 만한 충분한 공간)
+- `initialize_moran()`으로 얻어진 메모리 주소값을 IV에 저장하고 이를 Perl로 리턴
 
 이제 초기화 루틴을 완성했습니다. 다음으로 사전을 해제하는 루틴은 아래와 같이 간단히 작성할 수 있습니다.
 
@@ -197,10 +196,9 @@ moran.so에서 필요한 헤더 파일을 적당히 위치시키고 `MODULE = Mo
     OUTPUT:
     RETVAL
 
-- 참고
- - `SvCUR(SV*)`: SV에 저장된 스트링의 실제 길이
- - `XSRETURN()`: [perlapi][perlapi] 참조
- - `newSVpvf()`: [perlguts][perlguts] 참조
+- `SvCUR(SV*)`: SV에 저장된 스트링의 실제 길이
+- `XSRETURN()`: [perlapi][perlapi] 참조
+- `newSVpvf()`: [perlguts][perlguts] 참조
 
 이제 Moran.xs를 저장하고 make해서 정상적으로 컴파일되는지 확인해봅니다.
 
