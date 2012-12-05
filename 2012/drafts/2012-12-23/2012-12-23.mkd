@@ -82,8 +82,9 @@ vimana 혹은 vundle을 사용하면 됩니다.
 ## 참조
 
 다음의 문서를 읽으시면 여기 설명 안 된 기능에 대해 알 수 있습니다.
-[The help file online](http://lug.fh-swf.de/vim/vim-perl/perlsupport.html)
-[The key mappings of this plugin (PDF)](http://lug.fh-swf.de/vim/vim-perl/perl-hot-keys.pdf)
+
+- [The help file online](http://lug.fh-swf.de/vim/vim-perl/perlsupport.html)
+- [The key mappings of this plugin (PDF)](http://lug.fh-swf.de/vim/vim-perl/perl-hot-keys.pdf)
 
 [emacs] : http://www.gnu.org/software/emacs/
 [ps] : http://www.vim.org/scripts/script.php?script_id=556
