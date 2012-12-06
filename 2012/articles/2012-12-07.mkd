@@ -148,8 +148,8 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     
     sub mp3_copy_process {
     
-        my $s_filename = $_[0];
-        my $t_folder   = $_[1];
+        my $s_filename = shift;
+        my $t_folder   = shift;
         my $t_filename;
         my $filename;
     
