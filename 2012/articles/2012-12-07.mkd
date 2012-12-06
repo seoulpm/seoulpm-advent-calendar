@@ -1,4 +1,4 @@
-Title: 일곱번째 날: M3U Copier for Win32 (부제: 유니코드 파일명과의 전쟁)
+Title: M3U Copier for Win32 (부제: 유니코드 파일명과의 전쟁)
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
