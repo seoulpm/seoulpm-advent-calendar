@@ -148,8 +148,8 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     
     sub mp3_copy_process {
     
-        my $s_filename = $_[0];
-        my $t_folder   = $_[1];
+        my $s_filename = shift;
+        my $t_folder   = shift;
         my $t_filename;
         my $filename;
     
@@ -176,7 +176,7 @@ Perl과는 그다지 어울릴 것 같아보이지 않는, 법학을 전공한 �
     #
     
     sub mp3_enc_process {
-        ...
+        # ...
     }
     
     #
@@ -411,6 +411,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
     if ( ! -e "$shortName" ) {
         print "Warning: File is not exist!\n   $s_filename\n\n";
+        return;
     }
     
     my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
@@ -489,7 +490,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 - MP3 파일을 복사할 폴더명의 지정은 역시 Win32::FileOp 모듈의 `BrowseForFolder()`를 사용합니다. 옵션으로 `BIF_USENEWUI`를 주었기 때문에, 폴더 선택 과정에서 새 폴더를 만들어 그 폴더를 지정할 수도 있습니다. (실제 존재하는 폴더명만 넘어올 수 있기 때문에 폴더가 존재하는지 확인하여 없으면 없으면 `mkdir` 문을 사용해 폴더를 생성해 주던 코드도 필요가 없게 되었네요.)
 - 파일 및 폴더 선택 창에 _출력할 메시지는 모두 CP949 인코딩으로 출력_되어야 하므로, 각각의 출력 메시지 부분은 모두 `encode`를 사용하여 묶었습니다. 사용자가 인자에 상대 경로를 사용할지 절대 경로를 사용할지 알 수 없기 때문에 필요했던, 위 코드 끝 부분의 `rel2abs` 메소드는, `OpenDialog()` 함수와 `BrowseForFolder()` 함수 모두 반환값이 절대 경로이기 때문에, 이 역시 필요가 없는 코드가 되었습니다.
 
-조금 더 욕심을 부린다면, 현재 콘솔 창으로 출력되고 있는 오류 메시지를 별도의 메시지 창으로 출력되도록 하고, 콘솔 창을 보이지 않게 만들어서 좀 더 뭔가 있어보이는 프로그램처럼 보일 수도 있겠네요. 메시지를 별도의 메시지 창으로 출력하기 위한 도구들은 `Win32::GUI` 모듈의 `MessageBox` 메소드 또는 `Win32` 모듈의 `Win32::MsgBox` 함수 등이 있겠지만, 이 부분은 독자분들의 몫으로 남겨두도록 하겠습니다. ^^ 콘솔 창을 숨기는 방법은 [2011년에 제가 썼던 Advent Calendar 기사][2012-12-07]에 관련 내용이 있으므로 그쪽 글을 참고하시기 바랍니다. :-)
+조금 더 욕심을 부린다면, 현재 콘솔 창으로 출력되고 있는 오류 메시지를 별도의 메시지 창으로 출력되도록 하고, 콘솔 창을 보이지 않게 만들어서 좀 더 뭔가 있어보이는 프로그램처럼 보일 수도 있겠네요. 메시지를 별도의 메시지 창으로 출력하기 위한 도구들은 `Win32::GUI` 모듈의 `MessageBox` 메소드 또는 `Win32` 모듈의 `Win32::MsgBox` 함수 등이 있겠지만, 이 부분은 독자분들의 몫으로 남겨두도록 하겠습니다. ^^ 콘솔 창을 숨기는 방법은 [2011년에 제가 썼던 Advent Calendar 기사][2011-12-07]에 관련 내용이 있으므로 그쪽 글을 참고하시기 바랍니다. :-)
 
 
 
@@ -675,6 +676,7 @@ _그림 4._ 비트레이트를 확인할 수 없다는 오류 메시지. 뭐 잊
 
         if ( ! -e "$shortName" ) {
             print "Warning: File is not exist!\n   $s_filename\n\n";
+            return;
         }
         
         my $commandline = qq{./lame.exe -S --noreplaygain -b 192 "$shortName" "$t_filename"};
