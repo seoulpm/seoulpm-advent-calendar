@@ -58,7 +58,8 @@ MogileFS랑은 뭐가 다르지?
 
 일단 github에서 소스를 다운받습니다.
 
-	git clone git://github.com/stf-storage/stf.git
+    #!bash
+    git clone git://github.com/stf-storage/stf.git
 
 
 STF를 운영하는데 필요한 패키지들 설치
@@ -67,25 +68,20 @@ STF를 운영하는데 필요한 패키지들 설치
 그리고 혹시 필요한 패키지들이 설치되어있지 않다면 mysql, memcached를
 설치합니다.
 
-	apt-get install mysql-server
-
-	apt-get install libmysqlclient-dev
-
-	apt-get install memcached
-
-	apt-get install libwww-perl
-
-	apt-get install nginx
+    #!bash
+    apt-get install mysql-server
+    apt-get install libmysqlclient-dev
+    apt-get install memcached
+    apt-get install libwww-perl
+    apt-get install nginx
 
 CentOS이라면 아마도 아래와 같이 설치해줍니다.
 
-	yum install mysql-server
-
-	yum install mysql-devel
-
-	yum install memcached
-
-	yum install perl-libwww-perl
+    #!bash
+    yum install mysql-server
+    yum install mysql-devel
+    yum install memcached
+    yum install perl-libwww-perl
 
 nginx설치는 http://wiki.nginx.org/Install 여기를 참고해서...
 
@@ -98,54 +94,56 @@ nginx설치는 http://wiki.nginx.org/Install 여기를 참고해서...
 DBD::mysql은 테스팅과정에서 오류가 있어서 아래와 같이 cpan쉘에 들어간 후
 notest를 통해 강제로 설치해줍니다.
 
-	$ cpan
-	Terminal does not support AddHistory.
-
-	cpan shell -- CPAN exploration and modules installation (v1.9800)
-	Enter 'h' for help.
-
-	cpan[1]> notest install DBD::mysql
-
-	...
-
-	cpan[1]> exit  
-	Terminal does not support GetHistory.
-	Lockfile removed.
+    #!bash
+    $ cpan
+    Terminal does not support AddHistory.
+    
+    cpan shell -- CPAN exploration and modules installation (v1.9800)
+    Enter 'h' for help.
+    
+    cpan[1]> notest install DBD::mysql
+    
+    ...
+    
+    cpan[1]> exit  
+    Terminal does not support GetHistory.
+    Lockfile removed.
 
 그리고나면 나머지 모듈들은 그냥 주욱 설치해줍니다.
 
-	cpan Mouse
-	cpan Math::Round
-	cpan Parallel::ForkManager
-	cpan Scope::Guard
-	cpan Log::Minimal
-	cpan Furl
-	cpan Cache::Memcached::Fast
-	cpan Data::FormValidator
-	cpan Data::Localize
-	cpan Data::Page
-	cpan Digest::MurmurHash
-	cpan Email::MIME
-	cpan Email::Send
-	cpan HTML::FillInForm::Lite
-	cpan HTTP::Parser::XS
-	cpan Net::SNMP
-	cpan Parallel::Scoreboard
-	cpan Plack
-	cpan Plack::Middleware::Reproxy
-	cpan Plack::Middleware::ReverseProxy
-	cpan Plack::Middleware::Session
-	cpan Plack::Middleware::Static
-	cpan Proc::Guard
-	cpan Router::Simple
-	cpan SQL::Maker
-	cpan STF::Dispatcher::PSGI
-	cpan Starlet
-	cpan String::Urandom
-	cpan YAML
-	cpan Text::Xslate
-	cpan Data::Dumper::Concise
-	cpan Cache::Memcached
+    #!bash
+    cpan Mouse
+    cpan Math::Round
+    cpan Parallel::ForkManager
+    cpan Scope::Guard
+    cpan Log::Minimal
+    cpan Furl
+    cpan Cache::Memcached::Fast
+    cpan Data::FormValidator
+    cpan Data::Localize
+    cpan Data::Page
+    cpan Digest::MurmurHash
+    cpan Email::MIME
+    cpan Email::Send
+    cpan HTML::FillInForm::Lite
+    cpan HTTP::Parser::XS
+    cpan Net::SNMP
+    cpan Parallel::Scoreboard
+    cpan Plack
+    cpan Plack::Middleware::Reproxy
+    cpan Plack::Middleware::ReverseProxy
+    cpan Plack::Middleware::Session
+    cpan Plack::Middleware::Static
+    cpan Proc::Guard
+    cpan Router::Simple
+    cpan SQL::Maker
+    cpan STF::Dispatcher::PSGI
+    cpan Starlet
+    cpan String::Urandom
+    cpan YAML
+    cpan Text::Xslate
+    cpan Data::Dumper::Concise
+    cpan Cache::Memcached
 
 휴... 꽤나 오래 걸리네요.
 
@@ -167,87 +165,93 @@ Q4M은 별도로 소프트웨어를 설치해야되고 Mysql이 5.1이상버전�
 
 일단 여기서는 순수하게 Perl로 되어있는 Job Queueing System인 TheSchwartz를
 사용하도록 하겠습니다.
-
-
 일단 cpan으로 TheSchwartz를 설치하구요.
 
-	cpan TheSchwartz
+    #!bash
+    cpan TheSchwartz
 
 root로 mysql에 로그인하여 
 
-	$ mysql -u root -p mysql
-	Enter password: 
-	Reading table information for completion of table and column names
-	You can turn off this feature to get a quicker startup with -A
+    #!plain
+    $ mysql -u root -p mysql
+    Enter password: 
+    Reading table information for completion of table and column names
+    You can turn off this feature to get a quicker startup with -A
 
-	Welcome to the MySQL monitor.  Commands end with ; or \g.
-	Your MySQL connection id is 51
-	Server version: 5.5.28-1 (Debian)
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 51
+    Server version: 5.5.28-1 (Debian)
 
-	Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.
 
-	Oracle is a registered trademark of Oracle Corporation and/or its
-	affiliates. Other names may be trademarks of their respective
-	owners.
+    Oracle is a registered trademark of Oracle Corporation and/or its
+    affiliates. Other names may be trademarks of their respective
+    owners.
 
-	Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-	mysql> 
+    mysql> 
 
 
 TheSchwartz에서 사용할 Database를 생성하구요.
 
-	mysql> create database stf CHARACTER SET = 'utf8';
-	Query OK, 1 row affected (0.00 sec)
+    #!plain
+    mysql> create database stf CHARACTER SET = 'utf8';
+    Query OK, 1 row affected (0.00 sec)
 
 
 TheSchwartz에서 사용할 사용자 계정을 추가합니다.
 
-	mysql>  GRANT ALL PRIVILEGES ON stf.* TO stfuser@localhost IDENTIFIED BY 'stfpasswd';
+    #!plain
+    mysql>  GRANT ALL PRIVILEGES ON stf.* TO stfuser@localhost IDENTIFIED BY 'stfpasswd';
 
 
 권한을 Flush한뒤에
 
-	mysql>  FLUSH PRIVILEGES;
+    #!plain
+    mysql>  FLUSH PRIVILEGES;
 
 
 일단 TheSchwartz에서 사용할 DB 스키마를 로드합니다.
 스키마 파일은 stf/misc 디렉토리 아래에 stf_schwartz.sql 이런 파일네임으로
 존재합니다.
 
-	$ cd stf/misc
+    #!plain
+    $ cd stf/misc
 
-	$ mysql -u stfuser -p stf
-	Enter password: stfpasswd
+    $ mysql -u stfuser -p stf
+    Enter password: stfpasswd
 
 
-	mysql> source stf_schwartz.sql
-	Query OK, 0 rows affected (0.02 sec)
+    mysql> source stf_schwartz.sql
+    Query OK, 0 rows affected (0.02 sec)
 
-	...
+    ...
 
-	Query OK, 0 rows affected (0.02 sec)
+    Query OK, 0 rows affected (0.02 sec)
 
 
 이왕 DB로그인한거 STF에서 사용할 스키마도 덤으로 로드 합니다. 같은 디렉토리에
 stf.sql이라는 이름으로 들어있습니다.
 
 
-	mysql> source stf.sql
-	Query OK, 0 rows affected (0.03 sec)
+    #!plain
+    mysql> source stf.sql
+    Query OK, 0 rows affected (0.03 sec)
 
-	Query OK, 1 row affected (0.00 sec)
+    Query OK, 1 row affected (0.00 sec)
 
-	...
+    ...
 
-	Query OK, 0 rows affected (0.01 sec)
+    Query OK, 0 rows affected (0.01 sec)
 
 
 
 나중에 Admin UI에서 접근할때 필요한 public uri 정보를 잠시 추가로
 넣어놓습니다.
 
-	mysql> REPLACE INTO config (varname, varvalue) VALUES ("stf.global.public_uri", 'http://localhost');
+    #!plain
+    mysql> REPLACE INTO config (varname, varvalue) VALUES ("stf.global.public_uri", 'http://localhost');
 
 
 
@@ -258,23 +262,27 @@ stf.sql이라는 이름으로 들어있습니다.
 
 일단 stf디렉토리로 돌아온 뒤에
 
-	cd ..
+    #!bash
+    $ cd ..
 
 STF_HOME을 설정하고
 
-	export STF_HOME=`pwd`
+    #!bash
+    $ export STF_HOME=`pwd`
 
 STF가 접속할 id와 password를 설정해줍니다.
 
-	export STF_MYSQL_USERNAME=stfuser
-	export STF_MYSQL_PASSWORD=stfpasswd
+    #!bash
+    export STF_MYSQL_USERNAME=stfuser
+    export STF_MYSQL_PASSWORD=stfpasswd
 
 TheSchwartz가 사용할 DB와 id, password도 설정해줍니다.
 
-	export STF_QUEUE_TYPE=Schwartz
-	export STF_QUEUE_DSN=dbi:mysql:dbname=stf
-	export STF_QUEUE_USERNAME=stfuser
-	export STF_QUEUE_PASSWORD=stfpasswd
+    #!bash
+    export STF_QUEUE_TYPE=Schwartz
+    export STF_QUEUE_DSN=dbi:mysql:dbname=stf
+    export STF_QUEUE_USERNAME=stfuser
+    export STF_QUEUE_PASSWORD=stfpasswd
 
 
 Worker 프로세스 실행
@@ -284,8 +292,9 @@ Worker 프로세스 실행
 여러 호스트에서 worker를 띄우려면 STF_HOST_ID를 호스트마다 꼭 다르게 설정해야
 됩니다.
 
-	export STF_HOST_ID=1
-	./bin/stf-worker &
+    #!bash
+    export STF_HOST_ID=1
+    ./bin/stf-worker &
 
 
 Admin UI 실행
@@ -300,6 +309,7 @@ Admin UI 실행
 https와 도메인 설정을 지금 할수는 없으니 설정파일을 일단 아래와 같이
 바꿔줍니다.
 
+    #!bash
     # Session state configuration
     'AdminWeb::Session::State' => {
         path => "/",
@@ -312,7 +322,8 @@ https와 도메인 설정을 지금 할수는 없으니 설정파일을 일단 �
 
 그리고나서 9000번 포트로 Admin 페이지를 띄웁니다.
 
-	plackup -p 9000 -a etc/admin.psgi &
+    #!bash
+    plackup -p 9000 -a etc/admin.psgi &
 
 
 [IMAGE2]
@@ -326,17 +337,18 @@ https와 도메인 설정을 지금 할수는 없으니 설정파일을 일단 �
 서비스 3개를 다른포트로 띄워줍니다.
 
 
-	mkdir ../stf_storage1
-	export STF_STORAGE_ROOT=`pwd`/../stf_storage1
-	plackup -a $STF_HOME/etc/storage.psgi -p 8888 &
+    #!bash
+    mkdir ../stf_storage1
+    export STF_STORAGE_ROOT=`pwd`/../stf_storage1
+    plackup -a $STF_HOME/etc/storage.psgi -p 8888 &
 
-	mkdir ../stf_storage2
-	export STF_STORAGE_ROOT=`pwd`/../stf_storage2
-	plackup -a $STF_HOME/etc/storage.psgi -p 8889 &
+    mkdir ../stf_storage2
+    export STF_STORAGE_ROOT=`pwd`/../stf_storage2
+    plackup -a $STF_HOME/etc/storage.psgi -p 8889 &
 
-	mkdir ../stf_storage3
-	export STF_STORAGE_ROOT=`pwd`/../stf_storage3
-	plackup -a $STF_HOME/etc/storage.psgi -p 8890 &
+    mkdir ../stf_storage3
+    export STF_STORAGE_ROOT=`pwd`/../stf_storage3
+    plackup -a $STF_HOME/etc/storage.psgi -p 8890 &
 
 
 UI에서 스토리지 구성
@@ -353,10 +365,10 @@ Storage Cluster 메뉴에 들어가서 우측 상단의 + 버튼을 눌러서 �
 이번에는 Storage Nodes 메뉴에 들어가서 Create 버튼을 누른 뒤 아래와 같이
 추가해줍니다.
 
-ID 	URI 			Mode	Cluster
-1 	http://127.0.0.1:8888 	rw	test
-2 	http://127.0.0.1:8889 	rw	test
-3 	http://127.0.0.1:8890 	rw	test
+ID      URI             Mode    Cluster
+1   http://127.0.0.1:8888   rw  test
+2   http://127.0.0.1:8889   rw  test
+3   http://127.0.0.1:8890   rw  test
 
 (주의 http://127.0.0.1:8888 IP로 추가해야함. localhost로 넣으면 나중에
 reproxy설정에 dns를 세팅해야되는 문제가 있음 귀찮으니 그냥 IP로...)
@@ -368,7 +380,8 @@ Dispatcher 실행
 ----------------
 이제 실제 파일을 업로드 받거나 다운로드 해주는 Dispatcher를 실행합니다.
 
-	plackup -p 8080 -a /path/to/dispatcher.psgi &
+    #!bash
+    plackup -p 8080 -a /path/to/dispatcher.psgi &
 
 
 ReProxy 설정
@@ -383,21 +396,22 @@ apache mod_reproxy를 사용하는 방법도 있습니다만 일단 여기서는
 /etc/nginx/sites-enabled/default 파일을 열어서 server 설정 끝부분에
 추가해줍니다. nginx패키징에 따라서는 그냥 /etc/nginx/nginx.conf 파일일수도 있겠네요.
 
-	server {
-		...
-		location /bucket {
-		    proxy_pass http://127.0.0.1:8080;
-		}
+    #!plain
+    server {
+        ...
+        location /bucket {
+            proxy_pass http://127.0.0.1:8080;
+        }
 
-		location = "/reproxy" {
-		    internal;
-		    #resolver 127.0.0.1; # set up a proper resolver
-		    set $reproxy $upstream_http_x_reproxy_url;
-		    proxy_pass $reproxy;
-		    # inherits Content-Type header
-		    proxy_hide_header Content-Type;
-		}
-	}
+        location = "/reproxy" {
+            internal;
+            #resolver 127.0.0.1; # set up a proper resolver
+            set $reproxy $upstream_http_x_reproxy_url;
+            proxy_pass $reproxy;
+            # inherits Content-Type header
+            proxy_hide_header Content-Type;
+        }
+    }
 
 
 /bucket 이라는 이름으로 시작하는 경우에만 서빙하도록 설정했습니다. 다른 이름의
@@ -407,8 +421,9 @@ apache mod_reproxy를 사용하는 방법도 있습니다만 일단 여기서는
 resolver 위치에 주석을 풀고 제대로 된 DNS값으로 줘야됩니다.
 
 
-	# service nginx restart
-	Restarting nginx: nginx.
+    #!plain
+    # service nginx restart
+    Restarting nginx: nginx.
 
 
 완성!
@@ -421,30 +436,35 @@ resolver 위치에 주석을 풀고 제대로 된 DNS값으로 줘야됩니다.
 일단 bucket이라는 이름으로 버킷을 만들어봅니다. 버킷은 PUT 으로 만들고
 컨텐츠는 없어야 됩니다. 바로 Ctrl+D를 눌러서 빠져나오면 만들어집니다.
 
-	lwp-request -m PUT http://localhost/bucket
-	Please enter content (text/plain) to be PUTed:
-	# (Press Ctrl+D here so you don't send any content)
+    #!bash
+    $ lwp-request -m PUT http://localhost/bucket
+    Please enter content (text/plain) to be PUTed:
+    # (Press Ctrl+D here so you don't send any content)
 
 
 이미지 파일을 하나 올려보도록 하겠습니다.
 
-	cat seoulpm_bigger.png | lwp-request -m PUT http://localhost/bucket/seoulpm_bigger.png
+    #!bash
+    $ cat seoulpm_bigger.png | lwp-request -m PUT http://localhost/bucket/seoulpm_bigger.png
 
 텍스트 파일도...
 
-	lwp-request -m PUT http://localhost/bucket/text
-	Please enter content (text/plain) to be PUTed:
-	# (Press Ctrl+D here so you don't send any content)
-	test
+    #!bash
+    $ lwp-request -m PUT http://localhost/bucket/text
+    Please enter content (text/plain) to be PUTed:
+    # (Press Ctrl+D here so you don't send any content)
+    test
 
 파일을 받아봅니다.
 
-	lwp-request http://localhost/bucket/text
+    #!bash
+    $ lwp-request http://localhost/bucket/text
 
 
 이번엔 삭제
 
-	lwp-request -m DELETE http://localhost/bucket/seoulpm_bigger.png
+    #!bash
+    $ lwp-request -m DELETE http://localhost/bucket/seoulpm_bigger.png
 
 
 Admin UI에서 테스트
@@ -476,7 +496,7 @@ http://localhost:9000 으로 들어가서 테스트 해보시면 됩니다. 괜�
 스토리지 노드를 plackup -a etc/storage.psgi -p 8888 이런식으로 실행하고
 있습니다만 실제 GET, HEAD, PUT, DELETE 이외에는 하는일이 없습니다.
 별도의 스토리지 노드 프로세스를 띄울필요 없이 그냥 nginx설정만으로
-스토리지 노드를 만들면 성능과 안정성면에서 훨씬 좋을 것 같습니다. 
+스토리지 노드를 만들면 성능과 안정성면에서 훨씬 좋을 것 같습니다.
 한번 도전해보세요!
 
 
@@ -486,16 +506,16 @@ http://localhost:9000 으로 들어가서 테스트 해보시면 됩니다. 괜�
  * [HOWTO use nginx as a WebDAV server](http://code.google.com/p/mogilefs/wiki/nginx_webdav)
 
 
-[John_Cena]:	http://en.wikipedia.org/wiki/John_Cena
-[Livedoor]:	http://www.livedoor.com/
-[MogileFS]:	http://mogilefs.org/
+[John_Cena]:    http://en.wikipedia.org/wiki/John_Cena
+[Livedoor]:     http://www.livedoor.com/
+[MogileFS]:     http://mogilefs.org/
 
-[IMAGE1]:	800px-John_Cena_performs_STF_against_Mark_Henry.jpg
-[IMAGE2]:	adminuicapture1.png
-[IMAGE3]:	adminuicapture2.png
-[IMAGE4]:	adminuicapture3.png
-[IMAGE5]:	adminuicapture4.png
-[IMAGE6]:	adminuicapture5.png
-[IMAGE7]:	adminuicapture6.png
-[IMAGE8]:	adminuicapture7.png
-[IMAGE9]:	adminuicapture8.png
+[IMAGE1]:   800px-John_Cena_performs_STF_against_Mark_Henry.jpg
+[IMAGE2]:   adminuicapture1.png
+[IMAGE3]:   adminuicapture2.png
+[IMAGE4]:   adminuicapture3.png
+[IMAGE5]:   adminuicapture4.png
+[IMAGE6]:   adminuicapture5.png
+[IMAGE7]:   adminuicapture6.png
+[IMAGE8]:   adminuicapture7.png
+[IMAGE9]:   adminuicapture8.png
