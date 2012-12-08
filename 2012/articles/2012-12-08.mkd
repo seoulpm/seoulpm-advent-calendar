@@ -1,0 +1,501 @@
+Title: STF or "Stepover Toehold Facelock" or "STorage Farm"
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: luzluna
+
+저자
+-----
+
+@luzluna, 그냥 luz luna ...
+
+
+시작하며
+---------
+
+벌써 여덟번째 날이 되었습니다. 오늘 소개하려는것은 STF입니다.
+STF는 원래 프로레스링의 기술 이름입니다. "Stepover Toehold Facelock" 의
+약자인데 번역하면 '발을 걸고난 뒤 얼굴을 건다' 라는 의미입니다.
+주로 마지막 기술로 쓰이는 관절기로써 넘어뜨린 상대의 다리를 다리로 잡은 뒤
+돌아와서 머리를 잡아서 항복을 받아내거나 상대의 스테미너를 깍아내는
+기술입니다. 원래 처음에는 STFU(Shut the Fxxx Up)라는 이름으로 불렸다는데 좀
+순화해서 STF로 이름을 바꿨다는군요. [존 시나][John_Cena] 의 주요 끝내기
+기술이라고 합니다.
+
+[IMAGE1]
+
+정신좀 차리고
+--------------
+
+머엉... 펄 크리스마스 달력 쓴다고 해놓곤 뭔 뻘소리를 하는건지...
+정신좀 차려서 원래 하려던 펄 이야기로 좀 돌아오도록 하겠습니다. STF는 원래
+STorage Farm의 약자로 시작했는지도 모르겠습니다만 처음 프로젝트를 시작한
+사람이 프로레스링 매니아였던 관계로 무시무시한 관절기 이름이 이 소프트웨어에
+달리게 되었습니다.
+
+원래 [Livedoor][Livedoor]에서 블로그나 사진저장 서비스 또는 다른 서비스들에
+이미지를 저장할 목적으로 만들어졌습니다. 4억개의 오브젝트(13억개의 엔티티)를
+저장하고 있으며 전체 스토리지는 70테라바이트, 피크타임에 400Mbps정도의
+트레픽을 처리하고 있다고 합니다. 이렇게 기록된걸 제가 본게 거진 1년전이니까
+지금은 조금 더 늘었겠네요.
+
+MogileFS랑은 뭐가 다르지?
+--------------------------
+
+비슷한 프로젝트로 [MogileFS][MogileFS]라는 녀석이 오래되었고 충분히
+검증되었으며 또 유명합니다. STF의 기본 아이디어는 바로 이 MogileFS에서
+시작했습니다. MogileFS와의 차이점은 외형적으로는 모든 통신을 HTTP로 한다는
+점과 PSGI를 통해 구현되었다는 점입니다. 하지만 내부를 보면 분석하고 수정하기
+힘들던 MogileFS와 달리 STF는 MogileFS의 경험을 살려서 매우 깔끔하게 정리된
+상태로 개발되어있다는 점이 가장 큰 차이점입니다.
+신생 프로젝트임에도 불고하고 신뢰를 가지고 쓸만하다라고 추천하는데에는
+잘 정리된 코드라서 버그가 발생할 가능성이 낮다라는 점과 혹시라도 버그가 
+발생하더라도 적은 노력으로 충분히 Fix가 가능하다라는 점 때문이었습니다.
+
+
+잡소리 그만하고 이제 시작해보죠..
+----------------------------------
+
+일단 github에서 소스를 다운받습니다.
+
+	git clone git://github.com/stf-storage/stf.git
+
+
+STF를 운영하는데 필요한 패키지들 설치
+--------------------------------------
+
+그리고 혹시 필요한 패키지들이 설치되어있지 않다면 mysql, memcached를
+설치합니다.
+
+	apt-get install mysql-server
+
+	apt-get install libmysqlclient-dev
+
+	apt-get install memcached
+
+	apt-get install libwww-perl
+
+	apt-get install nginx
+
+CentOS이라면 아마도 아래와 같이 설치해줍니다.
+
+	yum install mysql-server
+
+	yum install mysql-devel
+
+	yum install memcached
+
+	yum install perl-libwww-perl
+
+nginx설치는 http://wiki.nginx.org/Install 여기를 참고해서...
+
+
+디펜던시가 걸려있는필요한 CPAN 패키지들 설치
+---------------------------------------------
+
+이제 필요한 cpan 패키지들을 설치해줍니다.
+
+DBD::mysql은 테스팅과정에서 오류가 있어서 아래와 같이 cpan쉘에 들어간 후
+notest를 통해 강제로 설치해줍니다.
+
+	$ cpan
+	Terminal does not support AddHistory.
+
+	cpan shell -- CPAN exploration and modules installation (v1.9800)
+	Enter 'h' for help.
+
+	cpan[1]> notest install DBD::mysql
+
+	...
+
+	cpan[1]> exit  
+	Terminal does not support GetHistory.
+	Lockfile removed.
+
+그리고나면 나머지 모듈들은 그냥 주욱 설치해줍니다.
+
+	cpan Mouse
+	cpan Math::Round
+	cpan Parallel::ForkManager
+	cpan Scope::Guard
+	cpan Log::Minimal
+	cpan Furl
+	cpan Cache::Memcached::Fast
+	cpan Data::FormValidator
+	cpan Data::Localize
+	cpan Data::Page
+	cpan Digest::MurmurHash
+	cpan Email::MIME
+	cpan Email::Send
+	cpan HTML::FillInForm::Lite
+	cpan HTTP::Parser::XS
+	cpan Net::SNMP
+	cpan Parallel::Scoreboard
+	cpan Plack
+	cpan Plack::Middleware::Reproxy
+	cpan Plack::Middleware::ReverseProxy
+	cpan Plack::Middleware::Session
+	cpan Plack::Middleware::Static
+	cpan Proc::Guard
+	cpan Router::Simple
+	cpan SQL::Maker
+	cpan STF::Dispatcher::PSGI
+	cpan Starlet
+	cpan String::Urandom
+	cpan YAML
+	cpan Text::Xslate
+	cpan Data::Dumper::Concise
+	cpan Cache::Memcached
+
+휴... 꽤나 오래 걸리네요.
+
+
+Backgroup Job을 위한 Queue 준비
+------------------------------------
+
+STF는 총 3가지 종류의 Queue를 사용할 수 있도록 되어있습니다. 아마도
+livedoor에서 사용중인것으로 보이는 Q4M이 디폴트이고 Perl로 되어있는
+TheSchwartz와 최근에 추가된 Redis를 이용하는 큐인 Resque가 있습니다.
+
+q4m을 이용하는 방법도 나오지만 mysql 5.1버전전용밖에 없는 문제가 있습니다. 대신
+TheSchwartz보다 메모리를 조금 덜 먹는것 장점이 있습니다. Resque는 테스트해보지
+않아서 잘 모르겠지만 Ruby로 되어있어서 일단 무시하고 지나갑니다.
+
+Q4M은 별도로 소프트웨어를 설치해야되고 Mysql이 5.1이상버전은 안되는것같고
+이러저러한 이유로 안되겠고, Resque는 아무래도 2개이상의 언어로 운영환경이 되면
+유지보수에 불편함이 있으니 안되겠습니다.
+
+일단 여기서는 순수하게 Perl로 되어있는 Job Queueing System인 TheSchwartz를
+사용하도록 하겠습니다.
+
+
+일단 cpan으로 TheSchwartz를 설치하구요.
+
+	cpan TheSchwartz
+
+root로 mysql에 로그인하여 
+
+	$ mysql -u root -p mysql
+	Enter password: 
+	Reading table information for completion of table and column names
+	You can turn off this feature to get a quicker startup with -A
+
+	Welcome to the MySQL monitor.  Commands end with ; or \g.
+	Your MySQL connection id is 51
+	Server version: 5.5.28-1 (Debian)
+
+	Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.
+
+	Oracle is a registered trademark of Oracle Corporation and/or its
+	affiliates. Other names may be trademarks of their respective
+	owners.
+
+	Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+	mysql> 
+
+
+TheSchwartz에서 사용할 Database를 생성하구요.
+
+	mysql> create database stf CHARACTER SET = 'utf8';
+	Query OK, 1 row affected (0.00 sec)
+
+
+TheSchwartz에서 사용할 사용자 계정을 추가합니다.
+
+	mysql>  GRANT ALL PRIVILEGES ON stf.* TO stfuser@localhost IDENTIFIED BY 'stfpasswd';
+
+
+권한을 Flush한뒤에
+
+	mysql>  FLUSH PRIVILEGES;
+
+
+일단 TheSchwartz에서 사용할 DB 스키마를 로드합니다.
+스키마 파일은 stf/misc 디렉토리 아래에 stf_schwartz.sql 이런 파일네임으로
+존재합니다.
+
+	$ cd stf/misc
+
+	$ mysql -u stfuser -p stf
+	Enter password: stfpasswd
+
+
+	mysql> source stf_schwartz.sql
+	Query OK, 0 rows affected (0.02 sec)
+
+	...
+
+	Query OK, 0 rows affected (0.02 sec)
+
+
+이왕 DB로그인한거 STF에서 사용할 스키마도 덤으로 로드 합니다. 같은 디렉토리에
+stf.sql이라는 이름으로 들어있습니다.
+
+
+	mysql> source stf.sql
+	Query OK, 0 rows affected (0.03 sec)
+
+	Query OK, 1 row affected (0.00 sec)
+
+	...
+
+	Query OK, 0 rows affected (0.01 sec)
+
+
+
+나중에 Admin UI에서 접근할때 필요한 public uri 정보를 잠시 추가로
+넣어놓습니다.
+
+	mysql> REPLACE INTO config (varname, varvalue) VALUES ("stf.global.public_uri", 'http://localhost');
+
+
+
+이제 실행을 위한 환경설정
+--------------------------
+
+이제 환경을 조금 손보면 실행해볼 수 있습니다!
+
+일단 stf디렉토리로 돌아온 뒤에
+
+	cd ..
+
+STF_HOME을 설정하고
+
+	export STF_HOME=`pwd`
+
+STF가 접속할 id와 password를 설정해줍니다.
+
+	export STF_MYSQL_USERNAME=stfuser
+	export STF_MYSQL_PASSWORD=stfpasswd
+
+TheSchwartz가 사용할 DB와 id, password도 설정해줍니다.
+
+	export STF_QUEUE_TYPE=Schwartz
+	export STF_QUEUE_DSN=dbi:mysql:dbname=stf
+	export STF_QUEUE_USERNAME=stfuser
+	export STF_QUEUE_PASSWORD=stfpasswd
+
+
+Worker 프로세스 실행
+---------------------
+
+이제 스토리지 서비스의 백그라운드 작업을 할 Worker들을 띄웁니다.
+여러 호스트에서 worker를 띄우려면 STF_HOST_ID를 호스트마다 꼭 다르게 설정해야
+됩니다.
+
+	export STF_HOST_ID=1
+	./bin/stf-worker &
+
+
+Admin UI 실행
+--------------
+
+스토리지를 추가하고 관리를 하기위해 Admin UI를 실행합니다. DB에 직접 접속해서
+할수도 있겠지만 그건 귀찮고 어려우니까 당연히 UI를....
+
+기본 설정파일(etc/config.pl) 에는 아래와같이 세션 쿠키에 대한 설정이 특정
+도메인으로 https로 접속할때만 동작하도록 되어있습니다. 별건 아니지만 디폴트가
+일본어라 메뉴 영어로 보려면 쿠키설정을 해야됩니다.
+https와 도메인 설정을 지금 할수는 없으니 설정파일을 일단 아래와 같이
+바꿔줍니다.
+
+    # Session state configuration
+    'AdminWeb::Session::State' => {
+        path => "/",
+        #domain => "admin.stf.your.company.com",
+        expires => 86400,
+        httponly => 1,
+        #secure => 1,
+    },
+
+
+그리고나서 9000번 포트로 Admin 페이지를 띄웁니다.
+
+	plackup -p 9000 -a etc/admin.psgi &
+
+
+[IMAGE2]
+
+
+스토리지 추가
+--------------
+
+뭐 정석은 여러대의 스토리지 노드를 준비해놓고 각각 호스트마다 스토리지
+서비스를 띄우는거겠지만 여기서는 테스트니까 디렉토리 3개 만들고 스토리지
+서비스 3개를 다른포트로 띄워줍니다.
+
+
+	mkdir ../stf_storage1
+	export STF_STORAGE_ROOT=`pwd`/../stf_storage1
+	plackup -a $STF_HOME/etc/storage.psgi -p 8888 &
+
+	mkdir ../stf_storage2
+	export STF_STORAGE_ROOT=`pwd`/../stf_storage2
+	plackup -a $STF_HOME/etc/storage.psgi -p 8889 &
+
+	mkdir ../stf_storage3
+	export STF_STORAGE_ROOT=`pwd`/../stf_storage3
+	plackup -a $STF_HOME/etc/storage.psgi -p 8890 &
+
+
+UI에서 스토리지 구성
+---------------------
+
+Storage Cluster 메뉴에 들어가서 우측 상단의 + 버튼을 눌러서 스토리지 클러스터
+추가
+
+여기서는 ID는 1 Name은 test Mode는 그냥 그대로 rw로 놓고 추가 합니다.
+
+[IMAGE3]
+
+
+이번에는 Storage Nodes 메뉴에 들어가서 Create 버튼을 누른 뒤 아래와 같이
+추가해줍니다.
+
+ID 	URI 			Mode	Cluster
+1 	http://127.0.0.1:8888 	rw	test
+2 	http://127.0.0.1:8889 	rw	test
+3 	http://127.0.0.1:8890 	rw	test
+
+(주의 http://127.0.0.1:8888 IP로 추가해야함. localhost로 넣으면 나중에
+reproxy설정에 dns를 세팅해야되는 문제가 있음 귀찮으니 그냥 IP로...)
+
+[IMAGE4]
+
+
+Dispatcher 실행
+----------------
+이제 실제 파일을 업로드 받거나 다운로드 해주는 Dispatcher를 실행합니다.
+
+	plackup -p 8080 -a /path/to/dispatcher.psgi &
+
+
+ReProxy 설정
+-------------------
+Dispatcher는 파일을 다운받을때 직접 파일을 서빙하지 않고 뒤에 달린 스토리지
+노드에 실제 다운로드 주소만 넘겨주게 됩니다. 그렇기 때문에 실제 사용하려면
+apache나 혹은 nginx의 reproxy기능을 이용해서 사용자가 뒤의 스토리지 노드를
+알아차리지 못하도록 만들어줍니다.
+
+apache mod_reproxy를 사용하는 방법도 있습니다만 일단 여기서는 러시아의 힘을 믿고 nginx로!
+
+/etc/nginx/sites-enabled/default 파일을 열어서 server 설정 끝부분에
+추가해줍니다. nginx패키징에 따라서는 그냥 /etc/nginx/nginx.conf 파일일수도 있겠네요.
+
+	server {
+		...
+		location /bucket {
+		    proxy_pass http://127.0.0.1:8080;
+		}
+
+		location = "/reproxy" {
+		    internal;
+		    #resolver 127.0.0.1; # set up a proper resolver
+		    set $reproxy $upstream_http_x_reproxy_url;
+		    proxy_pass $reproxy;
+		    # inherits Content-Type header
+		    proxy_hide_header Content-Type;
+		}
+	}
+
+
+/bucket 이라는 이름으로 시작하는 경우에만 서빙하도록 설정했습니다. 다른 이름의
+버킷을 이용하려면 별도로 추가해주거나 전용 파일 서비스라면 그냥 / 모든
+디렉토리에 대해 다 걸여주면 됩니다.
+스토리지 노드를 IP가 아닌 localhost혹은 hostname혹은 FQDN으로 주었을 경우
+resolver 위치에 주석을 풀고 제대로 된 DNS값으로 줘야됩니다.
+
+
+	# service nginx restart
+	Restarting nginx: nginx.
+
+
+완성!
+
+
+
+테스트
+-------
+
+일단 bucket이라는 이름으로 버킷을 만들어봅니다. 버킷은 PUT 으로 만들고
+컨텐츠는 없어야 됩니다. 바로 Ctrl+D를 눌러서 빠져나오면 만들어집니다.
+
+	lwp-request -m PUT http://localhost/bucket
+	Please enter content (text/plain) to be PUTed:
+	# (Press Ctrl+D here so you don't send any content)
+
+
+이미지 파일을 하나 올려보도록 하겠습니다.
+
+	cat seoulpm_bigger.png | lwp-request -m PUT http://localhost/bucket/seoulpm_bigger.png
+
+텍스트 파일도...
+
+	lwp-request -m PUT http://localhost/bucket/text
+	Please enter content (text/plain) to be PUTed:
+	# (Press Ctrl+D here so you don't send any content)
+	test
+
+파일을 받아봅니다.
+
+	lwp-request http://localhost/bucket/text
+
+
+이번엔 삭제
+
+	lwp-request -m DELETE http://localhost/bucket/seoulpm_bigger.png
+
+
+Admin UI에서 테스트
+--------------------
+
+http://localhost:9000 으로 들어가서 테스트 해보시면 됩니다. 괜히 귀찮게
+커멘드라인에서 했네...
+
+[IMAGE5]
+버킷 리스트 보기 메뉴
+
+[IMAGE6]
+새 버킷 추가
+
+[IMAGE7]
+버킷 보기
+
+[IMAGE8]
+파일(오브젝트) 올리기 메뉴
+
+[IMAGE9]
+올려진 파일(오브젝트) 관리 메뉴
+
+
+
+도전과제
+---------
+
+스토리지 노드를 plackup -a etc/storage.psgi -p 8888 이런식으로 실행하고
+있습니다만 실제 GET, HEAD, PUT, DELETE 이외에는 하는일이 없습니다.
+별도의 스토리지 노드 프로세스를 띄울필요 없이 그냥 nginx설정만으로
+스토리지 노드를 만들면 성능과 안정성면에서 훨씬 좋을 것 같습니다. 
+한번 도전해보세요!
+
+
+참고문서
+--------
+ * [STF Setup](http://stf-storage.github.com/setup.html)
+ * [HOWTO use nginx as a WebDAV server](http://code.google.com/p/mogilefs/wiki/nginx_webdav)
+
+
+[John_Cena]:	http://en.wikipedia.org/wiki/John_Cena
+[Livedoor]:	http://www.livedoor.com/
+[MogileFS]:	http://mogilefs.org/
+
+[IMAGE1]:	800px-John_Cena_performs_STF_against_Mark_Henry.jpg
+[IMAGE2]:	adminuicapture1.png
+[IMAGE3]:	adminuicapture2.png
+[IMAGE4]:	adminuicapture3.png
+[IMAGE5]:	adminuicapture4.png
+[IMAGE6]:	adminuicapture5.png
+[IMAGE7]:	adminuicapture6.png
+[IMAGE8]:	adminuicapture7.png
+[IMAGE9]:	adminuicapture8.png
