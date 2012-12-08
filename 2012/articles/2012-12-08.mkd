@@ -54,13 +54,13 @@ MogileFS랑은 뭐가 다르지?
 발생하더라도 적은 노력으로 충분히 Fix가 가능하다라는 점 때문이었습니다.
 
 
-잡소리 그만하고 이제 시작해보죠..
+잡소리 그만하고 이제 시작해보죠
 ----------------------------------
 
 일단 github에서 소스를 다운받습니다.
 
     #!bash
-    git clone git://github.com/stf-storage/stf.git
+    $ git clone git://github.com/stf-storage/stf.git
 
 
 STF를 운영하는데 필요한 패키지들 설치
@@ -70,25 +70,25 @@ STF를 운영하는데 필요한 패키지들 설치
 설치합니다.
 
     #!bash
-    apt-get install mysql-server
-    apt-get install libmysqlclient-dev
-    apt-get install memcached
-    apt-get install libwww-perl
-    apt-get install nginx
+    $ apt-get install mysql-server
+    $ apt-get install libmysqlclient-dev
+    $ apt-get install memcached
+    $ apt-get install libwww-perl
+    $ apt-get install nginx
 
 CentOS에서는 아마도 아래와 같이 설치해줍니다.
 
     #!bash
-    yum install mysql-server
-    yum install mysql-devel
-    yum install memcached
-    yum install perl-libwww-perl
+    $ yum install mysql-server
+    $ yum install mysql-devel
+    $ yum install memcached
+    $ yum install perl-libwww-perl
 
 nginx 설치는 [웹사이트 설치 문서](http://wiki.nginx.org/Install)를 참고합니다.
 
 
-디펜던시가 걸려있는필요한 CPAN 패키지들 설치
----------------------------------------------
+의존성있는 CPAN 패키지 설치
+--------------------------------------------
 
 이제 필요한 CPAN 모듈을 설치해줍니다.
 DBD::mysql은 테스팅과정에서 오류가 있어서 아래와 같이 cpan쉘에 들어간 후
@@ -112,43 +112,43 @@ notest를 통해 강제로 설치해줍니다.
 그리고나면 나머지 모듈들은 그냥 주욱 설치해줍니다.
 
     #!bash
-    cpan Mouse
-    cpan Math::Round
-    cpan Parallel::ForkManager
-    cpan Scope::Guard
-    cpan Log::Minimal
-    cpan Furl
-    cpan Cache::Memcached::Fast
-    cpan Data::FormValidator
-    cpan Data::Localize
-    cpan Data::Page
-    cpan Digest::MurmurHash
-    cpan Email::MIME
-    cpan Email::Send
-    cpan HTML::FillInForm::Lite
-    cpan HTTP::Parser::XS
-    cpan Net::SNMP
-    cpan Parallel::Scoreboard
-    cpan Plack
-    cpan Plack::Middleware::Reproxy
-    cpan Plack::Middleware::ReverseProxy
-    cpan Plack::Middleware::Session
-    cpan Plack::Middleware::Static
-    cpan Proc::Guard
-    cpan Router::Simple
-    cpan SQL::Maker
-    cpan STF::Dispatcher::PSGI
-    cpan Starlet
-    cpan String::Urandom
-    cpan YAML
-    cpan Text::Xslate
-    cpan Data::Dumper::Concise
-    cpan Cache::Memcached
+    $ cpan Mouse
+    $ cpan Math::Round
+    $ cpan Parallel::ForkManager
+    $ cpan Scope::Guard
+    $ cpan Log::Minimal
+    $ cpan Furl
+    $ cpan Cache::Memcached::Fast
+    $ cpan Data::FormValidator
+    $ cpan Data::Localize
+    $ cpan Data::Page
+    $ cpan Digest::MurmurHash
+    $ cpan Email::MIME
+    $ cpan Email::Send
+    $ cpan HTML::FillInForm::Lite
+    $ cpan HTTP::Parser::XS
+    $ cpan Net::SNMP
+    $ cpan Parallel::Scoreboard
+    $ cpan Plack
+    $ cpan Plack::Middleware::Reproxy
+    $ cpan Plack::Middleware::ReverseProxy
+    $ cpan Plack::Middleware::Session
+    $ cpan Plack::Middleware::Static
+    $ cpan Proc::Guard
+    $ cpan Router::Simple
+    $ cpan SQL::Maker
+    $ cpan STF::Dispatcher::PSGI
+    $ cpan Starlet
+    $ cpan String::Urandom
+    $ cpan YAML
+    $ cpan Text::Xslate
+    $ cpan Data::Dumper::Concise
+    $ cpan Cache::Memcached
 
 휴... 꽤나 오래 걸리네요.
 
 
-Backgroup Job을 위한 Queue 준비
+백그룹 잡을 위한 큐 준비
 ------------------------------------
 
 STF는 총 3가지 종류의 Queue를 사용할 수 있도록 되어있습니다. 아마도
@@ -168,7 +168,7 @@ Q4M은 별도로 소프트웨어를 설치해야되고 Mysql이 5.1이상버전�
 일단 cpan으로 TheSchwartz를 설치하구요.
 
     #!bash
-    cpan TheSchwartz
+    $ cpan TheSchwartz
 
 root로 mysql에 로그인하여 
 
@@ -255,7 +255,7 @@ TheSchwartz에서 사용할 사용자 계정을 추가합니다.
 
 
 
-이제 실행을 위한 환경설정
+실행을 위한 환경설정
 --------------------------
 
 이제 환경을 조금 손보면 실행해볼 수 있습니다!
@@ -285,7 +285,7 @@ TheSchwartz가 사용할 DB와 id, password도 설정해줍니다.
     export STF_QUEUE_PASSWORD=stfpasswd
 
 
-Worker 프로세스 실행
+워커 프로세스 실행
 ---------------------
 
 이제 스토리지 서비스의 백그라운드 작업을 할 Worker들을 띄웁니다.
@@ -297,7 +297,7 @@ Worker 프로세스 실행
     ./bin/stf-worker &
 
 
-Admin UI 실행
+관리자 UI 실행
 --------------
 
 스토리지를 추가하고 관리를 하기위해 Admin UI를 실행합니다. DB에 직접 접속해서
@@ -469,7 +469,7 @@ resolver 위치에 주석을 풀고 제대로 된 DNS값으로 줘야됩니다.
     $ lwp-request -m DELETE http://localhost/bucket/seoulpm_bigger.png
 
 
-Admin UI에서 테스트
+관리자 UI에서 테스트
 --------------------
 
 [http://localhost:9000](http://localhost:9000)으로 들어가서 테스트 해보시면 됩니다. 괜히 귀찮게
