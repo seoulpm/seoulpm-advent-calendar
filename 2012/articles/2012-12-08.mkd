@@ -22,7 +22,8 @@ STF는 원래 프로레스링의 기술 이름입니다. "Stepover Toehold Facel
 순화해서 STF로 이름을 바꿨다는군요. [존 시나][John_Cena]의 주요 끝내기
 기술이라고 합니다.
 
-[IMAGE1]
+![존 시나의 주요 끝내기 기술][IMAGE1-r]
+*그림 1.* 존 시나의 주요 끝내기 기술 ([원본][IMAGE1])
 
 정신좀 차리고
 --------------
@@ -324,7 +325,8 @@ https와 도메인 설정을 지금 할수는 없으니 설정파일을 일단 �
     plackup -p 9000 -a etc/admin.psgi &
 
 
-[IMAGE2]
+![Admin 페이지][IMAGE2-r]
+*그림 2.* Admin 페이지 ([원본][IMAGE2])
 
 
 스토리지 추가
@@ -357,7 +359,8 @@ Storage Cluster 메뉴에 들어가서 우측 상단의 + 버튼을 눌러서 �
 
 여기서는 ID는 1 Name은 test Mode는 그냥 그대로 rw로 놓고 추가 합니다.
 
-[IMAGE3]
+![스토리지 추가][IMAGE3-r]
+*그림 3.* 스토리지 추가 ([원본][IMAGE3])
 
 
 이번에는 Storage Nodes 메뉴에 들어가서 Create 버튼을 누른 뒤 아래와 같이
@@ -372,7 +375,8 @@ Storage Cluster 메뉴에 들어가서 우측 상단의 + 버튼을 눌러서 �
 (주의: http://127.0.0.1:8888 IP로 추가해야함. localhost로 넣으면 나중에
 reproxy설정에 dns를 세팅해야되는 문제가 있음 귀찮으니 그냥 IP로...)
 
-[IMAGE4]
+![IP 추가][IMAGE4-r]
+*그림 4.* IP 추가 ([원본][IMAGE4])
 
 
 Dispatcher 실행
@@ -471,22 +475,20 @@ Admin UI에서 테스트
 [http://localhost:9000](http://localhost:9000)으로 들어가서 테스트 해보시면 됩니다. 괜히 귀찮게
 커맨드라인에서 했네요.
 
-[IMAGE5]
-버킷 리스트 보기 메뉴
+![버킷 리스트 보기 메뉴][IMAGE5-r]
+*그림 5.* 버킷 리스트 보기 메뉴 ([원본][IMAGE5])
 
-[IMAGE6]
-새 버킷 추가
+![새 버킷 추가][IMAGE6-r]
+*그림 6.* 새 버킷 추가 ([원본][IMAGE6])
 
-[IMAGE7]
-버킷 보기
+![버킷 보기][IMAGE7-r]
+*그림 7.* 버킷 보기 ([원본][IMAGE7])
 
-[IMAGE8]
-파일(오브젝트) 올리기 메뉴
+![파일(오브젝트) 올리기 메뉴][IMAGE8-r]
+*그림 8.* 파일(오브젝트) 올리기 메뉴 ([원본][IMAGE8])
 
-[IMAGE9]
-올려진 파일(오브젝트) 관리 메뉴
-
-
+![올려진 파일(오브젝트) 관리 메뉴][IMAGE9-r]
+*그림 9.* 올려진 파일(오브젝트) 관리 메뉴 ([원본][IMAGE9])
 
 도전과제
 ---------
@@ -508,12 +510,22 @@ Admin UI에서 테스트
 [Livedoor]:     http://www.livedoor.com/
 [MogileFS]:     http://mogilefs.org/
 
-[IMAGE1]:   800px-John_Cena_performs_STF_against_Mark_Henry.jpg
-[IMAGE2]:   adminuicapture1.png
-[IMAGE3]:   adminuicapture2.png
-[IMAGE4]:   adminuicapture3.png
-[IMAGE5]:   adminuicapture4.png
-[IMAGE6]:   adminuicapture5.png
-[IMAGE7]:   adminuicapture6.png
-[IMAGE8]:   adminuicapture7.png
-[IMAGE9]:   adminuicapture8.png
+[IMAGE1]: 2012-12-08-1.jpg
+[IMAGE2]: 2012-12-08-2.png
+[IMAGE3]: 2012-12-08-3.png
+[IMAGE4]: 2012-12-08-4.png
+[IMAGE5]: 2012-12-08-5.png
+[IMAGE6]: 2012-12-08-6.png
+[IMAGE7]: 2012-12-08-7.png
+[IMAGE8]: 2012-12-08-8.png
+[IMAGE9]: 2012-12-08-9.png
+
+[IMAGE1-r]: 2012-12-08-1_r.jpg
+[IMAGE2-r]: 2012-12-08-2_r.png
+[IMAGE3-r]: 2012-12-08-3_r.png
+[IMAGE4-r]: 2012-12-08-4_r.png
+[IMAGE5-r]: 2012-12-08-5_r.png
+[IMAGE6-r]: 2012-12-08-6_r.png
+[IMAGE7-r]: 2012-12-08-7_r.png
+[IMAGE8-r]: 2012-12-08-8_r.png
+[IMAGE9-r]: 2012-12-08-9_r.png
