@@ -1,4 +1,4 @@
-Title: 보다 나은 Perl 개발 환경 for Vim
+Title: 더 나은 Perl 개발환경을 위하여 for Vim
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
