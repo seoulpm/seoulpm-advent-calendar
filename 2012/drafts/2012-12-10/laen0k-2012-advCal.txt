@@ -18,7 +18,7 @@ Wx 모듈 - 크로스 플랫폼 GUI 어플 개발 툴킷으로 윈도, 맥, 리�
 wxPerl::Styles - Wx 그리드 셀 내부 문자를 정렬시켜주기 위한 상수처리를 포함
 
 Wx모듈같은 경우에는 CPAN대신 PPM으로 바이너리 파일들을 받아옵시다.
-(strawberry 5.14.2.1 버전은 상위 버전의 PPM으로 설치해주셔야 ppd를 제대로 읽어오는데 http://sourceforge.net/apps/mediawiki/pdl/index.php?title=Installing_PDL_on_Windows 하단 Installing PPM을 참고하시기 바랍니다)
+(strawberry 5.14.2.1 버전은 상위 버전의 PPM으로 설치해주셔야 ppd를 제대로 읽어오는데 http://sourceforge.net/apps/mediawiki/pdl/index.php?title=Installing_PDL_on_Windows 하단 Installing PPM을 참고하시기 바랍니다.
 
 ppm install 
     http://www.wxperl.co.uk/repo29/Alien-wxWidgets.ppd 
@@ -105,7 +105,7 @@ sub info { shift->{'ship'} }
 sub attrorder { shift->{'attrorder'} }
 sub count{ scalar( keys %{shift->{'ship'}} ) }
 
-정렬을 완료한 함선 배열을 보유한 해쉬 레퍼런스를 반환합니다.
+정렬을 완료하고 함선 배열을 보유한 해쉬 레퍼런스를 반환합니다.
 sub grid_list{
     my ($self, $getCol, $order) = @_;
     my $ship_grid;
@@ -178,7 +178,7 @@ sub new{
     return $self;
 }
 
-여기서는 행, 열, 셀에 각각 들어가야할 배열을 레퍼런스로 받아 그리드를 생성해주게 됩니다. 또한 AutoSize로 시작하는 함수는 문자크기대로 셀크기를 맞춰주고, SetDefault로 시작하는 Alignment는 셀내부 문자의 정렬을 담당하는데 이때 wxPerl::Styles 모듈의 wxVal(가로, 세로)함수가 상수를 옳바로 전달하는 역할을 해줍니다.
+여기서는 행, 열, 셀에 각각 들어가야할 배열을 레퍼런스로 받아 그리드를 생성해주게 됩니다. 또한 AutoSize로 시작하는 함수는 문자크기대로 셀크기를 맞춰주고, SetDefault로 시작하는 Alignment는 셀내부 문자의 정렬을 담당하는데 이때 wxPerl::Styles 모듈의 wxVal함수가 상수를 옳바로 전달하는 역할을 해줍니다.
 sub _init{
     my ($self, $rows, $cols, $cells) = @_;
 
@@ -249,7 +249,7 @@ $app->MainLoop;
 
 [정리하며]
 
-150줄의 이 짧은 코드는 제가 처음으로 제대로 작성해본 코드입니다. 이자리를 빌어 2011 2012 크리스마스를 달력을 통해 perl의 세계로 인도해주신 perl프로그래머 분들께 감사의 인사를 올립니다.
+150줄의 이 짧은 코드는 제가 처음으로 제대로 작성해본 코드입니다. 이자리를 빌어 2011 2012 크리스마스를 달력을 통해 perl의 세계로 인도해주신 perl프로그래머 분들께 감사의 인사를 올리며 이번 2012 크리스마스 펄 달력을 위해 밤낮으로 수고하신 am0c님의 열정에 또한 아낌없는 박수와 감사의 인사를 올리고 싶습니다.
 
 [참고]
 
