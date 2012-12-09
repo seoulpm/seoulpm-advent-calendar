@@ -1,0 +1,100 @@
+Title: 더 나은 Perl 개발환경을 위하여 for Vim
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: JellyPooo
+
+## 저자
+
+[@JellyPooo](http://twitter.com/JellyPooo) -  4일에 이어 다시 등장한 시스템 관리자
+
+## 시작하며
+
+손에 맞는 개발환경은 보다 나은 효율을 약속합니다(꼭 그렇지만은 않습니다. 본말이 전도되어 개발환경을 위한 개발을 하게 되는 [e___s][emacs] 같은 에디터도 있습니다. (전.. emacs에 적응하지 못한 패배자입니다 T_T).
+편집과 실행용 창을 각각 띄우고, 문서 참고를 위해 브라우저 실행해 구글 검색하고 하다보면 원래의 목적을 잊고 인터넷 서핑을 하고 있는 자신을 발견합니다. 개발에 집중하기 위한 환경, 그중에서도 vim을 사용할 때 쓸 수 있는 플러그인을 소개합니다.
+
+## perl-support.vim
+
+[perl-support.vim][ps]는 Perl IDE를 표방한 vim 플러그인입니다.
+설치를 하고나면 `.pl` 파일 등의 펄 관련 파일을 열 때 자동으로 동작하며, 새 파일을 만들 때도 템플릿을 참조하여 기본 뼈대를 만들어줍니다.
+사용 방법을 간략히 소개해 보겠습니다.
+
+### \h: 커서가 위치한 단어의 perldoc 읽기
+
+`\h`를 입력하면 현재 커서가 있는 곳의 단어에 해당하는 perldoc을 엽니다.
+
+![binmode가 뭐야?!][img-1-rs]
+*그림 1.* binmode가 뭐야?! ([원본][img-1])
+
+![커서를 binmode에 둔채 `\h` 입력. 짜잔! perldoc binmode가 출력되었습니다.][img-2-rs]
+*그림 2.* 커서를 binmode에 둔채 `\h` 입력. 짜잔! perldoc binmode가 출력되었습니다. ([원본][img-2])
+
+### \rr: 현재 파일 실행
+
+`\rr`를 입력하면 현재 파일을 저장/실행을 합니다.
+
+![아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!!][img-1-rs]
+*그림 3.* 아까 나온 그 소스. 실행하려고 저장하고 나가서 파일명 입력하기 귀찮아!! ([원본][img-1])
+
+![\rr을 누르면 바로 실행 된다고, 친구.][img-3-rs]
+*그림 4.* `\rr`을 누르면 바로 실행 된다고, 친구. ([원본][img-3])
+
+그 외 실행 관련 단축키에는 다음이 있습니다.
+
+- `\rs`: 파일을 저장합니다. 문법 검사를 합니다. (실행하지는 않음)
+- `\ra`: 인자를 설정합니다. 이후 `\rr` 실행시 설정된 인자를 넘깁니다.
+
+### 주석(Comments) 관련
+
+다음은 주석 관련입니다.
+
+- `\cc`: 현재 줄 혹은 선택한 줄을 주석 처리하거나, 주석이면 주석을 없앱니다.
+- `\cb`: 선택한 블럭을 주석 처리합니다. 블럭 주석 해제는 블럭 안에 커서를 두고 `\cub`를 입력합니다.
+
+### 구문, Idioms 입력
+
+자주 쓰는 구문이나 Idioms를 빠르게 만들어준다.
+
+- `\sfe`: `foreach my $ () { }`를 입력합니다. 커서는 `$` 뒤에 위치합니다.
+- `\si`: `if ( ) { }`를 입력합니다. 커서는 `( )` 안에 위치합니다.
+- `\id`: `my $;`를 입력합니다. 커서는 `\$;`의 사이에 위치합니다.
+
+## 뱀발 vim 플러그인 스크립트를 관리하는 방법 두 가지
+
+그런데, vim 플러그인 스크립트를 그냥 설치하려면 여간 불편한게 아닙니다. 스크립트 업데이트 되면 수동으로 일일히 업데이트 해줘야 하는 문제도 있습니다... 해결책은 무엇일까요?
+_Vimana_ 혹은 _Vundle_을 사용하면 됩니다.
+
+Vimana 모듈을 설치하면 `vimana`란 실행 명령어가 생깁니다. `update`, `search`, `install` 등의 명령 옵션이 제공됩니다.
+자세한 사항은 [문서를 참고](https://www.metacpan.org/module/vimana)하세요.
+
+원래 이 기사는 Vundle을 소개하려고 쓴 글이었는데, a3r0님이 Vimana를 소개해주시는 바람에 뒤로 밀렸습니다.
+자세한 사항은 [KLDP의 vim 문서](http://wiki.kldp.org/wiki.php/VimEditor)를 참고하세요.
+
+## 그 외 팁
+
+- `gg=G`: vim에서 보이는 그대로 입력하면 현재 파일의 코드를 정렬합니다.
+- [perltidy][perltidy]: 코드 자동 정렬 도구입니다. vim에서 `gg=G` 명령이 들여쓰기 정도만 정리한다면, 이것은 Perl Best Practice에서 권고한 코딩 가이드라인에 맞춘 세부적인 설정도 가능합니다. 프로젝트 별로 설정을 가지고, 이것을 잘 지켰는지 검사할 수도 있습니다.
+- [Padre](http://padre.perlide.org/): Perl로 구현된 GUI Perl IDE입니다. Windows, Linux, OS X 등에서 작동합니다.
+
+## 정리하며
+
+**치명적인 단점**: 주석 처리나 블럭 자동 닫기 등 다양한 기능을 제공하기 때문에, 한 번 맛들이면 perl-support.vim 없는 vim에서 Perl 개발이 매우 어색하고 불편할 지경에 이를 수도 있습니다!
+
+## 참고
+
+다음의 문서를 읽으시면 여기에서 다루지 않은 더 많은 기능에 대해 알아볼 수 있습니다.
+
+- [The help file online](http://lug.fh-swf.de/vim/vim-perl/perlsupport.html)
+- [The key mappings of this plugin (PDF)](http://lug.fh-swf.de/vim/vim-perl/perl-hot-keys.pdf)
+
+[emacs]: http://www.gnu.org/software/emacs/
+[ps]: http://www.vim.org/scripts/script.php?script_id=556
+[perltity]: http://perltidy.sourceforge.net/
+
+[img-1]: 2012-12-09-01.png
+[img-2]: 2012-12-09-02.png
+[img-3]: 2012-12-09-03.png
+[img-1-rs]: 2012-12-09-01_r.png
+[img-2-rs]: 2012-12-09-02_r.png
+[img-3-rs]: 2012-12-09-03_r.png
+
