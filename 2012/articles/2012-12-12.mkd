@@ -1,48 +1,62 @@
-Title:    내겐 너무 어려운 PT
+Title:    내겐 너무 어려운 슬라이드
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
 Author:   rumidier
 
+
 저자
 -----
 
-[@rumidier][author] -
-흔한 병대라 불린다.
+[@rumidier][twitter-rumidier] -
+초보 Perler. rumidier 또는 병대라고 불리운다.
+
 
 시작하며
 ---------
 
-청중이 듣기만 해서는 발표자가 과연 무슨 말을 하는가를
-이해하는것은 결코 쉽지 않습니다.
-그래서 발표 자료가 필요하고 발표자는 발표 자료를 만듭니다.
-하지만 누군가는 발표 자료를 만드는것이 결코 쉽지 않습니다.
-그 어떠한 훌륭한 프로그램이 있더라도 사용하지 못하면 아무짝에도
-쓸모가 없습니다. 그런 사람(저를 위한)을 위한 `Vroom`을 알아 보겠습니다.
+파워포인트, 키노트, 프레지... 세상에는 정말 훌륭한 슬라이드 저작 도구가 많습니다.
+한 해, 한 해 거듭할 수록 이런 도구들이 지원하는 효과는 화려해지고 미려해집니다.
+하지만 그에 비해 익혀야 할 기능은 많고, 메뉴 목록을 보면 숨이 '턱'하니 막힐 것 같습니다.
+간단한 발표자료를 만들기 위해 발표자료 저작 도구를 공부해야 한다니...
+무릇 당연한 일 같지만, 또 한편으로는 무언가 비효율적인 것 같습니다.
+Perl 해커 중 한 명인 [Ingy döt Net][cpan-ingy]가 만든 [Vroom][cpan-vroom]은
+그야말로 저와 같은 사람을 위한 슬라이드 저작 도구입니다!
+자, 출발해볼까요? 부릉부릉~~ :)
+
 
 준비물
------
+-------
 
 필요한 모듈은 다음과 같습니다.
 
 - [CPAN의 Vroom 모듈][cpan-vroom]
 
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Vroom
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+`perlbrew`를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Vroom
+
+
 사용방법
--------
+---------
 
-`vroom`은 `vim`에서 슬라이드가 넘어가듯이 동작이 이루어 지게 됩니다.
-`vim`에서 동작하는 만큼 키를 정의 해주어야 합니다. 해주지 않으면 페이지
-넘김이 정삭적으로 동작 하지 않습니다.
-
-`.vimrc`에 `set exrc`를 추가해 주도록 합니다.
+Vroom은 Vim을 이용해서 슬라이드를 화면에 보여줍니다.
+Vroom을 사용하기 위해 `.vimrc`에 `set exrc`를 추가합니다.
 
     #!bash
     $ vi ~/.vimrc
 
     set exrc
 
-`vroom`이 성공적으로 설치 됐다면 `vroom -new`으로 `slieds.vroom` 파일을 생성 되며
-`slieds.vroom`안에는 기본적인 사용법이 나와 있습니다.
+Vroom을 설치했으므로 `vroom` 유틸리티를 사용해서 슬라이드를 생성할 수 있습니다.
 
     #!bash
     $ mkdir Vroom
@@ -51,9 +65,10 @@ Author:   rumidier
     $ ls
     slides.vroom
 
-slides.vroom 내용
+자동으로 생성된 `slieds.vroom` 파일은 Vroom의 기본적인 사용법이
+Vroom의 문법을 이용해서 기술 되어 있습니다.
 
-    #!text
+    #!plain
     ---- config
     # These are YAML settings for Vroom
     title: My Spiffy Slideshow
@@ -63,58 +78,71 @@ slides.vroom 내용
     # auto_size: 1  # Determines height/width automatically
     ---- center
     My Presentation
-     
+    
     by Ingy
     ----
     == Stuff I care about:
-     
+    
     * Foo
     +* Bar
     +* Baz
     ---- perl,i10
     # Perl code indented 10 spaces
     use Vroom;
-     
+    
     print "Hello World";
     ---- center
     THE END
 
-`vroom` 실행하기
+Vroom 슬라이드를 시작하려면 다음 명령을 실행합니다.
 
     #!bash
     $ vroom -vroom
 
+
 Vroom 기능 알아보기
----------------
+--------------------
 
-화면 조절을 위한 주석 제거
+### 설정
 
+화면을 조절하려면 다음 설정을 추가합니다.
+
+    #!plain
     auto_size: 1
 
-`---- config`항목에 해당 되며 전 페이지 하단에 표기 됩니다.
+`---- config` 항목에 해당 되며 전 페이지 하단에 표기 됩니다.
 
+    #!plain
     title: Waht! Vroom?
+
+
+### 페이지
 
 새로운 페이지를 추가해 줍니다.
 
+    #!plain
     ----
 
 전달할 내용를 페이지 중앙에 배치 합니다.
 
+    #!plain
     ----  center
     Slide Show In Vim
 
 페이지별 제목은 다음과 같습니다.
 
+    #!plain
     ==  Page Title
 
 여러가지 언어의 문법을 강조 해서 보여 줄수 있습니다.
 
+    #!plain
     perl,ruby,python,php,javascript,
     haskell,actionscript,html,yaml,xml,json,make,shell,diff
 
 문법 강조시 들여쓰기 칸수를 조정 할수 있습니다.
 
+    #!plain
     ---- perl,i4
     use Vroom;
     
@@ -122,115 +150,115 @@ Vroom 기능 알아보기
 
 `+`기호를 통해서 화면 이동시 한줄씩 출력 되도록 합니다.
 
+    #!plain
     * Foo
     +* Bar
     +* Baz
 
-화면 넘김 키 입니다.
+Vroom에서 사용하는 키 바인딩은 다음과 같습니다.
 
-    <SPACE>
+- `<SPACE>`: 다음 페이지
+- `<BACKSPACE>`: 이전 페이지
+- `QQ`: 종료
 
-화면 뒤로 넘기기 키 입니다.
+Vroom은 소개한 것 이외에도 다양한 기능을 제공합니다.
+자세한 내용은 공식 문서를 참조하세요.
 
-    <BACKSPACE>
 
-PT 종료
+슬라이드 제작
+--------------
 
-    QQ
-
-Vroom 작성해 보기
----------------
-
-이전에 명시된 Vroom 기능 말고도 더 있지만 거의 쓰이지는 않습니다. 위에 나열된
-기능들을 가지고 PT를 만들어 보도록 하겠습니다.
+자, 이제 슬라이드를 만들어보죠.
 
 기본 페이지 작성
 
-    #!text
+    #!plain
     ---- config
-    title: You PT Title
+    title: You Slide Title
     indent: 5
     height: 18
     width: 69
     auto_size: 1
     skip: 0
-
+    
     ---- center
     THE END
 
-대문 페이지 작성을 위해
-`skip: 0`과 `---- center` 사이에 추가해 줍니다.
+첫 페이지를 작성 하기위해 `skip: 0`과 `---- center` 사이에 내용을 추가합니다.
 
-    #!text
+    #!plain
     ---- center
     == Slide Show In Vim
     by rumidier
 
-페이지-2는 화면 이동시 한줄씩 문장이 추가 되는 화면을 작성합니다.
+`+`를 이용하면 순차적으로 목록을 보여줍니다.
 
-    #!text
+    #!plain
     ---- center
     == Add line
     * Foo
     +* Bar
     +* Baz
 
-페이지-3에는 펄 코드를 넣어 보도록 하겠습니다.
+이번에는 펄 코드를 넣어 보죠.
 
-    #!text
+    #!plain
     ---- perl,i4
     use Vroom;
     
     print "Hello, Vroom!";
 
-예제 작성후 실행 시켜 보면 다음과 같이 개인 `vim`설정 화면이 그대로 노출 됩니다.
-글씨도 작고 라인넘버도 보기 불편 합니다. 수정 해보도록 합니다.
+예제 작성후 실행 시켜 보면 개인 `vim`설정 화면이 그대로 노출 됩니다.
+글씨도 작고 줄번호 때문에 보기가 불편 합니다.
+수정해봅시다.
 
-![vim 설정 없음][img-01]
-*그림 1.* 개인 설정 vim
+![vim 설정][img-01]
 
-라인넘버와 하단 `vim` 정보를 보여주지 않게 합니다. 이 코드를 `skip: 0` 아래에 추가
-하도록 합니다.
+라인넘버와 하단 `vim` 정보를 보여주지 않도록 설정합니다.
+다음 내용을 `skip: 0` 아래에 추가합니다.
 
-    #!text
+    #!plain
     vimrc: |
       set nonu
       set noruler
 
-글자 크기는 마땅한 방법이 없습니다. 사용자 화면에 맞게 `vim` 크기를 늘려 주도록 합니다.
+터미널을 사용한다면 vim에서 글자 크기를 조정할 마땅한 방법은 없습니다.
+사용하는 터미널의 설정을 이용해서 모니터 크기에 맞게 터미널의 폰트 크기를 조정합니다.
 
-![vim 설정 추가][img-02]
-*그림 2.* Vroom 설정 추가
+![vroom 설정][img-02]
 
-만들고 보니 상단에 커서가 신경 쓰이기 시작 합니다.
-수정 해보도록 하겠습니다. 커서를 없에는 방법 보다는
-제목으로 나오도록 `set noruler` 밑에 옵션을 추가 합니다.
+만들고 보니 상단에 커서가 신경쓰이는군요.
+커서를 없애기보다 제목으로 활용할 수 있도록
+`set noruler` 아래에 옵션을 추가합니다.
 
-    #!text
+    #!plain
     map <SPACE> :n<CR>:<CR>ggddiPerl-Advent2012: Look at That!<CR><ESC>:w<CR>gg<C-L>
     map <BACKSPACE> :N<CR>:<CR>gg
 
-![페이지 타이틀][img-03]
-*그림 3.* 페이지 제목 추가
+![페이지 제목 추가][img-03]
 
-Vroom 단점
--------------------
 
-Vroom에는 두가지 단점이 존재 합니다.
+Vroom -> PDF
+-------------
+
+Vroom의 단점은 다음과 같습니다.
 
     - 텍스트만 표현 가능
     - 개인 컴퓨터에 최적화
 
-Vroom의 단점을 회피 하기 위해서는 파일을 `PDF`화 하는 방법이 있습니다.
-사진을 추가하기 위해  확인이 쉽도록 페이지에 제목을 추가해 주도록 합니다.
+Vroom의 단점을 극복하기 위해, 즉 사진을 넣거나 다른 컴퓨터에서도
+볼 수 있도록 하기위해 PDF로 변환해보죠.
+사진을 추가할 위치에 제목을 추가합니다.
+일종의 플레이스 홀더인 셈이죠.
 
-    #!text
+    #!plain
     ---- center
     == [사진 - 예쁜표정]
 
-`PDF`파일로 변환하기 위해 화면을 스크린 캡쳐합니다.
-
-`Mac`에서 `command+shift+3`키로 화면별 캡처를 합니다.
+Vroom이 자체적으로 PDF로 변환하는 기능을 제공하지 않으므로
+각각의 슬라이드 페이지를 그림 파일로 저장해서 묶으면 어떨까요?
+Mac을 사용한다면 `Cmd + Shift + 3`를 이용해서 화면을 갈무리할 수 있습니다.
+화면 갈무리가 모두 끝나면 페이지 개수 만큼(많은) 파일이 생깁니다.
 
     #!bash
     $ ls
@@ -242,61 +270,61 @@ Vroom의 단점을 회피 하기 위해서는 파일을 `PDF`화 하는 방법�
     스크린샷 2012-12-06 오후 12.17.27.png
     스크린샷 2012-12-06 오후 12.17.29.png
 
-파일 교체을 위해 복잡한 파일명을 수정 합니다.
+파일 명이 너무 길죠? 
+사진이나 이미지를 추가하려면 파일명과 페이지 번호가 일치하면 수정하기가 편할 것입니다.
+파일명을 페이지 번호와 일치하게 변경하려면 다음 명령을 실행합니다.
 
      #!bash
-     $ rename 's/^.*(.{11})$/$1/' *.png
-     $ ls
-     2.17.21.png	2.17.23.png    2.17.24.png	2.17.25.png	2.17.26.png	2.17.27.png	2.17.29.png
-     $ perl -e '$count=0; system("mv $_ " . sprintf("%02d", ++$count) . ".png" ) for (@ARGV);' *
+     $ perl -e '$count=0; rename $_, sprintf("%02d.png", ++$count) for @ARGV;' *
      $ ls
      01.png	02.png	03.png	04.png	05.png	06.png  07.png
 
-2번의 과정을 거쳐서 순서대로 파일명을 변경 하였습니다.
-굳이 파일명을 변경한 이유는 사진을 적용할 페이지를 쉽게 찾아 수정 하기 위해서 입니다.
-
-`05.png` 파일이 사진과 교체할 화면 입니다. 해당 하는 사진을 파일명에 복사합니다.
+`05.png` 파일이 그림 파일과 교체할 페이지입니다.
 
     #!bash
     $ mv pretty.png 05.png
 
-발표 자료는 모두 준비 되었습니다. PDF로 변환하기 위해서는
-`imagemagick`이 필요합니다.
 
-imagemagick 설치
----------------
+PDF 변환 하기
+--------------
 
-ubuntu
+모든 준비는 끝났습니다.  이제 PDF로 변환할 일만 남았죠.
+[ImageMagick][home-imagemagick]의 `convert` 도구를 사용하면 간단히 PDF로 변환할 수 있습니다.
+
+데비안 계열의 운영체제를 사용한다면 다음 명령을 이용해서 ImageMagick을 설치합니다.
 
     #!bash
     $ sudo apt-get install imagemagick
 
-mac
+Mac을 사용한다면 다음 명령으로 설치합니다.
 
     #!bash
     $ brew install imagemagick
 
-`imagemagick`이 정상적으로 설치 되면 `convert`를 사용할수 있습니다.
-
-PDF 변환 하기
-------------
+변환은 `convert` 도구를 이용합니다.
 
      #!bash
      $ ls
      01.png	02.png	03.png	04.png	05.png	06.png  07.png
-     $ convert *.png Vroom.pdf
+     $ convert *.png my-first-slide.pdf
      $ ls
-     01.png	02.png	03.png	04.png	05.png	06.png  07.png Vroom.pdf
+     01.png	02.png	03.png	04.png	05.png	06.png  07.png my-first-slide.pdf
+
 
 마치며
------
+-------
 
-Vroom은 발표자료를 만들수 있는 기타 다른 프로그램 보다 기능이 많고 화려하지도 않습니다.
-다만 짧은 시간 안에 필요한 내용만 간략하게 담아 발표 자료를 만들수는 있습니다.
-자료 만드는데 익숙치 않다면 발표 자료를 만드는것 또한 많은 심력과 시간을 낭비 합니다.
-다른 툴이 익숙치 않다면 Vroom 한번 써보시는것 어떻습니까? :D
+Vroom은 키노트나 파워포인트 등에 비하면 기능이 많거나 화려하진 않습니다.
+하지만 짧은 시간 안에 필요한 내용을 집중적으로 담기에는 부족함이 없습니다.
+GUI 도구가 익숙하지 않아 불편하거나, 발표 내용 이외의 것들로 골머리를 앓는 것이
+지긋지긋하다면 Vroom을 한번 써보는것은 어떨까요? :D
 
-[cpan-vroom]: https://metacpan.org/module/Vroom
-[img-01]: 2012-12-12-01.png
-[img-02]: 2012-12-12-02.png
-[img-03]: 2012-12-12-03.png
+
+[img-01]:   2012-12-12-01.png
+[img-02]:   2012-12-12-02.png
+[img-03]:   2012-12-12-03.png
+
+[cpan-ingy]:                https://metacpan.org/author/INGY
+[cpan-vroom]:               https://metacpan.org/module/Vroom
+[home-imagemagick]:         http://www.imagemagick.org/
+[twitter-rumidier]:         http://twitter.com/#!/rumidier
