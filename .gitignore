@@ -1,3 +1,6 @@
 /advent.ini
 /advent-*.ini
 output-*
+
+# editor swap file
+*.swp
