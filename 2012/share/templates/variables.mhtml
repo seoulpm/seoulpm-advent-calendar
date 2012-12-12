@@ -59,6 +59,7 @@ return {
         'gypark'       => 'profile_gypark.jpg',
         'hazzling'     => 'profile_hazzling.jpg',
         'ja3ck'        => 'profile_ja3ck.jpg',
+        'laen0k'       => 'profile_laen0k.jpg',
         'JEEN_LEE'     => 'profile_JEEN_LEE.jpg',
         'JellyPooo'    => 'profile_JellyPooo.jpg',
         'keedi'        => 'profile_keedi.jpg',
@@ -73,6 +74,7 @@ return {
         'sng2c'        => 'profile_sng2c.jpg',
         'y0ngbin'      => 'profile_y0ngbin.jpg',
         'Jeffrey Kegler' => 'profile_jeffreykegler.jpg',
+        'Yoshinori Matsunobu' => 'profile_yoshinori.jpg',
       },
     advent_links => [
         {
