@@ -5,10 +5,10 @@
 <div id="foot">
   <div class="indent">
     <ul class="detail">
-      <li><a href="http://perl.kr" target="_blank">펄.kr</a>
-      <li><a href="/2011#openbook" target="_blank">크리스마스 달력이란</a>
-      <li><a href="/2010" target="_blank">펄 크리스마스 달력 #2010</a>
-      <li><a href="/2011" target="_blank">펄 크리스마스 달력 #2011</a>
+      <li><a href="http://perl.kr" target="_blank">펄.kr</a></li>
+      <li><a href="/2011#openbook" target="_blank">크리스마스 달력이란</a></li>
+      <li><a href="/2010" target="_blank">펄 크리스마스 달력 #2010</a></li>
+      <li><a href="/2011" target="_blank">펄 크리스마스 달력 #2011</a></li>
     </ul>
     <ul class="like">
       <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2012/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
