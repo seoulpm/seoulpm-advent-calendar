@@ -1,4 +1,4 @@
-Title:    NoSQL으로서 MySQL 사용하기 - 일반 서버로 초당 750000 쿼리를 초과한 이야기
+Title:    NoSQL으로서 MySQL 사용하기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -8,7 +8,7 @@ Author:   Yoshinori Matsunobu
 
 [Yoshinori Matsunobu](http://www.blogger.com/profile/14180479977952026421)
 
-## 시작하며
+## 시작하며 - 일반 서버로 초당 750000 쿼리를 초과한 이야기
 
 대부분의 대규모 웹 응용프로그램들은 MySQL과 memcached를 사용합니다.
 그 중 대부분은 TokyoCabinet/Tyrant 같은 NoSQL도 사용하고 있습니다.
@@ -538,7 +538,7 @@ HandlerSocket 플러그인은 오픈소스이니, 마음껏 사용하시기 바�
 
 ## 옮기며
 
-이 글의 원문은 [요시노리 마쯔노부의의 블로그 포스트][origin]입니다.
+이 글의 원문은 [요시노리 마쯔노부의 블로그 포스트][origin]입니다.
 역자는 [@jachin24][jachin]입니다.
 
 
