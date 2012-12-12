@@ -536,10 +536,15 @@ HandlerSocket 플러그인은 오픈소스이니, 마음껏 사용하시기 바�
 어떠한 피드백이라도 감사합니다.
 
 
-## 역자
+## 옮기며
 
-[@jachin]()
+이 글의 원문은 [요시노리 마쯔노부의의 블로그 포스트][origin]입니다.
+역자는 [@jachin24][jachin]입니다.
 
+
+
+[origin]: http://yoshinorimatsunobu.blogspot.kr/search/label/handlersocket
+[jachin]: https://twitter.com/jachin24
 
 [img-1]: 2012-12-12-1.png
 [img-resize-1]: 2012-12-12-1_r.png
