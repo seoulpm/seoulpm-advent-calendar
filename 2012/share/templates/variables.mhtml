@@ -74,6 +74,7 @@ return {
         'sng2c'        => 'profile_sng2c.jpg',
         'y0ngbin'      => 'profile_y0ngbin.jpg',
         'Jeffrey Kegler' => 'profile_jeffreykegler.jpg',
+        'Yoshinori Matsunobu' => 'profile_yoshinori.jpg',
       },
     advent_links => [
         {
