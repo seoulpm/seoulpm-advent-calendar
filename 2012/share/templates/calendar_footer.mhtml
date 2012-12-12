@@ -9,15 +9,23 @@
       <li><a href="/2011#openbook" target="_blank">크리스마스 달력이란</a></li>
       <li><a href="/2010" target="_blank">펄 크리스마스 달력 #2010</a></li>
       <li><a href="/2011" target="_blank">펄 크리스마스 달력 #2011</a></li>
-    </ul>
-    <ul class="like">
-      <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2012/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
-      <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2012%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
+      <li><a href="http://www.perladvent.org/2012/" target="_blank">Perl Advent Calendar</a></li>
+      <li><a href="http://perl6advent.wordpress.com/" target="_blank">Perl 6 Advent Calendar</a></li>
+      <li><a href="http://advent.perldancer.org/2012" target="_blank">Perl Dancer Advent Calendar</a></li>
+      <li><a href="http://www.catalystframework.org/calendar/2012" target="_blank">Perl Catalyst Advent Calendar</a></li>
+      <li><a href="http://jptrans.naver.net/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2012/hacker/" target="_blank">Japanese Hacker Advent Calendar</a></li>
+      <li><a href="http://jptrans.naver.net/j2k_frame.php/korean/perl-users.jp/articles/advent-calendar/2012/casual/" target="_blank">Japanese Casual Advent Calendar</a></li>
+      <li><a href="http://iinteractive.github.com/OX/advent/" target="_blank">Ox Advent Calendar</a></li>
+      <li><a href="http://sysadvent.blogspot.com/" target="_blank">System Admin Advent Calendar</a></li>
     </ul>
     <ul class="icon">
       <li><a href="/2012/atom.xml"><img src="feed.png"></a></li>
       <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
       <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
+    </ul>
+    <ul class="like">
+      <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2012/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
+      <li class="fb"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2012%2F&amp;send=false&amp;layout=standard&amp;width=280&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe></li>
     </ul>
     <p class="copyright"><& copyright.mhtml &></p>
   </div>

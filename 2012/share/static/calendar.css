@@ -41,7 +41,7 @@
 #foot {
     position: relative;
     width: 706px;
-    height: 348px;
+    height: 548px;
     margin-top: 15px;
     margin-bottom: 16px;
     background: url("camel.png") no-repeat scroll 330px 0 transparent;
@@ -58,19 +58,20 @@
     padding-left: 28px;
     background: url("bullet2.gif") no-repeat 0 6px transparent;
 }
-#foot ul.like {
-    margin-top: 30px;
-    list-style: none;
-}
 #foot ul.icon {
-    position: absolute;
-    display: block;
-    bottom: 21px;
+    margin-top: 30px;
     list-style: none;
 }
 #foot ul.icon li {
     float: left;
     margin-right: 10px;
+}
+#foot ul.like {
+    position: absolute;
+    display: block;
+    list-style: none;
+    top: 390px;
+    left: 400px;
 }
 #foot .copyright {
     position: absolute;
