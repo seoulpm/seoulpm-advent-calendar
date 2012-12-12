@@ -74,6 +74,9 @@
 .nav ul.like li {
     display: inline-block;
 }
+.nav.bottom menu {
+    margin-bottom: 30px;
+}
 h1, h2, h3, h4 {
     display: block;
     font-family: 'NanumMyeongjoExtraBoldWeb';
@@ -157,7 +160,7 @@ h3 {
     font-size: 0.8em !important;
 }
 #foot {
-    margin-top: 12px;
+    margin-top: 80px;
     margin-bottom: 12px;
 }
 #foot .copyright {
