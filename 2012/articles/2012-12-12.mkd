@@ -174,9 +174,8 @@ MySQL 내부 스토리지 API를 사용하여 직접적으로 InnoDB에 접근�
 저의 대학에선 Akira Higuchi가 다른 플러그인인 HandlerSocket을 만들었습니다.
 아래의 그림은 HandlerSocket이 무엇을 하는지 보여주는 그림입니다.
 
-http://4.bp.blogspot.com/__ybECuKG5tc/TLqWDlJxDNI/AAAAAAAAACQ/bOq6w5Q5nYc/s1600/mysql_HandlerSocket.png
-
-< 그림 1 > HandlerSocket이란 무엇인가?
+![HandlerSocket이란 무엇인가?][img-resize-1]
+*그림 1.* HandlerSocket이란 무엇인가? ([확대][img-1], [원본][img-origin-1])
 
 HandlerSocket은 NoSQL과 같이 MySQL을 사용할 수 있는 MySQL 데몬 플러그인입니다.
 HandlerSocket의 가장 큰 목적은 SQL 관련 오버헤드 없이 InnoDB 와 같은 저장소 엔진과 통신하는 것입니다.
@@ -194,9 +193,8 @@ memcached는 점진적으로 데이터베이스 기록을 캐쉬하는데에 사
 만약 HandlerSocket이 memcached만큼이나 빠르게 레코드들을 불러올 수 있다면,
 레코드들을 기록하는데에 memcached를 사용할 필요가 없습니다.
 
-http://1.bp.blogspot.com/__ybECuKG5tc/TLqV2t9GeeI/AAAAAAAAACI/e8knOF_enPM/s1600/mysql_memcached.png
-
-<그림 2> MySQL + memcached 에 대한 공통 구조 패턴
+![MySQL + memcached 에 대한 공통 구조 패턴][img-resize-2]
+*그림 2.* MySQL + memcached 에 대한 공통 구조 패턴 ([확대][img-2], [원본][img-origin-2])
 
 ## HandlerSocket 사용하기
 
@@ -541,3 +539,12 @@ HandlerSocket 플러그인은 오픈소스이니, 마음껏 사용하시기 바�
 ## 역자
 
 [@jachin]()
+
+
+[img-1]: 2012-12-12-1.png
+[img-resize-1]: 2012-12-12-1_r.png
+[img-origin-1]: http://4.bp.blogspot.com/__ybECuKG5tc/TLqWDlJxDNI/AAAAAAAAACQ/bOq6w5Q5nYc/s1600/mysql_HandlerSocket.png
+
+[img-2]: 2012-12-12-2.png
+[img-resize-2]: 2012-12-12-2_r.png
+[img-origin-2]: http://1.bp.blogspot.com/__ybECuKG5tc/TLqV2t9GeeI/AAAAAAAAACI/e8knOF_enPM/s1600/mysql_memcached.png
