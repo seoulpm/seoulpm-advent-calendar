@@ -8,21 +8,20 @@ Author:   Yoshinori Matsunobu
 
 [Yoshinori Matsunobu](http://www.blogger.com/profile/14180479977952026421)
 
-
 ## 시작하며
 
-대부분의 대규모 웹 응용프로그램들은 MySQL과 memcached 를 사용합니다.
+대부분의 대규모 웹 응용프로그램들은 MySQL과 memcached를 사용합니다.
 그 중 대부분은 TokyoCabinet/Tyrant 같은 NoSQL도 사용하고 있습니다.
 몇몇 경우, 사람들은 MySQL을 배제하고, NoSQL과 구분해두었습니다.
 NoSQL이 MySQL보다 primary key 검색과 같은 단순 접근 패턴에서 훨씬 뛰어나다는 이유로 말입니다.
-웹 응용프로그램들로부터 받는 대부분의 쿼리들은 단순하기 때문에,
+웹 응용프로그램들로부터 받는 대부분의 쿼리는 단순하기 때문에
 이러한 결정이 합리적인 판단으로 보입니다.
 
-다른 대규모 웹 사이트들처럼, DeNA도 몇 년 동안 동일한 문제를 갖고 있었습니다.
+다른 대규모 웹 사이트들처럼 DeNA도 몇 년 동안 동일한 문제를 갖고 있었습니다.
 그러나 우리는 다른 결과에 도달하였습니다.
-지금도 우리는 "MySQL만" 사용하고 있습니다.
+지금도 우리는 *MySQL만* 사용하고 있습니다.
 물론 프론트엔드 캐쉬(예를 들어 전처리된 HTML, 조회/미리보기 정보 등)에서는 아직 memcached를 사용하고 있습니다.
-그러나 여러 행들을 캐쉬하는데에는 사용하지 않습니다.
+그러나 여러 행을 캐쉬하는데에는 사용하지 않습니다.
 또한 NoSQL도 사용하고 있지 않습니다. 왜냐고요?
 그건 우리가 MySQL에서 다른 NoSQL 제품들보다 더 나은 성능을 얻어낼 수 있었기 때문입니다.
 우리는 벤치마크에서 통상 MySQL/InnoDB 5.1 서버와 원격 웹 클라이언트로부터
@@ -49,13 +48,12 @@ MySQL은 얼마나 빨리 PK 검색을 실행할 수 있을까요? 벤치마킹 
 sysbench, super-smack, mysqlslap 등과 같은 프로그램으로부터
 동시다발적인 쿼리들을 실행하면 됩니다.
 
-
     #!plain
     [matsunobu@host ~]$ mysqlslap --query="select user_name,..  
     from test.user where user_id=1" \ 
     --number-of-queries=10000000 --concurrency=30 --host=xxx -uroot
 
-여러분은 다음 방법으로 1초당 얼마나 많은 InnoDB 행들을 읽었는지 확인할 수 있습니다.
+여러분은 다음 방법으로 1초당 얼마나 많은 InnoDB 행을 읽었는지 확인할 수 있습니다.
 
     #!plain
     [matsunobu@host ~]$ mysqladmin extended-status -i 1 -r -uroot \
@@ -72,7 +70,7 @@ sysbench, super-smack, mysqlslap 등과 같은 프로그램으로부터
 
 초당 10만개 이상의 쿼리들을 처리하는 것이 나쁜 성능은 아니지만,
 memcached에 비하면 무척 느린 것입니다. MySQL은 실제로 무엇을 했을까요?
-vmstat 출력을 보면, %user와 %system에 대한 수치는 무척 높습니다.
+`vmstat` 출력을 보면, `%user`와 `%system`에 대한 수치는 무척 높습니다.
 
     #!plain
     [matsunobu@host ~]$ vmstat 1
@@ -102,11 +100,11 @@ Oprofile 출력은 어디에서 CPU 자원들을 소비했는지 더 자세히 �
     46957     0.8190  vmlinux                  .text.elf_core_dump
     46499     0.8111  libc-2.5.so              malloc
 
-MYSQLparse()와 MYSQLlex()는 SQL 분석 부분에서 호출합니다.
-make_join_statistics() 와 JOIN::optimize()는 쿼리 최적화 부분에서 호출합니다.
-이것들은 "SQL" 오버헤드들입니다.
+`MYSQLparse()`와 `MYSQLlex()`는 SQL 분석 부분에서 호출합니다.
+`make_join_statistics()`와 `JOIN::optimize()`는 쿼리 최적화 부분에서 호출합니다.
+이것들은 _SQL의_ 오버헤드입니다.
 이것은 명백히 대부분의 SQL 레이어가 원인이 되어 성능을 떨어뜨리는 것이지,
-"Inno DB(스토리지)" 레이어에 의하여 성능이 떨어지는 것은 아닙니다.
+_Inno DB(스토리지)_ 레이어에 의하여 성능이 떨어지는 것은 아닙니다.
 MySQL은 아래의 memcached/NoSQL이 필요로 하지 않는, 더 많은 것들을 할 수 있습니다.
 
 * SQL 명령문 분석(파싱)
@@ -115,15 +113,15 @@ MySQL은 아래의 memcached/NoSQL이 필요로 하지 않는, 더 많은 것들
 * 테이블 언락 및 닫기
 
 MySQL 또한 수많은 동시 제어를 할 수 있습니다.
-예를 들어, 네트워크 패킷들을 송수신 할 때, 엄청난 횟수의 fcntl() 함수를 호출합니다.
-LOCK_open, LOCK_thread_count 들과 같은 전역 Mutex들을 아주 빈번하게 생성하고 해제합니다.
-my_pthread_fastmutex_lock()이 Oprofile에서 두 번째로 %output과 %system을 적지 않게 쓰고 있는 이유입니다.
+예를 들어, 네트워크 패킷들을 송수신 할 때, 엄청난 횟수의 `fcntl()` 함수를 호출합니다.
+`LOCK_open`, `LOCK_thread_count`과 같은 전역 뮤텍스를 아주 빈번하게 생성하고 해제합니다.
+`my_pthread_fastmutex_lock()`이 Oprofile에서 두 번째로 `%output`과 `%system`을 적지 않게 쓰고 있는 이유입니다.
 MySQL 개발팀과 외부 커뮤니티 모두 동시성 이슈에 대해 알고 있습니다.
 어떤 이슈들은 이미 5.5 버전에서 해결되었습니다.
 저는 이미 많은 문제점들이 고쳐졌다는 것에 대해 무척 기쁘게 생각합니다.
-그러나 %user 가 60%에 육박한다는 점 또한 무척 중요합니다.
-Mutex 경쟁은 결과적으로 %user 증가가 아닌 %system 증가를 야기합니다.
-심지어 MySQL 내부의 모든 mutex 문제들이 고쳐졌다 하더라도, 초당 30만 쿼리를 기대할 수 없습니다.
+그러나 `%user`가 60%에 육박한다는 점 또한 무척 중요합니다.
+뮤텍스 경쟁은 결과적으로 `%user` 증가가 아닌 `%system` 증가를 야기합니다.
+심지어 MySQL 내부의 모든 뮤텍스 문제들이 고쳐졌다 하더라도, 초당 30만 쿼리를 기대할 수 없습니다.
 여러분은 아마도 HANDLER 명령문에 대하여 들은 적이 있을 것입니다.
 불행하게도 HANDLER 명령문은 출력 향상에 많은 도움이 되지는 않습니다.
 왜냐하면 쿼리를 분석하고, 테이블을 여닫는 일이 아직까진 필요하기 때문입니다.
@@ -137,8 +135,10 @@ SQL 오버헤드는 상대적으로 무시할 수 있습니다.
 그러나 불타고 있는 우리의 몇몇 MySQL 서버들은,
 거의 모든 데이터가 메모리 안에 있으며, 완벽하게 CPU와 관련이 있습니다.
 프로파일링 결과는 위에 제가 쓴 내용과 동일했습니다.
-"SQL 레이어가 대부분의 리소스를 소비한다."
-우리는 수많은 Primary key 검색(예를 들어, SELECT x FROM t where id=?)이나 제한된 범위 검색 수행이 필요했습니다.
+
+> "SQL 레이어가 대부분의 리소스를 소비한다."
+
+우리는 수많은 Primary key 검색(예를 들어, `SELECT x FROM t where id=?`)이나 제한된 범위 검색 수행이 필요했습니다.
 심지어 쿼리들의 70~80%는 단순히 같은 테이블에서 PK 검색을 하는 것이었습니다.
 (차이점은 단순히 WHERE 값이 다를 뿐이었습니다.)
 MySQL은 매 쿼리마다 분석하고/열고/닫고/잠궈야 했으며,
@@ -154,7 +154,7 @@ SQL Node + NDB 성능에 대해 실망하는 많은 고객들을 보았습니다
 그리고 NDBAPI 클라이언트를 작성하는 것으로 몇 배나 더 좋은 성능을 얻고나서야 좋아했습니다.
 여러분은 NDBAPI와 SQL을 MySQL 클러스터에서 사용할 수 있습니다.
 빈번한 접근 패턴에는 NDBAPI를 사용하고,
-ad-hoc이나 빈번하지 않은 쿼리 패턴에 대해서는 SQL + MySQL + NDB 를 사용하는 것을 추천합니다.
+ad-hoc이나 빈번하지 않은 쿼리 패턴에 대해서는 SQL + MySQL + NDB를 사용하는 것을 추천합니다.
 
 이것이 우리가 원하던 것이었습니다. 우리는 더 빠른 접근 API들을 원하였지만,
 ad-hoc이나 복잡한 쿼리들에 대해서는 SQL도 사용하기를 원하였습니다.
@@ -201,7 +201,7 @@ http://1.bp.blogspot.com/__ybECuKG5tc/TLqV2t9GeeI/AAAAAAAAACI/e8knOF_enPM/s1600/
 ## HandlerSocket 사용하기
 
 예를들어, 여기 *user* 테이블이 있고,
-user_id를 이용하여 사용자 정보를 불러올 필요가 있다고 가정해봅시다.
+`user_id`를 이용하여 사용자 정보를 불러올 필요가 있다고 가정해봅시다.
 
     #!plain
     CREATE TABLE user (
@@ -226,7 +226,7 @@ MySQL에서 사용자 정보를 불러들이는 것은 물론 SELECT 명령문�
 
 ## HandlerSocket 설치하기
 
-설치 단계에 대해서는 http://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL/blob/master/docs-en/installation.en.txt 에 설명해두었습니다. 대강의 기본 단계는 다음과 같습니다.
+설치 단계에 대해서는 [여기](http://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL/blob/master/docs-en/installation.en.txt)에 설명해두었습니다. 대강의 기본 단계는 다음과 같습니다.
 
 - HandlerSocket을 다운로드 받습니다.
 - HandlerSocket을 (클라이언트와 서버 코드 모두) 빌드합니다.
@@ -241,7 +241,7 @@ MySQL 버전은 5.1 이후이면 됩니다.
 
 ## HandlerSocket 클라이언트 코드 작성하기
 
-우리는 C++ 과 Perl 클라이언트 라이브러리들을 제공합니다.
+우리는 C++와 Perl 클라이언트 라이브러리를 제공합니다.
 여기 PK 검색으로 한 행을 불러오는 간단한 Perl 코드가 있습니다.
  
     #!perl
@@ -256,14 +256,14 @@ MySQL 버전은 5.1 이후이면 됩니다.
     my $hs = new Net::HandlerSocket($args);  
       
     #2. initializing an index so that we can use in main logics.  
-     # MySQL tables will be opened here (if not opened)  
+    #   MySQL tables will be opened here (if not opened)  
     my $res = $hs->open_index(0, 'test', 'user', 'PRIMARY',  
         'user_name,user_email,created');  
     die $hs->get_error() if $res != 0;  
       
     #3. main logic  
-     #fetching rows by id  
-     #execute_single (index id, cond, cond value, max rows, offset)  
+    #   fetching rows by id  
+    #   execute_single (index id, cond, cond value, max rows, offset)  
     $res = $hs->execute_single(0, '=', [ '101' ], 1, 0);  
     die $hs->get_error() if $res->[0] != 0;  
     shift(@$res);  
@@ -272,13 +272,13 @@ MySQL 버전은 5.1 이후이면 됩니다.
       my $user_email= $res->[$row + 1];  
       my $created= $res->[$row + 2];  
       print "$user_name\t$user_email\t$created\n";  
-    }  
+    }
       
     #4. closing the connection  
     $hs->close();
 
-위의 코드는 user_name, user_email 을 불러들이고 user 테이블로부터 칼럼을 생성하고,
-user_id=101 조건으로 검색을 합니다.
+위의 코드는 `user_name`, `user_email`을 불러들이고 user 테이블로부터 칼럼을 생성하고,
+`user_id=101` 조건으로 검색을 합니다.
 따라서 여러분은 위의 SELECT문과 같은 결과를 얻을 것입니다.
 
     #!plain
@@ -312,12 +312,11 @@ memcached 텍스트 프로토콜과 같이,
 모든 사용자 자료 크기는 메모리 크기에 맞았습니다.
 (저는 10만개의 데이터를 테스트 했습니다.)
 또한 같은 데이터로 memcached를 테스트 하였습니다.
-(사용자 데이터를 불러들이기 위해 libmemcached와 memcached_get()을 사용하였습니다.)
+(사용자 데이터를 불러들이기 위해 libmemcached와 `memcached_get()`을 사용하였습니다.)
 SQL 테스트를 통한 MySQL 테스트에서는, 전통적인 SELECT 문으로
-"SELECT user_name,user_email, created FROM user WHERE user_id=?" 를 사용하였습니다.
+`SELECT user_name,user_email, created FROM user WHERE user_id=?`를 사용하였습니다.
 memcached와 HandlerSocket 클라이언트 코드는 C/C++로 작성하였습니다.
 모든 클라이언트 프로그램들은 원격 호스트에 두었으며, TCP/IP를 통한 MySQL/memcached에 연결하였습니다.
-
 가장 높은 수치는 다음과 같습니다.
 
     #!plain
@@ -326,11 +325,11 @@ memcached와 HandlerSocket 클라이언트 코드는 C/C++로 작성하였습니
     memcached                    420,000      %us  8%  %sy 88%
     MySQL via HandlerSocket      750,000      %us 45%  %sy 53%
 
-HandlerSocket을 통한 MySQL이 3/4 밖에 안되는 %us를 가지고도,
+HandlerSocket을 통한 MySQL이 3/4 밖에 안되는 `%us`를 가지고도,
 SQL 구문을 이용한 전통적인 MySQL보다 7.5배나 높은 결과를 얻을 수 있었습니다.
 이는 MySQL 내의 SQL 레이어가 무척 비용이 비싸다는 것과 레이어를 우회하는 것이
 극적으로 성능을 향상시킨다는 것을 보여줍니다.
-또한 memcached는 %system 자원을 더 많이 사용함에도 불구하고,
+또한 memcached는 `%system` 자원을 더 많이 사용함에도 불구하고,
 HandlerSocket이 memcached보다 178% 더 빠르다는 것이 흥미롭습니다.
 비록 memcached는 훌륭한 제품이지만, 최적화의 여지가 남아 있습니다.
 
@@ -390,7 +389,7 @@ SHOW GLOBAL STATUS와 같은 일반 MySQL 명령어로부터 통계값을 얻을
         memcached/libmemcached version: 1.4.5(memcached), 0.44(libmemcached)
         Network: Broadcom NetXtreme II BCM5709 1000Base-T (Onboard, quad-port, using three ports)
        
-memcached와 HandlerSocket 양쪽 모두 네트워크 I/O 대역폭을 모두 소모하였습니다. 단일 포트로 테스트 했을 때는HandlerSocket을 이용하는 쪽이 초당 26만 쿼리, memcached.상에서는 22만 쿼리에 근접했습니다.
+memcached와 HandlerSocket 양쪽 모두 네트워크 I/O 대역폭을 모두 소모하였습니다. 단일 포트로 테스트 했을 때는 HandlerSocket을 이용하는 쪽이 초당 26만 쿼리, memcached 상에서는 22만 쿼리에 근접했습니다.
 
 ## HandlerSocket의 구성요소와 이점
 
@@ -400,22 +399,23 @@ HandlerSocket은 다음과 같은 다양한 구성요소와 이점을 가지고 
 ### 다양한 쿼리 패턴을 지원
 
 HandlerSocket은 PK/unique 검색, non-unique 검색,
-범위 스캔, LIMIT, 그리고 INSERT/UPDATE/DELETE 를 지원합니다.
+범위 스캔, LIMIT, 그리고 INSERT/UPDATE/DELETE를 지원합니다.
 index를 사용하지 않는 동작들은 지원하지 않습니다.
 multi_get 동작 (IN(1,2,3..)과 유사한, 단일 네트워크 round-trip을 통한 다중 행들을 불러오기) 또한 지원합니다.
 
-http://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL/tree/master/docs-en/ 에서 자세한 사항을 확인하십시오.
+[HandlerSocket 플러그인 문서](http://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL/tree/master/docs-en/)에서
+자세한 사항을 확인하십시오.
 
 ### 수많은 동시 접속들을 제어할 수 있음
 
 HandlerSocket 연결은 가볍습니다.
 HandlerSocket이 epool()과 worker-thread/thread-pooling 구조를 채용한 이후로,
 MySQL 내부 스레드 수가 제한사항이 되었습니다.
-(my.cnf 안에서 handlersocket_threads 파라메터로 제어할 수 있습니다.)
+(`my.cnf` 안에서 `handlersocket_threads` 파라메터로 제어할 수 있습니다.)
 따라서 여러분은 수백에서 수십만 네트워크 접속을
-안정성을 잃지 않고(너무 많은 메모리를 사용하거나, mutex 경쟁을 야기하지 않는 등,
-버그 http://bugs.mysql.com/bug.php?id=26590, http://bugs.mysql.com/bug.php?id=33948,
-http://bugs.mysql.com/bug.php?id=49169 와 같은 문제점) 영구적으로 유지할 수 있습니다.
+안정성을 잃지 않고(너무 많은 메모리를 사용하거나, 뮤텍스 경쟁을 야기하지 않는 등
+(버그 [#26590](http://bugs.mysql.com/bug.php?id=26590), [#33948](http://bugs.mysql.com/bug.php?id=33948),
+[#49169](http://bugs.mysql.com/bug.php?id=49169)와 같은 문제점), 영구적으로 유지할 수 있습니다.
 
 ### 극한의 고성능
 
@@ -430,20 +430,19 @@ HandlerSocket은 SQL 관련 함수 호출을 없앴을 뿐만 아니라,
 
 HandlerSocket 프로토콜은 일반 MySQL 프로토콜보다 아주 단순하고 작습니다.
 따라서 전체 네트워크 전송 크기가 무척 작습니다.
-
 제한적인 MySQL 내부 스레드의 수에서도 동작합니다.
 위에 이미 설명하였습니다.
 
 ### 클라이언트 요청을 그룹핑 합니다.
 
 HandlerSocket에 수많은 동시 요청이 몰릴 경우,
-각 worker 스레드는 가능한 많은 요청을 모으고,
+각 워커 스레드는 가능한 많은 요청을 모으고,
 모은 요청을 한 번에 수행하며 결과를 돌려줍니다.
 이것은 응답시간을 약간 소모하는 것으로 성능을 비약적으로 개선할 수 있었습니다.
 예를 들어, 여러분이 다음과 같은 이익을 얻을 수 있습니다.
 원하신다면 이후의 글에서 더 자세히 설명하도록 하겠습니다.
 
-* fsync() 호출의 수를 줄일 수 있다.
+* `fsync()` 호출의 수를 줄일 수 있다.
 * 리플리케이션(복제) 지연을 감속할 수 있다.
 
 ### 중복 캐쉬 복제가 일어나지 않는다.
@@ -463,7 +462,7 @@ memcached와 MySQL 사이에서의 자료 일치 확인과 같은 동작은 필�
 
 백엔드 저장소가 InnoDB입니다.
 이는 트렌젝션을 지원하며, 충돌에 안전합니다.
-심지어 innodb-flush-log-at-trx-commit이 1이 아니더라도,
+심지어 `innodb-flush-log-at-trx-commit`이 1이 아니더라도,
 서버 충돌로부터 1초 미만의 데이터만 잃게 됩니다.
 
 ### mysql 클라이언트로 SQL도 사용할 수 있습니다.
@@ -481,7 +480,7 @@ HandlerSocket은 단순히 MySQL에 대한 플러그인입니다.
 예를 들어, SQL, 온라인 백업, 리플리케이션,
 Nagios/EnterpriseMonitor에 의한 모니터링 등과 같은
 모든 MySQL 동작들을 지원합니다. HandlerSocket 동작은
-SHOW GLOBAL STATUS, SHOW ENGINE INNODB STATUS, SHOW PROCESSLIST 와 같은
+`SHOW GLOBAL STATUS`, `SHOW ENGINE INNODB STATUS`, `SHOW PROCESSLIST`와 같은
 정규 MySQL 명령으로 모니터링 할 수 있습니다.
 
 ### MySQL을 수정하거나 재설치 할 필요 없음
@@ -498,14 +497,14 @@ HandlerSocket은 어떤 버전의 스토리지 엔진들과도 통신할 수 있
 
 ### HandlerSocket API를 배울 필요가 있음
 
-사용하기 쉽지만,
+사용하기는 쉽지만,
 여러분은 HandlerSocket으로 통신하기 위한 프로그램을 작성할 필요가 있습니다.
 우리는 C++ API와 Perl binding을 제공합니다.
 
 ### 보안체계가 없습니다.
 
 다른 NoSQL 데이터베이스들처럼, HandlerSocket은 어떤 보안 요소도 제공하지 않습니다.
-HandlerSocket의 worker 스레드들은 시스템 사용자 권한으로 동작합니다.
+HandlerSocket의 워커 스레드들은 시스템 사용자 권한으로 동작합니다.
 따라서 응용프로그램은 HandlerSocket 프로토콜로 모든 테이블에 접근할 수 있습니다.
 물론 여러분은 다른 NoSQL 제품들처럼 패킷을 막기 위해 방화벽을 사용할 수 있습니다.
 
@@ -520,7 +519,7 @@ HDD I/O 동작한계 안에서, 일반적인 결과로 1-10% CPU 사용율 내�
 ## DeNA는 제품에서 HandlerSocket을 사용하는 중입니다.
 
 우리는 이미 HandlerSocket 플러그인을 우리의 제품 환경에서 사용하고 있습니다.
-결과는 훌륭합니다. 우리는 많은 memcached 와 MySQL 슬레이브 서버들을 줄일 수 있었습니다.
+결과는 훌륭합니다. 우리는 많은 memcached와 MySQL 슬레이브 서버들을 줄일 수 있었습니다.
 전체 네트워크 트래픽도 감소하였습니다.
 우리는 어떤 성능 문제(응답시간이 줄어들거나, 스톨에 걸리는 등)도 보질 못했습니다.
 우리는 결과에 아주 만족합니다.
