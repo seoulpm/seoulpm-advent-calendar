@@ -1,0 +1,369 @@
+Title:    동아시아 언어의 로마자 변환 문자처리에 도전해보자!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   studioego
+
+## 저자
+
+[@studioego][author] -
+평범한 일반 직장인으로 자청하고 있는 컴맹 월급도둑.
+대만(臺灣,台湾,Taiwan)과 일본(日本, Japan) 여행을 갔다왔더니
+한자(漢字, 汉字, Chinese Character)에 대해 호기심을 가지며,
+관심을 갖게된 이상한 사람.
+
+## 시작하기 전에
+
+오늘은 동아시아의 각 나라에서 쓰이는 언어들에 대해 로마자 표기에 대해 소개하겠습니다.
+동아시아 각 나라의 문자 입력 방식은 아래와 같습니다.
+
+Locale (로케일)  |  Writing Systems (입력 시스템)
+ :-------------: | ---------------------------------------------------------
+  중국(China)    |  Latin, 한자[汉字, hanzi(simplified chinese) 简体中文]
+                 |
+  대만(Taiwan)   |  Latin, 주음부호[zhuyin,注音符號]
+                 |  and 한자[漢字, hanzi(traditional chinese),繁體中文]
+                 |  
+  일본(Japan)    |  Latin, "히라가나[hiragana,ひらがな]",
+                 |  "카타카나[Katakana,カタカナ]", and "한자[kanji 漢字,かんじ]"
+                 |  
+  한국(Korea)    |  Latin, 한글[hangul], 한자[漢字, hanja]
+[*표 1.* 각 나라의 문자 입력 방식 (출처: CJKV Information Processing , 1st Edition)]
+
+각 나라별로 입력 방식 참 많죠?
+영어를 쓰는 나라나 알파벳을 사용하는 나라에서는 입력 방식이 알파벳이면 되지만,
+한자(漢字/汉字/Chinese Character)를 사용하는 국가에서는 한자와 자국어를 입력하기
+위해 여러가지 입력방식을 사용한다는 것을 알 수 있습니다. 
+
+
+위의 문자들을 입력할때 한국어의 경우는 한글로 편하게 입력할수 있지만(로마자로도 입력 가능합니다),
+중국어의 경우는 중국어를 입력하기 위해서
+로마자로 표기를 한 후에 한자로 변환해서 입력을 해야하는 불편함이 있습니다.
+일본어의 경우는 히라가나로 입력을 해도 한자로 변환해서 입력해야하는 부분이 있기 때문에 불편합니다.
+(로마자로 입력을 해도 한자로 변환하는 등의 불편함이 있습니다.)
+이렇게 쓰고 보니 한글을 만든 세종대왕님이 존경스럽군요!
+
+아래에는 한국어, 중국어, 일본어의 라틴어 표기법에 대해서 간략히 소개를 하겠습니다.
+
+*중국어의 라틴어 표기법*에는 두가지가 있습니다.
+
+- 한어병음[번체: 漢語拼音/간체: 汉语拼音] 표기법
+  - 1955년~1957년 문자개혁을 할 때 중국 문자 개혁 위원회(中国文字改革委员会)는 한어병음방안(汉语拼音方案)을 채택
+  - 1958년 2월 전국인민대표대회(全国人民代表大会)에서 이 안을 비준, 시행.
+  - 1982년 국제표준ISO 7098이 되었다.
+  - 중국 대륙의 공식적인 로마자 표기법이다.
+- 웨이드-자일스식 표기법(Wade-Giles romanization)
+  - 1867년 토머스 프랜시스 웨이드 경(Sir. Thomas Francis Wade)이 중국어의 로마자 표기법을 창안
+  - 이후, 케임브리지대학교 교수인 허버트 앨런 자일스(Herbert Allen Giles)가 〈중영사전 Chinese-English Dictionary〉(1912)을 발간하면서 수정했다.
+  - 대만에서 주로 쓴다.
+
+*일본어의 라틴어 표기법*에는 세가지가 있습니다.
+보통 헵번식이라고 부르는 The Hepburn System(ヘボン式)를 주로 사용합니다.
+
+- The Hepburn System(ヘボン式)
+  - 미국인 선교사 James Curtis Hepburn이 1887년도에 고안한 로마자 표기 방법
+- The kunrei System(訓令式)
+  - 1937년 일본정부가 발표한 로마자 표기 방법
+- The Nippon System(日本式)
+  - 田中館愛橘(tanakadate aikitsu)가 1881년도에 고안한 로마자 표기 방법. 훈령식과 비슷하고 거의 사용안함.
+
+*한국어의 라틴어 표기법*은 세가지가 있으며 서로 혼용해 사용하고 있습니다.
+
+- 국어의 로마자 표기법(The Re-vised Romanization of Korean, abbreviation RRK)
+  - 2000년 7월 7일 공표된 로마자 표기법
+- 매큔-라이샤워 표기법(Ministry of Education (문교부) derived from and sometimes referred to as McCune-Reischauer)
+  - 1984년 1월 13일 문교부에서 공표하여 2000년도까지 사용하던 로마자 표기법
+- 한글학회(Korean Language Society)
+  - 1996년도에 발표된 로마자 표기법
+
+
+## 준비 시작!
+
+동아시아 언어를 로마자로 변환하는 문자 처리를 위해 CPAN 모듈을 설치해봅니다.
+동아시아 문자 처리를 소개하는데 사용한 CPAN 모듈은 아래와 같습니다.
+
+- [Unicode::Unihan][module-unihan]
+- [Lingua::JA::Romanize::Japanese][module-roman-jp]
+- [Lingua::ZH::Romanize::Pinyin][module-roman-zh]
+- [Lingua::KO::Romanize::Hangul][module-roman-ko]
+
+
+## 이 한자는 중국어, 광동어, 한국어, 일본어 훈독, 음독으로 어떻게 읽지?
+
+이 한자(漢字/汉字, Chinese Character)는 중국어(보통화普通話,표준북경어),
+광동어, 한국어, 일본어 훈독, 음독으로 어떻게 읽지?
+
+한자 읽기의 로마자화의 경우는 펄 모듈중의 하나인 [Unicode::Unihan][module-unihan] 모듈을 사용하면 됩니다.
+Unicode::Unihan 모듈은 유니코드의 한중일 통합한자 데이터베이스, 즉
+Unicode Unihan「"Unified Han" (CJK: Chinese, Japanese, and Korean)」데이터베이스를 사용하기 편하게
+만든 인터페이스입니다. 일본인 Dan Kogai가 작성하였습니다. 
+
+여기서 '한국'으로 읽는 '韓國'이란 한자를
+표준중국어(Mandarin), 광동어(Cantonese), 일본어 훈독과 일본어 음독으로
+어떻게 읽는지 로마자로 표기하는 것에 대해 알아보겠습니다.
+
+
+    #!perl
+    #!/usr/bin/perl
+    use v5.12;
+    use utf8;
+    use strict;
+    use warnings; # on by default
+    use warnings qw(FATAL utf8);
+    
+    use open qw(:std :utf8);
+    use charnames qw(:full :short);
+    
+    use Unicode::Unihan;
+    
+    my $str   = "韓國";
+    my $unhan = Unicode::Unihan->new;
+    
+    for my $lang (qw(Mandarin Cantonese Korean JapaneseOn JapaneseKun)) {
+        printf "CJK $str in %-12s is ", $lang;
+        say $unhan->$lang($str);
+    }
+
+다음은 실행 결과입니다.
+
+    #!plain
+    CJK 韓國 in Mandarin     is HAN2GUO2
+    CJK 韓國 in Cantonese    is hon4gwok3
+    CJK 韓國 in Korean       is HANKWUK
+    CJK 韓國 in JapaneseOn   is KANKOKU
+    CJK 韓國 in JapaneseKun  is IGETAKUNI
+
+
+우리가 '한국'으로 읽는 '韓國'이란 한자는
+표준중국어(Mandarin)는 '한궈', 광동어으로는 '혼궉', 일본어의 음독으로는 칸코쿠,
+훈독으로는 '이게타쿠니'라고 읽는군요!
+
+주변 사람들이 좌절할때 쓰는 이상한 한자(囧)가 있죠. 이 한자도 어떻게 읽는지 궁금해집니다!
+
+    #!perl
+    #!/usr/bin/perl
+    use utf8;
+    use v5.12;
+    use strict;
+    use warnings;
+    use warnings qw(FATAL utf8);
+    
+    use open qw(:std :utf8);
+    use charnames qw(:full :short);
+    
+    use Unicode::Unihan;
+    
+    my $str   = "囧";
+    my $unhan = Unicode::Unihan->new;
+    
+    for my $lang (qw(Mandarin Cantonese Korean JapaneseOn JapaneseKun)) {
+        printf "CJK $str in %-12s is ", $lang;
+        say $unhan->$lang($str);
+    }
+
+결과를 확인합시다.
+
+    #!plain
+    CJK 囧 in Mandarin     is JIONG3
+    CJK 囧 in Cantonese    is gwing2
+    CJK 囧 in Korean       is KYENG
+    CJK 囧 in JapaneseOn   is KEI KYOU
+    CJK 囧 in JapaneseKun  is AKIRAKA
+
+'囧'이라는 한자는 표준중국어(Mandarin)는 '지옹',
+광동어으로는 '귕', 한국어로 '경', 일본어의 음독으로는 '케이', '쿄우', 훈독으로는 '아키라카'로 읽는군요!
+사전으로 찾아봅시다.
+
+> 囧
+> 빛날 경(중국어 [jiǒng]) 1. 빛나다 2. 밝다 3. 새가 나는 모양 4. 창(窓)
+
+그런데 이 단어는 인터넷에서 변질되어(특히 중국어 웹사이트에서)
+우울한, 슬픈, 난감한, 말이 안나오는 등등으로 의미로 쓰이기도 합니다.
+여러 한자들을 가지고 실험하면 이 단어가 어느 나라에서 어떤 음으로 읽더라 하는 것을 알 수 있습니다.
+
+
+## 이 일본어 문자는 어떻게 읽을까?
+
+일본어로 된 문자나 문자열을 로마자로 변경해서 읽으려면
+펄 모듈 중에서 [Lingua::JA::Romanize::Japanese][module-roman-jp]를 사용하면 됩니다.
+이 모듈은 일본인 Yusuke Kawasaki이 작성하였습니다.
+이번에도 스크립트를 작성해 실험해봅시다.
+
+    #!perl
+    #!/usr/bin/perl
+    use Lingua::JA::Romanize::Japanese;
+    
+    my $conv = Lingua::JA::Romanize::Japanese->new();
+    
+    my $kanji = "字";  # one CJK character
+    my $roman = $conv->char($kanji);
+    printf(" %s - %s \n", $kanji, $roman);
+    
+    my $string = "文字列の場合"; #multiple CJK characters
+    printf(" %s - %s \n", $string, $conv->chars($string));
+
+실행 결과는 아래와 같습니다.
+
+    #!plain
+    字 - aza/azana/ji
+    文字列の場合 - mojiretsu no baai
+
+자(字)를 aza, azana 또는 ji라고 합니다.
+일본어 한자읽기사전을 보면 字를 음독으로 ji, 훈독으로 aza, azana로 읽는다고 합니다.
+文字列の場合(문자열의 집합)을 mojiretsu no baai(모지레츠노바마이)라고 읽는다고 하는군요.
+
+
+## 한국어를 어떻게 로마자로 변경할까?
+
+한국어로 된 문자나 문자열을 로마자로 변경해서 읽으려면
+[Lingua::KO::Romanize::Hangul][module-roman-ko]를 사용합니다.
+이 모듈도 위에서 소개한 일본어를 로마자로 변경하는 Lingua::JA::Romanize::Japanese를
+작성한 일본인 Yusuke Kawasaki이 작성하였습니다.
+
+    #!perl
+    #!/usr/bin/perl
+    use v5.12;  
+    use utf8;
+    use strict;   
+    use warnings; 
+    use warnings  qw(FATAL utf8);   
+    use open      qw(:std :utf8);   
+    use Lingua::KO::Romanize::Hangul;
+    
+    my $hangul = "한";
+    my $string = "나랏말씀이 중국(中國)과 달라";
+    
+    my $conv  = Lingua::KO::Romanize::Hangul->new();
+    my $roman = $conv->char( $hangul );
+    
+    printf("한글: %s - Romanized: %s \n", $hangul, $roman );
+    
+    my @array = $conv->string($string);
+
+    foreach my $pair (@array) {
+        my ( $han, $roman ) = @$pair;
+        if ( defined $roman ) {
+            printf( "한글: %s - Romanized: %s \n", $han, $roman );
+        }
+        else {
+            print $han;
+        }
+    }
+
+이번에도 실행해봅니다.
+
+    #!plain
+    한글: 한 - Romanized: han
+    한글: 나 - Romanized: na
+    한글: 랏 - Romanized: rat
+    한글: 말 - Romanized: mal
+    한글: 씀 - Romanized: sseum
+    한글: 이 - Romanized: i
+    한글: 중 - Romanized: jung
+    한글: 국 - Romanized: gug
+    (中國)한글: 과 - Romanized: gwa
+    한글: 달 - Romanized: dal
+    한글: 라 - Romanized: la
+
+안타깝게도, 한자는 변환하지 않는군요.
+그래도 한글을 로마자로 표현하였습니다!
+참고로 이 모듈이 한글을 로마자로 표현하는 방법은
+2000년도에 대한민국 정부에 의해 공표된
+국어의 로마자 표기법(Revised Romanization of Korean)을 따릅니다.
+
+
+## 중국어로 된 내용을 로마자로 된 한어병음(漢語拼音/汉语拼音)으로 바꾸는가?
+
+중국어로 된 문자나 문자열을 로마자로 변경해서 읽을려면
+[Lingua::ZH::Romanize::Pinyin][module-roman-zh]를 사용하면 됩니다.
+대만, 홍콩에서 주로 사용하고 있는, 한국에서 쓰는 한자와 같은, 번체자(繁體中文, Traditional Chinese)와
+중국 대륙에서 사용하고 있는 축약된 한자인 간체자(简体中文,Simplified Chinese)의 로마자화를 모두 지원합니다.
+(참고로, 이 모듈에서 사용하는 중국어 로마자화는 한어병음[번체: 漢語拼音/간체: 汉语拼音] 입니다.)
+
+이것도 위에서 소개한 Lingua::JA::Romanize::Japanese와 Lingua::KO::Romanize::Korean를
+작성한 일본인 Yusuke Kawasaki이 작성하였습니다. 일본인이면서 한국어와 중국어까지 다루다니 대단합니다.
+
+    #!perl
+    #!/usr/bin/perl
+    use v5.12;
+    use utf8;
+    use strict;
+    use utf8;
+    use warnings;
+    use warnings qw(FATAL utf8);
+    use open qw(:std :utf8);
+    
+    use Lingua::ZH::Romanize::Pinyin;
+
+    my $conv  = Lingua::ZH::Romanize::Pinyin->new();
+    
+    my $hanji = "中";
+    my $roman = $conv->char($hanji);
+    
+    printf( " %s - %s \n", $hanji, $roman );
+    
+    my $string = "韓國 韩国 漢語 汉语 東京 东京";
+    my @array  = $conv->string($string);
+    
+    foreach my $pair (@array) {
+        my ( $raw, $ruby ) = @$pair;
+        if ( defined $ruby ) {
+            printf( " %s － %s \n", $raw, $ruby );
+        }
+        else {
+            print $raw;
+        }
+    }
+
+이번에도 실행해봅시다.
+
+    #!plain
+    中 － zhong1/zhong4
+    韓 － han2
+    國 － guo2
+    韩 － han
+    国 － guo
+    漢 － han4
+    語 － yu3/yu4
+    汉 － han
+    语 － yu
+    東 － dong1
+    京 － jing1
+    东 － dong
+    京 － jing1
+
+위 코드에서 中은 "가운데 중"을 의미합니다.
+번체자와 간체자가 모두 같습니다.
+"한국"이란 단어의 번체자는 "韓國", 간체자는 "韩国"입니다.
+"한어"라는 단어의 번체자는 "漢語", 간체자는 "汉语"입니다.
+"동경(도쿄,Tokyo)"이라는 단어의 번체자는 "東京", 간체자는 "东京"입니다.
+여기에서는 번체자와 간체자 모두 _같은 음을 가지고 있기 때문에_ 로마자로 변경이 가능했던 것입니다.
+
+한국어, 중국어, 일본어의 로마자화하여 문자처리를 소개해보았습니다.
+
+## 정리하며
+
+여러가지 내용들 소개하려다보니 정리하기 어려웠습니다.
+설명하는것도 쉽지 않아서 간략하게 위의 각 언어별 로마자 표기법에 대해서 소개를 해 보았습니다.
+저도 이쪽에 대해서 제대로 아는 것도 아니라서 잘 모르겠습니다만...
+
+Perl의 동아시아 언어 모듈을 찾아보니 일본인이 일본어뿐만 아니라 한국어 문자 처리쪽에
+개발을 한 것을 보았고, 일본어의 문자 처리 모듈도 한국어, 중국어보다 엄청 다양하구나-하고 많이 느겼습니다.
+한국어를 로마자화하는 Lingua::KO::Romanize::Hangul 모듈에서 한자 부분을 못 읽는 부분이 있는데,
+한자를 읽는 부분도 추가해서 개발을 해볼까 생각을 해봅니다.
+일본인도 한국어 로마자화 개발을 했으니, 한국어를 더 잘하는 한국인이 한자에 대해서 로마자화 개발도 잘할 수 있을 것이라 생각합니다.
+일본어, 중국어, 한국어 로마자화 모듈을 작성한 일본인 Yusuke Kawasaki가 대단하다고 생각합니다.
+
+CJKV 첫번째 판을 빌려주신 @ganadist, Perl 커뮤니티를 알게해주신 @JEEN_LEE and @keedi,
+그리고 달력 만드느라 열심히 작업하시는 @am0c, 여러분 모두 고맙습니다.
+
+
+[module-unihan]:   http://p3rl.org/Unicode::Unihan
+[module-roman-jp]: http://p3rl.org/Lingua::JA::Romanize::Japanese
+[module-roman-zh]: http://p3rl.org/Lingua::ZH::Romanize::Pinyin
+[module-roman-ko]: http://p3rl.org/Lingua::KO::Romanize::Hangul
+
+
+[author]: http://twitter.com/studioego
+
+
