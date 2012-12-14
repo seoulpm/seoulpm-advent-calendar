@@ -105,11 +105,27 @@ h3 {
     font-size: 18px;
     line-height: 2em;
 }
-#cont p, #cont ul{
+#cont p, #cont ul {
     font-family: 'NanumMyeongjoWeb';
     display: block;
     margin-bottom: 1.6em;
     text-align: justify;
+}
+#cont table {
+    margin: 0 auto 1.6em auto;
+    border: 1px solid #b4b4b4;
+    padding: 0.2em;
+    font-family: 'NanumMyeongjoWeb';
+}
+#cont table thead {
+    background-color: #e8e8e8;
+}
+#cont table caption {
+    font-size: 0.8em;
+}
+#cont table tbody {
+    font-family: 'NanumMyeongjoWeb';
+    font-size: 0.9em;
 }
 #cont ul {
     margin-top: -0.6em;
