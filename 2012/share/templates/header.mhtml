@@ -1,15 +1,14 @@
-% use URI::Escape;
 <!doctype html>
 <html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
-  <title><% URI::Escape::uri_escape($title) %></title>
+  <title><% $title %></title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <meta name="description" content="Seoul.pm Perl Advent Calendar <% $year %>" />
   <meta name="keywords" content="perl, advent, calendar, seoulpm, seoul.pm" />
 % if ( defined $global->{fb_token} ) {
   <meta property="fb:admins" content="<% $global->{fb_token} %>" />
 % }
-  <meta property="og:title" content="<% URI::Escape::uri_escape($title) %>" />
+  <meta property="og:title" content="<% uri_escape($title) %>" />
   <meta property="og:url" content="<% $page_uri %>" />
 % if ( $article && (my $img = $global->{profile_image}{$article->author}) ) {
   <meta property="og:image" content="<% $global->{base_uri} %><% $img %>" />
@@ -18,7 +17,7 @@
   <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
 % }
   <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
-  <link rel="alternate" type="application/atom+xml" title="<% URI::Escape::uri_escape($year) %> Seoul.pm 펄 크리스마스 달력 - Atom" href="<% $global->{base_uri} %>atom.xml" />
+  <link rel="alternate" type="application/atom+xml" title="<% $year %> Seoul.pm 펄 크리스마스 달력 - Atom" href="<% $global->{base_uri} %>atom.xml" />
 
   <!-- Syntax Highlighter -->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -67,8 +66,10 @@
 </head>
 
 <%init>
+  use URI::Escape;
   my $title = $global->{location} ? "$global->{location} | $global->{title}" : "$global->{title} | $global->{title_en}";
   my $page_uri = defined($article) ? $article->atom_id : $global->{base_uri};
+  sub uri_escape { URI::Escape::uri_escape(shift, q{\$\#\@\&\(\)\=\"\'\[\]\!\?}) }
 </%init>
 
 <%args>
