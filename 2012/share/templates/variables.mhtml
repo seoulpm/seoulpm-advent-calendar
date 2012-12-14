@@ -71,6 +71,7 @@ return {
         'pung96'       => 'profile_pung96.jpg',
         'rumidier'     => 'profile_rumidier.jpg',
         'saillinux'    => 'profile_saillinux.jpg',
+        'studioego'    => 'profile_studioego.jpg',
         'sng2c'        => 'profile_sng2c.jpg',
         'y0ngbin'      => 'profile_y0ngbin.jpg',
         'Jeffrey Kegler' => 'profile_jeffreykegler.jpg',
