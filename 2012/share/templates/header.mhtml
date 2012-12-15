@@ -1,4 +1,3 @@
-% use URI::Escape;
 <!doctype html>
 <html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
@@ -9,7 +8,7 @@
 % if ( defined $global->{fb_token} ) {
   <meta property="fb:admins" content="<% $global->{fb_token} %>" />
 % }
-  <meta property="og:title" content="<% $title %>" />
+  <meta property="og:title" content="<% uri_escape($title) %>" />
   <meta property="og:url" content="<% $page_uri %>" />
 % if ( $article && (my $img = $global->{profile_image}{$article->author}) ) {
   <meta property="og:image" content="<% $global->{base_uri} %><% $img %>" />
@@ -67,8 +66,10 @@
 </head>
 
 <%init>
+  use URI::Escape;
   my $title = $global->{location} ? "$global->{location} | $global->{title}" : "$global->{title} | $global->{title_en}";
   my $page_uri = defined($article) ? $article->atom_id : $global->{base_uri};
+  sub uri_escape { URI::Escape::uri_escape(shift, q{\$\#\@\&\(\)\=\"\'\[\]\!\?}) }
 </%init>
 
 <%args>

@@ -1,4 +1,4 @@
-Title:    동아시아 언어의 로마자 변환 문자처리에 도전해보자!
+Title:    동아시아 언어의 로마자 변환에 도전해보자!
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
