@@ -130,6 +130,11 @@
     display: inline-block;
     overflow: hidden;
 }
+#preload {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+}
 #gifts .gift_1 { background-position: 0px 0; }
 #gifts .gift_2 { background-position: -70px 0; }
 #gifts .gift_3 { background-position: -140px 0; }
