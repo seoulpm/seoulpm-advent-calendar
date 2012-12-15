@@ -1,0 +1,585 @@
+Title:    도구를 만들고 배포하자
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   am0c
+
+
+## 저자
+
+[@am0c][am0c] - 프로그래밍 언어에 관심이 많다. 펄과 커피를 좋아한다.
+올해 크리스마스 달력의 메인 쓰레드로 활동하고 있다.
+
+
+## 시작하며
+
+양타 군은 외딴 초원사막 마을의 시스템 관리자입니다.
+양타 군은 시스템 관리 프로세스가 복잡해지면서, 반복되는 작업을 자동화하고 싶었습니다.
+시중에 있는 잘 알려진 도구가 좋은 선택이기는 했지만 자사의 환경에 맞지 않는 부분이 있었습니다.
+어떤 것은 너무 컸고, 어떤 것은 너무 느립니다. 일부는 그대로 쓰되 일부는 직접 구현하여 사용하기로 했습니다.
+유지보수 관리자에게 일을 넘기고 싶지는 않습니다. 문서는 간결하면 좋겠습니다.
+다른 머신에 도구를 쉽게 배포할 수 있어야 합니다. 다른 사람이 그 도구를 받아도 쉽게 사용할 수 있으면 좋겠습니다.
+양타 군은 이 모든 것을 해결하고 싶었습니다.
+
+하지만 양타 군은 시간이 부족합니다.
+수많은 관리 작업의 일부인 이것을 위해 정교한 도구를 만들며 시간을 버려서는 안됩니다.
+대충 만들면 나중에 보틀넥이 될 것 같습니다.
+우리의 마법사, 펄을 써야겠습니다!
+편집기를 열고, 곧장 명령행 옵션 상세를 정하고, 로직을 작성합니다.
+자원의 보고라 불리는 CPAN 해저를 탐색하고 수확한 라이브러리를 이리저리 붙입니다.
+양타는 그렇게 순식간에 원하는 도구를 만들었습니다.
+어떻게 만들었을까요?
+
+
+## 양타 군의 포스트잇
+
+나바빠 씨는 양타 군이 제작한 도구가 급히 필요했습니다. 양타 군을 불러 이렇게 말했습니다.
+"일단 급히 사용할 데가 있으니, 사용법과 함께 도구를 한꺼번에 전달해주게."
+양타 군은 마음 속으로 씨익 웃으며, 아래와 같이 적힌 쪽지를 건내며 답했습니다.
+"이렇게 입력만 하면 끝입니다."
+
+> curl -L http://example.com/yangta.pl | perl -
+
+나바빠 씨가 서버에서 실행하기 위해 `ssh` 명령을 붙여 그대로 입력하자 usage가 출력되었습니다.
+
+    #!bash
+    $ curl http://example.com/yangta.pl | ssh server perl -
+    usage:
+       --help  print this help
+       --do    do yangta
+
+나바빠 씨는 얼른 설명을 읽고 필요한 옵션을 뒤에 추가하는 것으로 작업을 완료했습니다.
+
+    #!bash
+    $ curl http://example.com/yangta.pl | ssh server perl - --do
+    Let's do it!
+
+나바빠 씨는 칼퇴할 수 있어 행복했습니다.
+
+
+## 양타 군의 설치
+
+나바빠 씨는 프로그램이 너무 마음에 들었습니다.
+앞으로 자주 쓰게 될 것 같았기 때문에 아래와 같이 복사했습니다.
+이것으로 도구 설치는 완료입니다.
+
+    #!bash
+    $ curl http://example.com/yangta.pl > yangta.pl
+    $ chmod +x yangta.pl
+    $ scp yangta.pl server:~/bin
+
+
+## 양타 군의 라이브러리
+
+양타 군은 관리를 위한 라이브러리를 만들고
+도구가 간단한 프론트앤드로 작동하도록 구성하였습니다.
+나바빠 씨에게 전달한 스크립트는 프론트앤드입니다.
+진지한 진지 씨는 작업 프로세스를 담당하고 있었습니다. 양타 군의 라이브러리 로직에 기능을 추가해야 합니다.
+양타 군을 불러 말했습니다.
+"펄은 잘 안써봤는데, 펄 환경 구축도 해야하고, 라이브러리는 어떻게 받는지 알려줄래?"
+양타군은 이번에도 포스트잇을 건내며 말했습니다.
+"이렇게 입력하기만 하면 됩니다."
+
+> curl http://example.com/yangta.pl | perl - --self-upgrade
+
+이것으로 라이브러리를 설치하고, 명령어도 같이 제공되었습니다.
+양타 군은 아래와 같이 모듈이 제대로 설치되었는지 확인해주었습니다.
+
+    #!bash
+    $ perldoc -l Yangta
+    /home/nabapa/perl5/Yangta.pm
+    $ which yangta.pl
+    /home/nabapa/bin/yangta.pl
+
+
+## 양타 군의 문서
+
+"간편하군. 그런데 레포지터리는 어디서 받아야 하지? 문서가 있으면 좋겠군."라는 진지 씨의 질문에
+양타 군은 이렇게 입력하며 말했습니다. "perldoc을 쓰면 문서가 나옵니다."
+
+    #!bash
+    $ perldoc Yangta
+
+나진지 씨는 어느정도 만족하였습니다.
+
+
+## 직접 만들어봅시다
+
+이야기에서 양타 군이 만든 도구와 같은 프로그램을 직접 만들어봅시다.
+프로그램의 조건을 간략히 정리해보니 아래와 같습니다.
+
+- 주요 로직은 재사용성과 확장성을 위해 모듈로 제공
+- 프론트앤드 명령행을 같이 제공
+- 의존하는 라이브러리까지 통째로 묶인 스크립트 제공
+- 따라서 HTTP/NFS/FTP 등을 통해 원라인으로 실행 가능
+- 의존하는 라이브러리와 명령행을 쉽게 설치하는 옵션 제공
+
+예제를 위해, 특히 로그를 분석하는 라이브러리를 만들어 봅니다.
+다양한 로그 포맷을 어댑터를 통해 지원할 수 있도록 만듭니다.
+
+
+## 프론트앤드를 만들자
+
+어떠한 로그도 쉽게 `grep` 할 수 있는 프로그램을 만듭시다.
+예를 들기 위해, 프로그램의 이름은
+필자의 닉네임(am0c)과 로그(log)의 합성어로 `amolog`라고 대충 지어보았습니다.
+
+아래와 같이 `amolog list`를 입력하면
+로그 분석을 지원하는 어댑터의 목록이 출력되고,
+`amolog grep`과 출력할 로그 줄의 조건을 기입하면
+쉽게 분석할 수 있으면 좋겠습니다.
+
+    #!bash
+    $ amolog list
+        xchat2 - you can grep xchat2 logs
+        syslog - you can grep syslogs
+        email  - you can even grep emails
+        
+    $ amolog grep xchat2 -channel perl-kr -user am0c
+    ...
+    
+    $ amolog grep syslog -today -fatal
+    ...
+
+실제로 만들어 봅시다.
+작업에 들어가기에 앞어, 작업 환경 디렉터리를 만드는 것이 당연하겠죠?
+
+    #!bash
+    $ mkdir ~/amolog
+    $ cd ~/amolog
+
+이제부터, 이 프로젝트의 모든 작업은 이 디렉터리를 최상위로 두고 하겠습니다.
+라이브러리는 `lib` 디렉터리에, 테스트 묶음은 `t` 디렉터리에,
+그리고 스크립트 파일은 `bin` 디렉터리에 두는 것이 관례입니다.
+
+    #!bash
+    $ mkdir ./bin ./t ./lib
+    $ vim bin/amolog
+
+먼저 편집기를 열어 명령어에 해당하는 스크립트를 만들어 봅시다.
+잠깐! _바퀴는 재발명할 필요가 없습니다._
+CPAN 저장소에는 수십만개의 편리한 모듈이 준비되어 있습니다.
+CPAN 보물 해저를 탐험해보니
+[App::Cmd][module-app-cmd]라는 놈이 있습니다.[^1]
+모듈의 문서를 보고 작성해봅니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use App::amolog;
+    App::amolog->run;
+
+짜잔! 이것으로 명령을 위한 실행파일이 완성되었습니다.
+실제 로직은 `App::amolog`으로 전달되는군요.
+명령행 프로그램에 해당하는 모듈은
+`App::` 이름공간을 사용하는 것이 관례입니다.
+
+    #!bash
+    $ mkdir -p ./lib/App/
+    $ vim ./lib/App/amolog.pm
+
+자, 이제 `lib` 디렉터리에 `App::amolog` 패키지를 작성합시다.
+
+    #!perl
+    package App::amolog;
+    use App::Cmd::Setup -app;
+    1;
+
+끝입니다. `App::Cmd::Setup`를 로드함으로서,
+도움말과 Usage, 명령어 Dispatch 기능을 자동으로 수행해줍니다.
+실행해봅니다.
+
+    #!bash
+    $ bin/amolog 
+    
+    Available commands:
+
+      commands: list the application's commands
+      help: display a command's help screen
+
+이번에는 하위 명령어를 만들어봅시다.
+다양한 포맷의 로그를 읽어낼 수 있어야 하기 때문에
+아래와 같이 어댑터 구조가 좋겠습니다.
+
+    #!plain
+    Amolog --> Amolog::Adapter
+                |
+                |- Amolog::Adapter::XChat2
+                |- Amolog::Adapter::Email
+                '- Amolog::Adapter::Syslog
+
+지원하는 어댑터 목록을 보여주는 `list` 명령을 추가해봅시다.
+`App/amolog/Command/list.pm`으로 파일을 작성합니다.
+
+    #!perl
+    package App::amolog::Command::list;
+    use App::amolog -command;
+    use Module::Find;
+    
+    sub execute {
+        for (findsubmod Amolog::Adapter) {
+            s/^.+:://;
+            print "\t$_\n";
+        }
+    }
+    1;
+
+`App::amolog`를 로드할 때 `-command` 인자를 넣는 것으로,
+이것이 `amolog`의 하위 명령이라는 것을 알립니다.
+`amolog list`라고 명령을 입력하면 `execute()`가 실행될 것입니다.
+`Amolog::Adapter` 이름공간 하위에 존재하는 모듈을 모두 찾아서
+출력합니다. `s///` 연산자를 통해 이름공간은 지우고 출력합니다.
+
+언제나 문서를 작성하는 것이 좋습니다.
+아래에 이 모듈의 상세를 기록합니다. 아래와 같이 간단하게
+POD 문서를 추가했습니다.
+
+    #!perl
+    =head1 NAME
+    
+    App::amolog::Command::list - List all adapters
+    
+    =cut
+
+이것으로 `list` 하위 명령도 완성입니다.
+아래와 같이 `XChat.pm`을 생성하고 `list` 하위 명령을 입력하면
+어댑터 목록에 나타나는 것을 확인할 수 있습니다.
+POD 문서에 넣은 `list`의 설명이 자동으로 `help` 하위 명령으로
+출력되는 것을 볼 수 있습니다.
+
+    #!bash
+    $ touch lib/Amolog/Adapter/XChat.pm
+    $ bin/amolog list
+         XChat
+
+    $ bin/amolog help
+    Available commands:
+
+      commands: list the application's commands
+      help: display a command's help screen
+
+      list: List all adapters
+
+참고로, 여기에 `opt_spec()` 함수를 아래와 같이
+서술하여 쉽게 명령행 옵션 규칙을 만들 수 있습니다.
+자동으로 명령행 인자가 규칙을 어기지 않았는지 검사하고,
+Usage 도움말을 생성해 출력해줍니다.
+입력된 명령행 인자가 규칙에 부합하면 `execute()`에
+해시로 전달됩니다.
+
+    #!perl
+    sub opt_spec {
+      return (
+        'my-program %o <some-arg>',
+        [ 'server|s=s', "the server to connect to"                  ],
+        [ 'port|p=i',   "the port to connect to", { default => 79 } ],
+        [],
+        [ 'verbose|v',  "print extra stuff"            ],
+        [ 'help',       "print usage message and exit" ],
+      );
+    }
+
+이 기능은 [Getopt::Long::Descriptive][module-getopt-desc] 모듈을
+통해 작동합니다. 특히 위 예제는 아래와 같은 Usage를 생성합니다.
+정말 편리해보이죠?
+
+    #!plain
+    my-program [-psv] [long options...] <some-arg>
+      -s --server     the server to connect to
+      -p --port       the port to connect to
+     
+      -v --verbose    print extra stuff
+      --help          print usage message and exit
+
+마지막으로 남은 `grep` 하위 명령은 실제 로직을 담당하는 백앤드 
+라이브러리를 작성한 다음에 추가해주는 것이 좋겠습니다.
+
+## 모듈을 만들자
+
+이번에는 실제 로직을 담당하는 라이브러리를 만들어봅시다.
+이렇게 모듈과 명령어 프론트앤드를 분리하면
+또다른 프론트앤드 인터페이스가 붙을 수도 있고,
+직접 모듈을 불러서 사용하는 펄 스크립트를 작성해
+cron 작업에 올리는 것도 가능할 것입니다.
+`App::` 이름공간을 빼서 `Amolog` 모듈을 만듭니다.
+
+    #!perl
+    package Amolog;
+    use Moo;
+    
+    has 'adapter',
+        is       => 'lazy',
+        isa      => sub { (shift)->isa('Amolog::Adapter') },
+        handles  => 'Amolog::Adapter',
+        required => 1;
+    
+    1;
+
+이것으로 완료입니다. 
+이 클래스는 `adapter` 속성 하나만 가지고 있습니다.
+여기에는 우리를 대신할 어댑터 객체가 할당될 것입니다.
+`isa` 옵션으로 이 어댑터 맴버 변수의 타입을 `Amolog::Adapter`로
+강제합니다. `handles` 옵션을 통해 이 객체에 호출되는 메소드는 어댑터에게 위임됩니다.
+
+이번에는 어댑터의 인터페이스인 `Amolog::Adapter`를 작성합시다.
+현대 펄에서는 인터페이스를 _Role_을 통해 구현합니다.
+아래와 같이 Role 프래그마를 선언하고 인터페이스 메소드를 적습니다.
+일단은 `grep()` 메소드만 제공합시다.
+
+    #!perl
+    package Amolog::Adapter;
+    use Moo::Role;
+    
+    sub grep { ... }
+    
+    1;
+
+이제 XChat 어댑터를 마저 만들어봅시다.
+
+    #!perl
+    package Amolog::Adapter::XChat;
+    use Moo;
+    
+    sub grep {
+        my ($self, $optree) = @_;
+        $optree = $self->adjust_optree($optree);
+        $self->perform($optree);
+    }
+    
+    sub adjust_optree { ... }
+    sub perform       { ... }
+    
+    1;
+
+`amolog grep` 명령어나 라이브러리를 통해 조건을 전달받습니다.
+이 복잡한 조건식은 OP 트리로 이루어져있습니다.
+이 OP 트리는 각 어댑터가 각자 로그의 형식과 구조에 알맞게
+재구성할 필요가 있습니다. OP 트리를 재구성하고 실행하면
+완료입니다! 자세한 구현은 생략하였습니다.
+
+## 배포 가능한 모듈을 만들자
+
+프로젝트의 빌드 스크립트를 만듭시다.
+우리가 일반적으로 외부에서 소스를 받으면 수행하는
+Configure - Make - Make Install 과정을 위한 것입니다.
+이것으로 모듈 의존성을 자동으로 해결하고, 버전을 관리합니다.
+모듈의 인덱스 정보와 구조를 관리합니다.
+모듈의 저자와 라이센스도 포함합니다.
+
+C나 C++에서 `automake`와 `autoconf`를 사용하는 대신
+펄은 `Module::Build`를 사용합니다.
+프로젝트 최상위 디렉터리에 `Module.PL` 파일을 생성하고
+아래와 같이 작성합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use Module::Build;
+    
+    my $build = Module::Build->new(
+        module_name   => 'Amolog',
+        dist_abstract => 'grep any log',
+        dist_version  => '0.0.1',
+        license       => 'perl',
+        requires      => {
+            Moo       => 0,
+            App::Cmd  => 0,
+            Try::Tiny => 0,
+        },
+    );
+    
+    $build->create_build_script;
+
+직접 만들어보면서 사용했던 `App::Cmd`과 `Moo` 등의 의존 모듈을
+적습니다. 모듈 이름도 적습니다. 이것으로 모듈 배포 준비가 되었습니다.
+아래와 같이 묶을 수 있습니다.
+
+    #!bash
+    $ perl Build.PL
+    $ ./Build manifest
+    $ ./Build dist
+    ...
+    Creating Amolog-0.0.1.tar.gz
+
+이 파일을 배포한 뒤, 사용자가 `cpan`과 `cpanm`을 통해 설치할 수 있습니다.[^2]
+
+    #!bash
+    $ cpanm Amolog-0.0.1.tar.gz
+    --> Working on Amolog-0.0.1.tar.gz
+    Fetching file:///home/amolog/Amolog-0.0.1.tar.gz ... OK
+    Configuring Amolog-v0.0.1 ... OK
+    Building and testing Amolog-v0.0.1 ... OK
+    Successfully installed Amolog-v0.0.1
+    1 distribution installed
+
+## 단일 실행 파일로 패킹하고 배포하기
+
+`bin/amolog` 명령행과 `Amolog` 및 `App::Amolog` 라이브러리를 단일
+실행 파일로 묶으면 배포가 용이할 것입니다.
+[App::FatPacker][module-fatpack]를 설치합니다.
+[SYNOPSIS를 참고](https://metacpan.org/module/App::FatPacker#SYNOPSIS)하여
+아래와 같이 `fatpack` 명령으로 단일 파일로 묶어
+최상위 작업 디렉터리에 `amolog`를 생성합니다.[^3]
+
+    #!bash
+    $ fatpack trace bin/amolog
+    $ fatpack packlists-for `cat fatpacker.trace` > packlists
+    $ fatpack tree `cat packlists`
+    $ (fatpack file; cat myscript.pl) > amolog
+
+`amolog`을 잘 살펴보고, `#!` 라인을 정리하거나
+추가적인 문서를 넣어주면 완성입니다.
+이것은 FTP나 HTTP로 제공하면 나바쁜 씨는 아래와 같이
+실행할 수 있을 것입니다.
+
+    #!bash
+    $ curl http://example.com/amolog | perl - --help
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100  166k  100  166k    0     0  2540k      0 --:--:-- --:--:-- --:--:-- 2322k
+    Available commands:
+    
+      commands: list the application's commands
+          help: display a command's help screen
+    
+          grep: grep log
+          list: List all adapters
+
+    $ curl file:///home/amolog/amolog | perl - --help
+    ...
+
+## 단일 실행 파일이 자기 자신을 설치하기
+
+이번에는 `--upgrade-self` 옵션을 받을 경우 자기 자신을 설치하도록 해봅시다.
+`App::cpanminus`를 사용하는 것이 가장 간편할 것 같습니다.
+하지만 `App::cpanminus`는 인터페이스를 숨기도록 설계되었기 때문에,
+외부에서 받아서 파이프를 요청합니다.
+
+    #!perl
+    require HTTP::Tiny;
+    my @option = __PACKAGE__;
+    my $cpanm = HTTP::Tiny->new->get('http://cpanmin.us')->{content};
+    open my $perl, "|-", $^X, "-", @option;
+    print $perl $cpanm;
+
+기본적으로 CPAN에서 설치하려고 할 것입니다.
+환경에 맞게 `@option`에 `cpanm`의 명령행 옵션을 추가해 설치 방법을 고칠 수 있습니다.
+
+## 패킹 작업을 자동화하기
+
+생성된 파일에 문제가 있다면 `fatlib/` 디렉터리와
+패킹 과정 중에 생성된 `packlists`와 `fatpacker.trace` 파일과
+`fatlib/` 디렉터리를 잘 살펴보아야 합니다.
+네 번의 입력과 수동적인 추가 작업을
+필요할 때마다 반복하는 것은 좋은 일이 아닌 것 같습니다.
+자동화를 위해 `scripts/upgrade-fatlib.pl`을 아래와 같이 작성합니다.[^4]
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use App::FatPacker ();
+    use File::Path;
+    use Cwd;
+    
+    my $modules = [ split /\s+/, <<MODULES ];
+    local/lib.pm
+    version.pm
+    MODULES
+    
+    my $packer = App::FatPacker->new;
+    my @packlists = $packer->packlists_containing($modules);
+    $packer->packlists_to_tree(cwd . "/fatlib", \@packlists);
+    
+    use Config;
+    rmtree("fatlib/$Config{archname}");
+
+자동을 추적하지 못한 모듈은 `$modules`에 등록하면
+올바른 `fatlib/`을 자동으로 생성할 수 있게 되었습니다.
+이제 `fatpack file` 과정을 `./Build` 스크립트에 포함하고
+쉬뱅 라인을 정리하도록 만듭시다.
+`Build.PL`의 상단에 위 코드를 추가합니다.
+
+    #!perl
+    Module::Build->subclass(
+        class => 'Module::Build::amolog',
+        code => << 'SUBCLASS');
+    
+    sub ACTION_fatpack {
+        my $self = shift;
+    
+        system $^X, "scripts/upgrade-fatlib.pl";
+    
+        open my $in, "<", "bin/amolog";
+        open my $out, ">", "amolog";
+    
+        while (<$in>) {
+            s/.+__FATPACK__/`$^X -e "use App::FatPacker -run_script" file`/e;
+            print $out $_;
+        }
+    }
+    
+    SUBCLASS
+
+이렇게 `Module::Build`의 하위 클래스를 만들고
+`ACTION_fatpack()` 메소드를 추가하면,
+`./Build fatpack` 입력 시 해당 메소드가 실행됩니다.
+`bin/amolog` 파일에서 `__FATPACK__`라는 부분이 발견되면
+그 줄에 패킹된 의존 모듈을 추가하도록 만듭니다.[^5]
+따라서 `bin/amolog` 스크립트 적당한 부분에 `__FATPACK__`을 추가합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    # __FATPACK__
+    use App::amolog;
+    App::amolog->run;
+    
+이것으로 완성입니다.
+
+## 정리하며
+
+시스템 관리를 위한 도구를 쉽게 제작하는 방법을 알아보았습니다.
+도구의 프론트앤드 명령어와 라이브러리를 분리하여 재사용과 확장에 대비하였습니다.
+배포를 위한 작업에 대해 알아보았고, 패킹하여 배포를 용이하게 하는
+방법도 알아보았습니다.
+
+펄은 도구를 만드는데 용이합니다.
+특히 프론트앤드 제작을 위한 프레임워크와, 백앤드를 제작하기 위한
+수많은 CPAN 라이브러리를 참고하면 머리도 몸도 편하고, 놀 시간도 많아집니다.
+연말을 즐겁게 마무리하기 위해 잡동사니를 자동화합시다.
+
+이 자리를 빌어 바쁜 와중에
+크리스마스 올해 달력 웹사이트 일러스트 및 디자인을 맡아주신 이유라 님과
+저의 모델이 되어주신 서울 펄 몽거스 여러분께 감사를 올립니다.
+
+## 참고
+
+- [(::)](https://metacpan.org/)
+- [cpanmin.us의 상단](http://cpanmin.us/)
+- [에어로님의 App::FatPacker 블로그 포스트](http://aero2blog.blogspot.kr/2010/09/perl-appfatpacker.html)
+- [App::Cmd를 소개한 RJBS의 달력 기사](http://advent.rjbs.manxome.org/2009/2009-12-14.html)
+
+### 각주
+
+[^1]: 명령 도구를 만들기 위한 간단한 프레임워크인가 봅니다.
+XS 모듈에 의존하지 않고, 간소하며, 신뢰할 수 있는 저자의
+모듈입니다. 시스템 관리 도구 제작을 위해 쓰는 데 나쁘지 않을 것 같습니다.
+
+[^2]: CPAN에 업로드하기 위해서는 고려할 것이 많습니다.
+CPAN에 호환하기 위해서는 인덱스와 버전을 잘 관리하고,
+빌드 스크립트가 이것을 잘 반영해야 합니다. 모듈은 이식성도 고려해야합니다. 
+
+[^3]: CPAN에 호환하는 모듈을 제작하려 하는 경우,
+이렇게 생성된 `fatlib/`과 `amolog`는 CPAN 인덱스에서 제외해야 합니다.
+한편, 코드 관리 시스템에는 등록하는 것이 좋을 수 있습니다.
+`App::FatPacker`는 XS를 호환하지 않습니다.
+
+[^4]: https://github.com/miyagawa/cpanminus/blob/1.5018/script/upgrade-fatlib.pl
+
+[^5]: 기사 예제에서는 간소하게 `bin/amolog`에서 바로 변형하도록 하였지만,
+이렇게 구성하면 실행 파일의 탬플렛을 만들어 두기 용이합니다.
+사용자에게 제공하는 스크립트와, 패킹하여 제공하는 스크립트를
+탬플렛에서 생성하면 관리가 용이할 것입니다.
+
+
+[am0c]: http://twitter.com/am0c
+[module-getopt-desc]: https://metacpan.org/module/Getopt::Long::Descriptive
+[module-app-cmd]: https://metacpan.org/module/App::Cmd
+[module-fatpack]: https://metacpan.org/module/App::FatPacker
