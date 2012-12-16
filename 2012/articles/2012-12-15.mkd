@@ -2,11 +2,11 @@ Title:    자랑스러운 우리회사의 숨은 일꾼 만들기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   yongbin
+Author:   y0ngbin
 
 ## 저자
 
-[@yongbin](http://twitter.com/yongbin) - aka 용사장 / Minivelo++ / 맞춤법 전문가
+[@y0ngbin](http://twitter.com/y0ngbin) - aka 용사장 / Minivelo++ / 맞춤법 전문가
 
 ## 시작하며
 
