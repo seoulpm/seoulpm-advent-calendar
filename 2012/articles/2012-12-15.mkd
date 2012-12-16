@@ -201,14 +201,14 @@ C로 구현된 gearmand를 컴파일해 설치하고 작업의 저장은 로컬 
 
 ## 참고자료
 
-- [Gearman.org](http://gearman.org/)
+- [Gearman.org](http://gearman.org/) -
   Eric Day의 C 구현 Gearman 홈페이지, 각종 문서와 최신 자료가 풍부합니다.
 
-- [Gearman을 사용하여 PHP 애플리케이션의 워크로드 분배하기](http://www.ibm.com/developerworks/kr/library/os-php-gearman/)
+- [Gearman을 사용하여 PHP 애플리케이션의 워크로드 분배하기](http://www.ibm.com/developerworks/kr/library/os-php-gearman/) -
   IBMdW에 기재된 gearman과 php 활용 기사, Perl Gearman 자료는 아니지만
   Gearman을 이해하는데 도움이 되는 우리말 기사입니다.
 
-- [Evolution of SoundCloud’s Architecture](http://backstage.soundcloud.com/2012/08/evolution-of-soundclouds-architecture/)
+- [Evolution of SoundCloud’s Architecture](http://backstage.soundcloud.com/2012/08/evolution-of-soundclouds-architecture/) -
   Gearman을 직접 다루지는 않지만 잡 큐 기반의 서브시스템을 활용해
   웹서비스의 기능을 확장하는 과정을 잘 설명하고 있습니다.
 
