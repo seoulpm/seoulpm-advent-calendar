@@ -6,6 +6,10 @@
     <p class="author"></p>
   </div>
 </div></div>
+<div id="preloader">
+  <img src="gift.gif"  width="1px" height="1px" alt="&nbsp;" />
+  <img src="popup.gif" width="1px" height="1px" alt="&nbsp;" />
+</div>
 <div id="wrap">
   <div id="head">
     <h1 class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
