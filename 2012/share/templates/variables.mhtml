@@ -48,7 +48,7 @@ return {
     profile_image => {
         '1985xmas'     => 'profile_1985xmas.jpg',
         'aanoaa'       => 'profile_aanoaa.jpg',
-        'aer0'         => 'profile_aer0.jpg',
+        'aer0'         => 'profile_aer0_1.jpg',
         'am0c'         => 'profile_am0c_1.jpg',
         'ascendo'      => 'profile_ascendo.jpg',
         'cheese_rulez' => 'profile_cheese_rulez.jpg',
