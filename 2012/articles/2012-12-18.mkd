@@ -1,0 +1,304 @@
+Title:    Urlader로 Perl 스크립트를 단일실행파일로 만들기 (node.js,Python,Ruby도 가능)
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aer0
+
+
+## 저자
+
+[@aer0][author] -
+Seoul.pm, #perl-kr의 정신적 지주,
+Perl에 대한 근원적이면서 깊은 부분까지 놓치지 않고 다루는 [홈페이지 및 블로그][blog]를 운영하고 있다.
+(서버 사망으로 유실된 자료 중 구글 캐시로 일부만 복구됨.)
+aero라는 닉을 사용하기도 한다.
+
+## 시작하며
+
+Perl로 유용한 프로그램을 만들어서 누군가와 공유해서 쓰고 싶다면 어떻게 배포할지 고민하게 됩니다.
+사용자가 Perl을 잘 아는 사람이면 "Perl을 설치하고
+이 스크립트를 실행하라"고 쉽게 떠넘길 수 있지만
+대다수 사용자들은 그냥 보통 실행 파일처럼 .exe 파일을 마우스로 클릭하면 모든게 알아서 실행되길 바랍니다.
+Perl을 단일 실행 파일로 만드는 방법은 PAR를 이용한 방법 등 다음과 같은 기존의 방법이 여럿 존재합니다.
+
+* [2011년 24일 펄 달력 기사][2011-12-24]의 마지막 "단일파일 배포 및 패키징" 섹션
+* [윈도우에서 Perl어플리케이션을 배포][deploy-perl]하는 방법에 대한 블로그 포스트
+
+위에서 언급한 PAR 등의 패키징 툴을 이용하는 방법의 문제는
+필요하지 않은 많은 파일들이 같이 패키징되어
+용량이 너무 커지고 초기 실행 시 임시로 내부 파일을 압축 해제하게 되는데
+그 시간이 다소 오래 걸린다는 단점이 있습니다.
+또, 후자의 방법같이 launcher만 만들어 하는 방식은 실행 속도는 빠르나
+내부 파일들이 그대로 노출되고 나열되어 좀 너저분해 보인다는 단점이 있습니다.
+그러면 꼭 필요한 파일들만 추려서 단일 실행 파일 하나로 패키징하는 방법은 없을까요? 
+
+## Urlader!
+
+해결책은 AnyEvent 등의 모듈을 만든 유명한 펄해커인
+[Marc Lehmann][marc]이 만든
+[Urlader][module-urlader]를 사용하는 것입니다.
+Urlader는 Linux, Mac OS X, Windows 등 많은 플랫폼을 지원하지만 여기서는 특히 Windows에서의 과정만 다루겠습니다.
+
+그럼 Urlader를 이용하여 [Win32::GUI][module-win-gui] 모듈에 포함된 데모 프로그램 중
+간단한 예제 하나를 가져와 약간 고쳐서 독립적인 .exe 파일로 패키징하는 과정을 알아보도록 합시다.
+
+## 따라해봅시다
+
+일단 Urlader 모듈을 `cpan Urlader` 명령을 통해 설치합니다.
+예제를 위해 사용할 `Win32::GUI` 모듈도 같이 설치해주세요.
+
+    #!plain
+    C:\> cpan Urlader
+    C:\> cpan Win32::GUI
+   
+이제 다음과 같은 예제 프로그램을 `helloworld.pl`라는 이름으로 만듭니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use FindBin;
+    use Win32::GUI();
+    
+    # Get text to diaply from the command line
+    my $text = defined($ARGV[0]) ? $ARGV[0] : $ENV{URLADER_EXEPATH}.','.$FindBin::Bin;
+    
+    # Create our window
+    my $main = Win32::GUI::Window->new(
+    	-name   => 'Main',
+    	-width  => 100,
+    	-height => 100,
+    	-text   => 'Perl',
+    );
+    
+    # Create a font to diaply the text
+    my $font = Win32::GUI::Font->new(
+    	-name => "Comic Sans MS", 
+    	-size => 10,
+    );
+    
+    # Add the text to a label in the window
+    my $label = $main->AddLabel(
+    	-text       => $text,
+    	-font       => $font,
+    	-foreground => 0x0000FF,
+    );
+    
+    my $ncw = $main->Width()  - $main->ScaleWidth();
+    my $nch = $main->Height() - $main->ScaleHeight();
+    my $w = $label->Width()  + $ncw;
+    my $h = $label->Height() + $nch;
+    
+    
+    # Get the desktop window and its size:
+    my $desk = Win32::GUI::GetDesktopWindow();
+    my $dw = Win32::GUI::Width($desk);
+    my $dh = Win32::GUI::Height($desk);
+    
+    # Calculate the top left corner position needed
+    # for our main window to be centered on the screen
+    my $x = ($dw - $w) / 2;
+    my $y = ($dh - $h) / 2;
+    
+    # And move the main window to the center of the screen
+    $main->Move($x, $y);
+    # Resize the window to the size of the label
+    $main->Resize($w, $h);
+    # Set the minimum size of the window to the size of the label
+    $main->Change(
+    	-minsize => [$w, $h],
+    );
+    
+    # SHow the window and enter the dialog phase.
+    $main->Show();
+    Win32::GUI::Dialog();
+    exit(0);
+    
+    # Terminate Event handler
+    sub Main_Terminate {
+    	return -1;
+    }
+    
+    # Resize Event handler
+    sub Main_Resize {
+    	my $mw = $main->ScaleWidth();
+    	my $mh = $main->ScaleHeight();
+    	my $lw = $label->Width();
+    	my $lh = $label->Height();
+    
+    	$label->Left(($mw - $lw) / 2);
+    	$label->Top(($mh - $lh) / 2);
+    
+    	return 0;
+    }
+
+위 파일을 만들고 저장한 뒤
+`perl helloworld.pl Hello`라고 명령을 내리면 다음과 같은 화면이 뜰 겁니다.
+
+!["helloworld.pl Hello"를 실행한 모습][img-1]
+*그림 1.* "helloworld.pl Hello"를 실행한 모습
+
+코드를 보면 명령행 인자(`Hello`)를 주지 않으면
+`$ENV{URLADER_EXEPATH}`와 `$FindBin::Bin`의 값을 찍도록 만들었는데,
+이것들에 대해서는 나중에 설명할테니 일단 넘어가도록 합시다.
+
+패키징을 위해 임시로 작업할 디렉토리를 만듭니다.
+여기서 저는 `c:\temp\for_pack`이란 디렉토리를 만들었습니다.
+디렉토리를 만들었으면 메인 스크립트 파일을 해당 디렉토리에 옮깁니다.
+
+`cmd.exe` 명령 프롬프트를 실행하여 `cd c:\temp\for_pack` 명령으로
+작업 디렉토리로 들어가서 패키징에 필요한 파일을 뽑아낼 준비를 합니다.
+Urlader도 자동으로 추출하는 기능은 제공하지는 않기 때문에
+[제 블로그 포스트에 소개한 방법][deploy-perl]을
+그대로 따라하겠습니다.
+
+## 추출 및 패킹하기
+
+[NtTrace][nttrace]를 받아서
+설치한 다음 아래와 같이 명령을 내립니다.
+
+    #!plain
+    C:\> NtTrace -filter File wperl helloworld.pl > out.txt
+
+프로그램이 정상적으로 실행이 완료된 다음 종료합니다.
+참고로 이때 `wperl.exe`는 `perl.exe`와 달리 명령행 창을 띄우지 않는 펄 실행 바이너리입니다.
+이제 아래와 같은 `make_dist.pl` 파일을 만듭니다.
+여기에서 perl의 base 경로를 나타내는 `$perl_path` 변수는 자기 환경에 맞게 바꾸어야 합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use 5.010;
+    use strict;
+    use warnings;
+     
+    my $perl_path = qr/C:\\strawberry-perl-5.14.2.1-32bit\\perl\\/;
+    my %files;
+    open my $fh , '<', 'out.txt' or die;
+    while (my $line = <$fh>) {
+        $files{$1}=1 if $line =~ m{($perl_path.*?)".*?=> 0$};
+    }  
+     
+    foreach my $file (sort keys %files) {
+        next if -d $file;
+        my $dest = $file;
+        $dest =~ s/$perl_path//;
+        say "$file -> $dest";
+        system(qq{echo f | xcopy /C "$file" .\\dist\\"$dest"});
+    }
+
+`perl make_dist.pl`라고 명령을 내리게 되면 현재 디렉토리 하위에
+`dist`란 디렉토리가 생성되며 필요한 파일들을 그 아래에 쭉 모으게 됩니다.
+그다음 메인 스크립트인 `helloworld.pl` 파일을 `dist` 디렉토리로 옮깁니다.
+
+    #!plain
+    <디렉토리 구조>
+    c:\temp\for_pack\dist\-- helloworld.pl
+                          +- bin  (wperl.exe, perl514.dll, ...)
+                          +- lib  (모듈들...)
+                          +- site (모듈들...)
+
+
+이제 각 플랫폼에 맞게 미리 준비된 urlader 런처를 받아 준비한 의존 모듈과 함께 패킹해야 합니다.
+[urlader 웹페이지][urlader-prebuilt]에서 `windows-x86` 파일을
+다운로드하여 작업 디렉토리 `c:\temp\for_pack`에 저장한다음 다음과 같이 명령을 내립니다.
+
+    #!plain
+    C:\> urlader-util --urlader windows-x86 --output helloworld.exe \
+                      --pack helloworld 1.0 \
+                      C:\temp\for_pack\dist \
+                      .\bin\wperl.exe helloworld.pl
+
+여기에서도 명령창 없이 실행하기 위해 `perl.exe`대신 `wperl.exe`를 지정했습니다.
+명령행 옵션의 형식은 아래와 같습니다.
+자세한 사항은 [문서를 참고][urlader-util-modes]하세요.
+
+    #!plain
+    C:\> urlader-util --urlader <다운받은부트스트랩용바이너리> \
+                 --out <출력실행파일명> \
+                 --pack <실행파일내부이름> \
+                 <실행파일내부버젼> \
+                 <패키지할파일들의base경로> \
+                 [선택사항:환경변수들] \
+                 <base경로를기준으로한실행바이너리경로(여기서는 perl해석기)> \
+                 [인자들(여기서는 perl스크립트이름)]
+
+Urlader 문서에 의하면 Perl 뿐만 아니라 Python 등 다른 어떤 언어도
+`<패키지할파일들의base경로>`(여기서는 `c:\temp\for_pack\dist`)를 기준으로
+`<base경로를기준으로한실행바이너리경로> [인자들]`로 프로그램이 실행가능하면
+Urlader로 하나의 실행파일로 패키징 가능하다고 합니다.
+직접 실험해 본 결과 Node.js, Python으로 만든 예제도 문제없이
+패키징되는 것을 확인했습니다. 물론 Ruby도 문제 없겠죠?
+
+위 명령이 정상적으로 실행되었다면 작업 디렉토리에 `helloworld.exe`란
+파일이 생성되어 있을겁니다. 이제 이렇게 만들어진 단일 실행 파일은
+어디로 가져가든지 이 파일 하나로만 실행할 수 있습니다.
+참고로, 실행 파일의 아이콘을 바꾸고 싶으면
+`urlader-util` 명령 실행시 `--windows-icon my.ico` 옵션을 추가하면 됩니다.
+
+## 실행해봅시다
+
+해당 파일을 마우스로 클릭해서 실행해 보면 다음과 같은 화면을 볼 수 있을겁니다.
+
+![패킹한 프로그램을 실행한 모습][img-2]
+*그림 2.* 패킹한 프로그램을 실행한 모습 ([원본][img-resize-2])
+
+명령행 인자가 주어지지 않았으므로 화면에
+`$ENV{URLADER_EXEPATH}`과 `$FindBin::Bin`에 해당하는 문자열이 찍혔습니다.
+왜 이 문자열을 찍도록 예제 프로그램을 작성했는지 말씀드리겠습니다.
+
+`$ENV{URLADER_EXEPATH}`는 Urlader로 만들어진
+실행 파일의 실행된 위치의 전체경로(여기서는 `c:\temp\for_pack\helloworld.exe`)을 뜻하며
+`$FindBin::Bin`은 패키징된 실행파일을 실행시킬 때
+실행시킨 사용자의 어플리케이션 데이터 디렉토리에 임시적으로 풀어서
+실제 실행되는 메인스크립트의 경로를 나타냅니다.
+
+현재 실험은 Windows 7에서 했으므로, `c:\Users\kang\AppData\Roaming\urlader\helloworld\i-1.0`는
+`c:\Users\사용자ID\AppData\Roaming\urlader\실행파일내부이름\실행파일내부버젼을포함한특정문자열`의 형식으로
+실행 파일 내부 이름, 실행 파일 내부 버전은 `urlader-util` 명령에서
+지정해준 것입니다. 따라서 새로 패키징할 때에는 버전을 바꿔야
+이전에 풀어서 캐시된 임시 디렉토리와 겹치지 않고 새버전으로 실행됩니다.
+또는 임시 캐시 디렉토리를 비워야 새로 패키징한 바이너리가 적용됩니다.
+
+- 만들어진 실행 바이너리 [helloworld.exe](2012-12-18-helloworld.exe)
+
+정리하면, 패키징한 메인 스크립트가
+내부적으로 어떤 데이터나 설정파일을 읽어야 하면
+메인스크립트에서 `$FindBin::Bin`경로를 기준으로 작업해야
+패키징할 때 같이 포함해도 문제없이 해당 파일을 잘 찾을 수 있을 것이고,
+패키징한 실행 파일이 실행된 경로를 기준으로 어떤 외부 파일을 읽어 사용해야 될 때에는
+`$ENV{URLADER_EXEPATH}`을 기준으로 상대 경로를 잡으면 될 것이라는 힌트를 드리기 위해서입니다.
+
+## 정리하며
+
+내가 만든 GUI 프로그램, 명령행 유틸리티, 독립적인 웹 기반 어플리케이션 등
+유용한 유틸리티 및 프로그램을 다른 사람에게 배포하고 싶은데,
+"실행하기전에 뭐 설치해라 무슨 모듈 설치해라" 이런 말 할 필요 없이
+원포인트로 돌아가도록 만들고 싶으싶니까?
+
+그러면 이제 Urlader로 자신이 만든 유용한 유틸리티를 간결하고 깔끔하게 패키징하여 널리 공유해보세요~
+
+### 참고 문서
+
+- 만들어진 실행 바이너리 [helloworld.exe](2012-12-18-helloworld.exe)
+- [NtTrace][nttrace]
+- [Urlader 문서][module-urlader]
+- [2011년 24일 펄 달력 기사][2011-12-24]
+- [윈도우에서 Perl 어플리케이션 배포][deploy-perl]
+
+
+[author]: https://twitter.com/aer0
+[blog]: http://aero.sarang.net/
+
+[marc]: https://www.metacpan.org/author/MLEHMANN
+[module-urlader]: https://www.metacpan.org/release/Urlader
+[urlader-prebuilt]: http://urlader.schmorp.de/prebuilt/1.0/
+[urlader-util-modes]: https://metacpan.org/module/MLEHMANN/Urlader-1.01/bin/urlader-util#MODES
+
+[module-win-gui]: https://www.metacpan.org/module/Win32::GUI
+[2011-12-24]: http://advent.perl.kr/2011/2011-12-24.html
+[deploy-perl]: http://aero2blog.blogspot.kr/2011/12/perl.html
+[nttrace]: http://www.howzatt.demon.co.uk/NtTrace/
+
+[img-1]: 2012-12-18-1.png
+[img-2]: 2012-12-18-2.png
+[img-resize-2]: 2012-12-18-2_r.png
