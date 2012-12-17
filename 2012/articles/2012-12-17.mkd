@@ -82,12 +82,13 @@ Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다
 크게 Input, Setting, Attack으로 나누어 소스를 보겠습니다.
 실질적으로 Wireshark로 패킷을 실시간으로 분석하여 소스 부분과 매치하며 보도록 하겠습니다.
 
-공격소스를 보기전에 일반적인 패턴을 보겠습니다.
+공격소스를 보기전에 nomal 패턴을 보겠습니다.
 아래와 같이 일반적인 HTTP Connection은 `syn->syn`, `ack->ack->push->fin->fin,ack`를 함으로서 접속을 마칩니다.
 `ack`후 `get`을 할 때 클라이언트는 아래와 같이 `0d0a0d0a`를 보냄으로써 종료됩니다.
 또한 이 때 Wireshark와 서버의 상태를 살펴보겠습니다.
 
-![img][]
+![nomal 패턴][img-resize-1]
+*그림 1.* nomal 패턴 ([원본][img-1])
 
 netstat로 보는 서버의 상태입니다.
 아래와 같이 하나의 세션이 ESTABLISHED 상태 입니다.
@@ -227,15 +228,15 @@ netstat로 보는 서버의 상태입니다.
 아래와 같이 클라이언트에서 정상적인 syc패킷을 보낸 후
 서버에서 SYN\_ACK가 오고난 후 ACK를 보낼 때 완전하지 않은 헤더를 보내게 됩니다. (`0d0a`만 보내게 됩니다.)
 그래서 서버는 마지막 `0d0a`를 기다리게됩니다.
+
+![0d0a만 보낸 모습][img-resize-2]
+*그림 2.* 0d0a만 보낸 모습 ([원본][img-2])
+
 payload를 살펴보면 GET을 시도한 후 브라우저 정보를 보내고
 실제 payload contents length값이 42바이트지만 헤더는 40바이트만 보내는 것을 알 수 있습니다.
 
-![img][]
-
-클라이언트에서 40바이트만 보내는걸 확인 할 수 있습니다. 하지만 실제 payload는 42바이트 입니다.
-header length : 40 bytes
-
-![img][]
+![40바이트 헤더][img-resize-3]
+*그림 3.* 40바이트 헤더 ([원본][img-3])
 
 Slowloris가 실핼될 때 서버 세션의 변화 모습입니다.
 정상적인 SYN을 받음으로 서버는 ESTABLISHED 상태로 연결을 맺고
@@ -347,7 +348,8 @@ SSL과 INET의 경우를 구분하였습니다.
 이번에는 세션수를 정의하고 브라우저의 정보를 GET 합니다.
 정상적인 SYN 패킷을 보내기 위한 부분입니다.
 
-![img][]
+![정상적인 SYN 패킷][img-resize-4]
+*그림 4.* 정상적인 SYN 패킷 ([원본][img-4])
 
     #!perl
     # if ($working) {
@@ -475,6 +477,13 @@ EOSUCKS2BU
 쓰레드를 사용하게 되면 `domultithreading()`을 호출하고 `doconnections()` 함수를
 다수의 쓰레드를 통해 실행합니다.
 
+공격을 수행하면 "X-a: b\r\n"의 불완전한 헤더를 계속 보냅니다.
+아래 그림과 같이 서버 측에서 FIN 패킷이 오지 않는 것을 확인 할 수 있습니다.
+계속해서 SYN->SYNACK, SYN->SYNACK를 반복하여 세션을 만드는 것을 알 수 있습니다.
+
+![SYN->SYNACK 반복][img-resize-5]
+*그림 5.* SYN->SYNACK 반복 ([원본][img-5])
+
 ## 로그가 정말 남지 않을까?
 
 아래는 공격을 시도하고 있지만 로그가 남지 않는 모습입니다.
@@ -519,3 +528,16 @@ Perl IRC를 지켜주는 봇 같은 것도 가능하겠네요.. :-)
 [module-inet]: https://www.metacpan.org/module/IO::Socket::INET
 [module-ssl]: https://www.metacpan.org/module/IO::Socket::SSL
 [module-trace]: https://www.metacpan.org/module/Devel::Trace::More
+
+[img-1]: 2012-12-17-1.jpg
+[img-2]: 2012-12-17-2.jpg
+[img-3]: 2012-12-17-3.jpg
+[img-4]: 2012-12-17-4.jpg
+[img-5]: 2012-12-17-5.jpg
+
+[img-resize-1]: 2012-12-17-1_r.jpg
+[img-resize-2]: 2012-12-17-2_r.jpg
+[img-resize-3]: 2012-12-17-3_r.jpg
+[img-resize-4]: 2012-12-17-4_r.jpg
+[img-resize-5]: 2012-12-17-5_r.jpg
+
