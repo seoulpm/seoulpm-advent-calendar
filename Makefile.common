@@ -4,7 +4,9 @@ PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
 DEPEND_CPAN_MODULES := Text::MultiMarkdown \
 		       WWW::AdventCalendar \
-		       App::HTTPThis
+		       App::HTTPThis \
+		       HTML::Escape \
+		       URI::Escape
 
 ADVCAL := $(PATCH_LIB) advcal
 ADVCAL_CONFIG  := advent.ini

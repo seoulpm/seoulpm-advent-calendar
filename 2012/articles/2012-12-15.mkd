@@ -54,24 +54,28 @@ _Gearman 서버_는
 클라이언트에서 전달받은 작업을 적절한 워커로 분배하는 역할을 합니다.
 초기 Gearman은 작업을 따로 저장하지 않고 메모리에서 처리했지만 현재는
 다양한 영속 저장방법을 지원하고 있습니다. (libmemcached, libdrizzle,
-SQLite, Mysql, Postgres, tokyocabinet, Redis , Mongodb)
-멀티서버를 지원합니다.
-[gearmand](http://gearman.org/)는 C로 구현되어 있으며,
-펄에서는 [Gearman::Server](http://search.cpan.org/~dormando/Gearman-Server-1.11/lib/Gearman/Server.pm)를 사용합니다.
+SQLite, Mysql, Postgres, tokyocabinet, Redis, Mongodb)
+Gearman 서버는 멀티서버를 지원하기 때문에 단일 장애지점(Single Point of Failure)을 피해서 구성할수 있습니다.
+현재 사용할 수 있는 Gearman 서버 구현체는
+C로 작성된 [gearmand](http://gearman.org/)과
+펄로 작성된
+[Gearman::Server](http://search.cpan.org/~dormando/Gearman-Server-1.11/lib/Gearman/Server.pm)가 있습니다.
 
 _Gearman 워커_는
 실제 우리가 원하는 작업을 수행하는 프로세스입니다.
-위에 언급한 것 처럼 다양한 언어로 작성할 수 있습니다.
-[Gearman::Worker](http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Worker.pm)는 펄로 구현되어 있으며,
-[Gearman::XS::Worker](http://search.cpan.org/~dschoen/Gearman-XS-0.12/lib/Gearman/XS/Worker.pm)을 통해
-libgearmand을 사용할 수도 있습니다.
+위에 언급한 것처럼 다양한 언어로 작성할 수 있습니다.
+Gearman 워커의 구현체는 펄로 구현된
+[Gearman::Worker](http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Worker.pm)과
+C로 구현된 libgearmand, 그리고 libgearmand를 사용해 구현된
+[Gearman::XS::Worker](http://search.cpan.org/~dschoen/Gearman-XS-0.12/lib/Gearman/XS/Worker.pm)가 있습니다.
   
 _Gearman 클라이언트_는
 워커에게 작업을 시키는 프로세스입니다.
 마찬가지로 다양한 언어로 작성될 수 있습니다.
-[Gearman::Client](http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Client.pm)을 사용하며,
-[Gearman::XS::Client](http://search.cpan.org/~dschoen/Gearman-XS-0.12/lib/Gearman/XS/Client.pm)을 통해
-libgearmand를 사용할 수도 있습니다.
+C로 작성된 libgearmand와 펄로 구현된
+[Gearman::Client](http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Client.pm)가 있으며,
+libgearmand를 사용해 구현된
+[Gearman::XS::Client](http://search.cpan.org/~dschoen/Gearman-XS-0.12/lib/Gearman/XS/Client.pm)가 있습니다.
 
     
 ## Gearman 서버 및 환경 구성하기

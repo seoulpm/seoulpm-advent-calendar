@@ -6,7 +6,7 @@
     <p class="author"></p>
   </div>
 </div></div>
-<div id="preloader">
+<div id="preload">
   <img src="gift.gif"  width="1px" height="1px" alt="&nbsp;" />
   <img src="popup.gif" width="1px" height="1px" alt="&nbsp;" />
 </div>
