@@ -7,7 +7,7 @@ Author:   John_Kang
 
 ## 저자
 
-[@John_Kang][author] - 펄로 한층 성숙해진 SE, Seoul.pm의 철권 2번 타자
+John_Kang - 펄로 한층 성숙해진 SE, Seoul.pm의 철권 2번 타자
 
 
 ## 시작하며
@@ -18,7 +18,7 @@ Author:   John_Kang
 lftp의 mirror 옵션을 이용하여 병렬 전송을 이용하여
 여러 개의 컨텐츠를 동시에 내려받곤 합니다.
 그런데 간혹 단일 대용량 파일은 약간의 꼼수를 이용하기도 합니다.
-대용량 파일을 64개로 분리(split)하여 lftp 옵션을 이용하여 병렬 다운로드한 후 다시 합치는 것입니다.
+즉, 대용량 파일을 64개로 분리(split)하여 lftp 옵션을 이용하여 병렬 다운로드한 후 다시 합치는 것입니다.
 (lftp의 병렬 옵션 최댓값이 64입니다.)
 
 서론은 걷어 버리고..
@@ -269,11 +269,10 @@ DDoS 공격에 대비하여 서버 관리자는 한 클라이언트의 최대 �
 
 ## 하나 더
 
-마지막으로 18일 자 aer0 님의 기사에 나온 컴파일 방법을 통해 .exe 실행 파일로 만들면
+마지막으로 [18일 자 aer0 님의 기사][advent-2012-12-18]에 나온 컴파일 방법을 통해 .exe 실행 파일로 만들면
 윈도우에서 `wget`보다 빠른 다운로더를 사용하실 수 있을 겁니다.
 
-
-
+[advent-2012-12-18]: http://advent.perl.kr/2012/2012-12-18.html
 
 [module-http-async]: https://www.metacpan.org/module/HTTP::Async
 [module-http-range]: https://www.metacpan.org/module/HTTP::Range
