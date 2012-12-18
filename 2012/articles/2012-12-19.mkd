@@ -7,7 +7,7 @@ Author:   John_Kang
 
 ## 저자
 
-John_Kang - 펄로 한층 성숙해진 SE, Seoul.pm의 철권 2번 타자
+John_Kang - SE, Seoul.pm의 철권 2번 타자
 
 
 ## 시작하며
