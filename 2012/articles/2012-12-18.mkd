@@ -33,7 +33,7 @@ Perl을 단일 실행 파일로 만드는 방법은 PAR를 이용한 방법 등 
 
 ## Urlader!
 
-해결책은 _AnyEvent_와 _libev_를 만든 유명한 펄해커인
+해결책은 [AnyEvent][anyevent]와 [libev][libev]를 만든 유명한 펄해커인
 [Marc Lehmann][marc]이 만든
 [Urlader][module-urlader]를 사용하는 것입니다.
 Urlader는 Linux, Mac OS X, Windows 등 많은 플랫폼을 지원하지만 여기서는 특히 Windows에서의 과정만 다루겠습니다.
@@ -292,6 +292,8 @@ Urlader로 하나의 실행파일로 패키징 가능하다고 합니다.
 [module-urlader]: https://www.metacpan.org/release/Urlader
 [urlader-prebuilt]: http://urlader.schmorp.de/prebuilt/1.0/
 [urlader-util-modes]: https://metacpan.org/module/MLEHMANN/Urlader-1.01/bin/urlader-util#MODES
+[libev]: http://libev.schmorp.de/
+[anyevent]: http://anyevent.schmorp.de/
 
 [module-win-gui]: https://www.metacpan.org/module/Win32::GUI
 [advent-2011-12-24]: http://advent.perl.kr/2011/2011-12-24.html
