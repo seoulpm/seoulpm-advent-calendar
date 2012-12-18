@@ -1,4 +1,4 @@
-Title:    RUDY slowloris
+Title:    RUDY Slowloris
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -36,9 +36,9 @@ Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다
 결국 세션이 넘치게 되면 서버는 die 상태가 됩니다.
 
 서론이 너무 길었습니다.
-이제 RUDY 공격 중 Perl로 짜여진 slowloris 공격 소스를 보고
+이제 RUDY 공격 중 Perl로 짜여진 Slowloris 공격 소스를 보고
 관리자의 시점이 아니라 순수한? 마음으로 분석을 진행해보겠습니다.
-본론으로 들어가기전 slowloris의 특징을 보겠습니다.
+본론으로 들어가기전 Slowloris의 특징을 보겠습니다.
 
 - HTTP GET 기반 Flooding입니다.
 - 공격 PC는 달랑 1대면 됩니다.
@@ -64,8 +64,9 @@ Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다
 
 ## 준비물
 
-필요한 모듈은 아래 3개면 충분합니다.
+준비물은 Slowloris와 의존 모듈 3개면 충분합니다.
 
+- [Slowloris][slowloris]
 - [IO::Socket::INET][module-inet]
 - [IO::Socket::SSL][module-ssl]
 - [Devel::Trace::More][module-trace] - host, get, cache 등의 값을 보기 위한 trace 모듈
@@ -89,7 +90,7 @@ Fire Sale은 국가 전체 구조에 대한 체계화된 3단계 공격입니다
 ![nomal 패턴][img-resize-1]
 *그림 1.* nomal 패턴 ([원본][img-1])
 
-netstat로 보는 서버의 상태입니다.
+`netstat`로 보는 서버의 상태입니다.
 아래와 같이 하나의 세션이 ESTABLISHED 상태 입니다.
 
     #!bash
@@ -514,7 +515,7 @@ Wireshark로 보면 아래와 같습니다.
 ## 정리하며
 
 Perl은 이처럼 여러 분야에서 활약하고 있습니다.
-더 많은 기능과 옵션이 있지만 아주 기본적인 DNS 기반의 공격만 분석해 보았습니다.
+더 많은 기능과 옵션이 있지만 아주 기본적인 공격 로직만 분석해 보았습니다.
 7.7대란때 사용되었던 DOS, DDOS는 RUDY 공격의 테스트였다고 보고 있습니다.
 
 2010년 달력 기사 [use Android;](http://advent.perl.kr/2010/2010-12-16.html)와
@@ -533,11 +534,18 @@ xS 모듈이 현재로서는 많이 까다로워 실험은 해보지 못했습�
 공격 뿐만 아니라 펄의 강력한 PCRE와 자동화 기능을 활용하여 더 멋진 봇을 만들 수 있지 않을까요?
 Perl IRC를 지켜주는 봇 같은 것도 가능하겠네요.. :-)
 
+### 참고
+
+- [Slowloris HTTP DoS][slowloris]
+- [Hijacking Web 2.0 Sites with SSLstrip and SlowLoris - Sam Bowne and RSnake at Defcon 17](http://vimeo.com/7618090)
 
 [author]: https://twitter.com/newbcode
+
 [module-inet]: https://www.metacpan.org/module/IO::Socket::INET
 [module-ssl]: https://www.metacpan.org/module/IO::Socket::SSL
 [module-trace]: https://www.metacpan.org/module/Devel::Trace::More
+
+[slowloris]: http://ha.ckers.org/slowloris/
 
 [img-1]: 2012-12-17-1.jpg
 [img-2]: 2012-12-17-2.jpg
