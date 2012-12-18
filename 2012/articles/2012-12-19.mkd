@@ -1,0 +1,282 @@
+Title:    HTTP 다운로드에 날개를
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   John_Kang
+
+
+## 저자
+
+John_Kang - 펄로 한층 성숙해진 SE, Seoul.pm의 철권 2번 타자
+
+
+## 시작하며
+
+관리하는 서버가 미국에 있는 관계로 간혹 대용량 컨텐츠를
+다운받는 시간이 업무의 많은 시간을 차지하는 경우가 있습니다.
+그래서 때로는 screen 세션에 다운로드를 걸어두고 퇴근을 하거나,
+lftp의 mirror 옵션을 이용하여 병렬 전송을 이용하여
+여러 개의 컨텐츠를 동시에 내려받곤 합니다.
+그런데 간혹 단일 대용량 파일은 약간의 꼼수를 이용하기도 합니다.
+즉, 대용량 파일을 64개로 분리하여 lftp 옵션을 이용하여 병렬 다운로드한 후 다시 합치는 것입니다.
+(lftp의 병렬 옵션 최댓값이 64입니다.)
+
+서론은 걷어 버리고..
+HTTP 컨텐츠를 빠르게 받을 수 있는 방법에 대해 소개해 보겠습니다.
+
+## HTTP 부분 요청
+
+먼저, HTTP 부분 요청(partial requeset)입니다.
+HTTP 헤더는 마치 서버 측에 전달하는 환경 변수처럼 사용됩니다.
+사용자의 설정을 저장하거나, 요청 방법에 변화를 주어야 할 때 등의 상황에 쓰입니다.
+우리가 설정해야 하는 헤더는 `Range` 헤더입니다.
+`Range` 헤더에 원하는 바이트의 시작과 끝 범위를 명시하여 HTTP 부분 요청을 통해
+서버가 해당 바이트만큼만 응답(response)하게 합니다.
+
+## 컨셉
+
+아래와 같이 목표를 설정하였습니다.
+
+- 하나의 HTTP::Request 객체를 생성합니다.
+- HTTP::Range 모듈을 통해 Range 헤더가 설정된 여러 개의 HTTP 요청을 생성합니다.
+- 병렬 처리를 위해 HTTP::Async 모듈을 사용합니다.
+- 이때 HTTP::Async 모듈은 여러 개의 프로세스를 생성하지 않고 이벤트 기반으로 동작하기 때문에
+  다수의 프로세스가 하나의 리소스(로컬 디스크에 쓰여져야 하는)에 접근할 때 발생하는 경쟁 상태 등의 문제를
+  해결할 수 있습니다.
+- 하나의 파일 핸들을 열어 `seek()` 함수를 이용해 해당 파일의 커서를 이동시킨 후 해당 부분에 `write()`합니다.
+- 오류가 발생하면 해당 요청의 인덱스 값을 반환하게 합니다. 오류 값이 반환되면 `--re-trans` 옵션에 해당 인덱스를
+  인자로 주어 해당 바이트 부분만 다시 내려받을 수 있도록 합니다.
+
+## 준비물
+
+- [HTTP::Async][module-http-async] - 블락하지 않고 HTTP 병렬 요청을 지원하는 모듈
+- [HTTP::Range][module-http-range] - HTTP 요청을 다수의 세그먼트로 분리하는 모듈
+- [LWP::UserAgent][module-lwp-useragent] - 웹 User Agent
+- [Getopt::Long][module-getopt-long] - 명령행 인자 처리 모듈
+
+## 만들어봅시다
+
+완성된 코드를 읽어내려가면서 하나씩 알아봅시다. 
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use utf8;
+    use strict;
+    use warnings;
+    use autodie;
+    
+    use HTTP::Async;
+    use HTTP::Range;
+    use LWP::UserAgent;
+    use Getopt::Long;
+    
+명령행 옵션 처리를 위해 변수를 선언합니다.
+
+    #!perl
+    my $agent   = 'Mozilla/5.0';
+    my $segment = 32;
+    my $url;
+    my @re_trans;
+    
+    GetOptions(
+        "agent=s"       => \$agent,
+        "segment=i"     => \$segment,
+        "url=s"         => \$url,
+        "re-trans=i{,}" => \@re_trans,
+        "help"          => sub { usage() },
+    );
+
+간단한 예외처리를 합니다.
+
+    #!perl
+    usage() unless defined $url;
+    die "The segment value shoud be great than 1\n" if $segment == 1;
+
+디스크에 저장될 파일명을 GET 요청의 파일명과 동일하게 유지합니다.
+
+    #!perl
+    ## get the filename from the $url
+    my $file     = ( split q{/}, $url )[-1];
+
+HTTP의 HEAD 메소드를 이용하여 해당 컨텐츠의 헤더 정보를 가져와 컨텐츠의 사이즈 정보를 얻어 옵니다.
+
+    #!perl
+    my $head_req = HTTP::Request->new( HEAD => $url );
+    my $head_res = LWP::UserAgent->new->request( $head_req );
+    my $size     = $head_res->header( 'Content-Length' );
+    my $mtime    = $head_res->header( 'last-modified' );
+
+`User-Agent` 헤더와 GET 요청을 이용하여 `HTTP::Request` 객체를 생성합니다.
+
+    #!perl
+    my $headers  = HTTP::Headers->new( 'User-Agent' => $agent );
+    my $get_req  = HTTP::Request->new( GET => $head_req->url ,$headers);
+
+`HTTP::Range` 모듈의 `split()`은 하나의 `HTTP::Request` 객체를
+`Range` 헤더가 설정된 여러 개의 `HTTP::Request` 객체로 분리하여 리스트로 반환합니다.
+
+    #!perl
+    # divide a single HTTP request object into many
+    my @requests = HTTP::Range->split(
+        request  => $get_req,
+        length   => $size,
+        segments => $segment,
+    );
+
+혹시 모를 손실된 요청 때문에 또 다른 시간을 보내야 할 수도 있습니다.
+그런 터무니 없는 시간을 뺏기지 않기 위해 각 요청에 인덱스를 할당하여
+실패한 요청은 `@failed`에 담아 다시 해당 부분만 내려받을 수 있게 합니다.
+
+    #!perl
+    ## make index for the request object
+    my $i = 0;
+    my @failed;
+    my %index = map { $_->{_headers}{range}, $i++ } @requests;
+
+`HTTP::Async`의 기본 슬롯 갯수는 10개 입니다.
+원하는 만큼의 작업을 병렬로 처리하기 위해 해당 값을 `$segment` 값으로 설정합니다.
+
+    #!perl
+    my $async = HTTP::Async->new( slots => $segment );
+    my $fh;
+
+`@re_trans`는 명령행 옵션에 의해 값이 할당되며,
+이 값이 있으면 사용자는 실패된 바이트에 대해 다시 내려받기를 원할 것입니다.
+그리고 내려받은 바이트를 덮어쓰기 위해 파일핸들 속성을 `RDWR`로 엽니다.
+
+    #!perl
+    ## to check if the request is for re-transmission.
+    if (@re_trans) {
+    
+        foreach my $seg ( (@requests)[@re_trans] ) {
+            $async->add( $seg );
+        }
+    
+        # to overwrite the part of content with indexes
+        open $fh, '+<', $file;
+    }
+
+`HTTP::Async`가 처리해야 할 작업을 모두 `add()`합니다.
+여기서 `HTTP::Async`가 처리해야 할 작업은 `HTTP::Request` 객체입니다.
+`HTTP::Range`가 하나의 요청 객체를 여러 개로 쪼개주었기 때문에
+우리는 `HTTP::Range`의 `split()` 메소드가 반환한 리스트 전체를 넘겨 주면 됩니다.
+
+    #!perl
+    # ...
+    else {
+        foreach my $seg ( @requests ) {
+            $async->add( $seg );
+        }
+        # to create/truncate the file in order to download fully.
+        open $fh, '>', $file;
+    }
+
+`wait_for_next_response()` 메소드는 일정 시간 단위로 실행 중인 작업들을 관찰하여
+완료된 작업을 `$res`로 할당하면, 우리는 여기서 파일에 써주는 작업을 하면 됩니다.
+
+    #!perl
+    while ( my $res = $async->wait_for_next_response ) {
+    
+해당 요청에 대한 응답 헤더의 `Content-Range` 헤더 값을 통해
+어디서부터 얼마만큼 어디까지 바이트를 받았는지 확인할 수 있습니다.
+
+여기서 중요한 부분은 여러 개의 파일을 별개로 다운받아 합치는 과정이 아니라
+한 파일에 써야 한다는 것입니다.
+`seek()` 함수를 통해 파일 핸들의 커서를 이동한 후
+해당 위치에 내려받은 바이트스트림를 써야 합니다.
+간단합니다!
+HTTP 요청에 있는 `Content-Range`의 범위 중에 시작 부분이 우리가 옮겨야 할 커서의 위치입니다.
+
+    #!perl
+    # while ( my $res = $async->wait_for_next_response ) {
+        if ($res->is_success) {
+            # response header : content-range => 'bytes 0-1172064/11720643'
+            $res->headers->{'content-range'} =~ /bytes (\d+)-/;
+            my $cursor = $1;
+            seek $fh, $cursor, 0;
+            print {$fh} $res->decoded_content;
+        }
+    #   ...
+    # }
+    
+해당 요청이 실패하면 간단한 출력과 함께
+해당 요청의 인덱스 번호를 `@failed` 배열에 담아 프로그램 종료와 함께 출력하여
+사용자가 `--re-trans` 옵션을 통해 해당 바이트 부분만 다시 다운로드하여 덮어쓸 수 있게 합니다.
+
+    #!perl
+    # while ( my $res = $async->wait_for_next_response ) {
+    #   if ($res->is_success) {
+    #   ...
+    #   }
+        else {
+            my $req_seg = $res->{_request}{_headers}{range};
+            warn "error occured : ", $index{$req_seg}, "\n";
+            push @failed, $index{$req_seg};
+        }
+    }
+
+    close $fh;
+
+    print "Failed with following index : @failed\n" if @failed;
+
+마지막으로 `usage()` 함수로 프로그램의 사용 방법을 출력합니다.
+
+    #!perl
+    ## subroutines
+    sub usage {
+        print <<"USAGE";
+    
+        -a, --agent    : User Agent, "$agent" is default
+    
+        -h, --help     : print help message
+    
+        -r, --re-trans : If you encountered some errors while to download content with parallel
+                       : You can get the indexes at the end of the execution.
+    
+        -s, --segment  : A number of job queue, $segment is default
+                       : 1 value of the segments won't work
+    
+        -u, --url      : Download URL, This should be an absolute with http:// or https://
+                       : Install LWP::Protocol::https if you want to use HTTPS
+    
+
+        Usage   : $0 -u download_url [ -s int ] [ -a agent ] [ -r failed indexes ]
+        example : $0 -u http://something.com/movie.avi -s 128
+                : $0 -u http://something.com/movie.avi -s 128 -a 'Mozilla/6.0' -r 1 2 3
+    USAGE
+    
+        exit 1;
+    }
+
+## 정리하며
+
+갑(甲) 입장에서 작업처리 속도에 대한 기대는 끝이 없는 것 같습니다.
+물론 어떤 컨텐츠를 다운받는 상황에서 보면 자기 자신이 갑이죠!!
+다운로더에게 날개를 달아주어 이에 부응할 수 있게 만들어 보았습니다. :)
+
+벤치마크한 자료를 정리하지 못해 많은 아쉬움이 남습니다.
+테스트 과정에서 약 40% 이상의 속도 향상이 있었습니다.
+
+장황하게 생각했던 부분들이 `HTTP::Range`와 `HTTP::Async` 모듈에 의해 간단히 끝나버려
+제가 뭘 했나 싶습니다. 거대한 펄의 모듈 창고(CPAN)를 통해 펄의 강력함에 한 번 더 감탄하게 된 계기가 되었습니다.
+
+## 주의사항
+
+DDoS 공격에 대비하여 서버 관리자는 한 클라이언트의 최대 접속 개수를 설정했을 수 있기 때문에,
+또는 서버에 프로세스 처리 방식을 사용하는 웹 서버에 부하를 줄 수 있기 때문에
+적당한 세그먼트 값을 사용하는 것을 권장합니다(약 16~64).
+실험 과정에서 특정 세그먼트 값을 초과하면 기댓값만큼의 큰 이점을 얻지 못했습니다.
+그리고 세그먼트가 늘어날수록 (송/수신해야 하는 헤더의 증가로 인해) 전체 트래픽의 양은 늘어날 것입니다.
+
+## 하나 더
+
+마지막으로 [18일 자 aer0 님의 기사][advent-2012-12-18]에 나온 컴파일 방법을 통해 .exe 실행 파일로 만들면
+윈도우에서 `wget`보다 빠른 다운로더를 사용하실 수 있을 겁니다.
+
+[advent-2012-12-18]: http://advent.perl.kr/2012/2012-12-18.html
+
+[module-http-async]: https://www.metacpan.org/module/HTTP::Async
+[module-http-range]: https://www.metacpan.org/module/HTTP::Range
+[module-lwp-useragent]: https://www.metacpan.org/module/LWP::UserAgent
+[module-getopt-long]: https://www.metacpan.org/module/Getopt::Long
