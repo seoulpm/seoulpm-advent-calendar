@@ -6,7 +6,9 @@ Author:   gypark
 
 ## 저자
 
-[@gypark][author] -
+[@gypark][author] - 
+개인 자료라고 믿기 어려울 정도의 방대한 Perl 자료를 제공하고 있는
+[gypark.pe.kr][website]의 주인장, Raymundo라는 닉을 사용하기도 한다.
 
 ## 들어가며
 
@@ -275,3 +277,7 @@ system()의 인자로 썼던 "path/to/binary" 경로명의 슬래시가 윈도�
 * http://plackperl.org/ - PSGI/Plack 공식 홈페이지
 * http://advent.plackperl.org/ - Plack Advent Calendar.
 
+
+
+[author]:  http://twitter.com/gypark
+[website]: http://gypark.pe.kr/
