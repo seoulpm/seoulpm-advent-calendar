@@ -12,18 +12,18 @@ Author:   gypark
 
 ## 들어가며
 
-예전에 리눅스 서버에서 만든 CGI를 윈도우에서 써 보고 싶은데, 짧은 CGI스크립트를 하나 쓰자고 apache 웹서버를 설치하는 건 과하다 싶었습니다.
-
-그렇다고 요즘 많이 쓴다는 Dancer나 Mojolicious 같은 웹프레임워크를 따로 배워서 새로 스크립트를 작성하자니 이것도 배보다 배꼽이 더 큰 느낌이었죠.
-
-그런데 Plack을 사용하여 기존 CGI스크립트를 그대로 실행할 수 있었습니다. 이 글에서는 간단한 예를 통해 그 과정을 설명합니다.
+예전에 리눅스 서버에서 만든 CGI를 윈도우에서 써 보고 싶은데, 짧은 CGI 스크립트를 하나 쓰자고 Apache 웹 서버를 설치하는 건 과하다 싶었습니다.
+그렇다고 요즘 많이 쓴다는 Dancer나 Mojolicious 같은 웹 프레임워크를 따로 배워서 새로 스크립트를 작성하자니 이것도 배보다 배꼽이 더 큰 느낌이었죠.
+그런데 Plack을 사용하여 기존 CGI 스크립트를 그대로 실행할 수 있었습니다. 이 글에서는 간단한 예를 통해 그 과정을 설명합니다.
 
 ## 준비물
 
-* PSGI
-* Plack
-* CGI::Emulate::PSGI
-* Plack::App::CGIBin
+사용하는 모듈은 아래와 같습니다.
+
+* [PSGI][module-psgi] - 펄 웹 서버 게이트웨이 인터페이스 스팩
+* [Plack][module-plack] - 웹 프레임워크와 웹 서버를 위한 PSGI 툴킷
+* [CGI::Emulate::PSGI][module-cgi-emulate-psgi] - CGI 환경을 위한 PSGI 어댑터
+* [Plack::App::CGIBin][module-plack-app-cgibin] - Plack 서버의 cgi-bin 대안
 
 
 ## PSGI와 Plack은 무엇인가
@@ -281,6 +281,11 @@ system()의 인자로 썼던 "path/to/binary" 경로명의 슬래시가 윈도�
 
 [author]:  http://twitter.com/gypark
 [website]: http://gypark.pe.kr/
+
+[module-psgi]: https://www.metacpan.org/module/PSGI
+[module-plack]: https://www.metacpan.org/module/Plack
+[module-cgi-emulate-psgi]: https://www.metacpan.org/module/CGI::Emulate::PSGI
+[module-plack-app-cgibin]: https://www.metacpan.org/module/Plack::App::CGIBin
 
 [img-1]:        2012-12-20-1.png
 [img-resize-1]: 2012-12-20-1_r.png
