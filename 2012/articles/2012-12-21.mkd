@@ -1,0 +1,195 @@
+Title:    
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   jaker
+
+## 저자
+
+[jaker][author] – Perl을 처음 만난 후로 18년, 방관자 또는 초심자로서의 완전체
+
+
+## 시작하며
+
+초심자로서 Perl 을 사용해 어떤 재미난 것을 할 수 있을까를 생각해 봤습니다. 평소 IRC 를 즐겨 하면서 고수들의 유익한 URL Link들이 공부에 많은 도움이 되고 있습니다. 여러 사정으로 인해 채널에 올라온 정보를 놓치는 경우가 많은데 POE::Component:IRC 모듈과 WWW::Mechanize::Firefox 모듈을 사용해서 평소 애용하는 Firefox 로 아카이빙 해 놓을 수 있을거란 생각이 들더군요. URL Link 는 언제든지 사라질 수도 있어 해당 URL Link 페이지의 주요정보를 Firefox로 고스란히 다시 읽어 볼 수 있게 하는 것이 목적입니다.
+
+
+## 준비하기
+
+POE::Component:IRC 모듈 - POE 에서 제공하는 IRC Client 모듈(A fully event-driven IRC client module)
+WWW::Mechanize::Firefox 모듈 - Firefox 자동화 제어 모듈(Mozrepl plugin 필요)
+Mozrepl Add-on – Mozilla Application(예: Firefox, Thunderbird 등)을 제어용 Console Add-on
+
+MozRepl Add-on 설치하기
+Firefox -> Add-ons -> Search 에서 MozRepl 로 검색 하시면 손쉽게 설치 하실 수 있습니다.
+
+![img][]
+*그림 1.* MozRepl 설치 화면
+
+정상적으로 설치/활성화 되면 telnet 을 지원하는 터미널 프로그램 등을 통해 localhost 의 4242 port 로 접속하시면 아래와 같은 화면을 확인할 수 있습니다.
+
+![img][]
+*그림 2.* Repl Console 접속 화면
+
+Console 명령을 통해 직접 제어가 가능합니다.
+repl.quit() [Enter]
+.repl 에 대한 정보는 
+https://github.com/bard/mozrepl/wiki
+를 참고해 주십시오.
+.
+.
+실제 작성한 실행코드로 넘어 가겠습니다….
+
+
+## 실행코드
+
+..
+
+    #!perl
+    use strict;
+    use warnings;
+    use POE qw(Component::IRC);
+    use WWW::Mechanize::Firefox;
+    use POSIX qw(strftime mktime);
+    
+    my $nickname = 'jaker_poe';
+    my $ircname  = 'jaker_poe';
+    my $username = 'jaker_poe';
+    my $server   = 'irc.freenode.net';
+    
+    my $default_path = 'F:\down\irc';
+    
+    my @channels = ('#perl-kr');
+    
+    my $irc = POE::Component::IRC->spawn(
+        nick => $nickname,
+        ircname => $ircname,
+        username => $username,
+        server  => $server,
+        debug => 1,
+    ) or die "Oh noooo! $!";
+    
+    POE::Session->create(
+         package_states => [
+             main => [ qw(_default _start irc_001 irc_public) ],
+         ],
+         heap => { irc => $irc },
+    );
+    
+    $poe_kernel->run();
+    
+    sub _start {
+         my $heap = $_[HEAP];
+         my $irc = $heap->{irc};
+    
+         $irc->yield( register => 'all' );
+         $irc->yield( connect => { } );
+         return;
+    }
+    
+    sub irc_001 {
+         my $sender = $_[SENDER];
+         my $irc = $sender->get_heap();
+    
+         print "Connected to ", $irc->server_name(), "\n";
+    
+         $irc->yield( join => $_ ) for @channels;
+         return;
+    }
+    
+    sub irc_public {   
+         my ($sender, $who, $where, $what) = @_[SENDER, ARG0 .. ARG2];
+         my $nick = ( split /!/, $who )[0];
+         my $channel = $where->[0];     
+    
+         if ( my ($url) = $what =~ /((^http|^https)\:\/\/(.+))/ ) {
+            $irc->yield( privmsg => $channel => "$nick: 잘 먹겠습니다." );
+            download_page($url);
+                          
+         }
+         return;
+    }
+    
+    # We registered for all events, this will produce some debug info.
+    sub _default {
+        my ($event, $args) = @_[ARG0 .. $#_];
+        my @output = ( "$event: " );
+    
+        for my $arg (@$args) {
+            if ( ref $arg eq 'ARRAY' ) {
+                push( @output, '[' . join(', ', @$arg ) . ']' );
+            }
+            else {
+                push ( @output, "'$arg'" );
+            }
+        }
+        print join ' ', @output, "\n";
+        return;
+    }
+    
+    sub download_page {
+        my $url = shift;
+        my $savename = strftime("%Y%m%d%H%M%S", localtime);
+        
+        my $mech = WWW::Mechanize::Firefox->new(
+            launch => 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe',
+            autoclose => 0,
+            activate => 1,
+        );
+        print $url;
+        $mech->get($url) or return;
+        $mech->save_content("$default_path\\$savename.html", "$default_path\\$savename");    
+    }
+
+POE::Component::IRC 부분은 CPAN 사이트(http://search.cpan.org/dist/POE-Component-IRC/lib/POE/Component/IRC.pm)에 나와있는 예제코드를 그대로 사용 하였으며, 채널 메시지메 대한 핸들링을 담당하는 irc_public 서브루틴만 일부 수정 하였습니다.
+
+## URL Link 체크하기
+
+    #!perl
+    sub irc_public {   
+         my ($sender, $who, $where, $what) = @_[SENDER, ARG0 .. ARG2];
+         my $nick = ( split /!/, $who )[0];
+         my $channel = $where->[0];     
+    
+         if ( my ($url) = $what =~ /((^http|^https)\:\/\/(.+))/ ) {
+            $irc->yield( privmsg => $channel => "$nick: 잘 먹겠습니다." );
+            download_page($url);
+                          
+         }
+         return;
+    }
+
+채널의 메시지가 http 또는 https 로 시작하는 URL Link 로 확인되면 감사의 인사(!?)를 채널에 내보내고, 아카이빙 처리를 수행하는 download_page 서브루틴을 호출하게 되어 있습니다.
+
+
+## 페이지 내려받기
+
+    #!perl
+    sub download_page {
+        my $url = shift;
+        my $savename = strftime("%Y%m%d%H%M%S", localtime);
+        
+        my $mech = WWW::Mechanize::Firefox->new(
+            launch => 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe',
+            autoclose => 1,
+            activate => 1,
+        );
+        print $url;
+        $mech->get($url) or return;
+        $mech->save_content("$default_path\\$savename.html", "$default_path\\$savename");    
+    }
+
+아카이빙 데이터를 저장할 기본경로(F:\down\irc) 아래에 ‘년월일시분초’를 이름으로 하는 html 파일이름과 디렉토리를 생성하고, save_content 메소드로 페이지 소스와 JS, CSS, IMAGE 등을 내려 받고 브라우저 또는 브라우저 탭을 닫습니다.
+내려받은 데이터는 Firefox 나 기타 웹브라우저를 사용해 읽어 들일 수 있습니다.
+
+![img][]
+*그림 3.* 데이터 저장 디렉토리 화면
+
+
+## 향후의 과제
+
+IRC 이외에 좀더 다양한 커뮤니케이션 서비스들을 통해 URL Link 등의 정보를 수집하고 
+WWW::Mechanize::Firefox 모듈의 기능을 충분히 활용하면 실무에 대한 많은 활용 가능성이 존재할 것 같습니다. 다양한 Automation 기능들을 구현 하면서 그 가능성을 확인해 보는 재미가 클 것 같습니다.
+
+
+[author]: 
