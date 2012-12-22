@@ -1,0 +1,225 @@
+Title:    Perl과 mozrepl로 IRC 떡밥 수집하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   jaker
+
+## 저자
+
+jaker – Perl을 처음 만난 후로 18년, 방관자 또는 초심자로서의 완전체
+
+
+## 시작하며
+
+초심자로서 Perl을 사용해 어떤 재미난 것을 할 수 있을까 생각해 봤습니다.
+평소 IRC를 즐겨 하면서 고수들의 유익한 URL 링크가 공부에 많은 도움이 되고 있습니다.
+여러 사정으로 인해 채널에 올라온 정보를 놓치는 경우가 많은데
+[POE::Component:IRC][module-poe-irc] 모듈과 [WWW::Mechanize::Firefox][module-firefox] 모듈을 사용해서
+평소 애용하는 Firefox로 보관해둘 수 있을 거란 생각이 들더군요.
+URL 링크는 언제든지 사라질 수도 있어 해당 페이지의 주요 정보를
+Firefox로 고스란히 다시 읽어 볼 수 있게 해 보겠습니다.
+
+
+## 준비하기
+
+아래 모듈을 사용합니다.
+
+[POE::Component:IRC][module-poe-irc] 모듈 - POE에서 제공하는 이벤트 기반 IRC 클라이언트 모듈
+[WWW::Mechanize::Firefox][module-firefox] 모듈 - Firefox 자동화 제어 모듈. Mozrepl 플러그인이 필요합니다.
+[Mozrepl Add-on][mozrepl] – Firefox, Thunderbird 등 모질라 응용 제어용 콘솔 애드온
+
+### MozRepl Add-on 설치하기
+
+Firefox를 실행하고 메뉴에서 `Add-ons -> Search`를 순서대로 선택하고 MozRepl로 검색합니다.
+결과에서 MozRepl을 선택하면 손쉽게 설치할 수 있습니다.
+
+![MozRepl 설치 화면][img-resize-1]
+*그림 1.* MozRepl 설치 화면 ([원본][img-1])
+
+정상적으로 설치하고 활성화되면 telnet을 지원하는 터미널 프로그램을 통해
+localhost의 4242 포트로 접속하면 아래와 같은 화면을 확인할 수 있습니다.
+
+![Repl Console 접속 화면][img-resize-2]
+*그림 2.* Repl Console 접속 화면 ([원본][img-2])
+
+콘솔 명령을 통해 직접 제어가 가능합니다.
+나오려면 `repl.quit()`을 입력하려면
+자세한 문서는 [위키][mozrepl-wiki]를 참고하세요.
+그러면 이제 실제로 작성한 코드로 넘어가겠습니다.
+
+## 실행코드
+
+먼저 완전한 소스코드는 아래와 같습니다.
+
+    #!perl
+    use strict;
+    use warnings;
+    use POE qw(Component::IRC);
+    use WWW::Mechanize::Firefox;
+    use POSIX qw(strftime mktime);
+    
+    my $nickname = 'jaker_poe';
+    my $ircname  = 'jaker_poe';
+    my $username = 'jaker_poe';
+    my $server   = 'irc.freenode.net';
+    
+    my $default_path = 'F:\down\irc';
+    
+    my @channels = ('#perl-kr');
+    
+    my $irc = POE::Component::IRC->spawn(
+        nick => $nickname,
+        ircname => $ircname,
+        username => $username,
+        server  => $server,
+        debug => 1,
+    ) or die "Oh noooo! $!";
+    
+    POE::Session->create(
+         package_states => [
+             main => [ qw(_default _start irc_001 irc_public) ],
+         ],
+         heap => { irc => $irc },
+    );
+    
+    $poe_kernel->run();
+    
+    sub _start {
+         my $heap = $_[HEAP];
+         my $irc = $heap->{irc};
+    
+         $irc->yield( register => 'all' );
+         $irc->yield( connect => { } );
+         return;
+    }
+    
+    sub irc_001 {
+         my $sender = $_[SENDER];
+         my $irc = $sender->get_heap();
+    
+         print "Connected to ", $irc->server_name(), "\n";
+    
+         $irc->yield( join => $_ ) for @channels;
+         return;
+    }
+    
+    sub irc_public {   
+         my ($sender, $who, $where, $what) = @_[SENDER, ARG0 .. ARG2];
+         my $nick = ( split /!/, $who )[0];
+         my $channel = $where->[0];     
+    
+         if ( my ($url) = $what =~ /((^http|^https)\:\/\/(.+))/ ) {
+            $irc->yield( privmsg => $channel => "$nick: 잘 먹겠습니다." );
+            download_page($url);
+                          
+         }
+         return;
+    }
+    
+    # We registered for all events, this will produce some debug info.
+    sub _default {
+        my ($event, $args) = @_[ARG0 .. $#_];
+        my @output = ( "$event: " );
+    
+        for my $arg (@$args) {
+            if ( ref $arg eq 'ARRAY' ) {
+                push( @output, '[' . join(', ', @$arg ) . ']' );
+            }
+            else {
+                push ( @output, "'$arg'" );
+            }
+        }
+        print join ' ', @output, "\n";
+        return;
+    }
+    
+    sub download_page {
+        my $url = shift;
+        my $savename = strftime("%Y%m%d%H%M%S", localtime);
+        
+        my $mech = WWW::Mechanize::Firefox->new(
+            launch => 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe',
+            autoclose => 0,
+            activate => 1,
+        );
+        print $url;
+        $mech->get($url) or return;
+        $mech->save_content("$default_path\\$savename.html", "$default_path\\$savename");    
+    }
+
+POE::Component::IRC 모듈의 사용 방법은 [CPAN 문서][module-poe-irc]에 나와있는 
+예제 코드를 그대로 사용하였으며,
+채널 메시지의 핸들링을 담당하는 `irc_public()` 서브루틴만 일부 수정 하였습니다.
+
+## URL Link 체크하기
+
+그러면 `irc_public()` 서브루틴을 자세히 보겠습니다.
+채널의 메시지가 `http` 또는 `https`로 시작하는 URL 형식으로 확인되면
+감사의 인사를 채널에 내보내고,
+저장(archive) 처리를 수행하는 `download_page()` 서브루틴을 호출합니다.
+
+    #!perl
+    sub irc_public {   
+         my ($sender, $who, $where, $what) = @_[SENDER, ARG0 .. ARG2];
+         my $nick = ( split /!/, $who )[0];
+         my $channel = $where->[0];     
+    
+         if ( my ($url) = $what =~ /((^http|^https)\:\/\/(.+))/ ) {
+            $irc->yield( privmsg => $channel => "$nick: 잘 먹겠습니다." );
+            download_page($url);
+                          
+         }
+         return;
+    }
+
+
+## 페이지 내려받기
+
+`download_page()` 서브루틴입니다.
+
+    #!perl
+    sub download_page {
+        my $url = shift;
+        my $savename = strftime("%Y%m%d%H%M%S", localtime);
+        
+        my $mech = WWW::Mechanize::Firefox->new(
+            launch => 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe',
+            autoclose => 1,
+            activate => 1,
+        );
+        print $url;
+        $mech->get($url) or return;
+        $mech->save_content("$default_path\\$savename.html", "$default_path\\$savename");    
+    }
+
+데이터를 저장할 기본경로(`F:\down\irc`) 아래에
+`년월일시분초`를 이름으로 하는 HTML 파일 이름과 디렉토리를 생성하고,
+`save_content()` 메소드로 페이지 소스와 JS, CSS, 이미지 등을 내려받고 브라우저 또는 브라우저 탭을 닫습니다.
+내려받은 데이터는 Firefox나 기타 웹 브라우저를 사용해 읽어 들일 수 있습니다.
+
+![데이터 저장 디렉토리 화면][img-resize-3]
+*그림 3.* 데이터 저장 디렉토리 화면 ([원본][img-3])
+
+
+## 정리하며
+
+IRC 이외에 좀더 다양한 커뮤니케이션 서비스를 통해 URL 링크 등의 정보를 수집하고 
+WWW::Mechanize::Firefox 모듈의 기능을 충분히 사용하면
+실무에 활용할 수 있는 가능성이 많이 열려있을 것 같습니다.
+다양한 자동화 기능을 구현하면서 그 가능성을 확인해 보는 재미를 느껴보는 것은 어떨까요?
+
+
+[author]: https://twitter.com/jakerorg
+[module-poe-irc]: https://www.metacpan.org/module/POE::Component::IRC
+[module-firefox]: https://www.metacpan.org/module/WWW::Mechanize::Firefox
+[mozrepl]: https://addons.mozilla.org/en-us/firefox/addon/mozrepl/
+[mozrepl-wiki]: https://github.com/bard/mozrepl/wiki
+
+[img-1]: 2012-12-21-1.png
+[img-2]: 2012-12-21-2.png
+[img-3]: 2012-12-21-3.png
+
+[img-resize-1]: 2012-12-21-1_r.png
+[img-resize-2]: 2012-12-21-2_r.png
+[img-resize-3]: 2012-12-21-3_r.png
+
