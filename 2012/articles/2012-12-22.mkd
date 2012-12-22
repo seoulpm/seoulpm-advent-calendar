@@ -1,0 +1,534 @@
+Title:    보면서 작성하는 마크다운 편집기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   skyloader
+
+
+저자
+-----
+
+skyloader - 백만년째 Perl초보 skyloader _at_ gmail.com
+
+
+시작하면서
+-----------
+
+90년대 통신 에뮬레이터를 열어 *쀠익--지지징-삑삑* 소리를 들으며
+PC통신을 하던 시절에서 10년도 채 지나기도 전에 인터넷 세상으로 바뀌었죠.
+인터넷 중에서도 웹이 가장 활성화 되면서 1인 1홈페이지 시대가 열렸고,
+웹의 표현 언어인 HTML을 자연스럽게 접할 수 있게 되었습니다.
+지금 보고 계신 [2012년 Seoul.pm 크리스마스 달력][advent-2012] 역시 HTML로 만들어졌기 때문에,
+컴퓨터 또는 모바일 환경의 브라우저를 이용해 볼 수 있는 것이죠.
+
+하지만 사실 [github][home-github]의 [저장소][github-seoulpm-advent-calendar]를
+살펴보신 분이라면 눈치채셨겠지만, 크리스마스 달력의 모든 기사는
+[마크다운][wiki-markdown]으로 작성되어 있습니다.
+마크다운은 HTML을 표현하기 위한 한 형식이지만 쉽고 간결한 덕에,
+전 세계적으로 널리 사용하고 있는 인기 있는 파일 형식입니다.
+다만, 위지위그 방식이 아니기 때문에 바로바로 확인하기가 어려운 것이 단점입니다.
+이러한 단점도 극복하고, 올해 크리스마스 달력 기사 작성할겸
+누구나 쉽게 이용할 수 있는 마크다운 편집기 웹앱을 만들어보겠습니다. :)
+
+
+마크다운
+---------
+
+개발자가 아닌 일반 사람들에게는 HTML마저도 쉬운 언어는 아닙니다.
+그리고 HTML을 잘 안다고 하더라도 HTML로 직접 문서를 작성하는 것은
+무척이나 인내를 요하는 일이죠.
+이러한 번거로움을 해결하기 위해 나온 기술 중 전세계적으로 가장 널리
+쓰이고 있는 것이 바로 [마크다운(markdown)][home-markdown]입니다.
+*John Gruber*와 *Aaron Swartz*가 처음으로 제안하고 만든 마크다운은
+가독성이 높은 문법을 이용해서 HTML 형식으로 쉽게 변환할 수 있는
+장점을 가지며, 일반적인 텍스트 형식이기 때문에 편집기를 가리지
+않는다른 특성이 있습니다.
+
+    #!plain
+    이 문장은 H1 입니다.
+    =====================
+
+    이 문장은 H2 입니다.
+    ---------------------
+
+    # 이렇게 써도 H1 입니다. 
+
+    ## 이렇게 쓰면 H2 입니다.
+
+    ### 이건 H3 입니다.
+
+앞에서 작성한 문자열은 다음처럼 HTML로 변환됩니다.
+
+    #!xml
+    <h1>이 문장은 H1 입니다.</h1>
+    <h2>이 문장은 H2 입니다.</h2>
+    <h1>이렇게 써도 H1 입니다.</h1>
+    <h2>이렇게 쓰면 H2 입니다.</h2>
+    <h3>이건 H3 입니다.</h3>
+
+이 외에도 목록과 인용, 링크, 이미지등 여러가지 기능을 손쉽게 기술할 수 있습니다.
+자세한 문법은 [마크다운 공식 홈페이지][home-markdown-syntax]와
+[위키피디아의 마크다운 페이지][wiki-markdown]를 참조하세요.
+
+
+준비물
+-------
+
+### 펄 모듈
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+- [CPAN의 Text::MultiMarkdown 모듈][cpan-text-multimarkdown]
+- [CPAN의 URI::Escape 모듈][cpan-uri-escape]
+- [CPAN의 UUID::Tiny 모듈][cpan-uuid-tiny]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Mojolicious Text::MultiMarkdown URI::Escape UUID::Tiny
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+`perlbrew`를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Mojolicious Text::MultiMarkdown URI::Escape UUID::Tiny
+
+
+### 부트스트랩
+
+이왕이면 다홍치마라고 동일한 기능이라면 미려한 쪽이 낫겠죠?
+*오픈소스*인 [Twitter Bootstrap][home-bootstrap]은 웹 작업을 하는
+사람들에게는 축복일 정도로 미려한 UI를 제공하므로 꼭 알아두도록 합시다.
+[공식 홈페이지][home-bootstrap]에서 가장 최신 버전의 압축 파일을 받아둡니다.
+
+
+### jQuery
+
+최근의 웹 개발에 있어 자바스크립트는 거의 필수라고 해도 과언이 아닙니다.
+하지만 자바스크립트로 처음부터 모두 개발하는 것은 HTML로 웹페이지를
+제작하는 것처럼 고역입니다.
+저처럼 자바스크립트를 잘 모르지만, 꼭 필요한 기능이 있을때
+손쉽게 많은 도움을 받을 수 있는 것이 바로 [jQuery][home-jquery]입니다.
+jQuery와 구글, 스택오버플로우를 활용하면 자바스크립트에 능숙하지
+않더라도 대부분의 일반적인 기능을 간단히 처리할 수 있습니다.
+물론 자바스크립트를 안다면 더 다양한 기능을 활용할 수 있겠죠?
+jQuery를 개발할 것은 아니므로 [공식 홈페이지][home-jquery]에서
+가장 최신의 최소 용량 버전으로 받으면 됩니다.
+
+
+작업환경 구성하기
+------------------
+
+일단 작업할 공간을 만들고 이동하죠.
+
+    #!bash
+    $ mkdir markdown-editor
+    $ cd markdown-editor
+
+이제 [Mojolicious][home-mojolicious]를 이용해서
+웹앱을 만들기 위한 기본 구조를 갖춰보지요.
+
+    #!bash
+    $ mojo generate lite_app markdown-editor.pl
+
+문제없이 실행된다면 `markdown-editor.pl` 파일이 생성됩니다.
+놀랍지만 여기까지만으로도 여러분의 장비에서 웹앱이 실행될 준비는 모두 끝났습니다.
+아무런 기능은 없긴 하지만 마크다운 편집기 웹앱을 실행해볼까요?
+
+    #!bash
+    $ morbo markdown-editor.pl
+    [Sun Dec 22 02:33:42 2012] [info] Listening at "http://*:3000".
+    Server available at http://127.0.0.1:3000.
+
+축하합니다. 웹서버가 성공적으로 실행되었군요.
+웹브라우저에서 `http://localhost:3000` 주소로 한번 접속해보세요.
+다음과 같은 화면이 나오면 성공입니다.
+
+![Mojolicious 기본 화면][img-resize-00]
+*그림 1.* Mojolicious 기본 화면 ([원본][img-00])
+
+Mojolicious에서는 웹용 정적 파일을 `public` 디렉터리 하부에서 관리합니다.
+앞서 받아놓은 부트스트랩과 jQuery 파일을 Mojolicious에서 이용할 수 있도록
+`public` 디렉터리 하부에 배치해보죠.
+
+![마크다운 웹앱 디렉터리 구조][img-01]
+*그림 2.* 마크다운 웹앱 디렉터리 구조
+
+`mkd` 디렉터리는 마크다운 파일을 저장하기 위한 공간으로 미리 만들어 둡시다.
+
+
+UI 화면 구성하기
+-----------------
+
+이젠 화면 구성을 할 차례입니다. 
+상단에는 네비게이션 바를 배치해 파일 저장등의 기능을 선택할 수 있도록 하고,
+하단은 화면을 좌우로 나누어 *편집 공간*과 *HTML 미리보기 공간*은 배치하겠습니다.
+좌측에서 입력한 내용이 어떻게 보여질지 우측에서 바로바로 확인할 수 있겠죠.
+
+`markdown-editor.pl` 파일의 `__DATA__` 섹션에는
+Mojolicious에서 사용하는 HTML 템플릿을 저장합니다.
+`layouts/default.html.ep` 섹션을 다음처럼 수정합니다.
+
+    #!perl
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title><%= title %></title>
+        <!-- Bootstrap -->
+        <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+      </head>
+      <body>
+        <div class="navbar navbar-static-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse"></a>
+              <a class="brand" href="#">Seoul.pm Markdown Editor</a>
+              <div class="nav-collapse collapse navbar-responsive-collapse">
+                <ul class="nav">
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li id="save-markdown"><a href="#">Save Markdown</a></li>
+                      <li class="divider"></li>
+                      <li id="open-html"><a href="#" target="viewer">Open HTML at New Tab</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div><!-- /.nav-collapse -->
+            </div>
+          </div><!-- /navbar-inner -->
+        </div><!-- /navbar -->
+        <%= content %>
+        <script src="/jquery-1.8.3.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+      </body>
+    </html>
+
+이제 다시 웹브라우저에서 새로 고침을 해봅시다.
+
+![상단 네비게이션 추가][img-resize-02]
+*그림 3.* 상단 네비게이션 추가 ([원본][img-02])
+
+상단 네비게이션 바가 잘 보이는군요!
+이 기세를 몰아 좌, 우의 영역을 만들어볼까요?
+`markdown-editor.pl`에 기본으로 있는 인덱스 페이지는 제거하고
+`editor.htmp.ep` 페이지를 새로 생성해서 부트스트랩의 그리드 시스템을 써보죠.
+
+    #!perl
+    @@ editor.html.ep
+    % layout 'default';
+    % title 'Seoul.pm Markdown Editor';
+    <div id="editor-layout" class="container">
+      <div class="row">
+        <div class="span6">
+          <section class="editor">
+            <h2>Markdown</h2>
+            <form>
+              <fieldset>
+                <textarea id="editor-markdown" class="span6" rows="26"></textarea>
+              </fieldset>
+            </form>
+          </section>
+        </div>
+        <div class="span6">
+          <h2>HTML</h2>
+          <div id="editor-html"></div> 
+        </div>
+      </div>
+    </div>
+
+이제 다시 웹브라우저에서 새로 고침을 해봅시다.
+
+![하단 화면 좌우 분할][img-resize-03]
+*그림 4.* 하단 화면 좌우 분할 ([원본][img-03])
+
+이 정도면 기본적은 모양새는 갖춘 것 같습니다.
+이제 남은 것은 기능 구현이군요!
+
+
+본격적인 기능 구현하기
+-----------------------
+
+마크다운을 HTML로 보여주는 편집기로써 필요한 기능을 정리해보았습니다.
+
+- 좌측의 편집 영역에서 작성한 마크다운을 우측에 변환해서 보여주는 기능
+- 작성한 마크다운을 파일로 저장
+- 결과물을 답답한 반쪽 화면이 아닌 새로운 창에서 보기
+
+많은 기능은 아니지만, 그래도 이정도만 되면 제법 쓸만할 것 같네요. :)
+
+
+### 마크다운을 HTML로 변환
+
+일단 마크다운을 HTML로 변환할 때는 `Text::MultiMarkdown` 모듈을 이용합니다.
+그렇다면 언제 변환을 해야할까요?
+사용상의 편의를 위해 처음 페이지가 불려졌을때와
+편집 영역에서 Enter 키를 눌렀을때 정도가 적당한 것 같군요.
+아! 그리고 주기적으로 10초에 한 번씩 변환해주는 것도 나쁘지 않겠군요.
+
+사용자가 편집하는 내용이 사라지면 안되므로 전통적인
+폼 핸들링 방식으로는 무리가 있습니다.
+역시 jQuery의 AJAX 기능을 이용해서 페이지 변환없이 처리해야 할 것입니다.
+jQuery를 이용해서 편집 화면 내의 문자열을 가져온 후
+AJAX를 이용해 POST 방식으로 `/convert`로 문자열을 보냅니다.
+`/convert` 컨트롤러에서는 문자열을 HTML로 변환해서 반환하면
+jQuery의 POST 응답 콜백에서 결과를 받아 우측 영역에 뿌려줍니다.
+자료의 흐름은 다음과 같습니다.
+
+- 좌측 편집기의 `textarea` 영역
+- `jQuery` `post()` 메소드
+- `markdown-editor.pl`의 `/convert` 컨트롤러
+- `jQuery` `post()` 메소드의 콜백 함수
+- 우측 HTML 뷰어 `div` 영역
+
+이를 위해 우선 `markdown-editor.pl`에 `/convert` 컨트롤러를 만듭니다.
+
+    #!perl
+    post '/convert' => sub {
+        my $self = shift;
+        my $html = $m->markdown( $self->param('markdown') || q{} );
+        return $self->render_json( { html=> $html } );
+    };
+
+`public/markdown-editor.js` 파일을 만들고 다음 내용을 추가합니다.
+
+    #!javascript
+    $(document).ready(function() {
+      function markdown_to_html() {
+        var markdown = $("#editor-markdown").val();
+        $.post(
+          "/convert",
+          { "markdown" : markdown },
+          function(data) { $("#editor-html").html(data.html); },
+          "json"
+        );
+      }
+      // converting markdown if enter is pressed
+      $("#editor-markdown").keyup(function(e) {
+        if ( e.keyCode == 13 ) {
+          markdown_to_html();
+        };
+      });
+      // timer to converting markdown for each 10 sec
+      var timer = setInterval(function() {
+        markdown_to_html();
+      }, 10000);
+      // force converting markdown when page is loading
+      markdown_to_html();
+    });
+
+
+### 저장하기
+
+웹브라우저가 파일 저장을 기본으로 제공하기 때문에
+전통적인 웹에서 파일 저장은 어렵지 않습니다.
+하지만 한 페이지 안에서 자바스크립트를 이용해
+파일을 저장하게 만드는 일은 그리 쉽지만은 않습니다.
+현재 간단하게 제작하는 웹앱인만큼 데이터베이스도 사용하지 않으므로
+[꼼수(hack)][stackoverflow-tip]를 써야합니다.
+
+사용자가 다운로드 액션을 취할 경우 작성한 마크다운을 서버측으로 보내고
+서버에서는 이 마크다운을 `mkd` 디렉터리 하부에 저장한 후 해당 파일을
+다운로드할 수 있는 링크를 반환하면 jQuery로 `iframe`을 동적으로 생성해
+`src` 속성에 해당 링크를 명시해서 강제로 다운로드가 가능하게 하는 방법입니다.
+
+`markdown-editor.pl`에 다음 내용을 추가합니다.
+
+    #!perl
+    post '/save' => sub {
+        my $self = shift;
+
+        my $markdown = $self->param('markdown');
+        my $view     = $self->param('view');
+        my $uuid     = create_UUID_as_string();
+        write_file( catfile(app->home, 'mkd', $uuid), { binmode => ':utf8' }, $markdown );
+
+        return $self->render_json( { url => "/$view/$uuid" } );
+    };
+
+    get '/markdown/:uuid' => sub {
+        my $self = shift;
+
+        my $uuid     = $self->param('uuid');
+        my $markdown = read_file( catfile(app->home, 'mkd', $uuid), binmode => ':utf8' );
+
+        $self->res->headers->header('Content-Disposition' => qq{'attachment; filename="$uuid.mkd"'}); 
+        return $self->render_text($markdown);
+    };
+
+텍스트 파일을 강제로 다운로드 가능하게 하기 위해 `/markdown/:uuid`
+컨트롤러에서 HTTP 응답 헤더 중 `Content-Disposition` 항목을 `attachemnt`로
+조작하는 부분을 염두해서 봐주세요.
+이 때 기본으로 파일명을 지정하려면 `filename` 값을 명시합니다.
+자세한 내용은 HTTP 프로토콜 명세를 확인하세요.
+
+`public/markdown-editor.js`에 다음 내용을 추가합니다.
+
+    #!javascript
+    function save_markdown() {
+      var markdown = $("#editor-markdown").val();
+      $.post(
+        "/save",
+        {
+          "markdown" : markdown,
+          "view"     : 'markdown',
+        },
+        function(data) {
+          $("body").append("<iframe src='" + data.url + "' style='display: none;' ></iframe>");
+        },
+        "json"
+      );
+    }
+    $("#save-markdown").click(function() { save_markdown(); });
+
+![저장하기][img-resize-04]
+*그림 5.* 저장하기 ([원본][img-04])
+
+
+파일 이름을 UUID로 지정해서 조금 복잡해 보이지만 어쨌든 잘 동작합니다!
+로그인 기능을 구현하지 않고, 데이터베이스를 사용하지도 않기 때문에
+가능하면 중복된 경우를 없애기 위해서 UUID를 사용하고 있습니다만
+더 좋은 방법이 있다면 개선해보는 것도 좋겠지요.
+
+
+### 새로운 탭에서 열기
+
+요즘 대부분의 모니터와 노트북 화면의 가로가 충분히 넓기 때문에
+좌우로 나누어 작업하는데 큰 무리가 없을 것입니다.
+하지만 최종 결과물이 화면에 어떻게 뿌려지는지 제대로 확인할 수 있다면 더 좋겠지요.
+그래서 새 창에서 HTML 결과물을 보여주는 기능을 넣어보겠습니다.
+브라우저의 설정에 따라 새 창 또는 새 탭에서 보일 것입니다.
+
+방법은 마크다운 파일 저장과 거의 비슷합니다.
+마크다운 파일을 `mkd` 디렉터리에 저장하는 것까지는 동일합니다.
+그 뒤 마크다운 파일을 유추할 수 있는 정보(UUID) 콜백으로 보내면
+jQuery에서 새로운 창(target)에 HTML을 갱신시키는 방법입니다. 
+화면의 통일성을 위해 새로운 레이아웃인 `layouts/viewer.html.ep`를 추가하겠습니다.
+
+`markdown-editor.pl`에 다음 내용을 추가합니다.
+
+    #!perl
+    get '/html/:uuid' => sub {
+        my $self     = shift;
+        my $uuid     = $self->param('uuid');
+        my $markdown = read_file( catfile(app->home, 'mkd', $uuid), binmode => ':utf8');
+        $self->stash( markdown => $m->markdown($markdown) );   
+        return $self->render('html-viewer');
+    };
+
+    @@ html-viewer.html.ep
+    % layout 'viewer';
+    % title 'Seoul.pm Markdown HTML Viewer';
+    <div class="container">
+      <div class="row">
+        <div class="span8">
+          <%== $markdown %>
+        </div>
+      </div>
+    </div>
+
+    @@ layouts/viewer.html.ep
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title><%= title %></title>
+        <!-- Bootstrap -->
+        <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+        <link href="/css/style.css" rel="stylesheet" media="screen">
+      </head>
+      <body>
+        <div class="navbar navbar-static-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse"></a>
+              <a class="brand" href="/">Seoul.pm Markdown Editor</a>
+            </div>
+          </div><!-- /navbar-inner -->
+        </div><!-- /navbar -->
+        <%= content %>
+        <script src="/jquery-1.8.3.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+      </body>
+    </html>
+
+`public/markdown-editor.js`에 다음 내용을 추가합니다.
+
+    #!javascript
+    function open_html() {
+      var markdown = $("#editor-markdown").val();
+      $.post(
+        "/save",
+        {
+          "markdown" : markdown,
+          "view"     : 'html'
+        },
+        function(data) { window.open(data.url, 'viewer'); },
+        "json"
+      );
+    }
+    $("#open-html").click(function() { open_html(); });
+
+자, 확인해볼까요?
+
+![새로운 탭에 열기][img-resize-05]
+*그림 6.* 새로운 탭에 열기 ([원본][img-05])
+
+
+정리하기
+---------
+
+지금까지의 작업을 살펴볼까요?
+
+- [Mojolicious][home-mojolicious]를 이용해 로컬 웹서버를 띄우기
+- [Twitter Bootstrap][home-bootstrap]을 사용한 UI를 구성
+- [Text::MultiMarkdown][cpan-text-multimarkdown]을 이용해 마크다운을 HTML로 변환
+- [Mojolicious][home-mojolicious]와 [jQuery][home-jquery]를 이용해 자료 송수신
+- [jQuery][home-jquery]를 이용해 현재 화면을 유지하면서 우측에 HTML로 표시
+- [UUID::Tiny][cpan-uuid-tiny]를 이용해서 마크다운 문서 저장
+
+호오, 얼마되지 않은 작업인줄 알았는데 꽤 많은 일을 하고 있군요.
+그 결과 웹서버에 올려 놓고 어디서나 사용할 수 있는 근사한 마크다운 편집기가 탄생했습니다.
+사실 저도 이 편집기를 이용해서 오늘 기사를 작성했답니다.
+이제 마크다운으로 문서 작성하기가 조금은 더 수월해진 것 같습니다.
+여기에서 한단계 더 발전시켜 어떤 기능을 추가하고 어떻게 활용할지는 여러분의 몫입니다.
+
+Don't forget [fork me on GitHub][github-markdown-editor]!! ;-)
+
+
+[img-00]: 2012-12-22-0.png
+[img-01]: 2012-12-22-1.png
+[img-02]: 2012-12-22-2.png
+[img-03]: 2012-12-22-3.png
+[img-04]: 2012-12-22-4.png
+[img-05]: 2012-12-22-5.png
+
+[img-resize-00]: 2012-12-22-0_r.png
+[img-resize-02]: 2012-12-22-2_r.png
+[img-resize-03]: 2012-12-22-3_r.png
+[img-resize-04]: 2012-12-22-4_r.png
+[img-resize-05]: 2012-12-22-5_r.png
+
+[advent-2012]:                    http://advent.perl.kr/2012
+[cpan-mojolicious]:               https://metacpan.org/module/Mojolicious
+[cpan-text-multimarkdown]:        https://metacpan.org/module/Text::MultiMarkdown
+[cpan-uri-escape]:                https://metacpan.org/module/URI::Escape
+[cpan-uuid-tiny]:                 https://metacpan.org/module/UUID::Tiny
+[cpan]:                           http://www.cpan.org
+[github-markdown-editor]:         https://github.com/skyloader/markdown-editor
+[github-seoulpm-advent-calendar]: https://github.com/seoulpm/seoulpm-advent-calendar
+[home-bootstrap-navbar]:          http://twitter.github.com/bootstrap/components.html#navbar
+[home-bootstrap]:                 http://twitter.github.com/bootstrap/
+[home-firebug]:                   https://www.getfirebug.com/
+[home-github]:                    https://github.com
+[home-jquery]:                    http://jquery.com/
+[home-markdown-syntax]:           http://daringfireball.net/projects/markdown/syntax/
+[home-markdown]:                  http://daringfireball.net/projects/markdown/
+[home-mojolicious]:               http://mojolicio.us/
+[stackoverflow-tip]:              http://stackoverflow.com/questions/3499597/javascript-jquery-to-download-file-via-post-with-json-data
+[wiki-markdown]:                  http://en.wikipedia.org/wiki/Markdown/
+[wiki-uuid]:                      http://en.wikipedia.org/wiki/UUID/
