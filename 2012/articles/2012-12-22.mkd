@@ -11,7 +11,6 @@ Author:   skyloader
 skyloader - 백만년째 Perl초보 skyloader _at_ gmail.com
 
 
-
 시작하면서
 -----------
 
@@ -64,8 +63,8 @@ Markdown은 적는(writing)에 초점이 있다고 할 수 있습니다.
 
 이 외에도 리스트, 인용등 Block element와 링크, 강조, 이미지등
 span element 등을 쉽게 기술할 수 있습니다. 
-자세한 문법은 [John Gruber-Markdown syntax][markdown-syntax]나
-[Wikipedia][wikipedia]를 참고해 주시면 되겠습니다.
+자세한 문법은 [마크다운 공식 홈페이지][home-markdown-syntax]와
+[위키피디아의 마크다운 페이지][wiki-markdown]를 참고해 주시면 되겠습니다.
 
 그러나 Markdown이 HTML에 비해 쉽게 만들어 졌다고는
 하지만 언제나 누구에나 쉽다는 뜻은 아닙니다.
@@ -85,7 +84,7 @@ span element 등을 쉽게 기술할 수 있습니다.
 -----------------
 
 제일 먼저 필요한 것은 Markdown 문서를 HTML로 변환시켜 주는 Module 입니다.
-이를 위해서는 [John Gruber][john-gruber]를 이용할 수도 있으나
+이를 위해서는 [공식 마크다운 변환기][home-markdown]를 이용할 수도 있으나
 [CPAN][cpan-text-multimarkdown]에서 Markdown module을 받아서 설치하도록 하죠.
 cpan을 이용해서 받는다면 다음과 같이 입력하시면 됩니다.
 
@@ -93,7 +92,7 @@ cpan을 이용해서 받는다면 다음과 같이 입력하시면 됩니다.
     $ sudo cpan install Text::MultiMarkdown
 
 두번째로는 웹서버를 띄우기 위해 작지만 강력함
-Web framework인 [Mojolicious][mojolicious]를 설치합니다.
+Web framework인 [Mojolicious][home-mojolicious]를 설치합니다.
 홈페이지에 에서 받아도 되고, 다음과 같이 cpan을 이용하여도 됩니다.
 
     #!bash
@@ -101,20 +100,20 @@ Web framework인 [Mojolicious][mojolicious]를 설치합니다.
 
 세번째로는 UI 테마 입니다.
 이왕이면 다홍치마라고 보기도 좋은 페이지라면 한번이라도 더 들어가고 싶겠죠?
-[Twitter Bootstrap][bootstrap]을 이용해서 한번 들어가면 나오지 못하고
+[Twitter Bootstrap][home-bootstrap]을 이용해서 한번 들어가면 나오지 못하고
 Markdown 문서만 마구 만들어 내고 싶은 그런 페이지를 만들어 봅시다.
-[Twitter Bootstrap][bootstrap]은 비단 여기서 뿐만아니라 Web작업을 하는
+[Twitter Bootstrap][home-bootstrap]은 비단 여기서 뿐만아니라 Web작업을 하는
 사람들에게는 축복이라 불릴만큼 아름다운 UI를 무려 **공짜**로 제공하므로 꼭 알아두도록 합시다.
 
-네번째로는 [jQuery][jquery]를 받도록 합니다.
+네번째로는 [jQuery][home-jquery]를 받도록 합니다.
 골치아픈 Javascript를 아주 간결하게 쓸수 있도록 해줍니다.
 Javascript도 모르고 jQuery는 더더욱 모르겠다구요?
 아니 이런... 당신은 필자와 같은 신세입니다.
-하지만 [jQuery][jquery]의 경우 일부분만 사용되고 그마져도
-[구글느님][google]에 의존할 것이기 때문에 걱정하지 않으셔도 됩니다.
+하지만 [jQuery][home-jquery]의 경우 일부분만 사용되고 그마져도
+구글느님에 의존할 것이기 때문에 걱정하지 않으셔도 됩니다.
 받는 파일은 jQuery를 개발 할 것이 아니기 때문에 min version으로 받도록 하겠습니다.
 
-다섯번째로는 file 저장을 위한 [UUID][uuid] module입니다.
+다섯번째로는 file 저장을 위한 [UUID][wiki-uuid] module입니다.
 지금은 개인용으로 만들지만 웹으로 만들기 때문에 언제든 다수를 위한 용도록 확장이 가능하죠.
 URL만 알면 되니깐요.
 그럴때, 혹시라도 같은 이름으로 누군가 file을 저장하게 되면,
@@ -138,7 +137,7 @@ URL만 알면 되니깐요.
     $ cd markdown-editor
 
 그리고 결과를 점검할 Web 서버 하나는 띄워 놓아야 겠지요.
-이때 [Mojolicious][mojolicious]가 필요합니다.
+이때 [Mojolicious][home-mojolicious]가 필요합니다.
 
     #!bash
     $ mojo generate lite_app
@@ -178,12 +177,12 @@ UI 화면 구성하기
 그리고, 상단에는 Navigation Bar를 두어서 file save 등의 기능을 구현하고,
 자칫 휑~ 해 보일 수 있는 화면을 좀 더 안정감 있도록 만들려고 합니다.
 
-그럼 이제 [Bootstrap][bootstrap]으로 돌아가서,
+그럼 이제 [Bootstrap][home-bootstrap]으로 돌아가서,
 필요한 구성요소들을 어떻게 사용하는지 확인해 보도록 합니다.
 
 먼서 상단 Navigation Bar를 구성할 적당한 예제를 찾아 보도록 합시다.
-[Navigation Bar][navbar] 로 들어가서 적당한 예제를 찾아 예제 code를 긁어와도 되고,
-혹은 [FireBug][firebug]등의 툴을 이용해서 원하는 부분의 code를 가져 옵니다.
+[Navigation Bar][home-bootstrap-navbar] 로 들어가서 적당한 예제를 찾아 예제 code를 긁어와도 되고,
+혹은 [FireBug][home-firebug]등의 툴을 이용해서 원하는 부분의 code를 가져 옵니다.
 다음과 같은 Navigation Bar를 만들기 위해 다음과 같이 가져온 code를 수정하였습니다.
 
     #!perl
@@ -228,7 +227,7 @@ UI 화면 구성하기
 ![navbar][img-02]
 
 되는 군요! 이기세를 몰아 text영역을 만듭니다.
-Bootstrap은 [Grid system][grid]도 아주 훌륭하게 지원합니다.
+Bootstrap은 Grid system도 아주 훌륭하게 지원합니다.
 markdown-editor.pl에서 기본으로 있던 index page는 삭제하고
 새로이 editor.htmp.ep page를 생성합니다. 
 여기에 Grid를 넣도록 합니다.
@@ -331,10 +330,10 @@ public directory 아래에 *markdown-editor.js* 라는 file을 만들어 jQuery 
 
 DB를 사용하지 않고 file을 저장하기 위해 구글느님의 힘을 빌어
 stackoverflow에서 나왔던 방법으로 저장을 할려 합니다.
-[javascript-jquery-to-download-file-via-post-with-json-data](http://stackoverflow.com/questions/3499597/javascript-jquery-to-download-file-via-post-with-json-data)
 이 방법은 Text box내용을 일단 UUID를 이용하여 서버단의 mkd directory에 저장하고,
 iframe을 위한 다운로드 링크를 보내주면,
 jQuery의 콜백에서 iframe을 동적으로 만들어서 다운로드 받을 수 있는 다이얼로그 상자가 생기도록 하는 방법입니다.
+[참고][stackoverflow-tip]
 
 markdown-editor.pl에 다음을 추가합니다.
 
@@ -491,14 +490,14 @@ markdown-editor.js에는 다음의 code를 역시 ready()안에 추가합니다.
 [img-04]: 2012-12-22-4.png width=700
 [img-05]: 2012-12-22-5.png width=700
 
-[markdown-syntax]:          http://daringfireball.net/projects/markdown/syntax/
-[wikipedia]:                http://en.wikipedia.org/wiki/Markdown/
-[john-gruber]:              http://daringfireball.net/projects/markdown/
 [cpan-text-multimarkdown]:  http://www.metacpan.org/module/Text::MultiMarkdown/
-[mojolicious]:              http://mojolicio.us/
-[bootstrap]:                http://twitter.github.com/bootstrap/
-[jquery]:                   http://jquery.com/
-[google]:                   http:google.com/
-[uuid]:                     http://en.wikipedia.org/wiki/UUID/
-[navbar]:                   http://twitter.github.com/bootstrap/components.html#navbar
-[firebug]:                  https://www.getfirebug.com/
+[home-bootstrap-navbar]:    http://twitter.github.com/bootstrap/components.html#navbar
+[home-bootstrap]:           http://twitter.github.com/bootstrap/
+[home-firebug]:             https://www.getfirebug.com/
+[home-jquery]:              http://jquery.com/
+[home-markdown-syntax]:     http://daringfireball.net/projects/markdown/syntax/
+[home-markdown]:            http://daringfireball.net/projects/markdown/
+[home-mojolicious]:         http://mojolicio.us/
+[stackoverflow-tip]:        http://stackoverflow.com/questions/3499597/javascript-jquery-to-download-file-via-post-with-json-data
+[wiki-markdown]:            http://en.wikipedia.org/wiki/Markdown/
+[wiki-uuid]:                http://en.wikipedia.org/wiki/UUID/
