@@ -279,11 +279,11 @@ AJAX를 이용해 POST 방식으로 `/convert`로 문자열을 보냅니다.
 jQuery의 POST 응답 콜백에서 결과를 받아 우측 영역에 뿌려줍니다.
 자료의 흐름은 다음과 같습니다.
 
-1. 좌측 편집기의 `textarea` 영역
-2. `jQuery` `post()` 메소드
-3. `markdown-editor.pl`의 `/convert` 컨트롤러
-4. `jQuery` `post()` 메소드의 콜백 함수
-5. 우측 HTML 뷰어 `div` 영역
+- 좌측 편집기의 `textarea` 영역
+- `jQuery` `post()` 메소드
+- `markdown-editor.pl`의 `/convert` 컨트롤러
+- `jQuery` `post()` 메소드의 콜백 함수
+- 우측 HTML 뷰어 `div` 영역
 
 이를 위해 우선 `markdown-editor.pl`에 `/convert` 컨트롤러를 만듭니다.
 
