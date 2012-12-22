@@ -33,14 +33,14 @@ Firefox로 고스란히 다시 읽어 볼 수 있게 해 보겠습니다.
 Firefox를 실행하고 메뉴에서 `Add-ons -> Search`를 순서대로 선택하고 MozRepl로 검색합니다.
 결과에서 MozRepl을 선택하면 손쉽게 설치할 수 있습니다.
 
-![img][]
-*그림 1.* MozRepl 설치 화면
+![MozRepl 설치 화면][img-resize-1]
+*그림 1.* MozRepl 설치 화면 ([원본][img-1])
 
 정상적으로 설치하고 활성화되면 telnet을 지원하는 터미널 프로그램을 통해
 localhost의 4242 포트로 접속하면 아래와 같은 화면을 확인할 수 있습니다.
 
-![img][]
-*그림 2.* Repl Console 접속 화면
+![Repl Console 접속 화면][img-resize-2]
+*그림 2.* Repl Console 접속 화면 ([원본][img-2])
 
 콘솔 명령을 통해 직접 제어가 가능합니다.
 나오려면 `repl.quit()`을 입력하려면
@@ -197,8 +197,8 @@ POE::Component::IRC 모듈의 사용 방법은 [CPAN 문서][module-poe-irc]에 
 `save_content()` 메소드로 페이지 소스와 JS, CSS, 이미지 등을 내려받고 브라우저 또는 브라우저 탭을 닫습니다.
 내려받은 데이터는 Firefox나 기타 웹 브라우저를 사용해 읽어 들일 수 있습니다.
 
-![img][]
-*그림 3.* 데이터 저장 디렉토리 화면
+![데이터 저장 디렉토리 화면][img-resize-3]
+*그림 3.* 데이터 저장 디렉토리 화면 ([원본][img-3])
 
 
 ## 정리하며
@@ -214,3 +214,12 @@ WWW::Mechanize::Firefox 모듈의 기능을 충분히 사용하면
 [module-firefox]: https://www.metacpan.org/module/WWW::Mechanize::Firefox
 [mozrepl]: https://addons.mozilla.org/en-us/firefox/addon/mozrepl/
 [mozrepl-wiki]: https://github.com/bard/mozrepl/wiki
+
+[img-1]: 2012-12-21-1.png
+[img-2]: 2012-12-21-2.png
+[img-3]: 2012-12-21-3.png
+
+[img-resize-1]: 2012-12-21-1_r.png
+[img-resize-2]: 2012-12-21-2_r.png
+[img-resize-3]: 2012-12-21-3_r.png
+
