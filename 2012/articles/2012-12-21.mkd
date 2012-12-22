@@ -201,7 +201,7 @@ POE::Component::IRC 모듈의 사용 방법은 [CPAN 문서][module-poe-irc]에 
 *그림 3.* 데이터 저장 디렉토리 화면
 
 
-## 향후의 과제
+## 정리하며
 
 IRC 이외에 좀더 다양한 커뮤니케이션 서비스를 통해 URL 링크 등의 정보를 수집하고 
 WWW::Mechanize::Firefox 모듈의 기능을 충분히 사용하면
