@@ -143,7 +143,7 @@ SQLite대신 MySQL이나 PostgreSQL을 사용한다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    cpan \
+    $ cpan \
         DBIx::Lite \
         Dist::Zilla \
         Dist::Zilla::Plugin::AutoPrereqs \
@@ -894,8 +894,6 @@ CRUD 기능을 완전하게 지원하기 위해서 몇가지 옵션을 더 추�
             --schema_sqlite    schema sql for sqlite
             -h --help          show this help message
 
-    $ 
-
 To-Do 목록을 추가하려면 `-a` 옵션을 이용합니다.
 이때 `-p` 옵션으로 중요도를 조정하고 `-s` 옵션을 이용해서
 `todo`, `doing`, `done` 중 하나의 값을 지정할 수 있습니다.
@@ -1589,7 +1587,6 @@ Rock 'n Roll!!
     [DZ] writing archive to MyTodo-0.001.tar.gz
     $ ls
     Changes  MyTodo-0.001  MyTodo-0.001.tar.gz  bin  dist.ini  lib  mytodo-web.conf  mytodo-web.pl
-    $ 
 
 유후~! :-D
 
