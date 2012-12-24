@@ -932,66 +932,66 @@ Let's Patch!
     From: Keedi Kim <keedi.k@gmail.com>
     Date: Mon, 17 Dec 2012 14:19:03 +0900
     Subject: Order attribute when displaying help message
-
+    
     Sorting option is helpful for users, so added order attribute.
     First sort keys by order attr value, and default order value set as 0.
     If order attr is same, trying to sort by it's key name. :-)
     ---
-    lib/MooX/Options.pm      |    7 ++-
-    lib/MooX/Options/Role.pm |    6 ++-
-    t/order.t                |  115 ++++++++++++++++++++++++++++++++++++++++++++++
-    3 files changed, 126 insertions(+), 2 deletions(-)
-    create mode 100644 t/order.t
-
+     lib/MooX/Options.pm      |    7 ++-
+     lib/MooX/Options/Role.pm |    6 ++-
+     t/order.t                |  115 ++++++++++++++++++++++++++++++++++++++++++++++
+     3 files changed, 126 insertions(+), 2 deletions(-)
+     create mode 100644 t/order.t
+    
     diff --git a/lib/MooX/Options.pm b/lib/MooX/Options.pm
     index 0bbdfc9..43b0d86 100755
     --- a/lib/MooX/Options.pm
     +++ b/lib/MooX/Options.pm
     @@ -17,7 +17,7 @@ use Carp;
-    
-    # VERSION
-    my @OPTIONS_ATTRIBUTES
+     
+     # VERSION
+     my @OPTIONS_ATTRIBUTES
     -    = qw/format short repeatable negativable autosplit doc/;
     +    = qw/format short repeatable negativable autosplit doc order/;
-    
-    sub import {
-        my ( undef, @import ) = @_;
+     
+     sub import {
+         my ( undef, @import ) = @_;
     @@ -121,6 +121,7 @@ sub _filter_attributes {
-    sub _validate_and_filter_options {
-        my (%options) = @_;
-        $options{doc} = $options{documentation} if !defined $options{doc};
+     sub _validate_and_filter_options {
+         my (%options) = @_;
+         $options{doc} = $options{documentation} if !defined $options{doc};
     +    $options{order} = 0 if !defined $options{order};
-    
-        my %cmdline_options = map { ( $_ => $options{$_} ) }
-            grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
+     
+         my %cmdline_options = map { ( $_ => $options{$_} ) }
+             grep { exists $options{$_} } @OPTIONS_ATTRIBUTES, 'required';
     @@ -420,6 +421,10 @@ Ex :
-        my $t = t->new_with_options;
-        t->verbose # 3
-    
+         my $t = t->new_with_options;
+         t->verbose # 3
+     
     +=item order
     +
     +Specified the order of the attribute.
     +
-    =back
-    
-    =head1 namespace::clean
+     =back
+     
+     =head1 namespace::clean
     diff --git a/lib/MooX/Options/Role.pm b/lib/MooX/Options/Role.pm
     index 279c025..9cc201a 100644
     --- a/lib/MooX/Options/Role.pm
     +++ b/lib/MooX/Options/Role.pm
     @@ -67,7 +67,11 @@ sub parse_options {
-        };
-    
-        my %has_to_split;
+         };
+     
+         my %has_to_split;
     -    for my $name ( keys %options_data ) {
     +    my @sorted_keys = sort {
     +        $options_data{$a}{order} <=> $options_data{$b}{order} # sort by order
     +            or $a cmp $b                                      # sort by attr name
     +    } keys %options_data;
     +    for my $name (@sorted_keys) {
-            my %data = %{ $options_data{$name} };
-            my $doc  = $data{doc};
-            $doc = "no doc for $name" if !defined $doc;
+             my %data = %{ $options_data{$name} };
+             my $doc  = $data{doc};
+             $doc = "no doc for $name" if !defined $doc;
     diff --git a/t/order.t b/t/order.t
     new file mode 100644
     index 0000000..8df6196
@@ -1157,27 +1157,27 @@ Let's Patch!
     @@ -1,4 +1,4 @@
     -package MooX::Options::Role;
     +package MyTodo::Patch::MooX::Options::Role;
-    
-    # ABSTRACT: role that is apply to your object
-    use strict;
-    diff -urN a/lib/MyTodo/Patch/MooX/Options.pm b/lib/MyTodo/Patch/MooX/Options.pm
+     
+     # ABSTRACT: role that is apply to your object
+     use strict;
+     diff -urN a/lib/MyTodo/Patch/MooX/Options.pm b/lib/MyTodo/Patch/MooX/Options.pm
     --- a/lib/MyTodo/Patch/MooX/Options.pm  2012-12-24 16:27:09.483471308 +0900
     +++ b/lib/MyTodo/Patch/MooX/Options.pm  2012-12-24 16:26:34.707469991 +0900
     @@ -1,4 +1,4 @@
     -package MooX::Options;
     +package MyTodo::Patch::MooX::Options;
-    
-    # ABSTRACT: add option keywords to your object (Mo/Moo/Moose)
-    
+     
+     # ABSTRACT: add option keywords to your object (Mo/Moo/Moose)
+     
     @@ -70,7 +70,7 @@
-        my $options_data = {};
-        my $apply_modifiers = sub {
-            return if $target->can('new_with_options');
+         my $options_data = {};
+         my $apply_modifiers = sub {
+             return if $target->can('new_with_options');
     -        $with->('MooX::Options::Role');
     +        $with->('MyTodo::Patch::MooX::Options::Role');
-    
-            $around->(
-                _options_data => sub {
+     
+             $around->(
+                 _options_data => sub {
 
 이제 `MooX::Options` 모듈을 사용하는 `MyTodo::Script` 모듈 쪽을 수정합니다.
 
@@ -1186,14 +1186,14 @@ Let's Patch!
     --- a/lib/MyTodo/Script.pm      2012-12-24 16:28:33.971474508 +0900
     +++ b/lib/MyTodo/Script.pm      2012-12-24 16:26:34.707469991 +0900
     @@ -2,7 +2,7 @@
-    # ABSTRACT: MyTodo command line utility options processing
-    
-    use Moo;
+     # ABSTRACT: MyTodo command line utility options processing
+     
+     use Moo;
     -use MooX::Options ( protect_argv => 0 );
     +use MyTodo::Patch::MooX::Options ( protect_argv => 0 );
-    use namespace::clean -except => [qw/_options_data _options_config/];
-    
-    use File::HomeDir;
+     use namespace::clean -except => [qw/_options_data _options_config/];
+     
+     use File::HomeDir;
 
 네, 모든 패치가 끝났습니다.
 사실 앞의 코드에서 속성값을 정의할때 `order`라는 값을 지정했는데,
@@ -1545,8 +1545,8 @@ Rock 'n Roll!!
     --- a/Changes   2012-12-24 17:15:04.863580223 +0900
     +++ b/Changes   2012-12-24 17:14:48.943579620 +0900
     @@ -1,4 +1,7 @@
-    Release history for MyTodo
-    
+     Release history for MyTodo
+     
     -0.XXX
     -    First version, released on unsuspecting world.
     +0.001
@@ -1558,14 +1558,14 @@ Rock 'n Roll!!
     --- a/dist.ini  2012-12-24 17:13:22.471576343 +0900
     +++ b/dist.ini  2012-12-24 17:13:48.999577347 +0900
     @@ -3,7 +3,7 @@
-    license          = Perl_5
-    copyright_holder = Keedi Kim
-    copyright_year   = 2012
+     license          = Perl_5
+     copyright_holder = Keedi Kim
+     copyright_year   = 2012
     -version          = 0.000
     +version          = 0.001
-    
-    ;[@Basic]
-    [@Filter]
+     
+     ;[@Basic]
+     [@Filter]
 
 자, 타르볼을 만들어봅시다!
 
