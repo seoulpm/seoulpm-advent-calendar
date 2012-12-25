@@ -1,0 +1,523 @@
+Title:    요즘은 ZooKeeper로 커피숍을 차리더라
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   saillinux
+
+
+## 저자
+
+[@saillinux][author] -
+마음씨 좋은 외국인 노동자,
+한국에 와서 비즈스프링에서 웹개발자 및 시스템 운영자로,
+야후 코리아에서 프로덕션 옵스 및 엔지니어로,
+블리자드 엔터테인먼트에서 시스템 운영자로,
+현재 페이스북에서 옵 엔지니어로 재직 중이다.
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자,
+Perl로 MMORPG를 만들어보겠다는 꿈을 갖고 있지만
+요즘은 현실과 타협해 시스템 트레이딩에 푹 빠져있는 Perl덕후,
+건강을 최고의 신조로 여기고 있다.
+
+
+## 주키퍼란?
+
+주키퍼는 분산 코디네이터 서비스를 제공하는 아파치 오픈소스 프로젝트입니다.
+분산 환경에는 락, 네이밍 서비스, 클러스터 멤버십 등을
+쉽게 구현할 수 있는 기능이 제공되어야 합니다.
+
+분산 환경에서는 다양한 운영 상황이나 예상치 못한 장애가 발생하는 것 등의 원인으로
+복잡한 문제가 발생하게 되는데, 
+분산된 애플리케이션 서버 사이의 자원 경합, 락 잠금/해제 등이 있습니다.
+주키퍼는 이러한 문제들을 쉽게 해결해주는 역할을 합니다.
+대표적인 이용 사례는 다음과 같습니다.
+
+- 네임 서비스, 환경 설정, 그룹 멤버쉽
+- 이중 배리어
+- 우선 순위 큐
+- 공유 락 제어
+- 두 단계 커밋
+- 리더 선출
+
+주키퍼가 실제로 이런 기능을 제공한다기 보다는 기능을 쉽게 구현할 수
+있는 메커니즘을 제공한다고 할 수 있습니다.
+이런 고급 기능을 분산 환경 서비스를 구축하는 것에만 쓰기에는 너무 쓸쓸하지 않나 싶습니다.
+그래서 주키퍼로 커피숍을 차려보도록 하겠습니다.
+
+## 주키퍼로 커피숍을 꾸려봅시다
+
+제가 현재 유일하게 즐기는게 있다면 그것은 Philz Coffee입니다.
+다양한 종류의 커피를 직접 눈앞에서 내려주기 때문에 눈요기도 되고
+신뢰해서 마실 수 있는 곳이죠(물론 점원 누나가 이뻐서가 아니랍니다).
+무엇보다 크림과 흑설탕을 듬뿍 넣어주는게 일품입니다.
+커피를 마시다가 문득 발견한 문구가 있습니다.
+
+
+![one cup at a time][img-resize-1]
+*그림 1.* one cup at a time ([원본][img-1])
+
+아아 과연 아마도 Philz Coffee의 창시자는 분명 분산 환경 시스템을
+구축하던 개발자였을 것입니다. 한번에 한잔씩이라니 경쟁 상태(race condition)로 인해
+말도 못할 고생을 하지 않았다면 사용할 수 없는 문구입니다.
+아마도 다음으로 내린 커피는 잠금 경합 상태에 자유로운 커피일지도
+모르겠네요.
+
+Philz Coffee을 경외하는 마음을 담아 주키퍼를 이용한 나만의
+자그마한 꿈의 커피숍을 만들어 보겠습니다.
+
+## 주키퍼 설치하기
+
+본문의 코드는 아쉽게도 Windows와 Mac에서 동작하지 않았습니다.
+리눅스에서 구현된 것임을 사전에 양해드립니다.
+
+펄에서 주키퍼를 사용하기 위해서는
+[Net::ZooKeeper][module-net-zookeeper]를 사용합니다.
+CPAN을 이용한 설치하는 대신 직접 소스를 받아 설치하도록 하겠습니다.
+본문을 작성할 때 사용한 주키퍼는 [3.4.5 stable 버전][download-zookeeper]입니다.
+[Net::ZooKeeper][module-net-zookeeper] 모듈은 주키퍼의 C API를 이용하여 만든 바인딩이기 때문에
+C API를 먼저 설치해줍니다.
+
+    #!bash
+    $ tar xzf zookeeper-3.4.5.tar.gz
+    $ cd zookeeper-3.4.5/src/c/
+
+    $ ./configure
+
+    $ make; sudo make install
+
+예제와 같이 입력하면 `/usr/local`에 설치됩니다.
+설치가 완료된 후 실제 Net::ZooKeeper 펄 모듈을 설치합니다.
+모듈은 내려받은 `zookeeper` 소스에 같이 포함되어 있습니다.
+주기퍼 C API의 헤더와 라이브러리가 설치된 곳을 인자로 주어 설치합니다.
+
+    #!bash
+    $ cd zookeeper-3.4.5/contrib/zkperl
+    $ perl Makefile.PL \
+        --zookeeper-include=/usr/local/include/zookeeper \
+        --zookeeper-lib=/usr/local/lib
+
+    $ make; sudo make install
+
+주키퍼 자체는 자바로 작성된 프로그램이기 때문에
+JDK가 설치되어 있으면 아래의 명령어로 실행할 수 있습니다.
+실행 전에 설정 파일을 만들어줍니다.
+
+    #!bash
+    $ cd zookeeper-3.4.5/conf
+    $ cp zoo_sample.cfg zoo.cfg
+
+    $ cd zookeeper-3.4.5/bin
+    $ ./zkServer.sh start
+
+이렇게 실행하면 localhost 호스트에 2181 포트로 서비스가 실행됩니다.
+그러면 아래 명령으로 주키퍼 인터페이스에 붙을 수 있습니다.
+
+    #!bash
+    $ ./zkCli.sh
+
+## 주키퍼의 데이터 모델
+
+주키퍼는 서버에 모든 데이터가 저장되면 클라이언트가 서버에 접속하여
+노드를 생성/접근하는 것으로 메타 데이터를 공유합니다.
+
+주키퍼는 파일시스템과 비슷한 계층적인 네임스페이스를 제공합니다.
+파일시스템은 파일에만 데이터를 저장할 수 있지만 주키퍼에서는 모든
+노드에 데이터를 저장할 수 있습니다. 그리고 파일시스템은 로컬에 저장되어 있거나
+마운트하여 사용하지만 주키퍼는 클라이언트 라이브러리를 이용하여
+네임스페이스에 대한 조회를 원격 클라이언트에서 할 수 있습니다.
+
+![Data Model][img-resize-3]
+*그림 2.* Data Model ([원본][img-3])
+
+- 경로:
+  주키퍼에서 노드를 구분하는 식별자는 파일시스템과 동일하게 `/`입니다.
+
+- Z노드:
+  네임스페이스의 각 노드를 Z노드라고 부릅니다. 즉, `/`, `/node1`,
+  `/node1/config` 등을 Z노드라고 부릅니다.
+
+보통 작은 데이터를 위주로 다양한 정보를 저장합니다. 서버의
+상태, 락 정보, 환경 설정과 같은 메타 데이터를 보관합니다. 그 외
+버전이나 ACL 관련 정보도 관리합니다.
+본문에서는 주키퍼의 프레임워크를 이용하여
+클러스터 멤버십 및 네이밍 서비스와 큐를 구현하여 커피숍을 꾸려보겠습니다.
+
+## 클러스터 멤버십과 네이밍 서비스
+
+먼저 클러스터 멤버십과 네이밍 서비스에 대해 먼저 알아보겠습니다.
+클러스터 멤버십 혹은 그룹 멤버십은 동일한 기능을 수행하는 서버군이나 서비스를 목록으로 유지하며 새로 추가되거나 점검/장애 등으로 제거되는 서버/서비스도 목록에서 제거하는 서비스를 말합니다.
+분산 시스템에서 필수 항목이며 장애 등으로 서버가 제거되었을 때 관리자에게 적절하게 보고하는 장애 대응을 조정합니다.
+
+![주키퍼를 이용한 클러스터 멤버십][img-resize-4]
+*그림 3.* 주키퍼를 이용한 클러스터 멤버십 ([원본][img-4])
+
+어플리케이션 서버에 접속해야 하는 클라이언트는 주키퍼에서
+정한 디렉토리에서 서버 목록을 받거나 노드 삭제 등의 이벤트를 받아 그에
+해당하는 작업을 할 수 있습니다.
+어플리케이션 서버에 장애가 발생하거나 네트워크 단절이 일어나면 주키퍼 서버에서
+세션 타임아웃을 발행하여 해당 노드를 삭제하면 멤버십 목록에서 제거됩니다.
+
+## 클러스터 멤버십과 큐를 위한 준비
+
+Philz Coffee에서는 먼저 바리스타한테 직접 가서 추천을 받거나 주문합니다.
+커피 값을 지불하는 것은 나중인 거죠. 즉, 먼저 만들어 준 것을 마셔보고 "죽이네~" 싶으면 돈을 내는 것입니다.
+
+![Philz Coffee][img-resize-2]
+*그림 4.* Philz Coffee ([원본][img-2])
+
+분산 시스템에서의 기능 분담(Distributed Coordination)을 위해 클러스터 멤버십과 큐를 적절하게 사용해야 합니다.
+여기서는 Philz Coffee의 업무 구조에 맞게 노드를 구성하고 구현한 코드를 보면서 설명해 나가도록 하겠습니다.
+먼저 아래와 같이 주키퍼를 초기화하고 클러스터 멤버십과 큐를 준비합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Net::ZooKeeper qw(:node_flags :acls);
+    use POSIX qw(:sys_wait_h);
+    use Time::HiRes qw(sleep);
+    use Sys::Hostname;
+
+    use constant ZK_SESSION_TIMEOUT => 10 * 1000;
+    use constant ZK_SERVERS => "localhost:2181";
+    use constant BARISTA_GROUP => '/barista_group';
+
+    my $zkh = Net::ZooKeeper->new(ZK_SERVERS,
+                  'session_timeout' => ZK_SESSION_TIMEOUT) or die "$!";
+
+    print "creating barista name services\n";
+    unless ($zkh->exists(BARISTA_GROUP)) {
+      $zkh->create(BARISTA_GROUP, 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+        or die "failed to create a node\n";
+    }
+
+    print "creating coffee order queues\n";
+    unless ($zkh->exists("/orders")) {
+      $zkh->create("/orders", 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+        or die "failed to create a node\n";
+    }
+
+맨처음 우리가 해야하는 일은 주키퍼 서버에 접속하는 것입니다.
+주키퍼 클라이언트를 생성하여 서버 주소 및 세션 타임아웃을 정하고 접속합니다.
+그렇게 해서 생성된 `$zhk` 핸들러를 이용하여 주키퍼 서버 메모리에 저장된 노드를 접근하고 생성합니다.
+이 때 `/barista_group`이라는 노드가 존재하지 않으면 생성하여 그룹 멤버십 관리를 하고 있습니다.
+
+    #!perl
+    $zkh->create(BARISTA_GROUP, 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+
+첫번째 인자로 노드 혹은 경로를 전달하여 `create()` 메소드를 호출합니다.
+두번째 인자는 데이터인데 여기서는 그룹 등록을 위한 디렉토리 생성이기 때문에
+데이터를 임의 값인 `0`으로 했습니다.
+세번째는 ACL인데 해당 노드에 대한 접근 권한입니다.
+여기서는 물론 모든 접근을 허용합니다.
+
+바리스타가 늘어나거나 떠나면 이 노드에 추가하거나 삭제할 것입니다.
+상세한 내용은 바리스타 섹션에서 다루겠습니다.
+
+    #!perl
+    $zkh->create("/orders", 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+
+추가로 `/orders`라는 큐를 관리하는 노드를 생성하였습니다.
+각 바리스타가 주문을 받을 수 있는 보관함이라고 볼 수 있습니다.
+
+## 바리스타
+
+Philz Coffee에서 서빙을 담당하는 바리스타를 서비스로 간주하겠습니다.
+각각 바리스타를 그룹 멤버십에 등록하면
+커피를 마시러 온 고객들이 `/barista_group` 노드에 등록된 바리스타 목록을
+참조하여 서비스에 있는 바리스타에게 커피를 주문합니다.
+
+여기서는 세명의 바리스타 프로세스를 생성하여 서비스에 임명합니다.
+생성된 프로세스는 주키퍼 클라이언트를 생성하여 서버에 접속합니다.
+접속 후 자신을 `/barista_group`의 하위 디렉토리에 노드를 생성하는 것으로 자신을 서비스에 등록합니다.
+
+`/barista_group/{$host}_{$pid}` 형식으로 노드를 생성합니다.
+바리스타가 해당 스크립트가 실행되는 서버 이외에도
+프로세스를 생성하여 서비스할 수 있음을 강조하기 위해 노드 이름에 호스트 이름을
+포함했습니다.
+
+여기서 주위할 점은 바리스타 노드 생성 시 `flag` 프로퍼티에
+`ZOO_EPHEMERAL` 값을 준 것입니다. `EPHEMERAL` 값으로 노드를 생성하면
+클라이언트가 서버에 세션을 가지는 동안에만 노드가 존재하게 됩니다.
+즉, 클라이언트가 접속을 끊으면 해당 노드가 `/barista_group`에서 지워지게 됩니다.
+
+`EPHEMERAL`로 얻는 이점은 바리스타 프로세스가 죽거나 바리스타가 서비스하는
+서버의 네트워크가 단절되면 클라이언트의 세션 타임아웃 값에 기반해 세션이 만료되고 자동으로 서비스에서 지워진다는 점입니다.
+단절된 바리스타를 목록에서 지움으로써 고객이 부재중인 바리스타를 찾지 않게 됩니다.
+주의해야 할 점은 `EPHEMERAL`로 생성된 노드는 하위 디렉토리를 가지지 못한다는 것입니다.
+
+DNS를 이용하여 서버를 관리하면 서버에 문제가 있을 때 해당 도메인이
+캐시에서 삭제될 때까지 장애가 계속 발생하거나 관리자가 수동으로
+제거해야 하는 부담이 있지만 주키퍼는 이런 부분을 자동으로 해결해 줍니다.
+이 부분에 대해서는 고객 섹션에서 더 자세히 알아보도록 하겠습니다.
+
+    #!perl
+    foreach (1..3) {
+      my $pid = fork();
+
+      if ($pid) {
+        print "Barista $pid is ready to serve at philz coffee\n";
+      } else {
+        my $host = hostname;
+        my $zkh  = Net::ZooKeeper->new(ZK_SERVERS, 'session_timeout' => ZK_SESSION_TIMEOUT);
+
+        my $name = $host . "_$$";
+        my $order_watch = $zkh->watch('timeout' => 10000);
+
+        $zkh->create(BARISTA_GROUP . "/" . $name, 0,
+                flags => ZOO_EPHEMERAL, 'acl' => ZOO_OPEN_ACL_UNSAFE);
+        $zkh->create("/orders/" . $name, 0,  'acl' => ZOO_OPEN_ACL_UNSAFE);
+
+        while (1) {
+          my @orders = $zkh->get_children("/orders/$name", 'watch' => $order_watch);
+
+          unless (@orders) {
+           next if ($order_watch->wait());
+           die "barista: I haven't received any order from me. I am leaving T_T";
+          }
+
+          foreach my $order (@orders) {
+           my $coffee = $zkh->get("/orders/$name/$order");
+           print "barista: I am making $coffee for you~\n";
+           sleep 2;
+           $zkh->delete("/orders/$name/$order");
+          }
+        }
+      }
+    }
+
+멤버십 등록이 완료되면 `/orders` 큐 노드에 자신의 버켓을 등록합니다.
+고객은 해당 바리스타에게 주문을 할 때 `/orders/{$host}_{$pid}` 노드에 주문을 생성합니다.
+
+언제 주문이 들어왔는지 알기 위해 watch 객체를 생성해 등록합니다.
+watch는 해당 노드에 이벤트가 발생하면 클라이언트에게 알리기(notify)위한 것입니다.
+주키퍼의 이벤트 핸들러에 대한 문서를 참고해주세요.
+
+해당 버켓에 주문이 있는지 먼저 `get_children()`을 호출하여 주문을 가져옵니다.
+호출 시 watch를 등록하였고 주문이 없으면 watch의 `wait()` 메소드를 호출하여 해당 노드에 이벤트가 있을 때까지
+대기합니다(blocking 모드로 이전됩니다).
+
+주문이 있는 것이 확인되면 `@orders` 배열에 주문 노드 경로를 저장하여
+각 경로를 `get()` 메소드 인자로 호출하면 데이터를 받을 수 있습니다.
+여기서 데이터는 커피 이름입니다. 주문이 무엇이었는지 확인하면 주문 노드를
+삭제하여 커피 생성이 완료된 것을 알립니다.
+
+## 고객
+
+커피를 찾는 고객이 없으면 바리스타는 단순히 커피 매니아일 뿐입니다.
+그래서 고객을 생성해 보도록 하겠습니다.
+
+고객님이 Philz Coffee를 방문하면 맨처음 바리스타를 찾아야 합니다.
+주키퍼 서버에 등록된 바리스타 중 한 명에게 다가가서 주문을 합니다.
+
+    #!perl
+    my @baristas = $zkh->get_children(BARISTA_GROUP);
+    my $barista_name = $baristas[int(rand(@baristas))];
+
+여기서는 `get_children()`을 호출하여 모든 바리스타 노드를
+`/barista_group`에서 가져옵니다. 그 중에 한명을 랜덤으로 선택하는거죠.
+즉, 인기가 많은 바리스타는 괴롭습니다. '-'] ㅎㅎ
+
+이쯤에서 그룹 멤버십의 이점을 느끼셨을 거라 믿습니다.
+마지막으로 다시 정리하자면 아래와 같습니다.
+
+- 바리스타 추가/삭제 시 별도의 작업이 필요 없습니다.
+  `get_children()` 호출 시 이미 바리스타 목록이 다시 생성되었을 겁니다.
+- 일부 바리스타가 장애를 일으켰을 때 주키퍼 서버에서 상황을 바로 확인할 수 있습니다.
+
+코드는 아래와 같습니다.
+
+    #!perl
+    foreach (1..6) {
+      my $pid = fork();
+
+      if ($pid) {
+        print "Customer $pid entered philz coffee\n";
+      } else {
+        my $zkh  = Net::ZooKeeper->new(ZK_SERVERS, 'session_timeout' => ZK_SESSION_TIMEOUT);
+
+        while (1) {
+          my @baristas = $zkh->get_children(BARISTA_GROUP);
+          my $barista_name = $baristas[int(rand(@baristas))];
+          my $order_watch = $zkh->watch('timeout' => 10000);
+
+          print "customer: my barista is [$barista_name]\n";
+
+          my @coffees = qw/tesora swisswater jacob sogood/;
+
+          my $coffee = $coffees[int(rand(@coffees))];
+          my $order  = $zkh->create("/orders/$barista_name/coffee", $coffee,
+                       'flags'=>ZOO_SEQUENCE, 'acl'=>ZOO_OPEN_ACL_UNSAFE) or die "Couldn't create a order node";
+
+          print "customer: I ordered $coffee from $barista_name\n";
+          if ($zkh->exists($order, 'watch' => $order_watch)) {
+           if ($order_watch->wait()) {
+             die "customer: I got my $coffee and I can die now in rest '-']/";
+           } else {
+             die "customer: Ahhh I waited for my coffee too long and died!! T_T";
+           }
+          }
+        }
+      }
+    }
+
+커피를 랜덤으로 선택하여 주문 노드를 `/orders/{$barista_name}`에 생성합니다.
+여기서 주위깊게 보셔야 할 부분은 `flags`에 `ZOO_SEQUENCE` 옵션을 주었다는 것입니다.
+이때 접두사는 `coffee`인데 이렇게 해서 생성된 노드의 이름은 아래와 같습니다.
+
+- `/orders/{$barista_name}/coffee0000000000`
+- `/orders/{$barista_name}/coffee0000000001`
+
+이렇게 노드 이름에 생성 순서대로 일련의 순서(sequence)를 할당합니다.
+이름을 정렬하여 순서대로 주문을 처리할 수 있습니다. 본문에서의 바리스타는
+상당히 편파적이기 때문에 순서에 상관없이 기분내키는 대로 커피를 타드립니다.
+
+    #!perl
+    my $order  = $zkh->create("/orders/$barista_name/coffee", $coffee,
+                              'flags'=>ZOO_SEQUENCE, 'acl'=>ZOO_OPEN_ACL_UNSAFE)
+
+주문이 완료되었는지 알기위해 `order_watch`를 타임아웃 10초로 생성하였고,
+`wait()`을 호출해 이벤트를 기다립니다. 커피가 10초 이내로 완성되면 기쁜 마음으로 죽습니다.
+10초가 지나면 기다리다 지쳐 죽도록 설정하였습니다(커피를 사랑하는 마음을 가지면 이정도는 되어야합니다).
+즉 watch에 타임아웃을 주면 이벤트를 10초 이상 기다리지 않고 blocking 상태에서 해제되어 이후 로직을 수행할 수 있습니다.
+
+## 정리하며
+
+대세는 주키퍼라고 회사에서 갈굽니다.
+새로운 건 배우기 귀찮고..
+어떻게 하나요. 이럴 때에는 재밌게 배우는 게 최고입니다.
+그래서 무리하게 커피숍을 모델로 주키퍼를 선보여 드렸지만 부끄럽기 그지 없습니다.
+
+그래도 주키퍼에 익숙해지니 전에 보이지 않았던 장점이 보이기 시작했고
+다음 프로젝트에 어떻게 적용해야 할 지 정리가 많이 되었습니다.
+
+주키퍼를 분산 코디네이터로만 사용하여 서버 관리 뿐만 아니라 이렇게
+분산 관리가 필요한 커피숍에 적용하는것도 나쁘지 않아 보입니다.
+환경 설정을 주키퍼 서버에 저장하여 이를 가져다 여러 커피숍을 만들 수도 있고
+매니저 프로세서를 추가하여 바리스타 및 고객 관리를 할 수도 있어 보입니다.
+심지어 모든 커피숍의 주문을 중앙 집중적으로 관리할 수도 있어 매출 관리도 주키퍼로 가능해 보이네요.
+
+즉, 정리하면 지금 까지 고수해 왔던 프로그램을 한 서버에 하나의 프로세스로 구축하기 보다는
+좀 더 자유롭게 여러 곳에 분산 하여 쉽게 디자인 할 수 있어 기존에 느꼈던 한계에서 상당히 벗어난 것 같습니다.
+
+AnyEvent를 이용하여 비동기적으로 주키퍼를 사용 하는것이 저의 다음 목표입니다.
+이렇게 부족한 글 여기까지 읽어주셔서 모두 감사 드립니다.
+
+## 전체코드
+
+아래는 본문의 전체 코드입니다.
+
+    #!perl
+    use strict;
+    use warnings;
+    use Net::ZooKeeper qw(:node_flags :acls);
+    use POSIX qw(:sys_wait_h);
+    use Time::HiRes qw(sleep);
+    use Sys::Hostname;
+
+    use constant ZK_SESSION_TIMEOUT => 10 * 1000;
+    use constant ZK_SERVERS => "localhost:2181";
+    use constant BARISTA_GROUP => '/barista_group';
+
+
+    my $zkh = Net::ZooKeeper->new(ZK_SERVERS,
+                      'session_timeout' => ZK_SESSION_TIMEOUT) or die "$!";
+
+    print "creating barista name services\n";
+    unless ($zkh->exists(BARISTA_GROUP)) {
+      $zkh->create(BARISTA_GROUP, 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+        or die "failed to create a node\n";
+    }
+
+    print "creating coffee order queues\n";
+    unless ($zkh->exists("/orders")) {
+      $zkh->create("/orders", 0, "acl" => ZOO_OPEN_ACL_UNSAFE)
+        or die "failed to create a node\n";
+    }
+
+    foreach (1..3) {
+      my $pid = fork();
+
+      if ($pid) {
+        print "Barista $pid is ready to serve at philz coffee\n";
+      } else {
+        my $host = hostname;
+        my $zkh  = Net::ZooKeeper->new(ZK_SERVERS, 'session_timeout' => ZK_SESSION_TIMEOUT);
+
+        my $name = $host . "_$$";
+        my $order_watch = $zkh->watch('timeout' => 10000);
+
+        $zkh->create(BARISTA_GROUP . "/" . $name, 0,
+             flags => ZOO_EPHEMERAL, 'acl' => ZOO_OPEN_ACL_UNSAFE);
+        $zkh->create("/orders/" . $name, 0,  'acl' => ZOO_OPEN_ACL_UNSAFE);
+
+        while (1) {
+          my @orders = $zkh->get_children("/orders/$name", 'watch' => $order_watch);
+
+          unless (@orders) {
+        next if ($order_watch->wait());
+        die "barista: I haven't received any order from me. I am leaving T_T";
+          }
+
+          foreach my $order (@orders) {
+        my $coffee = $zkh->get("/orders/$name/$order");
+        print "barista: I am making $coffee for you~\n";
+        sleep 2;
+        $zkh->delete("/orders/$name/$order");
+          }
+        }
+      }
+    }
+
+    foreach (1..6) {
+      my $pid = fork();
+
+      if ($pid) {
+        print "Customer $pid entered philz coffee\n";
+      } else {
+        my $zkh  = Net::ZooKeeper->new(ZK_SERVERS, 'session_timeout' => ZK_SESSION_TIMEOUT);
+
+        while (1) {
+          my @baristas = $zkh->get_children(BARISTA_GROUP);
+          my $barista_name = $baristas[int(rand(@baristas))];
+          my $order_watch = $zkh->watch('timeout' => 10000);
+
+          print "customer: my barista is [$barista_name]\n";
+
+          my @coffees = qw/tesora swisswater jacob sogood/;
+
+          my $coffee = $coffees[int(rand(@coffees))];
+          my $order  = $zkh->create("/orders/$barista_name/coffee", $coffee,
+                    'flags'=>ZOO_SEQUENCE, 'acl'=>ZOO_OPEN_ACL_UNSAFE) or die "Couldn't create a order node";
+
+          print "customer: I ordered $coffee from $barista_name\n";
+          if ($zkh->exists($order, 'watch' => $order_watch)) {
+        if ($order_watch->wait()) {
+          die "customer: I got my $coffee and I can die now in rest '-']/";
+        } else {
+          die "customer: Ahhh I waited my coffee too long and died!! T_T";
+        }
+          }
+        }
+      }
+    }
+
+### 참고자료
+
+- [주키퍼 3.4 문서](http://zookeeper.apache.org/doc/r3.4.5/)
+- [Net::ZooKeeper][module-net-zookeeper]
+
+[author]: https://twitter.com/saillinux
+[download-zookeeper]: http://www.carfab.com/apachesoftware/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz
+[module-net-zookeeper]: https://www.metacpan.org/module/Net::ZooKeeper
+
+[img-1]: 2012-12-24-1.png
+[img-2]: 2012-12-24-2.png
+[img-3]: 2012-12-24-3.png
+[img-4]: 2012-12-24-4.png
+
+[img-resize-1]: 2012-12-24-1_r.png
+[img-resize-2]: 2012-12-24-2_r.png
+[img-resize-3]: 2012-12-24-3_r.png
+[img-resize-4]: 2012-12-24-4_r.png
+
+[yes24-4433208]: http://www.yes24.com/24/goods/4433208
