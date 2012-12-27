@@ -39,10 +39,6 @@
      == =  == ==
   </pre>
 </div>
-<div id="comment">
-  <& disqus.mhtml, article => undef, year => undef &>
-  <& fb_comment.mhtml, article => undef, global => $global &>
-</div>
 </div>
 </body>
 </html>
