@@ -205,7 +205,7 @@ local::lib을 사용하면 자신이 원하는 모듈을 root 권한없이 자�
 
 ### perlbrew - 최신 버전의 perl을 사용하자
 
-[perlbrew][cpan-perl-brew]:
+[perlbrew][cpan-perlbrew]:
 시스템에서 제공하는 펄의 버전이 낮다면 가장 먼저
 생각할 수 있는 방법은 홈 디렉토리에 직접 펄 소스를 내려받고
 컴파일해서 사용하는 것입니다. 실행 파일 생성을 위해 필요한 기본적인
