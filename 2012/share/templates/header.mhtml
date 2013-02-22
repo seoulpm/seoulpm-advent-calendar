@@ -21,7 +21,7 @@
 
   <!-- Syntax Highlighter -->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <script type="text/javascript" src="jquery.cooltipbox-1.1.8.js"></script>
+% if ( $article ) {
   <script type="text/javascript" src="shCore.js"></script>
   <script type="text/javascript" src="shBrushBash.js"></script>
   <script type="text/javascript" src="shBrushYaml.js"></script>
@@ -34,12 +34,12 @@
   <script type="text/javascript" src="shBrushDiff.js"></script>
   <script type="text/javascript" src="shBrushJava.js"></script>
   <script type="text/javascript" src="shBrushCpp.js"></script>
-  <link type="text/css" rel="stylesheet" href="jquery.cooltipbox-1.1.8.css">
   <link type="text/css" rel="stylesheet" href="shCore.css">
   <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">
   <script type="text/javascript">
       SyntaxHighlighter.all();
   </script>
+% }
 
 % unless ( $global->{location} ) {
   <script type="text/javascript">
