@@ -28,8 +28,8 @@ Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.
 
                                               +------------------------+
         +--------------+    (Byte Stream)     |                        |
-        |              |      표준 입력       |                        |
-        |    키보드    |+-------------------->|   Perl 프로그램        |
+        |              |      표준 입력        |                        |
+        |    키보드     |+-------------------->|   Perl 프로그램         |
         |              |    (010101110101)    |                        |
         +--------------+                      |                        |
                                               +------------------------+
@@ -40,9 +40,9 @@ Data가 프로그램(Perl)을 만나 Output Stream이 되면 Perl은 decode함�
 
         +------------------------+
         |                        |    (Byte Stream)     +--------------+
-        |                        |      표준 출력       |              |
-        |   Perl 프로그램        |+-------------------->|     화면     |
-        |                        |    (decode func)     |              |
+        |                        |      표준 출력        |              |
+        |   Perl 프로그램         |+-------------------->|     화면     |
+        |                        |    (decode func)     |             |
         |                        |                      +--------------+
         +------------------------+
 
@@ -58,20 +58,23 @@ unicode에 관해서는 perldoc의 unicode문서를 참조합니다.
 준비물
 -------
 
-[CPAN의 Encode 모듈][cpan-encode]
+- [CPAN의 Encode 모듈][cpan-encode]
+
 Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 cpan 명령어를 통해 Encode 모듈을 설치 합니다.
 
         newbcode@newb-dt:~/advent_2013$  cpan Encode
 
-[CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
+- [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
+ 
 Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 html을 가져오기 위한 LWP::UserAgent 모듈도 필요합니다.
 cpanm 명령어를 통해 모듈을 설치 합니다.
 
         newbcode@newb-dt:~/advent_2013$  cpan LWP::UserAgent
 
-[CPAN의 Data::Printer 모듈][cpan-data-printer]
+- [CPAN의 Data::Printer 모듈][cpan-data-printer]
+
 data 구조를 보기위한 Data::Printer 모듈도 설치합니다.
 
         newbcode@newb-dt:~/advent_2013$  cpan Data::Printer
@@ -115,8 +118,8 @@ html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다
         <option value="http://kostat.go.kr/">����û</option>
 
 
-기상청의 html은 "<meta http-equiv="Content-Type" content="text/html; charset=euc-kr" />"로 Encoding 되어 있습니다.
-여기서 확인 할 수 있는 부분은 Content-Type Header에 문자인코딩(charset=euc-kr)이 되어있는 것을 불 수 있습니다. 위에서 본 것과 같이 Data가 Perl을 만나기전까지의 Encoding은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 Decoding을 하게 되지 않으면 문자는 깨져서 보이게 됩니다 .
+기상청의 html은 "charset=euc-kr"로 Encoding 되어 있습니다.
+여기서 확인 할 수 있는 부분은 Content-Type Header에 문자인코딩(charset=euc-kr)이 되어있는 것을 볼 수 있습니다. 위에서 본 것과 같이 Data가 Perl을 만나기전까지의 Encoding은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 Decoding을 하게 되지 않으면 문자는 깨져서 보이게 됩니다 .
 (Perl을 거치지 않은 모든 표준입력은 perl에서는 Byte Stream으로 취급하게 됩니다)
 
 
@@ -241,7 +244,6 @@ use utf8;
 ------------------------------
 
 binmode는 표준입력 파일핸들과 표준출력 파일핸들에다가 encoding tag를 추가합니다.
-
 binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표준 출력으로 나가는건 자동으로 encode를 진행합니다.
 
         binmode STDIN, ":encoding(euc-kr)";
