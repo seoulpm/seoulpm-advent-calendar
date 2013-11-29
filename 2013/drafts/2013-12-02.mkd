@@ -8,9 +8,7 @@ Author:   newbcode
 -----
 
 [@newbcode][twitter-newbcode] - 사랑스러운 딸 바보 도치파파.
-[리눅스의 모든것][yes24-11040637]의 공동저자. 
-
-
+[리눅스의 모든것][yes24-11040637]의 공동저자.  
 시작하며
 ---------
 
@@ -252,10 +250,19 @@ binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표
 
 정리하며
 ---------
+
 Encoding/Decoding은 어떤 언어이든지 한두번은 Hell을 만나게 됩니다. 하지만 perl은 이런 문제를 위와같이 간단하게 해결 할 수 있는 방법들을 제공합니다.
 이것은 perl이 Internal Unicode로 utf8을 구현했기 때문입니다.
 Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니다. 
 Encoding/Decoding과 같은 Hell에 빠지는것보다는 좀더 여러분의 프로그램에게 애정을 쏟기를 바랍니다.
+
+
+참고문서
+----------
+        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
+        http://perldoc.perl.org/perlunicode.html
+        http://perldoc.perl.org/utf8.html
+        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 
 
 
