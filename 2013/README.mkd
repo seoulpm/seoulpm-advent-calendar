@@ -153,3 +153,19 @@ bash 환경에서 아래 명령을 통해 축소된 이미지를 생성할 수 �
 
 그런다음, `make`를 통해 웹페이지를 생성하면 정적 파일로만 이루어진
 `output-2013` 디렉터리가 생성됩니다.
+
+자신의 장비에서 웹서버를 띄워 브라우저로 접속해서 확인하려면
+다음 명령을 실행합니다.
+
+    $ make run
+    perl -E 'symlink "2013/advent.ini", "advent.ini" unless -e "advent.ini"'
+    PERL5LIB=./patch/lib/:/home/askdna/.perlbrew/libs/perl-5.18.1@advent/lib/perl5:lib:extlib/lib/perl5 advcal --config advent.ini --output-dir output-2013 --article-dir 2013/articles --share-dir 2013/share
+    /sbin/ifconfig | perl -nlE 'do { say $1 } if /inet addr:(\d{1,3}(?:\.\d{1,3}){3})/'
+    127.0.0.1
+    192.168.25.60
+    http_this output-2013
+    Exporting 'output-2013', available at:
+       http://127.0.0.1:7007/
+
+정상적으로 로컬 웹서버가 실행되면 `http://127.0.0.1:7007/index.html`로
+접속해서 기사를 확인합니다.
