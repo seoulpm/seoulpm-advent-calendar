@@ -90,7 +90,7 @@
 #popup {
     display: none;
     position: absolute;
-    background: url("popup.gif") no-repeat scroll 0 0 transparent;
+    background: url("popup.png") no-repeat scroll 0 0 transparent;
     width: 230px;
     height: 168px;
 }
@@ -103,7 +103,7 @@
 }
 #popup_text {
     display: block;
-    margin-top: 19px;
+    margin-top: 50px;
 }
 #popup_text .title {
     display: block;

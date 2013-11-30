@@ -50,7 +50,7 @@
       $("#gifts li.on").hover(function() {
         var offset = $(this).offset();
         var popup  = $("#popup");
-        popup.css("left", offset.left - (230 / 2) + 34);
+        popup.css("left", offset.left - (230 / 2) + 60);
         popup.css("top", offset.top - 168 + 6);
         $("#popup_text .title").text($(".title", this).text());
         $("#popup_text .author").text($(".author", this).text());
