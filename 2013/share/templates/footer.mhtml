@@ -1,0 +1,33 @@
+<%args>
+  $global
+</%args>
+
+  <div id="foot">
+    <div class="indent">
+      <& link.mhtml, global => $global &>
+      <ul class="icon">
+        <li><a href="/2013/atom.xml"><img src="feed.png"></a></li>
+        <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
+        <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
+      </ul>
+      <ul class="like">
+        <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://advent.perl.kr/2013/" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
+        <li class="fb">
+          <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fadvent.perl.kr%2F2013&amp;width=280&amp;layout=standard&amp;action=like&amp;show_faces=true&amp;share=true&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe>
+        </li>
+      </ul>
+      <p class="copyright"><& copyright.mhtml &></p>
+    </div>
+    <pre class="hidden">
+     .-'''  __  __
+    /     \/  \/  \&nbsp;
+    =-_-           |
+        \. -____- / \&nbsp;
+         //    /||  ''
+        //|   //||
+       == =  == ==
+    </pre>
+  </div>
+</div>
+</body>
+</html>

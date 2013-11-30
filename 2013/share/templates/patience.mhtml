@@ -1,0 +1,17 @@
+<%args>
+  $days
+  $year
+</%args>
+
+<html>
+<head>
+  <title>patience</title>
+</head>
+
+<body>
+  <pre>
+    days: <% $days %>
+    year: <% $year %>
+  </pre>
+</body>
+</html>

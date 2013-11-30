@@ -1,0 +1,37 @@
+<& header.mhtml, global => $global, article => $article, year => $year &>
+<body><& xfbml.mhtml &>
+<div id="wrap">
+
+  <div class="nav top">
+    <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
+    <a href="http://advent.perl.kr/<% $year %>"><img src="title.gif"/></a>
+    <& sns.mhtml, global => $global, article => $article &>
+    <& nav.mhtml, prev => $prev, next => $next &>
+  </div>
+
+  <div id="cont">
+    <h1><% $title %></h1>
+    <% $article->body_html %>
+  </div>
+
+  <div class="nav bottom"> <& nav.mhtml, prev => $prev, next => $next &> </div>
+  <& disqus.mhtml, article => $article, year => undef &>
+  <& fb_comment.mhtml, article => $article, global => $global &>
+  <div class="nav bottom"> <& nav.mhtml, prev => $prev, next => $next &> </div>
+
+<& footer.mhtml, global => $global &>
+
+<%init>
+  my $global = $m->comp('variables.mhtml');
+
+  my $title = $global->{korean_day}->($article->date->day) . " 날: " . $article->title;
+  $global->{location} = $title;
+</%init>
+
+<%args>
+  $date
+  $year
+  $next
+  $prev
+  $article
+</%args>
