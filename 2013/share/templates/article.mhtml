@@ -4,7 +4,7 @@
 
   <div class="nav top">
     <p class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " " . $global->{title_en} %></p>
-    <a href="http://advent.perl.kr/<% $year %>"><img src="title.gif"/></a>
+    <a href="http://advent.perl.kr/<% $year %>"><img src="title.png"/></a>
     <& sns.mhtml, global => $global, article => $article &>
     <& nav.mhtml, prev => $prev, next => $next &>
   </div>
@@ -19,6 +19,7 @@
   <& fb_comment.mhtml, article => $article, global => $global &>
   <div class="nav bottom"> <& nav.mhtml, prev => $prev, next => $next &> </div>
 
+  <div class="space-20"></div>
 <& footer.mhtml, global => $global &>
 
 <%init>

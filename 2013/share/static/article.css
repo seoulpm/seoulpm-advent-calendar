@@ -16,6 +16,9 @@
     padding: 0;
     font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
 }
+.space-20 {
+    height: 20px;
+}
 #wrap {
     width: 690px;
     margin: 0 auto;
@@ -134,17 +137,17 @@ h3 {
     list-style: none;
 }
 #cont li {
-    margin: 8px 0 8px 12px;
-    padding-left: 50px;
-    background: url("bullet.gif") no-repeat scroll 4px 4px transparent;
+    margin: 5px 0 5px 16px;
+    padding-left: 40px;
+    background: url("bullet.png") no-repeat scroll 4px 4px transparent;
 }
 #cont li ul {
     margin-top: -0.4em;
     margin-bottom: 1em;
 }
 #cont li li {
-    background: url("bullet2.gif") no-repeat scroll 6px 6px transparent;
-    padding-left: 34px;
+    background: url("bullet2.png") no-repeat scroll 6px 6px transparent;
+    padding-left: 40px;
 }
 #cont em {
     font-weight: bold;
@@ -180,10 +183,10 @@ h3 {
 #foot {
     position: relative;
     width: 706px;
-    height: 480px;
-    margin-top: 80px;
+    height: 548px;
+    margin-top: 60px;
     margin-bottom: 16px;
-    background: url("footer-bg.png") no-repeat scroll 330px 0 transparent;
+    background: url("foot-bg.png") no-repeat scroll 330px 0 transparent;
 }
 #foot .indent {
     margin-left: 63px;
@@ -193,9 +196,9 @@ h3 {
     list-style: none;
 }
 #foot #link ul li {
-    margin-left: -28px;
-    padding-left: 28px;
-    background: url("bullet2.gif") no-repeat 0 6px transparent;
+    margin-left: -36px;
+    padding-left: 36px;
+    background: url("bullet2.png") no-repeat 0 1px transparent;
 }
 #foot ul.icon {
     margin-top: 30px;
@@ -210,7 +213,7 @@ h3 {
     position: absolute;
     display: block;
     list-style: none;
-    top: 390px;
+    top: 468px;
     left: 400px;
 }
 #foot .copyright {
