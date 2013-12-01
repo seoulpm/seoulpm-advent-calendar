@@ -374,6 +374,8 @@ Enjoy Your Perl... and R.I.P. [@am0c][twitter-am0c]! ;-)
 
 ![EOT][img-5]
 
+_EOT_
+
 
 [img-1]:          2013-12-01-1.png
 [img-2]:          2013-12-01-2.png
