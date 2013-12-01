@@ -19,12 +19,18 @@
 .space-20 {
     height: 20px;
 }
+body {
+    background: url("hr.png") repeat-x scroll -4px 0;
+}
 #wrap {
     width: 690px;
     margin: 0 auto;
+    min-height: 100px;
+    overflow: visible;
 }
 .nav {
-    margin-top: 8px;
+    margin-top: 0;
+    padding-top: 60px;
 }
 .nav menu, .nav ul.like {
     list-style: none;

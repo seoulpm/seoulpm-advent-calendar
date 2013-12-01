@@ -6,19 +6,21 @@
 .space-20 {
     height: 20px;
 }
+body {
+    background: url("hr.png") repeat-x scroll -4px 0;
+}
 #wrap {
     width: 690px;
     margin: 0 auto;
-    background: url("hr.png") repeat-x scroll -4px 0;
     min-height: 100px;
     overflow: visible;
 }
 #head {
     margin-left: 57px;
-    padding-top: 30px;
+    padding-top: 70px;
     width: 576px;
-    height: 370px;
-    background: url("head.png") no-repeat scroll 0 30px transparent;
+    height: 400px;
+    background: url("head.png") no-repeat scroll 0 70px transparent;
 }
 #cont {
     margin-top: 14px;
