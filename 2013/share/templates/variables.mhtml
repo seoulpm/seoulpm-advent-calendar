@@ -1,7 +1,7 @@
 <%init>
 return {
-    title          => 'Seoul.pm 펄 크리스마스 달력 #2013',
-    title_en       => 'Seoul.pm Perl Advent Calendar 2013',
+    title          => 'R.I.P. @am0c - Seoul.pm 펄 크리스마스 달력 #2013',
+    title_en       => 'R.I.P. @am0c - Seoul.pm Perl Advent Calendar 2013',
     css_article    => 'article.css',
     css_calendar   => 'calendar.css',
     articles_total => 24,
