@@ -9,6 +9,8 @@ Author:   newbcode
 
 [@newbcode][twitter-newbcode] - 사랑스러운 딸 바보 도치파파.
 [리눅스의 모든것][yes24-11040637]의 공동저자.
+
+
 시작하며
 ---------
 
@@ -24,25 +26,25 @@ Input Stream은 두 종류로 나눌수 있는데 하나는 "Byte Stream" 다른
 Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.
 
 
-                                              +------------------------+
-        +--------------+    (Byte Stream)     |                        |
-        |              |      표준 입력        |                        |
-        |    키보드     |+-------------------->|   Perl 프로그램         |
-        |              |    (010101110101)    |                        |
-        +--------------+                      |                        |
-                                              +------------------------+
-        (Data Source)
+                                            +------------------------+
+    +--------------+    (Byte Stream)     |                        |
+    |              |      표준 입력        |                        |
+    |    키보드     |+-------------------->|   Perl 프로그램         |
+    |              |    (010101110101)    |                        |
+    +--------------+                      |                        |
+                                            +------------------------+
+    (Data Source)
 
 
 Data가 프로그램(Perl)을 만나 Output Stream이 되면 Perl은 decode함수를 통해 Encoding을 지정하게 됩니다.
 
-        +------------------------+
-        |                        |    (Byte Stream)     +--------------+
-        |                        |      표준 출력        |              |
-        |   Perl 프로그램         |+-------------------->|     화면     |
-        |                        |    (decode func)     |             |
-        |                        |                      +--------------+
-        +------------------------+
+    +------------------------+
+    |                        |    (Byte Stream)     +--------------+
+    |                        |      표준 출력        |              |
+    |   Perl 프로그램         |+-------------------->|     화면     |
+    |                        |    (decode func)     |             |
+    |                        |                      +--------------+
+    +------------------------+
 
 간단한 정의는 이것으로 마치고 실제 html 문서들의 Encoding과 Decoding을 살펴보도록 합시다.
 
@@ -61,7 +63,7 @@ unicode에 관해서는 perldoc의 unicode문서를 참조합니다.
 Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 cpan 명령어를 통해 Encode 모듈을 설치 합니다.
 
-        newbcode@newb-dt:~/advent_2013$  cpan Encode
+    newbcode@newb-dt:~/advent_2013$  cpan Encode
 
 - [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
 
@@ -69,13 +71,13 @@ Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 html을 가져오기 위한 LWP::UserAgent 모듈도 필요합니다.
 cpanm 명령어를 통해 모듈을 설치 합니다.
 
-        newbcode@newb-dt:~/advent_2013$  cpan LWP::UserAgent
+    newbcode@newb-dt:~/advent_2013$  cpan LWP::UserAgent
 
 - [CPAN의 Data::Printer 모듈][cpan-data-printer]
 
 data 구조를 보기위한 Data::Printer 모듈도 설치합니다.
 
-        newbcode@newb-dt:~/advent_2013$  cpan Data::Printer
+    newbcode@newb-dt:~/advent_2013$  cpan Data::Printer
 
 html의 encoding과 decoding을 하기위한 타겟 페이지가 필요합니다.
         -kma.go.kr
@@ -87,33 +89,33 @@ HTML En/Decoding
 html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다운로드 합니다.
 다운로드가 완료되면 콘솔에 출력을 합니다.
 
-        #!/usr/bin/env perl
+    #!/usr/bin/env perl
 
-        use strict;
-        use warnings;
-        use LWP::UserAgent;
-        use Data::Printer;
-        use Encode qw(encode decode);
+    use strict;
+    use warnings;
+    use LWP::UserAgent;
+    use Data::Printer;
+    use Encode qw(encode decode);
 
-        my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-        my $ua = LWP::UserAgent->new;
-        my $resp = $ua->get($url);
+    my $ua = LWP::UserAgent->new;
+    my $resp = $ua->get($url);
 
-        if ($resp->is_success) {
-                print $resp->content;
-        }
-        else {
-                die $resp->status_line;
-        }
+    if ($resp->is_success) {
+        print $resp->content;
+    }
+    else {
+        die $resp->status_line;
+    }
 
 위와 같은 소스로 콘솔에 프린트를 하면 아래와같이 한글이 깨지는 것을 볼수 있습니다.
 
-        <option value=''>17û-----------------</option>
-        <option value="http://www.nts.go.kr/">����û</option>
-        <option value="http://www.customs.go.kr/">����û</option>
-        <option value="http://www.pps.go.kr/">����û</option>
-        <option value="http://kostat.go.kr/">����û</option>
+    <option value=''>17û-----------------</option>
+    <option value="http://www.nts.go.kr/">����û</option>
+    <option value="http://www.customs.go.kr/">����û</option>
+    <option value="http://www.pps.go.kr/">����û</option>
+    <option value="http://kostat.go.kr/">����û</option>
 
 
 기상청의 html은 "charset=euc-kr"로 Encoding 되어 있습니다.
@@ -121,8 +123,8 @@ html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다
 (Perl을 거치지 않은 모든 표준입력은 perl에서는 Byte Stream으로 취급하게 됩니다)
 
 
-        html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (문자깨짐)
-        (perl의 input stream)                     (decodeing 하지 않음)
+    html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (문자깨짐)
+    (perl의 input stream)                     (decodeing 하지 않음)
 
 
 표준입력이 perl 내부로 들어오고 나갈때는 decoding이 되어서 나가야하는데 perl에서 decoding을 하지 않았기 때문에 문자가 깨지게 됩니다.
@@ -131,38 +133,38 @@ perl은  Internal unicode string을  내부적으로 가지고 있습니다.
 byte stream이 "string + notag"라면 perl은 내부에서 byte stream을 decoding 하기 위해 "string + unicodetag"를 붙입니다. 그리고 내부에 항상 tag를 생성하여 관리를 하게 됩니다. string을 unicode string으로 만드는 함수가 바로 decode함수 입니다. 외부에서 들어오는 euc-kr이나 utf8로 encoding되어 있는 string을 perl 내부에서 인식할수 있는 형태로 decoding을 하게 됩니다.
 그러면 위의 html의 문서를 깨지지 않게 출력하려면 어떻게 해야 할까요? decode 함수를 호출하면 되겠죠 ?
 
-        #!/usr/bin/env perl
+    #!/usr/bin/env perl
 
-        use strict;
-        use warnings;
-        use LWP::UserAgent;
-        use Data::Printer;
-        use Encode qw(encode decode);
+    use strict;
+    use warnings;
+    use LWP::UserAgent;
+    use Data::Printer;
+    use Encode qw(encode decode);
 
-        my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-        my $ua = LWP::UserAgent->new;
-        my $resp = $ua->get($url);
+    my $ua = LWP::UserAgent->new;
+    my $resp = $ua->get($url);
 
-        if ($resp->is_success) {
-                print $resp->decoded_content;
-        }
-        else {
-                die $resp->status_line;
-        }
+    if ($resp->is_success) {
+        print $resp->decoded_content;
+    }
+    else {
+        die $resp->status_line;
+    }
 
 아래와 같이 정상적으로 출력되는 것을 볼 수 있습니다.
 
-        <option value=''>17청-----------------</option>
-        <option value="http://www.nts.go.kr/">국세청</option>
-        <option value="http://www.customs.go.kr/">관세청</option>
-        <option value="http://www.pps.go.kr/">조달청</option>
-        <option value="http://kostat.go.kr/">통계청</option>\
+    <option value=''>17청-----------------</option>
+    <option value="http://www.nts.go.kr/">국세청</option>
+    <option value="http://www.customs.go.kr/">관세청</option>
+    <option value="http://www.pps.go.kr/">조달청</option>
+    <option value="http://kostat.go.kr/">통계청</option>\
 
 결론적으로 아래와 같은 형태가 됩니다.
 
-        html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (정상출력)
-        (perl의 input stream)                     (decoded_content를 사용)
+    html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (정상출력)
+    (perl의 input stream)                     (decoded_content를 사용)
 
 perl은 내부적으로  unicode의 utf8을 채택한덕에 한글지원이 가장 잘되는 언어가 되었습니다.
 
@@ -172,34 +174,34 @@ Wide character in print at.
 
 perl로 출력을 하다보면 아래와 같은 경고메세지를 볼 경우가 종종있습니다. 이 경우의 경고 메세지는 perl로 들어온 unicode를 byte stream인것처럼 출력을 하면서 경고를 내보내는 것입니다.
 
-        newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무쳐
-        Wide character in print at ./encoding.pl line 16.
-        newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
-        Wide character in print at ./encoding.pl line 16.
-        <option value="http://nas.na.go.kr/">국회사무처</option>
+    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무쳐
+    Wide character in print at ./encoding.pl line 16.
+    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
+    Wide character in print at ./encoding.pl line 16.
+    <option value="http://nas.na.go.kr/">국회사무처</option>
 
 이 경우는 print encode('utf8', $string)으로 매번 encoding을 해주어야 합니다. 출력시 encoding을 하지 않고 encode 함수를  아래와 같이 사용하여도 됩니다.
 
-        #!/usr/bin/env perl
+    #!/usr/bin/env perl
 
-        use strict;
-        use warnings;
-        use LWP::UserAgent;
-        use Data::Printer;
-        use Encode qw(encode decode);
+    use strict;
+    use warnings;
+    use LWP::UserAgent;
+    use Data::Printer;
+    use Encode qw(encode decode);
 
-        my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-        my $ua = LWP::UserAgent->new;
-        my $resp = $ua->get($url);
+    my $ua = LWP::UserAgent->new;
+    my $resp = $ua->get($url);
 
-        if ($resp->is_success) {
-                my $html = $resp->decoded_content;
-                my $encode_html = encode('utf8', $html);
-        }
-        else {
-                die $resp->status_line;
-        }
+    if ($resp->is_success) {
+        my $html = $resp->decoded_content;
+        my $encode_html = encode('utf8', $html);
+    }
+    else {
+            die $resp->status_line;
+    }
 
 
 use utf8;
@@ -207,35 +209,35 @@ use utf8;
 
 그래서 use utf8 pragma를 사용하면 파일에 있는 모든 string들의 encoding을 utf8로 간주하고 internal unicode string으로 변환해주는 것을 자동으로 해주게 되어 개발자는 encoding을 다루는데에 있어서 귀찬은것을 상당이 많이 줄 일수 있습니다.
 
-        #!/usr/bin/env perl
+    #!/usr/bin/env perl
 
-        use strict;
-        use warnings;
-        use LWP::UserAgent;
-        use Data::Printer;
-        use Encode qw(encode decode);
-        use utf8;
+    use strict;
+    use warnings;
+    use LWP::UserAgent;
+    use Data::Printer;
+    use Encode qw(encode decode);
+    use utf8;
 
-        my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-        my $ua = LWP::UserAgent->new;
-        my $resp = $ua->get($url);
+    my $ua = LWP::UserAgent->new;
+    my $resp = $ua->get($url);
 
-        if ($resp->is_success) {
-                my $html = $resp->decoded_content;
-                utf8::encode($html);
-                print "$html";
-        }
-        else {
-                die $resp->status_line;
-        }
+    if ($resp->is_success) {
+        my $html = $resp->decoded_content;
+        utf8::encode($html);
+        print "$html";
+    }
+    else {
+        die $resp->status_line;
+    }
 
 
 
-        출력화면
+    출력화면
 
-        newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
-        <option value="http://nas.na.go.kr/">국회사무처</option>
+    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
+    <option value="http://nas.na.go.kr/">국회사무처</option>
 
 
 모든게 귀찮으면 binmode.....
@@ -244,8 +246,8 @@ use utf8;
 binmode는 표준입력 파일핸들과 표준출력 파일핸들에다가 encoding tag를 추가합니다.
 binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표준 출력으로 나가는건 자동으로 encode를 진행합니다.
 
-        binmode STDIN, ":encoding(euc-kr)";
-        binmode STDOUT, ":encoding(euc-kr)
+    binmode STDIN, ":encoding(euc-kr)";
+    binmode STDOUT, ":encoding(euc-kr)
 
 
 정리하며
@@ -258,11 +260,12 @@ Encoding/Decoding과 같은 Hell에 빠지는것보다는 좀더 여러분의 �
 
 
 참고문서
-----------
-        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
-        http://perldoc.perl.org/perlunicode.html
-        http://perldoc.perl.org/utf8.html
-        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
+---------
+
+    https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
+    http://perldoc.perl.org/perlunicode.html
+    http://perldoc.perl.org/utf8.html
+    http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 
 
 
