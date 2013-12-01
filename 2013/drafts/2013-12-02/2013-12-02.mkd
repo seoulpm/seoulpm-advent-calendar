@@ -8,7 +8,7 @@ Author:   newbcode
 -----
 
 [@newbcode][twitter-newbcode] - 사랑스러운 딸 바보 도치파파.
-[리눅스의 모든것][yes24-11040637]의 공동저자.  
+[리눅스의 모든것][yes24-11040637]의 공동저자.
 시작하며
 ---------
 
@@ -17,11 +17,11 @@ Encode와 Decode는 사용되는 곳에 따라 조금씩 다르게 표현되기�
 간단히 짚고 넘어갑니다.
 
 위키백과의 간단한 정의는 "부호화나 인코딩은 정보의 형태나 형식을 변환하는 처리나 처리방식"으로 나와있습니다.
-보통 영상이나 음악에서는 아날로그 소리를 디지털화를 하는것이 Encoding이고 암호화하는 과정은 인코딩 복호화하는 과정을 디코딩이라고도 합니다. 
+보통 영상이나 음악에서는 아날로그 소리를 디지털화를 하는것이 Encoding이고 암호화하는 과정은 인코딩 복호화하는 과정을 디코딩이라고도 합니다.
 
 I/O 스트림은 입/출력의 대상이 되는 소스와 그 대상을 가르키며 아래 그림은 Input Stream입니다.
-Input Stream은 두 종류로 나눌수 있는데 하나는 "Byte Stream" 다른 하나는 "Character Stream"입니다. 
-Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.  
+Input Stream은 두 종류로 나눌수 있는데 하나는 "Byte Stream" 다른 하나는 "Character Stream"입니다.
+Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.
 
 
                                               +------------------------+
@@ -64,7 +64,7 @@ cpan 명령어를 통해 Encode 모듈을 설치 합니다.
         newbcode@newb-dt:~/advent_2013$  cpan Encode
 
 - [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
- 
+
 Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 html을 가져오기 위한 LWP::UserAgent 모듈도 필요합니다.
 cpanm 명령어를 통해 모듈을 설치 합니다.
@@ -127,7 +127,7 @@ html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다
 
 표준입력이 perl 내부로 들어오고 나갈때는 decoding이 되어서 나가야하는데 perl에서 decoding을 하지 않았기 때문에 문자가 깨지게 됩니다.
 보통 이 byte stream을 perl이 읽으면 펄은 여전히 byte stream으로 인식하게되는데 보통 읽고 저장하고 쓰는데는 큰문제가 없지만 정규표현식으로 매칭을 한다거나 한글같은 unicode를 표현할때는 깨진 바이트 단위로 인식을 하기 때문에 곤란해 지게 됩니다.
-perl은  Internal unicode string을  내부적으로 가지고 있습니다. 
+perl은  Internal unicode string을  내부적으로 가지고 있습니다.
 byte stream이 "string + notag"라면 perl은 내부에서 byte stream을 decoding 하기 위해 "string + unicodetag"를 붙입니다. 그리고 내부에 항상 tag를 생성하여 관리를 하게 됩니다. string을 unicode string으로 만드는 함수가 바로 decode함수 입니다. 외부에서 들어오는 euc-kr이나 utf8로 encoding되어 있는 string을 perl 내부에서 인식할수 있는 형태로 decoding을 하게 됩니다.
 그러면 위의 html의 문서를 깨지지 않게 출력하려면 어떻게 해야 할까요? decode 함수를 호출하면 되겠죠 ?
 
@@ -205,7 +205,7 @@ perl로 출력을 하다보면 아래와 같은 경고메세지를 볼 경우가
 use utf8;
 ----------
 
-그래서 use utf8 pragma를 사용하면 파일에 있는 모든 string들의 encoding을 utf8로 간주하고 internal unicode string으로 변환해주는 것을 자동으로 해주게 되어 개발자는 encoding을 다루는데에 있어서 귀찬은것을 상당이 많이 줄 일수 있습니다. 
+그래서 use utf8 pragma를 사용하면 파일에 있는 모든 string들의 encoding을 utf8로 간주하고 internal unicode string으로 변환해주는 것을 자동으로 해주게 되어 개발자는 encoding을 다루는데에 있어서 귀찬은것을 상당이 많이 줄 일수 있습니다.
 
         #!/usr/bin/env perl
 
@@ -253,7 +253,7 @@ binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표
 
 Encoding/Decoding은 어떤 언어이든지 한두번은 Hell을 만나게 됩니다. 하지만 perl은 이런 문제를 위와같이 간단하게 해결 할 수 있는 방법들을 제공합니다.
 이것은 perl이 Internal Unicode로 utf8을 구현했기 때문입니다.
-Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니다. 
+Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니다.
 Encoding/Decoding과 같은 Hell에 빠지는것보다는 좀더 여러분의 프로그램에게 애정을 쏟기를 바랍니다.
 
 
