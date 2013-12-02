@@ -13,7 +13,7 @@ Author:   JEEN_LEE
 시작하며
 ---------
 
-[CPAN Testers Statistics][home-stats-cpantesters]에서 확인할 수 있는 것처럼 현재 CPAN 에 등록된 모듈은 3만여개에 가깝습니다.
+[CPAN Testers Statistics][home-cpantesters-stats]에서 확인할 수 있는 것처럼 현재 CPAN 에 등록된 모듈은 3만여개에 가깝습니다.
 많은 모듈이 있다는 것은 좋은 것입니다.  하지만 모든 모듈이 다 좋은 것은 아닙니다.
 *A*라는 일을 하기위한 모듈이 수십여개인 경우 도대체 무엇을 골라야 할지 난감하기 마련입니다.
 그럼 우리는 어떻게 좋은 모듈을 골라야 할까요? 
@@ -99,17 +99,22 @@ GitHub 같은 저장소 링크가 있다면 필요한 기능이나 패치를 직
 경우에 따라 독자적인 라이센스를 제시하고 있는 경우가 있으니 항상 확인하는 것이 좋습니다.
 
 
-### 3. [CPAN Dependencies][url-deps-cpantesters]
+3. [CPAN 의존성][home-cpantesters-deps]
+----------------------------------------
 
-Top 100 Leaderboard 에서 확인할 수 있는 "좋은 모듈"들 또한 의존모듈을 가지고 있습니다. 그런 "좋은 모듈"들의 의존모듈들은 기본적인 안정성을 보장하기 때문에 이 의존관계에서 자주 등장하는 모듈이라면 이 또한 분명 "좋은 모듈" 이라고 할 수 있을 것입니다.
+[Top 100 Leaderboard][home-metacpan-leaderboard]에서 확인할 수 있는 *좋은 모듈* 또한 의존 모듈을 가집니다.
+그런 *좋은 모듈*의 의존모듈은 기본적인 안정성을 보장하기 때문에 이 의존 관계에
+자주 등장하는 모듈이라면 이 또한 분명 *좋은 모듈*이라고 할 수 있을 것입니다.
 
-![CPAN Dependencies - Moo][url-img-deps-cpantesters]
+![Moo - MetaCPAN][img-2-resize]
+*그림 2.* CPAN 의존성 - Moo ([원본][img-2])
 
-거꾸로 역의존성을 확인해볼 수 있습니다. 이 모듈을 얼마나 많은 모듈들이 사용하고 있냐라는 것이 하나의 지표가 되겠죠?
+거꾸로 역 의존성(reverse dependency)을 확인해볼 수 있습니다.
+*이 모듈을 얼마나 많은 모듈이 사용하고 있냐?*라는 것이 하나의 지표가 되겠죠?
+[Moo 역 의존성][metacpan-rev-deps-moo] 링크에서 볼 수 있듯이, 수백개가 넘는 모듈이 `Moo`를 기반으로 만들어졌습니다.
+대개 중추적인 기능을 하는 모듈은 이 역 의존성 페이지를 통해 확인할 수 있습니다.
+`Moo`와 같은 OOP 구현체 또는 각종 파서, 각종 클라이언트, 로거 등의 범용적인 모듈을 역 의존성 페이지를 이용해 확인하면 좋습니다. 
 
-[Reverse Dependencies - Moo][url-rev-deps-moo]
-
-위의 링크에서 볼 수 있듯이, 수백에 가까운 모듈들이 Moo 를 기반으로 만들어졌습니다. 대개는 중추적인 기능을 하는 모듈들에 대해서는 이것을 통해서 확인할 수 있습니다. 대개는 뭐 Moo 와 같은 OOP 구현체, 또는 각종 파서, 각종 클라이언트, 로거 등등의 범용적인 모듈들을 이것으로 확인하면 좋습니다. 
 
 ### 4. [Task::BeLike::.+][url-cpan-task-belike]
 
@@ -140,14 +145,13 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 결국은 꾸준하게 사용하면 "좋은 것"을 찾아내고, 그러면서 "더 좋은 것"을 선택하게 되지 않을까요?
 
 [img-1]:          2013-12-03-1.png
+[img-2]:          2013-12-03-2.png
 
 [img-1-resize]:   2013-12-03-1_r.png
+[img-2-resize]:   2013-12-03-2_r.png
 
 
 [url-cpan-task-belike]: https://metacpan.org/search?q=Task%3A%3ABeLike
-[url-rev-deps-moo]: https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
-[url-img-deps-cpantesters]: https://dl.dropboxusercontent.com/u/262117/pict-deps-cpantesters.png
-[url-deps-cpantesters]: http://deps.cpantesters.org/?module=Moo
 [url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
 
 [cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
@@ -160,10 +164,12 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [cpan-moose]:                     http://metacpan.org/module/Moose
 [cpan-perl]:                      http://metacpan.org/module/perl
 [cpan-plack]:                     http://metacpan.org/module/Plack
+[home-cpantesters-deps]:          http://deps.cpantesters.org/?module=Moo
+[home-cpantesters-stats]:         http://stats.cpantesters.org/
 [home-metacpan-leaderboard]:      https://metacpan.org/favorite/leaderboard
 [home-mojolicious]:               http://mojolicio.us/
 [home-moose]:                     http://moose.iinteractive.com/en/
 [home-perl]:                      http://www.perl.org/
-[home-stats-cpantesters]:         http://stats.cpantesters.org/
+[metacpan-rev-deps-moo]:          https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
 [perl-license]:                   http://dev.perl.org/licenses/
 [twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
