@@ -116,12 +116,15 @@ GitHub 같은 저장소 링크가 있다면 필요한 기능이나 패치를 직
 `Moo`와 같은 OOP 구현체 또는 각종 파서, 각종 클라이언트, 로거 등의 범용적인 모듈을 역 의존성 페이지를 이용해 확인하면 좋습니다. 
 
 
-### 4. [Task::BeLike::.+][url-cpan-task-belike]
+4. [Task::BeLike::.+][search-cpan-task-belike]
+-----------------------------------------------
 
-`Task::BeLike::` 네임스페이스로 시작하는 모듈은 나름 스스로 잘나간다고 생각하는 CPAN Author 마다 하나씩 가지고 있는 모듈입니다. 이 모듈들은 어떤 일들을 처리하기 위해서 어떤 모듈들을 사용하는 지에 대해서 나열합니다. 저자별로 수십가지 `Task::BeLike::` 모듈이 있으니까, 나름 이름있는 CPAN Author 들의 `Task::BeLike::` 페이지를 확인해보세요.
+`Task::BeLike::` 이름 공간으로 시작하는 모듈은 나름 스스로 잘나간다고 생각하는 CPAN Author마다 하나씩 가지고 있는 모듈입니다.
+이런 모듈은 어떤 일들을 처리하기 위해서 어떤 모듈들을 사용하는 지에 대해서 나열합니다.
+저자별로 수십가지 `Task::BeLike::` 모듈이 있으니 나름 이름있는 CPAN Author의 `Task::BeLike::` 페이지를 확인해보세요.
 
-- RJBS [Task::BeLike::RJBS](https://metacpan.org/pod/Task::BeLike::RJBS) 
-- TOKUHIROM [Task::BeLike::TOKUHIROM](https://metacpan.org/pod/Task::BeLike::TOKUHIROM)
+- RJBS [Task::BeLike::RJBS][cpan-task-belike-rjbs]
+- TOKUHIROM [Task::BeLike::TOKUHIROM][cpan-task-belike-tokuhirom]
 
 
 ### 5. [Module::Advisor][url-cpan-module-advisor] 를 사용하기 
@@ -151,7 +154,6 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [img-2-resize]:   2013-12-03-2_r.png
 
 
-[url-cpan-task-belike]: https://metacpan.org/search?q=Task%3A%3ABeLike
 [url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
 
 [cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
@@ -164,6 +166,8 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [cpan-moose]:                     http://metacpan.org/module/Moose
 [cpan-perl]:                      http://metacpan.org/module/perl
 [cpan-plack]:                     http://metacpan.org/module/Plack
+[cpan-task-belike-rjbs]:          https://metacpan.org/module/Task::BeLike::RJBS
+[cpan-task-belike-tokuhirom]:     https://metacpan.org/module/Task::BeLike::TOKUHIROM
 [home-cpantesters-deps]:          http://deps.cpantesters.org/?module=Moo
 [home-cpantesters-stats]:         http://stats.cpantesters.org/
 [home-metacpan-leaderboard]:      https://metacpan.org/favorite/leaderboard
@@ -172,4 +176,5 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [home-perl]:                      http://www.perl.org/
 [metacpan-rev-deps-moo]:          https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
 [perl-license]:                   http://dev.perl.org/licenses/
+[search-cpan-task-belike]:        https://metacpan.org/search?q=Task%3A%3ABeLike
 [twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
