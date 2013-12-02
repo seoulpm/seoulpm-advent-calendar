@@ -19,15 +19,15 @@ Encode와 Decode는 사용되는 곳에 따라 조금씩 다르게 표현되기�
 본격적인 이야기를 하기전에 어떤곳에 어떤의미로 쓰이는지 간단히 짚고 넘어갑니다.
 
 위키백과의 간단한 정의는 "부호화나 인코딩은 정보의 형태나 형식을 변환하는 처리나 처리방식"으로 나와있습니다.
-보통 영상이나 음악에서는 아날로그 소리를 디지털화를 하는것이 Encoding이고 암호화하는 과정은 인코딩 복호화하는 과정을 디코딩이라고도 합니다.
+보통 영상이나 음악에서는 아날로그 소리를 디지털화를 하는것이 인코딩이고 암호화하는 과정은 인코딩 복호화하는 과정을 디코딩이라고도 합니다.
 
-I/O 스트림은 입/출력의 대상이 되는 소스와 그 대상을 가르키며 아래 그림은 Input Stream입니다.
-Input Stream은 두 종류로 나눌수 있는데 하나는 "Byte Stream" 다른 하나는 "Character Stream"입니다.
-Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.
+I/O 스트림은 입/출력의 대상이 되는 소스와 그 대상을 가르키며 아래 그림은 입력 스트림입니다.
+입력 스트림은 두 종류로 나눌수 있는데 하나는 *바이트 스트림(byte stream)* 다른 하나는 *문자 스트림(character stream)*입니다.
+Data가 프로그램(Perl)을 만나기전까지는 바이트 스트림입니다.
 
 
                                           +------------------------+
-    +--------------+    (Byte Stream)     |                        |
+    +--------------+    (바이트 스트림)   |                        |
     |              |      표준 입력       |                        |
     |    키보드    |+-------------------->|   Perl 프로그램        |
     |              |    (010101110101)    |                        |
@@ -36,17 +36,17 @@ Data가 프로그램(Perl)을 만나기전까지는 Byte Stream입니다.
     (Data Source)
 
 
-Data가 프로그램(Perl)을 만나 Output Stream이 되면 Perl은 decode함수를 통해 Encoding을 지정하게 됩니다.
+Data가 프로그램(Perl)을 만나 Output Stream이 되면 Perl은 decode함수를 통해 인코딩을 지정하게 됩니다.
 
     +------------------------+
-    |                        |    (Byte Stream)     +--------------+
+    |                        |    (바이트 스트림)   +--------------+
     |                        |      표준 출력       |              |
     |   Perl 프로그램        |+-------------------->|     화면     |
     |                        |    (decode func)     |              |
     |                        |                      +--------------+
     +------------------------+
 
-간단한 정의는 이것으로 마치고 실제 html 문서들의 Encoding과 Decoding을 살펴보도록 합시다.
+간단한 정의는 이것으로 마치고 실제 html 문서들의 인코딩과 디코딩을 살펴보도록 합시다.
 
 
 주의
@@ -60,14 +60,14 @@ unicode에 관해서는 perldoc의 unicode문서를 참조합니다.
 
 - [CPAN의 Encode 모듈][cpan-encode]
 
-Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
+인코딩과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 cpan 명령어를 통해 Encode 모듈을 설치 합니다.
 
     newbcode@newb-dt:~/advent_2013$  cpan Encode
 
 - [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
 
-Encoding과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
+인코딩과 Deconding을 확인하기 위한 Encode 모듈이 필요합니다.
 html을 가져오기 위한 LWP::UserAgent 모듈도 필요합니다.
 cpanm 명령어를 통해 모듈을 설치 합니다.
 
@@ -83,7 +83,7 @@ html의 encoding과 decoding을 하기위한 타겟 페이지가 필요합니다
         -kma.go.kr
 
 
-HTML En/Decoding
+HTML En/디코딩
 -------------------
 
 html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다운로드 합니다.
@@ -118,10 +118,10 @@ html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다
     <option value="http://kostat.go.kr/">����û</option>
 
 
-기상청의 html은 "charset=euc-kr"로 Encoding 되어 있습니다.
+기상청의 html은 "charset=euc-kr"로 인코딩 되어 있습니다.
 여기서 확인 할 수 있는 부분은 Content-Type Header에 문자인코딩(charset=euc-kr)이 되어있는 것을 볼 수 있습니다.
-위에서 본 것과 같이 Data가 Perl을 만나기전까지의 Encoding은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 Decoding을 하게 되지 않으면 문자는 깨져서 보이게 됩니다.
-(Perl을 거치지 않은 모든 표준입력은 perl에서는 Byte Stream으로 취급하게 됩니다)
+위에서 본 것과 같이 Data가 Perl을 만나기전까지의 인코딩은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 디코딩을 하게 되지 않으면 문자는 깨져서 보이게 됩니다.
+(Perl을 거치지 않은 모든 표준입력은 perl에서는 바이트 스트림으로 취급하게 됩니다)
 
 
     html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (문자깨짐)
@@ -259,11 +259,11 @@ binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표
 정리하며
 ---------
 
-Encoding/Decoding은 어떤 언어이든지 한두번은 Hell을 만나게 됩니다.
+인코딩/디코딩은 어떤 언어이든지 한두번은 Hell을 만나게 됩니다.
 하지만 perl은 이런 문제를 위와같이 간단하게 해결 할 수 있는 방법들을 제공합니다.
 이것은 perl이 Internal Unicode로 utf8을 구현했기 때문입니다.
 Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니다.
-Encoding/Decoding과 같은 Hell에 빠지는것보다는 좀더 여러분의 프로그램에게 애정을 쏟기를 바랍니다.
+인코딩/디코딩과 같은 Hell에 빠지는것보다는 좀더 여러분의 프로그램에게 애정을 쏟기를 바랍니다.
 
 
 참고문서
