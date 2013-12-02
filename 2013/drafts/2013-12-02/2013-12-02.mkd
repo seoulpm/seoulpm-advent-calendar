@@ -1,4 +1,4 @@
-Title:    Perl 인코딩/디코딩
+Title:    유니코드 인코딩/디코딩
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -14,34 +14,25 @@ Author:   newbcode
 시작하며
 ---------
 
-Data를 다룰때 까다로운 부분이 여러가지가 있겠지만 가장 많이 부딧히는 문제가 Encode와 Decode가 아닐까 합니다.
-Encode와 Decode는 사용되는 곳에 따라 조금씩 다르게 표현되기도 합니다.
-본격적인 이야기를 하기전에 어떤곳에 어떤의미로 쓰이는지 간단히 짚고 넘어갑니다.
+[위키백과][wiki-ko-encoding]를 따르면 인코딩(encoding)은 정보의 형태나 형식을
+표준화, 보안, 처리 속도 향상, 저장 공간 절약 등을 위해서 다른 형태나 형식으로
+변환하는 처리 혹은 그 처리 방식을 말한다고 합니다.
+인코딩/디코딩은 다루는 자료의 종류에 따라 의미하는 바가 조금씩 다르지만
+지금은 유니코드 인코딩/디코딩으로 한정합니다.
 
-위키백과의 간단한 정의는 "부호화나 인코딩은 정보의 형태나 형식을 변환하는 처리나 처리방식"으로 나와있습니다.
-보통 영상이나 음악에서는 아날로그 소리를 디지털화를 하는것이 인코딩이고 암호화하는 과정은 인코딩 복호화하는 과정을 디코딩이라고도 합니다.
+    #!plain
+    I/O 스트림
+    +--------+              +-------------+              +------+
+    |        |  표준 입력   |             |  표준 출력   |      |
+    | 키보드 +------------->| 펄 프로그램 |+------------>| 화면 |
+    |        |              |             |              |      |
+    +--------+              +-------------+              +------+
 
-I/O 스트림은 입/출력의 대상이 되는 소스와 그 대상을 가르키며 아래 그림은 입력 스트림입니다.
-입력 스트림은 두 종류로 나눌수 있는데 하나는 *바이트 스트림(byte stream)* 다른 하나는 *문자 스트림(character stream)*입니다.
-Data가 프로그램(Perl)을 만나기전까지는 바이트 스트림입니다.
-
-    +--------+   (바이트 스트림)   +---------------+
-    |        |     표준 입력       |               |
-    | 키보드 +-------------------->| Perl 프로그램 |
-    |        |   (010101110101)    |               |
-    +--------+                     +---------------+
-    (Data Source)
-
-
-Data가 프로그램(Perl)을 만나 Output Stream이 되면 Perl은 decode함수를 통해 인코딩을 지정하게 됩니다.
-
-    +---------------+   (바이트 스트림)   +------+
-    |               |     표준 출력       |      |
-    | Perl 프로그램 |+------------------->| 화면 |
-    |               |   (decode func)     |      |
-    +---------------+                     +------+
-
-간단한 정의는 이것으로 마치고 실제 html 문서들의 인코딩과 디코딩을 살펴보도록 합시다.
+앞의 그림은 가장 일반적인 입출력 스트림(input/output stream)을 보여줍니다.
+입출력 스트림은 *바이트 스트림(byte stream)*과 *문자 스트림(character stream)* 두 종류로 나눌 수 있습니다.
+입력 스트림을 통해 전달되는 자료는 프로그램, 즉 펄 프로그램을 만나기 전까지는 바이트 스트림으로 존재합니다.
+펄 프로그램에서 바이트 스트림을 어떻게 처리하느냐가 펄에서의 인코딩/디코딩의 핵심입니다.
+실제 웹 상에 있는 HTML 문서를 이용해서 직접 인코딩/디코딩을 살펴봅니다.
 
 
 주의
@@ -271,8 +262,9 @@ Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니
 
 
 
-[twitter-newbcode]:      http://twitter.com/#!/newbcode
-[cpan-encode]:           http://metacpan.org/module/Encode
-[cpan-lwp-useragent]:    http://metacpan.org/module/LWP::UserAgent
-[cpan-data-printer]:     http://metacpan.org/module/Data::Printer
-[yes24-11040637]:        http://www.yes24.com/24/goods/11040637
+[twitter-newbcode]:       http://twitter.com/#!/newbcode
+[cpan-encode]:            http://metacpan.org/module/Encode
+[cpan-lwp-useragent]:     http://metacpan.org/module/LWP::UserAgent
+[cpan-data-printer]:      http://metacpan.org/module/Data::Printer
+[yes24-11040637]:         http://www.yes24.com/24/goods/11040637
+[wiki-ko-encoding]:       http://ko.wikipedia.org/wiki/%EB%B6%80%ED%98%B8%ED%99%94
