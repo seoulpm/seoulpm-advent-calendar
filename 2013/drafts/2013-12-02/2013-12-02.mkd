@@ -61,50 +61,71 @@ Author:   newbcode
     $ cpan HTTP::Tiny
 
 
-HTML En/디코딩
--------------------
+오늘의 날씨
+------------
 
-html문서를 다루기 위해 LWP::UserAgent를 이용하여 html 문서를 다운로드 합니다.
-다운로드가 완료되면 콘솔에 출력을 합니다.
+현실 세계의 인코딩/디코딩 문제를 다뤄보기 위해 웹상의 문서를 예로 들어보죠.
+[대한민국 기상청][kma]에서는 시시각각 변하는 기상 정보를 홈페이지에서 제공합니다.
+대한민국 곳곳의 날씨는 [도시별 현재 날씨][kma-weather] 페이지에서 확인할 수 있습니다.
+도시별 현재 날씨 페이지를 다운로드 받는 코드는 다음과 같습니다.
 
+    #!perl
     #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
 
     use strict;
     use warnings;
-    use LWP::UserAgent;
-    use Data::Printer;
-    use Encode qw(encode decode);
+
+    use HTTP::Tiny;
 
     my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-    my $ua = LWP::UserAgent->new;
-    my $resp = $ua->get($url);
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
 
-    if ($resp->is_success) {
-        print $resp->content;
-    }
-    else {
-        die $resp->status_line;
-    }
+    print $res->{content};
 
-위와 같은 소스로 콘솔에 프린트를 하면 아래와같이 한글이 깨지는 것을 볼수 있습니다.
 
+웹 상의 HTML 문서를 내려받기 위해 `HTTP::Tiny`를 이용합니다.
+`HTTP::Tiny` 객체는 GET/POST/PUT/DELETE 등의 HTTP 1.1 프로토콜은 완벽하게 지원하며
+특히 요청후 반환 받은 해시는 다음과 같은 항목을 포함하고 있습니다.
+
+- `protocol`
+- `reason`
+- `status`
+- `success`
+- `headers`
+- `content`
+
+자세한 내용은 [공식 문서][cpan-http-tiny]를 참조하세요.
+
+
+한글이 깨져요!
+---------------
+
+앞의 코드를 실행하면 내려 받은 도시별 현재 날씨 페이지의 HTML을 터미널에 출력합니다.
+그런데 자세히 보면 브라우저에서 정상적으로 보이던 한글이 모두 깨져 보입니다.
+
+    #!bash
+    $ perl weather.pl
+    ...
     <option value=''>17û-----------------</option>
     <option value="http://www.nts.go.kr/">����û</option>
     <option value="http://www.customs.go.kr/">����û</option>
     <option value="http://www.pps.go.kr/">����û</option>
     <option value="http://kostat.go.kr/">����û</option>
-
+    ...
 
 기상청의 html은 "charset=euc-kr"로 인코딩 되어 있습니다.
 여기서 확인 할 수 있는 부분은 Content-Type Header에 문자인코딩(charset=euc-kr)이 되어있는 것을 볼 수 있습니다.
 위에서 본 것과 같이 Data가 Perl을 만나기전까지의 인코딩은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 디코딩을 하게 되지 않으면 문자는 깨져서 보이게 됩니다.
 (Perl을 거치지 않은 모든 표준입력은 perl에서는 바이트 스트림으로 취급하게 됩니다)
 
-
     html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (문자깨짐)
     (perl의 input stream)                     (decodeing 하지 않음)
-
 
 표준입력이 perl 내부로 들어오고 나갈때는 decoding이 되어서 나가야하는데 perl에서 decoding을 하지 않았기 때문에 문자가 깨지게 됩니다.
 보통 이 byte stream을 perl이 읽으면 펄은 여전히 byte stream으로 인식하게되는데 보통 읽고 저장하고 쓰는데는 큰문제가 없지만 정규표현식으로 매칭을 한다거나 한글같은 unicode를 표현할때는 깨진 바이트 단위로 인식을 하기 때문에 곤란해 지게 됩니다.
@@ -256,7 +277,9 @@ Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니
 
 [twitter-newbcode]:       http://twitter.com/#!/newbcode
 [cpan-encode]:            http://metacpan.org/module/Encode
-[cpan-lwp-useragent]:     http://metacpan.org/module/LWP::UserAgent
+[cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
 [cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [yes24-11040637]:         http://www.yes24.com/24/goods/11040637
 [wiki-ko-encoding]:       http://ko.wikipedia.org/wiki/%EB%B6%80%ED%98%B8%ED%99%94
+[kma-weather]:            http://www.kma.go.kr/weather/observation/currentweather.jsp
+[kma]:                    http://www.kma.go.kr
