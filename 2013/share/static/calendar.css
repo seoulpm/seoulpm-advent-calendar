@@ -101,10 +101,10 @@ body {
     height: 168px;
 }
 #popup .inner {
-    margin-top: 24px;
+    margin-top: 20px;
     margin-left: 33px;
     width: 166px;
-    height: 97px;
+    height: 130px;
     overflow: hidden;
 }
 #popup_text {
