@@ -151,11 +151,18 @@ IRC 에 들어오셔서 사람들과 호흡해보세요. :-)
 적절한 키워드를 사용해서 Stackoverflow를 탐험해보세요.
 
 
-## 끝으로
+정리하며
+---------
 
-"좋다" 라는 것은 극히 주관적인 감정의 표현입니다. 다른 사람들에게는 소중하고 아름다운 모듈이라도 내가 쓰기에 좋지 아니한 경우라면 어쩔 수가 없는 노릇입니다. 특히 HTTP Client 구현체가 그렇습니다. 정말로 많은 사람들이 저마다의 모듈을 내보이니, 두 손 두 발 다 써도 셀 수 없을 지경입니다. 그 중에 몇몇 모듈들이 저마다의 목적에 맞게 사용되고 있습니다. (대표적인 예: `LWP::UserAgent`, `HTTP::Tiny`, `Furl`, `Mojo::UserAgent`,  `LWP::Simple`, ... )
+*좋다*라는 것은 극히 주관적인 감정의 표현입니다.
+다른 사람들에게는 소중하고 아름다운 모듈이라도 내가 쓰기에 좋지 아니한 경우라면 어쩔 수가 없는 노릇입니다.
+특히 HTTP 클라이언트 구현체가 그렇습니다.
+정말로 많은 사람들이 저마다의 모듈을 내보이니, 두 손 두 발 다 써도 셀 수 없을 지경입니다.
+그 중에 몇몇 모듈은 저마다의 목적에 맞게 널리 사용되고 있습니다.
+대표적으로 [LWP::UserAgent][cpan-lwp-useragent], [HTTP::Tiny][cpan-http-tiny], [Furl][cpan-furl],
+[Mojo::UserAgent][cpan-mojo-useragent], [LWP::Simple][cpan-lwp-simple] 등이 있습니다.
+결국은 꾸준하게 사용하면 *좋은 것*을 찾아내고 그러면서 *더 좋은 것*을 선택하게 되지 않을까요?
 
-결국은 꾸준하게 사용하면 "좋은 것"을 찾아내고, 그러면서 "더 좋은 것"을 선택하게 되지 않을까요?
 
 [img-1]:          2013-12-03-1.png
 [img-2]:          2013-12-03-2.png
@@ -164,22 +171,27 @@ IRC 에 들어오셔서 사람들과 호흡해보세요. :-)
 [img-2-resize]:   2013-12-03-2_r.png
 
 
-[cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
-[cpan-app-perlbrew]:              http://metacpan.org/module/App::perlbrew
-[cpan-datetime]:                  http://metacpan.org/module/DateTime
-[cpan-dbi]:                       http://metacpan.org/module/DBI
-[cpan-dbix-class]:                http://metacpan.org/module/DBIx::Class
+[cpan-app-cpanminus]:             https://metacpan.org/module/App::cpanminus
+[cpan-app-perlbrew]:              https://metacpan.org/module/App::perlbrew
+[cpan-datetime]:                  https://metacpan.org/module/DateTime
+[cpan-dbi]:                       https://metacpan.org/module/DBI
+[cpan-dbix-class]:                https://metacpan.org/module/DBIx::Class
+[cpan-furl]:                      https://metacpan.org/module/Furl
+[cpan-http-tiny]:                 https://metacpan.org/module/HTTP::Tiny
+[cpan-lwp-simple]:                https://metacpan.org/module/LWP::Simple
+[cpan-lwp-useragent]:             https://metacpan.org/module/LWP::UserAgent
 [cpan-module-advisor]:            https://metacpan.org/pod/Module::Advisor
-[cpan-mojolicious]:               http://metacpan.org/module/Mojolicious
-[cpan-moo]:                       http://metacpan.org/module/Moo
-[cpan-moose]:                     http://metacpan.org/module/Moose
-[cpan-perl]:                      http://metacpan.org/module/perl
-[cpan-plack]:                     http://metacpan.org/module/Plack
+[cpan-mojo-useragent]:            https://metacpan.org/module/Mojo::UserAgent
+[cpan-mojolicious]:               https://metacpan.org/module/Mojolicious
+[cpan-moo]:                       https://metacpan.org/module/Moo
+[cpan-moose]:                     https://metacpan.org/module/Moose
+[cpan-perl]:                      https://metacpan.org/module/perl
+[cpan-plack]:                     https://metacpan.org/module/Plack
 [cpan-task-belike-rjbs]:          https://metacpan.org/module/Task::BeLike::RJBS
 [cpan-task-belike-tokuhirom]:     https://metacpan.org/module/Task::BeLike::TOKUHIROM
 [home-cpantesters-deps]:          http://deps.cpantesters.org/?module=Moo
 [home-cpantesters-stats]:         http://stats.cpantesters.org/
-[home-metacpan-leaderboard]:      https://metacpan.org/favorite/leaderboard
+[home-metacpan-leaderboard]:      http://metacpan.org/favorite/leaderboard
 [home-mojolicious]:               http://mojolicio.us/
 [home-moose]:                     http://moose.iinteractive.com/en/
 [home-perl]:                      http://www.perl.org/
