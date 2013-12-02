@@ -1,4 +1,8 @@
-# 좋은 모듈을 고르는 좋은 방법
+Title:    좋은 모듈을 고르는 좋은 방법
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   JEEN_LEE
 
 ## 저자
 
