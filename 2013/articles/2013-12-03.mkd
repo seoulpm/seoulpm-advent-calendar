@@ -62,33 +62,41 @@ Top 100중 10위까지의 결과입니다.
 적어도 다른 사람들이 높게 평가하는 모듈을 사용하면 큰 지장은 없습니다.
 
 
-### 2. MetaCPAN
+2. MetaCPAN
+------------
 
-![Moo - MetaCPAN][url-img-metacpan-moo]
+MetaCPAN 홈페이지에는 몇 가지 참고할 만한 사항들이 있습니다.
 
-위의 MetaCPAN 페이지를 캡쳐한 이미지에서 몇가지 참고지표가 있습니다.
+![Moo - MetaCPAN][img-1-resize]
+*그림 1.* Moo - MetaCPAN ([원본][img-1])
 
-1. `Fav` 수 (118++)
-2. 최근 릴리즈 (Sep 10, 2013)
-3. Bugs(7)
-4. Reviews
-5. Repository
-6. Test results
-7. License
+*그림 1*의 화면은 MetaCPAN의 `Moo` 모듈의 페이지입니다.
+여기서 다음 항목을 살펴볼까요.
 
-위에서 언급한 대로 `Fav` 수는 가장 일반적인 수치가 될 겁니다.
+- `++` 수 (118++)
+- 최근 릴리즈 (Sep 10, 2013)
+- Bugs(7)
+- Reviews
+- Repository
+- Test results
+- License
 
-최근 릴리즈 날짜 또한 좋은 선택기준이 됩니다. 가장 최근까지 이 모듈이 유지보수되고 있다는 것을 의미해주죠.
+이전에 언급한 대로 `++` 수는 참고할만한 가장 일반적인 수치입니다.
 
-`Bugs` 또한 살펴봐야 할 부분입니다. 경우에 따라서는 실행환경에 의존되는 내용이 주를 이루는 경우가 있어, 관련 내용도 유심히 살펴볼 필요가 있습니다.
+*최근 릴리즈 날짜* 또한 좋은 선택기준이 됩니다. 가장 최근까지 이 모듈이 유지보수되고 있다는 것을 의미해주죠.
 
-`Reviews` 의 경우는 말그대로 주관이 남발하는 곳이라서 이 내용들 또한 잘 살펴봐야 됩니다.
+*Bugs* 또한 살펴봐야 할 부분입니다. 경우에 따라서는 실행환경에 의존되는 내용이 주를 이루는 경우가 있어, 관련 내용도 유심히 살펴볼 필요가 있습니다.
 
-`Repository` 는 Github 와 같은 공개된 소스 저장소를 통해서 모듈이 잘 관리되고 있는 지를 확인할 수 있습니다. Github 같은 링크가 있다면 필요한 기능이나 버그가 있다면 직접 Pull Request 같은 것을 보낼수도 있겠죠.
+*Reviews*의 경우는 굉장히 주관적인 평이 주를 이루기 때문에 이 내용들 또한 잘 살펴봐야 됩니다.
 
-`Test Results` 도 매우 중요합니다. 모듈의 SYNOPSIS 를 봐도 잘 모르겠다 싶은 모듈의 사용법들에 대해서는 테스트코드에서 확인할 수 있는 데, 많은 테스트 케이스는 어느 정도의 신뢰성을 보장해주기 마련입니다.
+*Repository*는 GitHub 같은 공개된 소스 저장소를 통해 모듈이 잘 관리되고 있는지를 확인할 수 있습니다.
+GitHub 같은 저장소 링크가 있다면 필요한 기능이나 패치를 직접 구현한 후 Pull Request를 손쉽게 보낼 수 있겠죠.
 
-`License` 는 대개 Perl License 를 따르는 경우가 있지만, 경우에 따라서는 독자적인 License 를 제시하고 있는 경우가 있으니 이를 확인해볼 필요가 있습니다.
+*Test Results*도 매우 중요합니다. 테스트 케이스가 많다면 어느 정도의 신뢰성을 보장해주기 마련입니다.
+더불어 모듈의 *SYNOPSIS*를 봐도 이해하기 어려운 모듈의 사용법은 테스트 코드를 예제 삼아 사용법을 확인할 수 있습니다.
+
+*License*는 [펄 라이센스][perl-license]를 따르는 경우가 대부분이지만
+경우에 따라 독자적인 라이센스를 제시하고 있는 경우가 있으니 항상 확인하는 것이 좋습니다.
 
 
 ### 3. [CPAN Dependencies][url-deps-cpantesters]
@@ -131,12 +139,15 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 
 결국은 꾸준하게 사용하면 "좋은 것"을 찾아내고, 그러면서 "더 좋은 것"을 선택하게 되지 않을까요?
 
+[img-1]:          2013-12-03-1.png
+
+[img-1-resize]:   2013-12-03-1_r.png
+
 
 [url-cpan-task-belike]: https://metacpan.org/search?q=Task%3A%3ABeLike
 [url-rev-deps-moo]: https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
 [url-img-deps-cpantesters]: https://dl.dropboxusercontent.com/u/262117/pict-deps-cpantesters.png
 [url-deps-cpantesters]: http://deps.cpantesters.org/?module=Moo
-[url-img-metacpan-moo]: https://dl.dropboxusercontent.com/u/262117/pict-metacpan-moo.png
 [url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
 
 [cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
@@ -154,4 +165,5 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [home-moose]:                     http://moose.iinteractive.com/en/
 [home-perl]:                      http://www.perl.org/
 [home-stats-cpantesters]:         http://stats.cpantesters.org/
+[perl-license]:                   http://dev.perl.org/licenses/
 [twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
