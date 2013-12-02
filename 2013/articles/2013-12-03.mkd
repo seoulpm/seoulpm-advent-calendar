@@ -140,11 +140,16 @@ GitHub 같은 저장소 링크가 있다면 필요한 기능이나 패치를 직
 코드안에서 특정 모듈을 사용할 경우 그것보다 더 나은 선택지가 있는지를 알려줍니다.
 
 
-### 6. 다른 사람에게 물어보기
+6. 다른 사람에게 물어보기
+--------------------------
 
-[IRC #perl-kr Channel](http://webchat.freenode.net/?channels=perl-kr) 에서는 당장 무엇을 하기 위해서 가장 적합한 모듈이 무엇인지 알려줄 수 있는 사람들이 있습니다. IRC 에 들어오셔서 사람들과 호흡하세요.
+[프리노드 IRC 서버의 #perl-kr 채널][irc-perl-kr]에는 당장 무엇을 하려할때
+가장 적합한 모듈이 무엇인지 알려줄 수 있는 사람들이 있습니다.
+IRC 에 들어오셔서 사람들과 호흡해보세요. :-)
 
-Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용해서 Stackoverflow 를 탐험해보세요.
+[스택오버플로우][home-stackoverflow] 역시나 큰 도움이 됩니다.
+적절한 키워드를 사용해서 Stackoverflow를 탐험해보세요.
+
 
 ## 끝으로
 
@@ -178,6 +183,8 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [home-mojolicious]:               http://mojolicio.us/
 [home-moose]:                     http://moose.iinteractive.com/en/
 [home-perl]:                      http://www.perl.org/
+[home-stackoverflow]:             http://stackoverflow.com/
+[irc-perl-kr]:                    http://webchat.freenode.net/?channels=perl-kr
 [metacpan-rev-deps-moo]:          https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
 [perl-license]:                   http://dev.perl.org/licenses/
 [search-cpan-task-belike]:        https://metacpan.org/search?q=Task%3A%3ABeLike
