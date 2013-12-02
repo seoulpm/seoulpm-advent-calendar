@@ -42,15 +42,20 @@ Author:   newbcode
 
 - [CPAN의 Encode 모듈][cpan-encode]
 - [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
+- [CPAN의 Data::Printer 모듈][cpan-data-printer]
 
 `Encode` 모듈의 경우 펄 코어 모듈이므로 별도로 설치할 필요는 없습니다.
 `HTTP::Tiny`의 경우 펄 5.14 이후 버전(정확히는 v5.13.9)의 경우
 코어 모듈로 지정되었으므로 역시 별도로 설치할 필요는 없습니다.
 하지만 `HTTP::Tiny`는 지속적으로 버전이 갱신되고 있으므로 가능하면 최신 버전으로 설치하도록 합니다.
+`Data::Printer` 모듈은 디버깅의 편의를 위해 필요한 모듈입니다.
+`print`나 `say`로도 충분하지만 이런 도구를 잘 활용한다면 자료를 시각적으로
+확인할 수 있기 때문에 문제가 생겼을때 빠른 시간에 문제를 해결할 수 있도록 도와줍니다.
+
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan HTTP::Tiny
+    $ sudo cpan HTTP::Tiny Data::Printer
 
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
@@ -58,7 +63,7 @@ Author:   newbcode
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan HTTP::Tiny
+    $ cpan HTTP::Tiny Data::Printer
 
 
 오늘의 날씨
@@ -119,94 +124,152 @@ Author:   newbcode
     <option value="http://kostat.go.kr/">����û</option>
     ...
 
-기상청의 html은 "charset=euc-kr"로 인코딩 되어 있습니다.
-여기서 확인 할 수 있는 부분은 Content-Type Header에 문자인코딩(charset=euc-kr)이 되어있는 것을 볼 수 있습니다.
-위에서 본 것과 같이 Data가 Perl을 만나기전까지의 인코딩은 euc-kr로 되어있고 다시 Perl의 내부로 들어오게 될때 디코딩을 하게 되지 않으면 문자는 깨져서 보이게 됩니다.
-(Perl을 거치지 않은 모든 표준입력은 perl에서는 바이트 스트림으로 취급하게 됩니다)
+한글이 정상적으로 보이지 않을 경우에는 항상 문자 인코딩을 확인해야 합니다.
+코드를 약간 수정해서 기상청 페이지의 문자 인코딩을 확인해보죠.
 
-    html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (문자깨짐)
-    (perl의 input stream)                     (decodeing 하지 않음)
-
-표준입력이 perl 내부로 들어오고 나갈때는 decoding이 되어서 나가야하는데 perl에서 decoding을 하지 않았기 때문에 문자가 깨지게 됩니다.
-보통 이 byte stream을 perl이 읽으면 펄은 여전히 byte stream으로 인식하게되는데 보통 읽고 저장하고 쓰는데는 큰문제가 없지만 정규표현식으로 매칭을 한다거나 한글같은 unicode를 표현할때는 깨진 바이트 단위로 인식을 하기 때문에 곤란해 지게 됩니다.
-perl은  Internal unicode string을  내부적으로 가지고 있습니다.
-byte stream이 "string + notag"라면 perl은 내부에서 byte stream을 decoding 하기 위해 "string + unicodetag"를 붙입니다.
-그리고 내부에 항상 tag를 생성하여 관리를 하게 됩니다.
-string을 unicode string으로 만드는 함수가 바로 decode함수 입니다.
-외부에서 들어오는 euc-kr이나 utf8로 encoding되어 있는 string을 perl 내부에서 인식할수 있는 형태로 decoding을 하게 됩니다.
-그러면 위의 html의 문서를 깨지지 않게 출력하려면 어떻게 해야 할까요? decode 함수를 호출하면 되겠죠?
-
+    #!perl
     #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
 
     use strict;
     use warnings;
-    use LWP::UserAgent;
-    use Data::Printer;
-    use Encode qw(encode decode);
+
+    use DDP;
+    use HTTP::Tiny;
 
     my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-    my $ua = LWP::UserAgent->new;
-    my $resp = $ua->get($url);
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
 
-    if ($resp->is_success) {
-        print $resp->decoded_content;
+    p $res->{headers};
+
+`DDP` 모듈(`Data::Printer`가 제공하는 단축 모듈)을 적재하는 부분이 추가되고
+`$res->{content}`를 출력하던 부분 대신 `DDP` 모듈이 제공하는 `p` 함수를 이용해서
+`$res->{headers}`를 출력하는 부분으로 변경되었습니다.
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ perl weather.pl 
+    \ {
+        connection          "close",
+        content-type        "text/html;charset=euc-kr",
+        date                "Mon, 02 Dec 2013 05:32:37 GMT",
+        server              "Jeus WebContainer/JEUS 5.0 (fix #16)",
+        set-cookie          "JSESSIONID=cJDvjEKVIp7F8AEd0aTJbEERec727KIZUeHXSFnHBt7GQGCk2aFJF6qq5GEkZ2Mv;Path=/",
+        transfer-encoding   "chunked"
     }
-    else {
-        die $resp->status_line;
-    }
 
-아래와 같이 정상적으로 출력되는 것을 볼 수 있습니다.
+실제로 터미널에서 보면 색을 입혀 꽤나 알록달록하게 보이기 때문에 디버깅할때 큰 도움이 됩니다.
+응답 헤더의 `content-type`가 `"text/html;charset=euc-kr"`임을 알 수 있습니다.
+자료가 펄 프로그램을 만나기 전까지는 `EUC-KR`로 인코딩 되어 있는데
+펄 프로그램 내부로 들어오게 될 때 적절하게 디코딩을 해주지 않으면
+`EUC-KR` 자료를 `UTF-8`로 해석하려하기 때문에 깨져보이는 문자가 생깁니다.
+즉 기상청이 제공하는 페이지의 문자 인코딩은 `EUC-KR`이며, 펄의 기본 인코딩은
+`UTF-8`이기 때문에 한글이 정상적으로 보이지 않았던 것입니다.
 
+    +---------------+     +-----------------+     +-----------+
+    | html 문서     | --> | 펄 프로그램     | --> | 터미널    |
+    | EUC-KR 인코딩 |     | 디코딩하지 않음 |     | 문자 깨짐 |
+    +---------------+     +-----------------+     +-----------+
+
+그러면 인코딩으로 인해 문자가 깨지는 현상을 방지하려면 어떻게 해야할까요?
+
+    +---------------+     +-----------------+     +-----------+
+    | html 문서     | --> | 펄 프로그램     | --> | 터미널    |
+    | EUC-KR 인코딩 |     | 디코딩          |     | 정상 출력 |
+    +---------------+     +-----------------+     +-----------+
+
+즉 펄 프로그램 내부에서 사용하기 직전에 `EUC-KR` 인코딩을 펄 내부 인코딩에 맞도록 디코딩 과정을 거쳐야 합니다.
+디코딩을 수행하기 위해 `Encode` 모듈의 `decode` 함수를 사용합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
+
+    use strict;
+    use warnings;
+
+    use Encode qw( decode );
+    use HTTP::Tiny;
+
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
+
+    print decode( 'euc-kr', $res->{content} );
+
+이제는 실행해보면 한글이 정상적으로 보이는 것을 확인할 수 있습니다.
+
+    #!bash
+    $ perl weather.pl
+    ...
     <option value=''>17청-----------------</option>
     <option value="http://www.nts.go.kr/">국세청</option>
     <option value="http://www.customs.go.kr/">관세청</option>
     <option value="http://www.pps.go.kr/">조달청</option>
     <option value="http://kostat.go.kr/">통계청</option>\
-
-결론적으로 아래와 같은 형태가 됩니다.
-
-    html 문서(charset=euc-kr)  ==========>    perl(LWP::UserAgent)  ==========> console (정상출력)
-    (perl의 input stream)                     (decoded_content를 사용)
-
-perl은 내부적으로  unicode의 utf8을 채택한덕에 한글지원이 가장 잘되는 언어가 되었습니다.
+    ...
 
 
 Wide character in print at.
 -----------------------------
 
-perl로 출력을 하다보면 아래와 같은 경고메세지를 볼 경우가 종종있습니다.
-이 경우의 경고 메세지는 perl로 들어온 unicode를 byte stream인것처럼 출력을 하면서 경고를 내보내는 것입니다.
+사실 출력이 길어서 눈치채치 못했을 수도 있지만 사실 프로그램은 계속 경고를 출력하고 있었습니다.
 
-    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무쳐
-    Wide character in print at ./encoding.pl line 16.
-    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
-    Wide character in print at ./encoding.pl line 16.
-    <option value="http://nas.na.go.kr/">국회사무처</option>
+    #!bash
+    $ perl weather.pl > /dev/null
+    Wide character in print at weather.pl line 14.
+    $
 
-이 경우는 print encode('utf8', $string)으로 매번 encoding을 해주어야 합니다.
-출력시 encoding을 하지 않고 encode 함수를  아래와 같이 사용하여도 됩니다.
+펄로 한글을 비롯 영어가 아닌 문자를 출력하다보면 `Wide character ...` 경고를 종종 볼 수 있습니다.
+이 경고는 인코딩을 하지 않았을때 펄이 친절하게(?) 경고해주는 것입니다.
+펄의 내부 형식으로 존재하는 바이트를 그대로 보내게(출력을 한다던가) 되었을 때 발생합니다.
+물론 펄의 내부 형식은 'UTF-8'이지만 이 내부 형식에 의존해서 출력하면(내보내면) 안됩니다.
+펄은 이런 경우를 최대한 감지해서 사용자에게 `Wide character ...` 경고를 보여줍니다.
+입력 받은 자료에 대해서 디코딩을 하듯 출력할 자료에 대해서도 인코딩을 명시적으로 해야 한다는 뜻입니다.
+지금까지 보았던 그림을 더 정확하게 표현해보죠.
 
+    +---------------+     +------------------------------+     +----------------+
+    | html 문서     |     | 펄 프로그램                  |     | 터미널         |
+    +---------------+     +------------------------------+     +----------------+
+    |               | --> |     (디코딩)                 | --> |                |
+    | EUC-KR 인코딩 |     | EUC-KR -> 내부 형식          |     |                |
+    |               |     |           내부 형식 -> UTF-8 |     | UTF-8 (리눅스) |
+    |               |     |                  (인코딩)    |     |                |
+    +---------------+     +------------------------------+     +----------------+
+
+그림에서 *내부 형식*이라고 표기했지만 이 펄의 *내부 형식*은 언급했듯이 *UTF-8*입니다.
+그럼에도 불구하고 *명시적*으로 *UTF-8*로 인코딩함을 유의하세요.
+
+    #!perl
     #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
 
     use strict;
     use warnings;
-    use LWP::UserAgent;
-    use Data::Printer;
-    use Encode qw(encode decode);
+
+    use Encode qw( decode encode );
+    use HTTP::Tiny;
 
     my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
 
-    my $ua = LWP::UserAgent->new;
-    my $resp = $ua->get($url);
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
 
-    if ($resp->is_success) {
-        my $html = $resp->decoded_content;
-        my $encode_html = encode('utf8', $html);
-    }
-    else {
-            die $resp->status_line;
-    }
+    print encode( 'utf-8', decode( 'euc-kr', $res->{content} ) );
+
+이제는 `Wide character ...` 경고도 나타나지 않으며 한글 출력에도 전혀 문제가 없습니다. :-)
 
 
 use utf8;
