@@ -68,7 +68,7 @@
       });
     </script>
   </div>
-<& footer.mhtml, global => $global &>
+<& footer.mhtml, global => $global, article => undef &>
 <%init>
   my $global = $m->comp('variables.mhtml');
   $global->{location} = '';
