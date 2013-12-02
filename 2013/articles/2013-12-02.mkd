@@ -310,6 +310,7 @@ Wide character in print at.
 [cpan]:                   http://www.cpan.org/
 [kma-weather]:            http://www.kma.go.kr/weather/observation/currentweather.jsp
 [kma]:                    http://www.kma.go.kr
+[perl-and-hangul]:        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 [perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
 [perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
 [perldoc-utf8]:           http://perldoc.perl.org/utf8.html
