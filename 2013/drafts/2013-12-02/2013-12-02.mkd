@@ -272,16 +272,6 @@ Wide character in print at.
 이제는 `Wide character ...` 경고도 나타나지 않으며 한글 출력에도 전혀 문제가 없습니다. :-)
 
 
-모든게 귀찮으면 binmode.....
-------------------------------
-
-binmode는 표준입력 파일핸들과 표준출력 파일핸들에다가 encoding tag를 추가합니다.
-binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표준 출력으로 나가는건 자동으로 encode를 진행합니다.
-
-    binmode STDIN, ":encoding(euc-kr)";
-    binmode STDOUT, ":encoding(euc-kr)
-
-
 정리하며
 ---------
 
