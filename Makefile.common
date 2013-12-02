@@ -28,6 +28,7 @@ ADV_UPLOAD_SERVER  ?=
 ADV_UPLOAD_COMMAND ?=
 
 IFCONFIG ?= ifconfig
+CPAN     ?= cpan
 
 all: build
 
@@ -40,7 +41,7 @@ clean:
 	perl -E 'unlink "$(ADVCAL_CONFIG)" if readlink("$(ADVCAL_CONFIG)") eq "$(DEFAULT_CONFIG)";'
 
 install-depends:
-	cpan $(DEPEND_CPAN_MODULES)
+	$(CPAN) $(DEPEND_CPAN_MODULES)
 
 upload: build
 	tar cvzf $(ADVCAL_OUT_TGZ) $(ADVCAL_OUT)
