@@ -1,4 +1,5 @@
 requires 'App::HTTPThis';
-requires 'Plack';
+requires 'HTML::Escape';
 requires 'Text::MultiMarkdown';
+requires 'URI::Escape';
 requires 'WWW::AdventCalendar';
