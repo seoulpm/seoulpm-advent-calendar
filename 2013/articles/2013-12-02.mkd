@@ -307,6 +307,7 @@ Wide character in print at.
 [cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [cpan-encode]:            http://metacpan.org/module/Encode
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
+[cpan]:                   http://www.cpan.org/
 [kma-weather]:            http://www.kma.go.kr/weather/observation/currentweather.jsp
 [kma]:                    http://www.kma.go.kr
 [perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
