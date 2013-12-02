@@ -7,7 +7,7 @@ Author:   JEEN_LEE
 저자
 -----
 
-[@JEEN_LEE][twitter-jeen_lee] - 세작, 사쿠라, 쁘락치, github:jeen
+[@JEEN_LEE][twitter-jeen_lee] - 세작, 사쿠라, 쁘락치, [github:jeen][github-jeen]
 
 
 시작하며
@@ -189,6 +189,7 @@ IRC 에 들어오셔서 사람들과 호흡해보세요. :-)
 [cpan-plack]:                     https://metacpan.org/module/Plack
 [cpan-task-belike-rjbs]:          https://metacpan.org/module/Task::BeLike::RJBS
 [cpan-task-belike-tokuhirom]:     https://metacpan.org/module/Task::BeLike::TOKUHIROM
+[github-jeen]:                    https://github.com/jeen
 [home-cpantesters-deps]:          http://deps.cpantesters.org/?module=Moo
 [home-cpantesters-stats]:         http://stats.cpantesters.org/
 [home-metacpan-leaderboard]:      http://metacpan.org/favorite/leaderboard
