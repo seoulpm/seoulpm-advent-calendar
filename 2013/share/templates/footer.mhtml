@@ -17,6 +17,16 @@
         </li>
       </ul>
       <p class="copyright"><& copyright.mhtml &></p>
+      <!--
+        Adjust copyright vertical position due to facebook widget is variable
+      -->
+      <script type="text/javascript">
+      (function() {
+        $(function() {
+          $('#foot .copyright').css('bottom', ( $('.fb').height() - 32 ) * -1 );
+        });
+      }).call(this);
+      </script>
     </div>
     <pre class="hidden">
      .-'''  __  __
