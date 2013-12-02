@@ -19,7 +19,8 @@ Author:   JEEN_LEE
 그럼 우리는 어떻게 좋은 모듈을 골라야 할까요? 
 
 
-## 좋은 모듈이란?
+좋은 모듈이란?
+---------------
 
 그러면 좋은 모듈이란 도대체 무엇일까요?
 
@@ -30,28 +31,36 @@ Author:   JEEN_LEE
 - 삽질을 덜 하게 해줄
 - 잘 유지보수되고 있는
 
-제가 생각하는 몇가지를 나열해봤습니다만, 이 모든 것들을 충족시켜주는 것들은 손에 꼽을 정도가 아닐까요? 아니, 뭐 더 많을 수도 있구요. 좋은 모듈이라는 것은 결국은 개인 경험에 따른 주관이 개입하기 마련입니다.
-
+제가 생각하는 몇가지를 나열해봤습니다만, 이 모든 것들을 충족시켜주는 것들은 손에 꼽을 정도가 아닐까요?
+아니, 뭐 더 많을 수도 있구요. 좋은 모듈이라는 것은 결국은 개인 경험에 따른 주관이 개입하기 마련입니다.
 그럼 100% 제 주관에 근거한 좋은 모듈을 찾는 방법을 알아보도록 하겠습니다.
 
-### 1. [Top 100 ++ Leaderboard @ MetaCPAN][url-metacpan-leaderboard]
 
-주관을 뒤로하고 객관적인 지표가 될 수 있는 것은 바로 다른 사람들의 어떤 모듈에 대한 평가입니다. 현재 CPAN 에서 가장 높은 평가를 받고 있는 모듈은 그럼 무엇일까요? (2013. 12. 2. 기준)
+1. [Top 100 ++ Leaderboard @ MetaCPAN][home-metacpan-leaderboard]
+------------------------------------------------------------------
 
-1. Mojolicious (170++)
-2. Moose (168++)
-3. perl (153++)
-4. DBIx-Class (143++)
-5. App-cpanminus (142++)
-6. DBI (129++)
-7. Plack (127++)
-8. Moo (118++)
-9. App-perlbrew (107++)
-10. DateTime (103++)
+주관을 뒤로하고 객관적인 지표가 될 수 있는 것은 바로 다른 사람들의 어떤 모듈에 대한 평가입니다.
+현재 CPAN 에서 가장 높은 평가를 받고 있는 모듈은 그럼 무엇일까요?
+2013년 12월 3일을 기준으로 다음과 같습니다.
 
-Top 100 중에 10위권은 대략 위와 같습니다. 1위는 요즘 인기를 누리고 있고, 저도 절찬리에 애용하고 있는 [Mojolicious][url-mojolicious] 입니다. 2위는 Meta Object Protocol 구현체인 [Moose][url-moose], 4위는 대표적인 ORM인 [DBIx::Class][url-dbic] 가 차지하고 있습니다.
+1.  [Mojolicious][cpan-mojolicious] (170++)
+2.  [Moose][cpan-moose] (168++)
+3.  [perl][cpan-perl] (153++)
+4.  [DBIx-Class][cpan-dbix-class] (143++)
+5.  [App-cpanminus][cpan-app-cpanminus] (142++)
+6.  [DBI][cpan-dbi] (129++)
+7.  [Plack][cpan-plack] (127++)
+8.  [Moo][cpan-moo] (118++)
+9.  [App-perlbrew][cpan-app-perlbrew] (107++)
+10. [DateTime][cpan-datetime] (103++)
 
-적어도 다른 사람들이 높게 평가를 해주고 있는 것들을 사용하면 큰 지장은 없습니다.
+Top 100중 10위까지의 결과입니다.
+1위는 요즘 인기를 누리고 있고, 저 역시 절찬리에 애용하고 있는 [Mojolicious][home-mojolicious] 입니다.
+2위는 Meta Object Protocol 구현체인 [Moose][home-moose], 3위는 두 말할 것도 없는 [Perl][home-perl],
+4위는 대표적인 ORM인 [DBIx::Class][cpan-dbix-class]입니다.
+
+적어도 다른 사람들이 높게 평가하는 모듈을 사용하면 큰 지장은 없습니다.
+
 
 ### 2. MetaCPAN
 
@@ -129,10 +138,20 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [url-deps-cpantesters]: http://deps.cpantesters.org/?module=Moo
 [url-img-metacpan-moo]: https://dl.dropboxusercontent.com/u/262117/pict-metacpan-moo.png
 [url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
-[url-dbic]: https://metacpan.org/pod/DBIx::Class
-[url-moose]: http://moose.iinteractive.com/en/
-[url-mojolicious]: http://mojolicio.us/
-[url-metacpan-leaderboard]: https://metacpan.org/favorite/leaderboard
 
+[cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
+[cpan-app-perlbrew]:              http://metacpan.org/module/App::perlbrew
+[cpan-datetime]:                  http://metacpan.org/module/DateTime
+[cpan-dbi]:                       http://metacpan.org/module/DBI
+[cpan-dbix-class]:                http://metacpan.org/module/DBIx::Class
+[cpan-mojolicious]:               http://metacpan.org/module/Mojolicious
+[cpan-moo]:                       http://metacpan.org/module/Moo
+[cpan-moose]:                     http://metacpan.org/module/Moose
+[cpan-perl]:                      http://metacpan.org/module/perl
+[cpan-plack]:                     http://metacpan.org/module/Plack
+[home-metacpan-leaderboard]:      https://metacpan.org/favorite/leaderboard
+[home-mojolicious]:               http://mojolicio.us/
+[home-moose]:                     http://moose.iinteractive.com/en/
+[home-perl]:                      http://www.perl.org/
 [home-stats-cpantesters]:         http://stats.cpantesters.org/
 [twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
