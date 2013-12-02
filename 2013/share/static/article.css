@@ -161,8 +161,11 @@ h3 {
 #cont em {
     font-weight: bold;
 }
+.syntaxhighlighter .gutter .line {
+    font-family: 'Nanum Gothic Coding',나눔고딕코딩,monospace !important;
+}
 #cont code {
-    font-family: 'Nanum Gothic Coding', monospace;
+    font-family: 'Nanum Gothic Coding',나눔고딕코딩,monospace !important;
     background-color: #f4f4f4;
     padding: 4px;
 }
