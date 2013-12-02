@@ -127,13 +127,18 @@ GitHub 같은 저장소 링크가 있다면 필요한 기능이나 패치를 직
 - TOKUHIROM [Task::BeLike::TOKUHIROM][cpan-task-belike-tokuhirom]
 
 
-### 5. [Module::Advisor][url-cpan-module-advisor] 를 사용하기 
+5. [Module::Advisor][cpan-module-advisor]
+------------------------------------------
 
-내가 이 모듈을 쓰면 욕들어 먹지는 않을까 하고 종종 걱정하기도 합니다.
+모듈을 사용하다 보면 *이 모듈을 쓰면 문제가 생기지는 않을까?*하고 종종 걱정하기도 합니다.
 
-> 혹시나 어떤 문제가 있지는 않을까? 이것보다 더 좋은 것이 있지는 않을까?
+> 혹시나 어떤 문제가 있지는 않을까?
+> 이것보다 더 좋은 것이 있지는 않을까?
 
-그럴때는 [Module::Advisor][url-cpan-module-advisor] 를 사용하도록 합니다. `Module::Advisor` 는 그 모듈의 특정 버젼들이 가진 보안적인 이슈, 퍼포먼스 이슈, 버그 를 확인할 수 있으며, 코드안에서 특정 모듈을 사용했을 경우에는 그것보다 더 나은 선택지가 있다는 것을 알려줍니다.
+그럴때는 [Module::Advisor][cpan-module-advisor]를 사용해보세요.
+`Module::Advisor`를 사용하면 모듈의 특정 버젼이 가진 보안 이슈, 퍼포먼스 이슈, 버그를 확인할 수 있으며
+코드안에서 특정 모듈을 사용할 경우 그것보다 더 나은 선택지가 있는지를 알려줍니다.
+
 
 ### 6. 다른 사람에게 물어보기
 
@@ -154,13 +159,12 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [img-2-resize]:   2013-12-03-2_r.png
 
 
-[url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
-
 [cpan-app-cpanminus]:             http://metacpan.org/module/App::cpanminus
 [cpan-app-perlbrew]:              http://metacpan.org/module/App::perlbrew
 [cpan-datetime]:                  http://metacpan.org/module/DateTime
 [cpan-dbi]:                       http://metacpan.org/module/DBI
 [cpan-dbix-class]:                http://metacpan.org/module/DBIx::Class
+[cpan-module-advisor]:            https://metacpan.org/pod/Module::Advisor
 [cpan-mojolicious]:               http://metacpan.org/module/Mojolicious
 [cpan-moo]:                       http://metacpan.org/module/Moo
 [cpan-moose]:                     http://metacpan.org/module/Moose
