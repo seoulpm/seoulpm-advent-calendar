@@ -35,12 +35,6 @@ Author:   newbcode
 실제 웹 상에 있는 HTML 문서를 이용해서 직접 인코딩/디코딩을 살펴봅니다.
 
 
-주의
-----
-
-unicode에 관해서는 perldoc의 unicode문서를 참조합니다.
-
-
 준비물
 -------
 
