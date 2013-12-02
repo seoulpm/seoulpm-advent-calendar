@@ -4,9 +4,10 @@ Category: perl
 Category: Seoul.pm
 Author:   JEEN_LEE
 
-## 저자
+저자
+-----
 
-@JEEN_LEE - 세작, 사쿠라, 쁘락치, github:jeen
+[@JEEN_LEE][twitter-jeen_lee] - 세작, 사쿠라, 쁘락치, github:jeen
 
 ## 시작하며
 
@@ -127,3 +128,5 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [url-mojolicious]: http://mojolicio.us/
 [url-metacpan-leaderboard]: https://metacpan.org/favorite/leaderboard
 [url-stats-cpantesters]: http://stats.cpantesters.org/
+
+[twitter-jeen_lee]:                http://twitter.com/#!/JEEN_LEE
