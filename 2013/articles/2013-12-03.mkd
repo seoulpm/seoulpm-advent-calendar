@@ -1,0 +1,125 @@
+# 좋은 모듈을 고르는 좋은 방법
+
+## 저자
+
+@JEEN_LEE - 세작, 사쿠라, 쁘락치, github:jeen
+
+## 시작하며
+
+[CPAN Testers Statistics][url-stats-cpantesters] 에서 확인할 수 있는 것처럼 현재 CPAN 에 등록된 모듈은 3만여개에 가깝습니다. 많은 모듈이 있다는 것은 좋은 것입니다. 하지만 모든 모듈이 다 좋은 것은 아닙니다. __A__ 라는 일을 하기 위한 모듈이 수십여개가 되는 경우에는 도대체 무엇을 골라야 할 지 난감해지기 마련입니다. 그럼 우리는 어떻게 좋은 모듈을 골라야 할까요? 
+
+## 좋은 모듈이란?
+
+그러면 좋은 모듈이란 도대체 무엇일까요?
+
+- 보다 빠르게
+- 보다 유연하게
+- 보다 쉽게
+- 잘 문서화 된
+- 삽질을 덜 하게 해줄
+- 잘 유지보수되고 있는
+
+제가 생각하는 몇가지를 나열해봤습니다만, 이 모든 것들을 충족시켜주는 것들은 손에 꼽을 정도가 아닐까요? 아니, 뭐 더 많을 수도 있구요. 좋은 모듈이라는 것은 결국은 개인 경험에 따른 주관이 개입하기 마련입니다.
+
+그럼 100% 제 주관에 근거한 좋은 모듈을 찾는 방법을 알아보도록 하겠습니다.
+
+### 1. [Top 100 ++ Leaderboard @ MetaCPAN][url-metacpan-leaderboard]
+
+주관을 뒤로하고 객관적인 지표가 될 수 있는 것은 바로 다른 사람들의 어떤 모듈에 대한 평가입니다. 현재 CPAN 에서 가장 높은 평가를 받고 있는 모듈은 그럼 무엇일까요? (2013. 12. 2. 기준)
+
+1. Mojolicious (170++)
+2. Moose (168++)
+3. perl (153++)
+4. DBIx-Class (143++)
+5. App-cpanminus (142++)
+6. DBI (129++)
+7. Plack (127++)
+8. Moo (118++)
+9. App-perlbrew (107++)
+10. DateTime (103++)
+
+Top 100 중에 10위권은 대략 위와 같습니다. 1위는 요즘 인기를 누리고 있고, 저도 절찬리에 애용하고 있는 [Mojolicious][url-mojolicious] 입니다. 2위는 Meta Object Protocol 구현체인 [Moose][url-moose], 4위는 대표적인 ORM인 [DBIx::Class][url-dbic] 가 차지하고 있습니다.
+
+적어도 다른 사람들이 높게 평가를 해주고 있는 것들을 사용하면 큰 지장은 없습니다.
+
+### 2. MetaCPAN
+
+![Moo - MetaCPAN][url-img-metacpan-moo]
+
+위의 MetaCPAN 페이지를 캡쳐한 이미지에서 몇가지 참고지표가 있습니다.
+
+1. `Fav` 수 (118++)
+2. 최근 릴리즈 (Sep 10, 2013)
+3. Bugs(7)
+4. Reviews
+5. Repository
+6. Test results
+7. License
+
+위에서 언급한 대로 `Fav` 수는 가장 일반적인 수치가 될 겁니다.
+
+최근 릴리즈 날짜 또한 좋은 선택기준이 됩니다. 가장 최근까지 이 모듈이 유지보수되고 있다는 것을 의미해주죠.
+
+`Bugs` 또한 살펴봐야 할 부분입니다. 경우에 따라서는 실행환경에 의존되는 내용이 주를 이루는 경우가 있어, 관련 내용도 유심히 살펴볼 필요가 있습니다.
+
+`Reviews` 의 경우는 말그대로 주관이 남발하는 곳이라서 이 내용들 또한 잘 살펴봐야 됩니다.
+
+`Repository` 는 Github 와 같은 공개된 소스 저장소를 통해서 모듈이 잘 관리되고 있는 지를 확인할 수 있습니다. Github 같은 링크가 있다면 필요한 기능이나 버그가 있다면 직접 Pull Request 같은 것을 보낼수도 있겠죠.
+
+`Test Results` 도 매우 중요합니다. 모듈의 SYNOPSIS 를 봐도 잘 모르겠다 싶은 모듈의 사용법들에 대해서는 테스트코드에서 확인할 수 있는 데, 많은 테스트 케이스는 어느 정도의 신뢰성을 보장해주기 마련입니다.
+
+`License` 는 대개 Perl License 를 따르는 경우가 있지만, 경우에 따라서는 독자적인 License 를 제시하고 있는 경우가 있으니 이를 확인해볼 필요가 있습니다.
+
+
+### 3. [CPAN Dependencies][url-deps-cpantesters]
+
+Top 100 Leaderboard 에서 확인할 수 있는 "좋은 모듈"들 또한 의존모듈을 가지고 있습니다. 그런 "좋은 모듈"들의 의존모듈들은 기본적인 안정성을 보장하기 때문에 이 의존관계에서 자주 등장하는 모듈이라면 이 또한 분명 "좋은 모듈" 이라고 할 수 있을 것입니다.
+
+![CPAN Dependencies - Moo][url-img-deps-cpantesters]
+
+거꾸로 역의존성을 확인해볼 수 있습니다. 이 모듈을 얼마나 많은 모듈들이 사용하고 있냐라는 것이 하나의 지표가 되겠죠?
+
+[Reverse Dependencies - Moo][url-rev-deps-moo]
+
+위의 링크에서 볼 수 있듯이, 수백에 가까운 모듈들이 Moo 를 기반으로 만들어졌습니다. 대개는 중추적인 기능을 하는 모듈들에 대해서는 이것을 통해서 확인할 수 있습니다. 대개는 뭐 Moo 와 같은 OOP 구현체, 또는 각종 파서, 각종 클라이언트, 로거 등등의 범용적인 모듈들을 이것으로 확인하면 좋습니다. 
+
+### 4. [Task::BeLike::.+][url-cpan-task-belike]
+
+`Task::BeLike::` 네임스페이스로 시작하는 모듈은 나름 스스로 잘나간다고 생각하는 CPAN Author 마다 하나씩 가지고 있는 모듈입니다. 이 모듈들은 어떤 일들을 처리하기 위해서 어떤 모듈들을 사용하는 지에 대해서 나열합니다. 저자별로 수십가지 `Task::BeLike::` 모듈이 있으니까, 나름 이름있는 CPAN Author 들의 `Task::BeLike::` 페이지를 확인해보세요.
+
+- RJBS [Task::BeLike::RJBS](https://metacpan.org/pod/Task::BeLike::RJBS) 
+- TOKUHIROM [Task::BeLike::TOKUHIROM](https://metacpan.org/pod/Task::BeLike::TOKUHIROM)
+
+
+### 5. [Module::Advisor][url-cpan-module-advisor] 를 사용하기 
+
+내가 이 모듈을 쓰면 욕들어 먹지는 않을까 하고 종종 걱정하기도 합니다.
+
+> 혹시나 어떤 문제가 있지는 않을까? 이것보다 더 좋은 것이 있지는 않을까?
+
+그럴때는 [Module::Advisor][url-cpan-module-advisor] 를 사용하도록 합니다. `Module::Advisor` 는 그 모듈의 특정 버젼들이 가진 보안적인 이슈, 퍼포먼스 이슈, 버그 를 확인할 수 있으며, 코드안에서 특정 모듈을 사용했을 경우에는 그것보다 더 나은 선택지가 있다는 것을 알려줍니다.
+
+### 6. 다른 사람에게 물어보기
+
+[IRC #perl-kr Channel](http://webchat.freenode.net/?channels=perl-kr) 에서는 당장 무엇을 하기 위해서 가장 적합한 모듈이 무엇인지 알려줄 수 있는 사람들이 있습니다. IRC 에 들어오셔서 사람들과 호흡하세요.
+
+Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용해서 Stackoverflow 를 탐험해보세요.
+
+## 끝으로
+
+"좋다" 라는 것은 극히 주관적인 감정의 표현입니다. 다른 사람들에게는 소중하고 아름다운 모듈이라도 내가 쓰기에 좋지 아니한 경우라면 어쩔 수가 없는 노릇입니다. 특히 HTTP Client 구현체가 그렇습니다. 정말로 많은 사람들이 저마다의 모듈을 내보이니, 두 손 두 발 다 써도 셀 수 없을 지경입니다. 그 중에 몇몇 모듈들이 저마다의 목적에 맞게 사용되고 있습니다. (대표적인 예: `LWP::UserAgent`, `HTTP::Tiny`, `Furl`, `Mojo::UserAgent`,  `LWP::Simple`, ... )
+
+결국은 꾸준하게 사용하면 "좋은 것"을 찾아내고, 그러면서 "더 좋은 것"을 선택하게 되지 않을까요?
+
+
+[url-cpan-task-belike]: https://metacpan.org/search?q=Task%3A%3ABeLike
+[url-rev-deps-moo]: https://metacpan.org/requires/distribution/Moo?sort=[[2,1]]
+[url-img-deps-cpantesters]: https://dl.dropboxusercontent.com/u/262117/pict-deps-cpantesters.png
+[url-deps-cpantesters]: http://deps.cpantesters.org/?module=Moo
+[url-img-metacpan-moo]: https://dl.dropboxusercontent.com/u/262117/pict-metacpan-moo.png
+[url-cpan-module-advisor]: https://metacpan.org/pod/Module::Advisor
+[url-dbic]: https://metacpan.org/pod/DBIx::Class
+[url-moose]: http://moose.iinteractive.com/en/
+[url-mojolicious]: http://mojolicio.us/
+[url-metacpan-leaderboard]: https://metacpan.org/favorite/leaderboard
+[url-stats-cpantesters]: http://stats.cpantesters.org/
