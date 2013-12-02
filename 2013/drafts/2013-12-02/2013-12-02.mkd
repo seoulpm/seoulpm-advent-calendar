@@ -275,28 +275,39 @@ Wide character in print at.
 정리하며
 ---------
 
-인코딩/디코딩은 어떤 언어이든지 한두번은 Hell을 만나게 됩니다.
-하지만 perl은 이런 문제를 위와같이 간단하게 해결 할 수 있는 방법들을 제공합니다.
-이것은 perl이 Internal Unicode로 utf8을 구현했기 때문입니다.
-Perl의 창시자인 Larry Wall이 언어학자인 덕분이기도 할 것입니다.
-인코딩/디코딩과 같은 Hell에 빠지는것보다는 좀더 여러분의 프로그램에게 애정을 쏟기를 바랍니다.
+인코딩/디코딩에 익숙하지 않다면 문자 인코딩 때문에 한 두번쯤은 골머리를 싸매게되곤 합니다.
+이 문자열 인코딩의 문제는 비단 펄에서만의 이슈가 아니라 어떤 프로그래밍 언어를 사용하든
+입출력 스트림에서 제공하거나 요구하는 형식에 따라 항상 발생하는 문제입니다.
+하지만 펄은 이런 인코딩 문제를 코어 모듈을 이용해서 간단하게 해결 할 수 있는 방법을 제공합니다.
+이것은 펄이 내부적으로 유니코드 기반으로 동작하기 때문이며 이런 이슈에 대해
+세심하게 고려한 덕분(Thanks, Larry Wall! :)이기도 합니다.
 
 
 참고문서
 ---------
 
-    https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
-    http://perldoc.perl.org/perlunicode.html
-    http://perldoc.perl.org/utf8.html
-    http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
+- [Unicode in Perl][unicode-in-perl] - [@aer0][twitter-aer0]
+- [Perl과 한글][perl-and-hangul] - [@gypark][twitter-gypark]
+- [perldoc perlunicode][perldoc-perlunicode]
+- [perldoc perlunifaq][perldoc-perlunifaq]
+- [perldoc utf8][perldoc-utf8]
 
 
+[img-1]:          2013-12-02-1.png
+[img-1-resize]:   2013-12-02-1_r.png
 
-[twitter-newbcode]:       http://twitter.com/#!/newbcode
+
+[cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [cpan-encode]:            http://metacpan.org/module/Encode
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
-[cpan-data-printer]:      http://metacpan.org/module/Data::Printer
-[yes24-11040637]:         http://www.yes24.com/24/goods/11040637
-[wiki-ko-encoding]:       http://ko.wikipedia.org/wiki/%EB%B6%80%ED%98%B8%ED%99%94
 [kma-weather]:            http://www.kma.go.kr/weather/observation/currentweather.jsp
 [kma]:                    http://www.kma.go.kr
+[perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
+[perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
+[perldoc-utf8]:           http://perldoc.perl.org/utf8.html
+[twitter-aer0]:           https://twitter.com/aer0
+[twitter-gypark]:         http://twitter.com/gypark
+[twitter-newbcode]:       http://twitter.com/newbcode
+[unicode-in-perl]:        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
+[wiki-ko-encoding]:       http://ko.wikipedia.org/wiki/%EB%B6%80%ED%98%B8%ED%99%94
+[yes24-11040637]:         http://www.yes24.com/24/goods/11040637
