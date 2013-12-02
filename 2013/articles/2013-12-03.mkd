@@ -9,9 +9,15 @@ Author:   JEEN_LEE
 
 [@JEEN_LEE][twitter-jeen_lee] - 세작, 사쿠라, 쁘락치, github:jeen
 
-## 시작하며
 
-[CPAN Testers Statistics][url-stats-cpantesters] 에서 확인할 수 있는 것처럼 현재 CPAN 에 등록된 모듈은 3만여개에 가깝습니다. 많은 모듈이 있다는 것은 좋은 것입니다. 하지만 모든 모듈이 다 좋은 것은 아닙니다. __A__ 라는 일을 하기 위한 모듈이 수십여개가 되는 경우에는 도대체 무엇을 골라야 할 지 난감해지기 마련입니다. 그럼 우리는 어떻게 좋은 모듈을 골라야 할까요? 
+시작하며
+---------
+
+[CPAN Testers Statistics][home-stats-cpantesters]에서 확인할 수 있는 것처럼 현재 CPAN 에 등록된 모듈은 3만여개에 가깝습니다.
+많은 모듈이 있다는 것은 좋은 것입니다.  하지만 모든 모듈이 다 좋은 것은 아닙니다.
+*A*라는 일을 하기위한 모듈이 수십여개인 경우 도대체 무엇을 골라야 할지 난감하기 마련입니다.
+그럼 우리는 어떻게 좋은 모듈을 골라야 할까요? 
+
 
 ## 좋은 모듈이란?
 
@@ -127,6 +133,6 @@ Stackoverflow 역시나 큰 도움이 됩니다. 적절한 키워드를 사용�
 [url-moose]: http://moose.iinteractive.com/en/
 [url-mojolicious]: http://mojolicio.us/
 [url-metacpan-leaderboard]: https://metacpan.org/favorite/leaderboard
-[url-stats-cpantesters]: http://stats.cpantesters.org/
 
-[twitter-jeen_lee]:                http://twitter.com/#!/JEEN_LEE
+[home-stats-cpantesters]:         http://stats.cpantesters.org/
+[twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
