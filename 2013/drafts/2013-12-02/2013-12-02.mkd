@@ -272,42 +272,6 @@ Wide character in print at.
 이제는 `Wide character ...` 경고도 나타나지 않으며 한글 출력에도 전혀 문제가 없습니다. :-)
 
 
-use utf8;
-----------
-
-그래서 use utf8 pragma를 사용하면 파일에 있는 모든 string들의 encoding을 utf8로 간주하고 internal unicode string으로 변환해주는 것을 자동으로 해주게 되어 개발자는 encoding을 다루는데에 있어서 귀찬은것을 상당이 많이 줄 일수 있습니다.
-
-    #!/usr/bin/env perl
-
-    use strict;
-    use warnings;
-    use LWP::UserAgent;
-    use Data::Printer;
-    use Encode qw(encode decode);
-    use utf8;
-
-    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
-
-    my $ua = LWP::UserAgent->new;
-    my $resp = $ua->get($url);
-
-    if ($resp->is_success) {
-        my $html = $resp->decoded_content;
-        utf8::encode($html);
-        print "$html";
-    }
-    else {
-        die $resp->status_line;
-    }
-
-
-
-    출력화면
-
-    newbcode@newb-dt:~/advent_2013$ ./encoding.pl |grep 국회사무처
-    <option value="http://nas.na.go.kr/">국회사무처</option>
-
-
 모든게 귀찮으면 binmode.....
 ------------------------------
 
