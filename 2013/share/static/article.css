@@ -161,7 +161,8 @@ h3 {
 #cont em {
     font-weight: bold;
 }
-.syntaxhighlighter .gutter .line {
+.syntaxhighlighter .gutter .line,
+.syntaxhighlighter .code .line {
     font-family: 'Nanum Gothic Coding',나눔고딕코딩,monospace !important;
 }
 #cont code {
