@@ -24,7 +24,10 @@
       <script type="text/javascript">
       (function() {
         $(function() {
-          $('#foot .copyright').css('bottom', ( $('.fb').height() - 32 ) * -1 );
+	  var link_height = $('#link').height() - 410;
+	  var fb_height   = $('.fb').height() - 32;
+	  var pos = ( link_height > fb_height ? link_height : fb_height ) * -1;
+          $('#foot .copyright').css('bottom', pos );
         });
       }).call(this);
       </script>
