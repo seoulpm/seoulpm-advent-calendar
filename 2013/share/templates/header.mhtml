@@ -34,6 +34,7 @@
   <script type="text/javascript" src="shBrushDiff.js"></script>
   <script type="text/javascript" src="shBrushJava.js"></script>
   <script type="text/javascript" src="shBrushCpp.js"></script>
+  <script type="text/javascript" src="shBrushLisp.js"></script>
   <link type="text/css" rel="stylesheet" href="shCore.css">
   <link type="text/css" rel="stylesheet" href="shThemeMidnight.css">
   <script type="text/javascript">
