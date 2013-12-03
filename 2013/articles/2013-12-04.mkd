@@ -1,0 +1,105 @@
+Title:    emacs 에서의 perl 개발환경
+Package:  Seoul.pm
+Category: emacs
+Author:   aanoaa
+
+저자
+----
+
+홍형석 - 사당동 펠프스
+
+- [twitter](https://twitter.com/aanoaa)
+- [github](https://github.com/aanoaa)
+
+
+서론
+----
+
+emacs 에 perl 개발환경을 설정해 놓으면 문서보기도 좋고, 코딩하기에도
+편리합니다. 이에 대해 알아 보겠습니다.
+
+
+본론
+----
+
+perlbrew, plenv 등의 perl (installation|binary) management tool 을
+사용한다면 자신의 shell 과 emacs 의 환경변수를 맞춰주어야 합니다.
+
+- [perlbrew-mini.el](https://github.com/dams/perlbrew-mini.el)
+- [plenv.el](https://github.com/karupanerura/plenv.el)
+
+plenv 를 사용중이라면 아래코드가 도움이 될 지 모르겠습니다.
+
+    #!plain
+    ; in your .emacs
+    (setenv "PATH" (concat (getenv "HOME") "/.plenv/shims:" (getenv "HOME") "/.plenv/bin:" (getenv "PATH")))
+    (setq exec-path (cons (concat (getenv "HOME") "/.plenv/shims") (cons (concat (getenv "HOME") "/.plenv/bin") exec-path)))
+    (require 'plenv)
+    (plenv-global "5.18.1")
+
+`PERL5LIB` 환경변수에 `./lib` 을 추가합니다.
+
+    #!plain
+    (setenv "PERL5LIB" (concat "./lib:" (getenv "PERL5LIB")))
+
+그리고 `perl-mode` 대신에 항상 `cperl-mode` 를 사용합니다.
+파일 확장자에 따라 emacs 가 알아서 `cperl-mode` 로 동작하도록
+해놓는다면 편리합니다.
+
+    #!plain
+    (defalias 'perl-mode 'cperl-mode)
+    (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\||psgi\\|t\\)\\'" . cperl-mode))
+
+`<C-j>`(newline-and-indent) 로 개행을 하는 습관을 가지면 줄바꿈 후에
+적절한 들여쓰기가 됩니다.
+
+`<M-x> cperl-perldoc`
+
+perl의 built-in 함수부터 확장모듈의 문서까지 볼 수 있습니다.
+화면을 split 해서 문서를 띄워놓고 작업할때에 아주 좋습니다.
+
+저는 자주 사용하기 때문에 `<C-h P>` 로 키바인딩 해서 사용하고
+있습니다.
+
+### flymake ###
+
+![perldoc 과 flymake](https://lh4.googleusercontent.com/-M507FBPqrzE/Up4S1MRZIQI/AAAAAAAABTg/I6-N90nnDtE/a.png)
+
+flymake 는 emacs 의 문법 검사기 입니다.
+버퍼에 구문오류를 강조해주기 때문에 오타와 같은 오류를 줄여줍니다.
+
+perlbrew 사용자라면 `Project::Libs` 모듈이 필요합니다.
+
+    #!plain
+    (add-hook 'cperl-mode-hook (lambda () (flymake-mode t)))
+
+    ;; for plenv user
+    (defun flymake-perl-init ()
+      (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-with-folder-structure))
+             (local-file (file-relative-name
+                          temp-file
+                          (file-name-directory buffer-file-name))))
+        (list (guess-plenv-perl-path) (list "-wc" local-file))))
+
+    ;; for perlbrew user
+    (defun flymake-perl-init ()
+      (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-inplace))
+             (local-file (file-relative-name
+                          temp-file
+                          (file-name-directory buffer-file-name))))
+        (list (perlbrew-mini-get-current-perl-path)
+              (list "-MProject::Libs" "-wc" local-file))))
+
+마무리
+------
+
+flymake 와 perldoc 의 도움을 받으면 꽤나 편리합니다.
+그밖에 편리한 팁들을 공유해주세요 :)
+
+고수는 노트패드만 있어도 코딩한다던데..
+
+하늘에 있는 [@am0c](https://twitter.com/am0c) 군 역시 emacs 를 사용했습니다.
+
+'-']/
