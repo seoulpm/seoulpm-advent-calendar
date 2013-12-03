@@ -103,8 +103,32 @@ return {
             url   => 'http://www.perladvent.org/2013/',
         },
         {
+            title => 'Perl 6 Advent Calendar',
+            url   => 'http://perl6advent.wordpress.com/',
+        },
+        {
             title => 'Perl Catalyst Advent Calendar',
             url   => 'http://www.catalystframework.org/calendar/2013',
+        },
+        {
+            title => 'Perl Dancer Advent Calendar',
+            url   => 'http://advent.perldancer.org/2013',
+        },
+        {
+            title => 'Future Advent Calendar',
+            url   => 'http://leonerds-code.blogspot.co.uk/search/label/advent',
+        },
+        {
+            title => '일본 Perl Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2013/perl',
+        },
+        {
+            title => '일본 Mojolicious Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2013/mojolicious',
+        },
+        {
+            title => 'Sysadmin Advent Calendar',
+            url   => 'http://sysadvent.blogspot.kr/',
         },
     ],
     links => [
