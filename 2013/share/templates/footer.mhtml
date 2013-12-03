@@ -24,8 +24,14 @@
       <script type="text/javascript">
       (function() {
         $(function() {
+% if ($article) {
+	  var link_height = $('#link').height() - 500;
+	  var fb_height   = $('.fb').height() - 122;
+% }
+% else {
 	  var link_height = $('#link').height() - 410;
 	  var fb_height   = $('.fb').height() - 32;
+% }
 	  var pos = ( link_height > fb_height ? link_height : fb_height ) * -1;
           $('#foot .copyright').css('bottom', pos );
         });
