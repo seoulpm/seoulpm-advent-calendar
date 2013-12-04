@@ -1,3 +1,10 @@
+Title:    pcap을 이용한 네트워크 패킷 캡쳐
+Package:  Seoul.pm
+Category: pcap
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
 설치하기
 ========
 
