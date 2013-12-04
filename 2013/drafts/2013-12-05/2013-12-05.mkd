@@ -12,44 +12,30 @@ Author:   luzluna
 [@luzluna][twitter-luzluna] - luz + luna
 
 
-설치하기
-========
+준비물
+-------
 
-먼저 Net::Pcap 설치에 필요한 라이브러리를 설치합니다.
+[pcap][home-pcap] 관련 라이브러리를 컴파일하기 위해 설치해야 할 도구가 있습니다.
+데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 패키지를 설치합니다.
 
     $ sudo apt-get install libpcap-dev
-    패키지 목록을 읽는 중입니다... 완료
-    의존성 트리를 만드는 중입니다.
-    상태 정보를 읽는 중입니다... 완료
-    다음 패키지를 더 설치할 것입니다:
-    libpcap0.8-dev
-    다음 새 패키지를 설치할 것입니다:
-    libpcap-dev libpcap0.8-dev
-    0개 업그레이드, 2개 새로 설치, 0개 제거 및 384개 업그레이드 안 함.
-    288 k바이트 아카이브를 받아야 합니다.
-    이 작업 후 644 k바이트의 디스크 공간을 더 사용하게 됩니다.
-    계속 하시겠습니까? [Y/n] y
-    받기:1 http://ftp.debian.org/debian/ jessie/main libpcap0.8-dev amd64 1.4.0-2 [265 kB]
-    받기:2 http://ftp.debian.org/debian/ jessie/main libpcap-dev all 1.4.0-2 [22.6 kB]
-    내려받기 288 k바이트, 소요시간 3초 (72.2 k바이트/초)
-    Selecting previously unselected package libpcap0.8-dev.
-    (데이터베이스 읽는중 ...현재 199094개의 파일과 디렉터리가 설치되어 있습니다.)
-    libpcap0.8-dev 패키지를 푸는 중입니다 (.../libpcap0.8-dev_1.4.0-2_amd64.deb에서) ...
-    Selecting previously unselected package libpcap-dev.
-    libpcap-dev 패키지를 푸는 중입니다 (.../libpcap-dev_1.4.0-2_all.deb에서) ...
-    man-db에 대한 트리거를 처리하는 중입니다 ...
-    libpcap0.8-dev (1.4.0-2) 설정하는 중입니다 ...
-    libpcap-dev (1.4.0-2) 설정하는 중입니다 ...
 
-이제 Net::Pcap 모듈을 설치합니다.
+필요한 모듈은 다음과 같습니다.
 
-    $ cpanm Net::Pcap
-    --> Working on Net::Pcap
-    Fetching http://www.cpan.org/authors/id/S/SA/SAPER/Net-Pcap-0.17.tar.gz ... OK
-    Configuring Net-Pcap-0.17 ... OK
-    Building and testing Net-Pcap-0.17 ... ^[[AOK
-    Successfully installed Net-Pcap-0.17
-    1 distribution installed
+- [CPAN의 Net::Pcap 모듈][cpan-net-pcap]
+- [CPAN의 NetPacket 모듈][cpan-netpacket]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Net::Pcap NetPacket
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Net::Pcap NetPacket
 
 
 첫번째 프로그램
@@ -293,4 +279,7 @@ and, or, ()을 조합하여 다음과 같은 변형이 가능합니다.
 출력 결과는 길어서 생략했습니다. 직접 해보세요~
 
 
+[home-pcap]:                http://www.tcpdump.org/
 [twitter-luzluna]:          http://twitter.com/#!/luzluna
+[cpan-net-pcap]:            https://metacpan.org/module/Net::Pcap
+[cpan-netpacket]:           https://metacpan.org/module/NetPacket
