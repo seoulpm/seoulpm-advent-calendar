@@ -5,6 +5,13 @@ Category: perl
 Category: Seoul.pm
 Author:   luzluna
 
+
+저자
+-----
+
+[@luzluna][twitter-luzluna] - luz + luna
+
+
 설치하기
 ========
 
@@ -282,3 +289,6 @@ $ wget -O - http://advent.perl.kr/2013/
 ...
 
 출력 결과는 길어서 생략했습니다. 직접 해보세요~
+
+
+[twitter-luzluna]:          http://twitter.com/#!/luzluna
