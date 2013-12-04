@@ -11,7 +11,7 @@ Author:   luzluna
 먼저 Net::Pcap 설치에 필요한 라이브러리를 설치합니다.
 $ sudo apt-get install libpcap-dev
 패키지 목록을 읽는 중입니다... 완료
-의존성 트리를 만드는 중입니다       
+의존성 트리를 만드는 중입니다.
 상태 정보를 읽는 중입니다... 완료
 다음 패키지를 더 설치할 것입니다:
   libpcap0.8-dev
@@ -60,7 +60,7 @@ print $dev,"\n";
 
 
 
-$ perl pcap.pl 
+$ perl pcap.pl
 
 $
 
@@ -112,7 +112,7 @@ $ chmod +x pcap.pl
 
 이제 실행해보겠습니다.
 
-$ sudo ./pcap.pl 
+$ sudo ./pcap.pl
 eth0
 
 잘 되네요.
@@ -184,7 +184,7 @@ sub process_packet {
 
 핵심은 다음의 2 라인입니다.
 
-pcap_compile($pcap, \$filter, $filter_str, 1, 0); 
+pcap_compile($pcap, \$filter, $filter_str, 1, 0);
 pcap_setfilter($pcap, $filter);
 
 먼저 필터를 컴파일 한 뒤(pcap_compile) 필터를 적용합니다.(pcap_setfilter)
@@ -273,7 +273,7 @@ sub process_packet {
 
 실행해봅니다.
 
-$ sudo ./pcap.pl 
+$ sudo ./pcap.pl
 ...
 
 다른 콘솔로 접근해서 한번 요청을 해보겠습니다.
