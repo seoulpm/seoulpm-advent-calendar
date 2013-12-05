@@ -412,7 +412,7 @@ pcap과 관리자 권한
     pcap_compile($pcap, \$filter, $filter_str, 1, 0);
     pcap_setfilter($pcap, $filter);
 
-먼저 필터를 컴파일(`pcap\_compile`)한 뒤 필터를 적용(`pcap\_setfilter`)합니다.
+먼저 필터를 컴파일(`pcap_compile`)한 뒤 필터를 적용(`pcap_setfilter`)합니다.
 예제의 `host advent.perl.kr` 필터는 `advent.perl.kr` 호스트와 통신하는 패킷을 캡쳐하라는 의미입니다.
 
 필터를 제대로 사용하려면 필터 문법을 제대로 알아야 합니다.
