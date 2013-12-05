@@ -2,11 +2,13 @@ DEFAULT_CONFIG := $(YEAR)/advent.ini
 
 PATCH_LIB := PERL5LIB=./patch/lib/:$(PERL5LIB)
 
-DEPEND_CPAN_MODULES := Text::MultiMarkdown \
-		       WWW::AdventCalendar \
-		       App::HTTPThis \
-		       HTML::Escape \
-		       URI::Escape
+DEPEND_CPAN_MODULES := \
+	App::HTTPThis \
+	HTML::Escape \
+	Mojo::DOM \
+	Text::MultiMarkdown \
+	URI::Escape \
+	WWW::AdventCalendar
 
 ADVCAL := $(PATCH_LIB) advcal
 ADVCAL_CONFIG  := advent.ini
