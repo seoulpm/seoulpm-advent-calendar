@@ -33,6 +33,7 @@ Author:   luzluna
 의존성이 있는 [Net::Libdnet 모듈][cpan-net-libdnet]을 컴파일 하기 위해 설치해야 할 도구가 있습니다.
 데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 패키지를 설치합니다.
 
+    #!bash
     $ sudo apt-get install libpcap-dev libdumbnet-dev
 
 필요한 모듈은 다음과 같습니다.
@@ -86,7 +87,7 @@ NetPacket 모듈 설치
 
 제대로 변경되었는지 확인해보죠.
 
-    $!bash
+    #!bash
     $ diff -urN Libdnet.xs.bak Libdnet.xs
 
 다음처럼 변경되었다면 성공입니다.
@@ -520,7 +521,8 @@ pcap과 관리자 권한
 
 실행 후 `advent.perl.kr` 호스트에 웹브라우저나 `curl`, `wget` 등으로 접속하면 다음과 같은 결과를 화면에 출력합니다.
 
-    #!plain
+    #!bash
+    $ perl pcap.pl
     eth0
     221.143.48.32:80->192.168.25.37:45902 (0) SYN ACK
     192.168.25.37:45902->221.143.48.32:80 (0) ACK
@@ -570,6 +572,7 @@ pcap과 관리자 권한
 [cpan-netpacket]:           https://metacpan.org/module/NetPacket
 [cpan]:                     http://www.cpan.org/
 [doc-tcpdump]:              http://www.tcpdump.org/#documentation
+[home-perlbrew]:            http://perlbrew.pl/
 [home-tcpdump]:             http://www.tcpdump.org/
 [home-wireshark]:           http://www.wireshark.org/
 [twitter-luzluna]:          http://twitter.com/#!/luzluna
