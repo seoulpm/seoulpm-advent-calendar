@@ -15,7 +15,7 @@ Author:   luzluna
 준비물
 -------
 
-[pcap][home-pcap] 관련 라이브러리를 컴파일하기 위해 설치해야 할 도구가 있습니다.
+[pcap][home-tcpdump] 관련 라이브러리를 컴파일하기 위해 설치해야 할 도구가 있습니다.
 데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 패키지를 설치합니다.
 
     $ sudo apt-get install libpcap-dev
@@ -248,6 +248,7 @@ pcap과 관리자 권한
 
 먼 길을 돌아 `Net::Pcap` 모듈을 사용할 준비가 되었으니 이제 패킷을 캡쳐해봐야겠죠?
 
+    #!perl
     #!/usr/bin/env perl
 
     #
@@ -277,6 +278,7 @@ pcap과 관리자 권한
 앞의 예제는 패킷을 3번 캡쳐한 후 캡쳐한 자료의 길이, 헤더에 기록된 길이, 그리고 캡쳐된 데이터의 실제 길이를 출력하는 예제입니다.
 실행해 볼까요?
 
+    #!bash
     $ ./pcap.pl
     eth0
     66/66 66
@@ -285,49 +287,57 @@ pcap과 관리자 권한
     $
 
 
-필터기능
-========
+필터 기능
+----------
 
-아무 패킷이나 막 다 캡쳐를 하니까 내가 원하는걸 골라서 찍어볼 수가 없네요..
+너무 많은 자료는 사실 없는 것이나 마찬가지입니다.
+원하는 패킷 정보만 추려내려면 필터 기능을 이용하면 됩니다.
 
-다음과 같이 필터 기능을 넣어봅니다.
+    #!perl
+    #!/usr/bin/env perl
 
+    #
+    # FILE: pcap.pl
+    #
 
-    #!/home/bilbo/perl5/perlbrew/perls/perl-5.18/bin/perl
+    use v5.14;
+    use strict;
+    use warnings;
     use Net::Pcap;
 
-    my $err = '';
+    my $err = q{};
     my $dev = pcap_lookupdev(\$err);  # find a device
+    say $dev;
 
-    print $dev,"\n";
-    my $pcap = pcap_open_live($dev, 1024, 1, 0, \$err);
+    my $pcap = pcap_open_live( $dev, 1024, 1, 0, \$err );
 
     my $filter;
     my $filter_str = "host advent.perl.kr";
-    pcap_compile($pcap, \$filter, $filter_str, 1, 0);
-    pcap_setfilter($pcap, $filter);
+    pcap_compile( $pcap, \$filter, $filter_str, 1, 0 );
+    pcap_setfilter( $pcap, $filter );
 
     pcap_loop($pcap, 10, \&process_packet, "just for the demo");
 
     pcap_close($pcap);
 
     sub process_packet {
-        my ($user_data, $header, $packet) = @_;
+        my ( $user_data, $header, $packet ) = @_;
         printf "%d/%d %d\n",$header->{caplen}, $header->{len}, length($packet);
     }
 
-핵심은 다음의 2 라인입니다.
+새로워진 예제의 핵심은 다음 두 줄입니다.
 
+    #!perl
     pcap_compile($pcap, \$filter, $filter_str, 1, 0);
     pcap_setfilter($pcap, $filter);
 
-먼저 필터를 컴파일 한 뒤(pcap\_compile) 필터를 적용합니다.(pcap\_setfilter)
+먼저 필터를 컴파일(`pcap\_compile`)한 뒤 필터를 적용(`pcap\_setfilter`)합니다.
+예제의 `host advent.perl.kr` 필터는 `advent.perl.kr` 호스트와 통신하는 패킷을 캡쳐하라는 의미입니다.
 
-여기에서는 "host advent.perl.kr" advent.perl.kr사이트와 통신하는 모든 패킷을 캡쳐하라고 필터를 지정해보았습니다.
-이걸 사용하려면 필터 사용 문법을 알아야 하는데요. tcpdump의 메뉴얼을 찾아보시면 여기에서 사용할 수 있는 문법들과 예제를 보실 수 있습니다.
+필터를 제대로 사용하려면 필터 문법을 제대로 알아야 합니다.
+다음은 유용하게 쓰일만한 필터 몇 가지 입니다.
 
-유용하게 쓰일만한 필터 몇가지
-
+    #!plain
     host advent.perl.kr      # advent.perl.kr 과 통신하는 모든 패킷
     dst host advent.perl.kr  # destination 이 advent.perl.kr 인 패킷
     src host advent.perl.kr  # source 가 advent.perl.kr 인 패킷
@@ -337,14 +347,28 @@ pcap과 관리자 권한
     len <= 10                # 10 바이트 이하인 패킷
     len >= 10                # 10 바이트 이상인 패킷
 
-and, or, ()을 조합하여 다음과 같은 변형이 가능합니다.
+`and`, `or`, `()`을 조합하여 다양하게 변형이 가능합니다.
 
-    ip and not net 192.168.7.0/24  # ip 패킷이면서 192.168.7.0/24대역과 통신하지 않는 패킷
-    gateway snup and (port ftp or ftp-data)  # snup 게이트웨이를 통과하면서 ftp 포트를 사용하는 패킷
+    #!plain
+    #
+    # ip 패킷이면서 192.168.7.0/24대역과 통신하지 않는 패킷
+    #
+    ip and not net 192.168.7.0/24
 
-좀 더 복잡한 조합으로
+    #
+    # snup 게이트웨이를 통과하면서 ftp 포트를 사용하는 패킷
+    #
+    gateway snup and (port ftp or ftp-data)
 
-    tcp[tcpflags] = tcp-syn and port http  # http 접속중 SYN패킷만 모아서 보기
+좀 더 복잡한 조합으로 사용하는 것 역시 가능합니다.
+
+    #!plain
+    #
+    # http 접속중 SYN패킷만 모아서 보기
+    #
+    tcp[tcpflags] = tcp-syn and port http
+
+더 자세한 필터 문법은 [tcpdump 공식 문서][doc-tcpdump]를 참조하세요.
 
 
 캡쳐한 패킷 분석하기
@@ -423,5 +447,6 @@ and, or, ()을 조합하여 다음과 같은 변형이 가능합니다.
 
 [cpan-net-pcap]:            https://metacpan.org/module/Net::Pcap
 [cpan-netpacket]:           https://metacpan.org/module/NetPacket
-[home-pcap]:                http://www.tcpdump.org/
+[doc-tcpdump]:              http://www.tcpdump.org/#documentation
+[home-tcpdump]:             http://www.tcpdump.org/
 [twitter-luzluna]:          http://twitter.com/#!/luzluna
