@@ -558,10 +558,17 @@ pcap과 관리자 권한
 정리하며
 ---------
 
+대부분의 패킷 캡쳐와 관련한 기능은 궁극의 [pcap 라이브러리][home-pcap]가 다 처리합니다.
+펄에서는 이 *pcap 라이브러리*를 바인딩한 [Net::Pcap 모듈][cpan-net-pcap]이
+[CPAN][cpan]을 통해 배포되고 있어 간단하게 *pcap*을 사용할 수 있습니다.
+성능 역시 *pcap 라이브러리*에 의존하기 때문에 C로 작성하는 것과 비교해 별반 차이가 없죠.
+아마 여러분에게 닥친 상황이 복잡하면 복잡할수록 여러분은 다른 패킷 캡쳐 도구보다 `Net::Pcap`을 더 선호하게 될 겁니다. :-)
+
 
 [cpan-net-libdnet]:         https://metacpan.org/module/Net::Libdnet
 [cpan-net-pcap]:            https://metacpan.org/module/Net::Pcap
 [cpan-netpacket]:           https://metacpan.org/module/NetPacket
+[cpan]:                     http://www.cpan.org/
 [doc-tcpdump]:              http://www.tcpdump.org/#documentation
 [home-tcpdump]:             http://www.tcpdump.org/
 [home-wireshark]:           http://www.wireshark.org/
