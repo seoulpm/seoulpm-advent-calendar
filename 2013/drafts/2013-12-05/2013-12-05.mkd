@@ -12,6 +12,20 @@ Author:   luzluna
 [@luzluna][twitter-luzluna] - luz + luna
 
 
+시작하며
+---------
+
+네트워크상에서 작업을 하다보면 가끔씩은 정말 무엇이 어떻게 돌아가고 있는지
+두 눈으로 확인하고 싶은 욕구가 (치?)밀어 오를때가 많곤합니다.
+응용과 시스템 그리고 원격지 사이에서 그 누구도 잘못이 없어보일때
+범인을 찾으려면 역시 네트워크 패킷을 직접 확인하는 것보다 정확한 것은 없죠.
+[tcpdump][home-tcpdump]나 [와이어샤크][home-wireshark] 같은 유명한 도구도 있지만 직접 펄 코드와 연동해서
+디버깅하는 것이 훨씬 편리할때가 많습니다.
+[pcap 라이브러리][home-tcpdump]는 *tcpdump* 팀이 제작한 라이브러리로
+*tcpdump*와 *와이어샤크*등의 패킷 캡쳐 프로그램의 핵심이라고 할 수 있습니다.
+*pcap*을 사용하면 펄에서는 손쉽게 패킷 캡쳐를 펄 프로그램과 연동할 수 있습니다.
+
+
 준비물
 -------
 
@@ -541,9 +555,14 @@ pcap과 관리자 권한
     192.168.25.37:45908->221.143.48.32:80 (0) SYN
 
 
+정리하며
+---------
+
+
 [cpan-net-libdnet]:         https://metacpan.org/module/Net::Libdnet
 [cpan-net-pcap]:            https://metacpan.org/module/Net::Pcap
 [cpan-netpacket]:           https://metacpan.org/module/NetPacket
 [doc-tcpdump]:              http://www.tcpdump.org/#documentation
 [home-tcpdump]:             http://www.tcpdump.org/
+[home-wireshark]:           http://www.wireshark.org/
 [twitter-luzluna]:          http://twitter.com/#!/luzluna
