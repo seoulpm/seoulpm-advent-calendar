@@ -7,6 +7,7 @@ use Moose;
 
 
 use autodie;
+use Mojo::DOM;
 use WWW::AdventCalendar::MultiMarkdown;
 
 has date => (is => 'ro', isa => 'DateTime', required => 1);
@@ -46,6 +47,19 @@ sub atom_id {
   my ($self) = @_;
 
   return $self->calendar->uri . $self->date->ymd . '.html';
+}
+
+sub description {
+  my ($self) = @_;
+
+  my @desc;
+  my $dom = Mojo::DOM->new( '<div id="root">' . $self->body_html . '</div>' );
+  for ( my $e = $dom->find('h2')->[1]->next; $e; $e = $e->next ) {
+    last if $e->type eq 'h2';
+    push @desc, $e->all_text;
+  }
+
+  return join( "\n", @desc );
 }
 
 1;

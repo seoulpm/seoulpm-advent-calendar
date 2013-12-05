@@ -10,11 +10,14 @@
 % }
   <meta property="og:title" content="<% escape_html($title) %>" />
   <meta property="og:url" content="<% $page_uri %>" />
-% if ( $article && (my $img = $global->{profile_image}{$article->author}) ) {
-  <meta property="og:image" content="<% $global->{base_uri} %><% $img %>" />
+  <meta property="og:image" content="<% $global->{base_uri} %>head.png" />
+% if ( $article ) {
   <meta property="og:type" content="article" />
-% } else {
-  <meta property="og:image" content="<% $global->{base_uri} %>logo_fb.gif" />
+  <meta property="og:description" content="<% escape_html($article->description) %>" />
+% }
+% else {
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="<% escape_html($title) %>" />
 % }
   <link rel="stylesheet" type="text/css" href="<% $global->{location} ? $global->{css_article} : $global->{css_calendar} %>" />
   <link rel="alternate" type="application/atom+xml" title="<% $year %> Seoul.pm 펄 크리스마스 달력 - Atom" href="<% $global->{base_uri} %>atom.xml" />
