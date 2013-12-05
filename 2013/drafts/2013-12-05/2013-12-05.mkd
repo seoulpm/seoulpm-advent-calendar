@@ -38,74 +38,204 @@ Author:   luzluna
     $ cpan Net::Pcap NetPacket
 
 
-첫번째 프로그램
-===============
+pcap과 관리자 권한
+-------------------
 
-패킷캡쳐에 사용할 디바이스를 화면에 출력하는 간단한 프로그램입니다.
+다음은 패킷 캡쳐에 사용할 장치를 화면에 출력하는 간단한 프로그램입니다.
 
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: pcap.pl
+    #
+
+    use v5.14;
     use Net::Pcap;
 
     my $err = '';
     my $dev = pcap_lookupdev(\$err);  # find a device
 
-    print $dev,"\n";
+    say $dev;
 
+간단하죠? 실행해볼까요?
+
+    #!bash
     $ perl pcap.pl
 
     $
 
-아무것도 안나오네요.
+어라! 명령줄에 아무 것도 출력되지 않는군요.
 
-pcap모듈은 디바이스에 직접 접근하기 때문에 root권한이 있어야 제대로 동작합니다. 그럼 해볼까요?
+*pcap 모듈*은 네트워크 장비에 직접 접근하기 때문에 *관리자 권한*이 있어야 제대로 동작합니다.
+관리자 권한으로 실행해보죠.
 
+    #!bash
+    $ sudo perl pcap.pl
+    eth0
+    $
+
+잘 되는군요! :-)
+
+
+펄 경로와 관리자 권한
+----------------------
+
+앞서 모듈 설치시에 잠깐 언급했던 것처럼 여러분이 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면 지금쯤이면 꽤나 혼란스러울 것입니다.
+아마도 다음과 같은 오류를 출력하며 간단한 예제 프로그램이 여전히 동작하지 않을테니까요. :)
+
+    #!bash
     $ sudo perl pcal.pl
     Can't locate Net/Pcap.pm in @INC (you may need to install the Net::Pcap module) (@INC contains: /etc/perl /usr/local/lib/perl/5.18.1 /usr/local/share/perl/5.18.1 /usr/lib/perl5 /usr/share/perl5 /usr/lib/perl/5.18 /usr/share/perl/5.18 /usr/local/lib/site_perl .) at pcap.pl line 1.
     BEGIN failed--compilation aborted at pcap.pl line 1.
     $
 
-헉 이건 또 뭔 에러... 미궁으로 빠져듭니다.
+놀라지 마세요. 모든 문제와 문제의 해답은 경고나 오류 메시지에 담겨져 있습니다.
+관리자 권한으로 실행하기 위해 관리자 계정으로 로그인 하거나 `sudo`를 이용해서
+프로그램을 실행하는 순간 지금까지 *사용하던 펄*이 아닌 *관리자 계정의 펄*을 사용하게 되기 때문입니다.
+여러분이 시스템의 펄과는 별개의 펄을 사용하고 있었다면 당연히 모듈도 별개의 펄을 위해 설치했을 것입니다.
+어쩌면 필요한 모듈을 찾지 못하는 것은 당연한 결과죠.
+지금까지 *사용하던 펄*이 아닌 *관리자 계정의 펄*이 어떻게 다른지 직접 확인해보죠.
 
-sudo를 실행하는 순간 내가 사용하던 perl 버전이 아니라 다른 펄 버전을 사용하게 되면서 아까 설치했던 Net::Pcap 모듈을 찾지 못해서 그러는건데요. 다음의 명령으로 상황을 확인할 수 있습니다.
-
+    #!bash
     $ which perl
     /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
     $ sudo which perl
     /usr/bin/perl
+    $
 
-네.. sudo를 하는 순간 /usr/bin/perl 이걸 실행해버리게 되네요...
+문제를 해결하기 위한 몇 가지 방법이 있는데 가장 간단한 방법부터 가장 정확한 방법까지 하나씩 짚어보죠.
 
-해결책인 두가지가 있습니다.
 
-첫번째는 sudo를 할때 사용할 perl버전의 full path를 다 넣어주는 방법.
+### 관리자 권한으로 로그인, 펄 모듈 설치, 프로그램 실행
 
+*DON'T DO THAT!*
+
+이 방법은 쉽고 간단해서 마약과 같습니다.
+부득이한 경우가 아니라면 추천하지 않습니다.
+
+
+### `sudo`로 실행시 펄의 절대 경로 지정
+
+`sudo`로 실행 시 두 번째 인자로 `perl`을 입력하죠.
+
+    #!bash
+    $ sudo perl pcal.pl
+
+이 부분에 착안을 하면 관리자 권한으로 실행을 하되 자신의 계정에 설치했던 펄을
+사용할 수 있도록 전체 경로를 지정하면 설치했던 모듈을 사용하는 데 지장이 없을 것입니다.
+
+    #!bash
     $ sudo /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl pcap.pl
     eth0
     $
 
-잘 되네요. 그런데 매번 실행할때마다 저 복잡한 라인을 다 쓰려니 귀찮습니다. 다른 방법을 찾아보도록 하겠습니다.
+잘 되죠?
 
-두번째는 쉬뱅라인을 펄 프로그램에 삽입하여 특정 펄을 실행하도록 강제하는 방법입니다.
 
-먼저 소스를 아래와 같이 바꿉니다.
+### 쉬뱅라인에 펄의 절대 경로 지정
 
+그런데 매번 실행할때마다 저 복잡한 라인을 다 쓰려면 꽤나 번거롭습니다.
+유닉스 계열에서 스크립트는 대부분 쉬뱅 라인을 지정합니다.
+실행 권한이 있는 스크립트는 파일의 가장 첫 줄인 쉬뱅 라인을 읽어
+자신을 실행시킬 프로그램을 찾습니다.
+보통 확장성 있는 펄 프로그램을 작성하기 위해 쉬뱅 라인은 `#!/usr/bin/env perl`로
+작성하는 것을 선호하지만 이 경우 펄의 정확한 절대 경로로 설정할 경우
+`sudo`로 실행한다 하더라도 원하는 펄로 스크립트를 구동할 수 있습니다.
+
+쉬뱅 라인을 바꿔보죠.
+
+    #!perl
     #!/home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
+
+    #
+    # FILE: pcap.pl
+    #
+
+    use v5.14;
     use Net::Pcap;
 
     my $err = '';
     my $dev = pcap_lookupdev(\$err);  # find a device
 
-    print $dev,"\n";
+    say $dev;
 
 그리고 스크립트에 실행 권한을 줍니다.
 
+    #!bash
     $ chmod +x pcap.pl
 
-이제 실행해보겠습니다.
+실행해볼까요?
 
+    #!bash
     $ sudo ./pcap.pl
     eth0
+    $
 
-잘 되네요.
+역시 잘 동작합니다. :)
+
+
+### pcap을 사용할 펄에 적절한 권한 추가
+
+이번 방법은 조금 어렵지만 리눅스를 사용한다면 제일 확실한 방법입니다.
+단 시스템과 파일의 권한과 pcap에 대해서 어느 정도 이해할(하려 노력할) 필요가 있습니다. :)
+
+모든 문제의 시작은 pcap 라이브러리가 네트워크 장치에 접근할 때 *관리자 권한*이 필요하기 때문에 발생합니다.
+더 정확히 표현하면 *관리자 권한*은 모든 장치에 접근할 수 있기 때문에 관리자 권한을 획득해서
+프로그램을 실행하는 것은 종종 가장 간단한 해결책이며 유일한 해결책이기도 합니다.
+다행히 pcap은 선택의 여지가 있는데 pcap을 사용할 바이너리에 적절한 권한을 부여한다면
+사용자 권한이 없이도 pcap 관련 도구를 사용할 수 있습니다.
+
+현재 사용하는 펄의 경로를 우선 확인합니다.
+
+    #!bash
+    $ which perl
+    /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
+
+상기 경로의 펄에 적절한 권한을 추가합니다.
+
+    #!bash
+    $ sudo setcap cap_net_raw,cap_net_admin=eip /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
+
+권한이 제대로 추가되었는지 확인합니다.
+
+    #!bash
+    $ sudo getcap /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
+    /home/user/perl5/perlbrew/perls/perl-5.18/bin/perl = cap_net_admin,cap_net_raw+eip
+
+`setcap`과 `getcap` 유틸리티가 없을 경우 데비안 계열의 리눅스를 사용하고 있다면
+다음 명령을 이용해서 패키지를 설치합니다.
+
+    #!bash
+    $ sudo apt-get install libcap2-bin
+
+파일 관련 권한 기능이 제대로 동작하려면 커널에 capability 기능이 포함되어 있어야 합니다.
+리눅스 커널 2.6.33 이후의 경우 커널에 포함되어 있으며 이전 커널의 경우
+`CONFIG_SECURITY_FILE_CAPABILITIES` 설정을 활성화 시키고 빌드되어 있어야 합니다.
+
+해당 기능을 활성화하기 위해 부팅 커널의 매개변수 옵션에 `file_caps=1`을 추가합니다.
+데비안의 경우 `/etc/default/grub` 파일에서 `GRUB_CMDLINE_LINUX_DEFAULT` 값을 조정합니다.
+
+    #!diff
+    --- a/etc/default/grub
+    --- b/etc/default/grub
+    -GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+    +GRUB_CMDLINE_LINUX_DEFAULT="quiet file_caps=1"
+
+수정 후 다음 명령을 실행해서 *grub* 설정을 갱신합니다.
+
+    #!bash
+    $ sudo update-grub
+
+커널 매개변수 옵션을 변경했다면 재부팅 후 다시 프로그램을 실행합니다.
+
+    #!bash
+    $ ./pcap.pl
+    eth0
+    $
+
+관리자 권한이 없이도 pcap 관련 함수가 제대로 호출되어 결과를 반환합니다. :)
 
 
 실제 패킷 캡쳐해보기
@@ -279,7 +409,7 @@ and, or, ()을 조합하여 다음과 같은 변형이 가능합니다.
 출력 결과는 길어서 생략했습니다. 직접 해보세요~
 
 
-[home-pcap]:                http://www.tcpdump.org/
-[twitter-luzluna]:          http://twitter.com/#!/luzluna
 [cpan-net-pcap]:            https://metacpan.org/module/Net::Pcap
 [cpan-netpacket]:           https://metacpan.org/module/NetPacket
+[home-pcap]:                http://www.tcpdump.org/
+[twitter-luzluna]:          http://twitter.com/#!/luzluna
