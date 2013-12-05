@@ -51,9 +51,11 @@ pcap과 관리자 권한
     #
 
     use v5.14;
+    use strict;
+    use warnings;
     use Net::Pcap;
 
-    my $err = '';
+    my $err = q{};
     my $dev = pcap_lookupdev(\$err);  # find a device
 
     say $dev;
@@ -154,9 +156,11 @@ pcap과 관리자 권한
     #
 
     use v5.14;
+    use strict;
+    use warnings;
     use Net::Pcap;
 
-    my $err = '';
+    my $err = q{};
     my $dev = pcap_lookupdev(\$err);  # find a device
 
     say $dev;
@@ -235,42 +239,50 @@ pcap과 관리자 권한
     eth0
     $
 
-관리자 권한이 없이도 pcap 관련 함수가 제대로 호출되어 결과를 반환합니다. :)
+관리자 권한이 없이도 pcap 관련 함수가 제대로 호출되어 결과를 반환합니다.
+권한과 관련한 자세한 내용은 `man capabilities` 문서를 참조하세요. :)
 
 
 실제 패킷 캡쳐해보기
-====================
+---------------------
 
-Net::Pcap 모듈을 사용할 준비가 되었으니 이제 패킷을 캡쳐해봐야겠지요?
+먼 길을 돌아 `Net::Pcap` 모듈을 사용할 준비가 되었으니 이제 패킷을 캡쳐해봐야겠죠?
 
-    #!/home/bilbo/perl5/perlbrew/perls/perl-5.18/bin/perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: pcap.pl
+    #
+
+    use v5.14;
+    use strict;
+    use warnings;
     use Net::Pcap;
 
-    my $err = '';
+    my $err = q{};
     my $dev = pcap_lookupdev(\$err);  # find a device
+    say $dev;
 
-    print $dev,"\n";
-    my $pcap = pcap_open_live($dev, 1024, 1, 0, \$err);
+    my $pcap = pcap_open_live( $dev, 1024, 1, 0, \$err );
 
     pcap_loop($pcap, 3, \&process_packet, "just for the demo");
 
     pcap_close($pcap);
 
     sub process_packet {
-        my ($user_data, $header, $packet) = @_;
+        my ( $user_data, $header, $packet ) = @_;
         printf "%d/%d %d\n",$header->{caplen}, $header->{len}, length($packet);
     }
 
-실행해보겠습니다.
+앞의 예제는 패킷을 3번 캡쳐한 후 캡쳐한 자료의 길이, 헤더에 기록된 길이, 그리고 캡쳐된 데이터의 실제 길이를 출력하는 예제입니다.
+실행해 볼까요?
 
-    $ sudo ./pcap.pl
+    $ ./pcap.pl
     eth0
     66/66 66
     1024/1514 1024
     60/60 60
     $
-
-총 3번 패킷을 캡쳐하여 캡쳐된 길이, 헤더이 기록된 길이, 그리고 캡쳐된 데이터의 실제 길이를 찍어보았습니다.
 
 
 필터기능
