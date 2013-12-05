@@ -25,12 +25,12 @@
       (function() {
         $(function() {
 % if ($article) {
-	  var link_height = $('#link').height() - 500;
-	  var fb_height   = $('.fb').height() - 122;
+	  var link_height = $('#link').height() - 450;
+	  var fb_height   = $('.fb').height() - 72;
 % }
 % else {
-	  var link_height = $('#link').height() - 410;
-	  var fb_height   = $('.fb').height() - 32;
+	  var link_height = $('#link').height() - 380;
+	  var fb_height   = $('.fb').height() - 2;
 % }
 	  var pos = ( link_height > fb_height ? link_height : fb_height ) * -1;
           $('#foot .copyright').css('bottom', pos );
