@@ -437,78 +437,108 @@ pcap과 관리자 권한
 더 자세한 필터 문법은 [tcpdump 공식 문서][doc-tcpdump]를 참조하세요.
 
 
-캡쳐한 패킷 분석하기
-====================
+패킷 분석
+----------
 
-분석을 조금 쉽게 하기위해서 다른 모듈의 도움을 좀 받아보도록 하겠습니다.
+[CPAN의 NetPacket 모듈][cpan-netpacket]은 패킷 분석을 손쉽게 할 수 있게 도와줍니다.
+패킷 분석 기능을 추가한 코드는 다음과 같습니다.
 
-    $ cpanm NetPacket
-    --> Working on NetPacket::IP
-    Fetching http://www.cpan.org/authors/id/Y/YA/YANICK/NetPacket-1.4.4.tar.gz ... OK
-    Configuring NetPacket-1.4.4 ... OK
-    Building and testing NetPacket-1.4.4 ... OK
-    Successfully installed NetPacket-1.4.4
-    1 distribution installed
-    bilbo@dongsik:~/dev/pcap$ cpanm NetPacket::TCP
-    NetPacket::TCP is up to date. (1.4.4)
-    $
+    #!perl
+    #!/usr/bin/env perl
 
-소스코드를 다음과 같이 수정해봅니다.
+    #
+    # FILE: pcap.pl
+    #
 
-    #!/home/user/perl5/perlbrew/perls/perl-5.18/bin/perl
+    use v5.14;
+    use strict;
+    use warnings;
+
     use Net::Pcap;
-
-    my $err = '';
-    my $dev = pcap_lookupdev(\$err);  # find a device
-
-    print $dev,"\n";
-    my $pcap = pcap_open_live($dev, 1024, 1, 0, \$err);
-
-    my $filter;
-    my $filter_str = "host advent.perl.kr";
-    pcap_compile($pcap, \$filter, $filter_str, 1, 0);
-    pcap_setfilter($pcap, $filter);
-
-    pcap_loop($pcap, 100, \&process_packet, "just for the demo");
-
-    pcap_close($pcap);
-
     use NetPacket::Ethernet qw(:strip);
     use NetPacket::IP qw(:strip);
     use NetPacket::TCP;
-    sub process_packet {
-        my ($user_data, $header, $packet) = @_;
 
-        my $ip_obj = NetPacket::IP->decode(eth_strip($packet));
+    my $err = q{};
+    my $dev = pcap_lookupdev(\$err);
+    say $dev;
+    $dev = 'wlan0';
+
+    my $pcap = pcap_open_live( $dev, 1024, 1, 0, \$err );
+
+    my $filter;
+    my $filter_str = "host advent.perl.kr";
+    pcap_compile( $pcap, \$filter, $filter_str, 1, 0 );
+    pcap_setfilter( $pcap, $filter );
+
+    pcap_loop($pcap, 10, \&process_packet, "just for the demo");
+
+    pcap_close($pcap);
+
+    sub process_packet {
+        my ( $user_data, $header, $packet ) = @_;
+
+        my $ip_obj  = NetPacket::IP->decode( eth_strip($packet) );
         my $tcp_obj = NetPacket::TCP->decode( $ip_obj->{data} );
-        printf("%s:%d->%s:%d (%d) ", $ip_obj->{src_ip},$tcp_obj->{src_port}, $ip_obj->{dest_ip},$tcp_obj->{dest_port}, length($tcp_obj->{data}));
+
+        printf(
+            "%s:%d->%s:%d (%d) ",
+            $ip_obj->{src_ip},  $tcp_obj->{src_port},
+            $ip_obj->{dest_ip}, $tcp_obj->{dest_port},
+            length( $tcp_obj->{data} )
+        );
+
         print "FIN " if ( $tcp_obj->{flags} & FIN );
         print "SYN " if ( $tcp_obj->{flags} & SYN );
         print "RST " if ( $tcp_obj->{flags} & RST );
-        print "PST " if ( $tcp_obj->{flags} & PST );
+        print "PSH " if ( $tcp_obj->{flags} & PSH );
         print "ACK " if ( $tcp_obj->{flags} & ACK );
         print "URG " if ( $tcp_obj->{flags} & URG );
         print "ECE " if ( $tcp_obj->{flags} & ECE );
         print "CWR " if ( $tcp_obj->{flags} & CWR );
         print "\n";
 
-        if ( length($tcp_obj->{data}) > 0 ) {
-            print $tcp_obj->{data},"\n";
+        if ( length( $tcp_obj->{data} ) > 0 ) {
+            print $tcp_obj->{data}, "\n";
             print "============\n";
         }
     }
 
-실행해봅니다.
+실행 후 `advent.perl.kr` 호스트에 웹브라우저나 `curl`, `wget` 등으로 접속하면 다음과 같은 결과를 화면에 출력합니다.
 
-    $ sudo ./pcap.pl
-    ...
+    #!plain
+    eth0
+    221.143.48.32:80->192.168.25.37:45902 (0) SYN ACK
+    192.168.25.37:45902->221.143.48.32:80 (0) ACK
+    192.168.25.37:45902->221.143.48.32:80 (685) PSH ACK
+    GET /2013/2013-12-04.html HTTP/1.1
+    Host: advent.perl.kr
+    User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+    Accept-Language: en-US,en;q=0.5
+    Accept-Encoding: gzip, deflate
+    Referer: http://advent.perl.kr/2013/
+    Cookie: __utma=97638351.475138252.1385891323.1386204394.1386208284.13; __utmz=97638351.1385891323.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _fjtads1=443; _fjtad6=3:4T2T5T6T1T3; _fjpvnum1=4; _fjpermvid1=1386195821039-8972276113869514; __utmc=97638351; __utmb=97638351.1.10.1386208284
+    Connection: keep-alive
+    If-Modified-Since: Tue, 03 Dec 2013 20:57:50 GMT
 
-다른 콘솔로 접근해서 한번 요청을 해보겠습니다.
 
-    $ wget -O - http://advent.perl.kr/2013/
-    ...
+    ============
+    221.143.48.32:80->192.168.25.37:45902 (0) ACK
+    221.143.48.32:80->192.168.25.37:45902 (157) PSH ACK
+    HTTP/1.1 304 Not Modified
+    Server: nginx/1.2.4
+    Date: Thu, 05 Dec 2013 02:11:56 GMT
+    Connection: keep-alive
+    Last-Modified: Tue, 03 Dec 2013 20:57:50 GMT
 
-출력 결과는 길어서 생략했습니다. 직접 해보세요~
+
+    ============
+    192.168.25.37:45902->221.143.48.32:80 (0) ACK
+    192.168.25.37:45905->221.143.48.32:80 (0) SYN
+    192.168.25.37:45906->221.143.48.32:80 (0) SYN
+    192.168.25.37:45907->221.143.48.32:80 (0) SYN
+    192.168.25.37:45908->221.143.48.32:80 (0) SYN
 
 
 [cpan-net-libdnet]:         https://metacpan.org/module/Net::Libdnet
