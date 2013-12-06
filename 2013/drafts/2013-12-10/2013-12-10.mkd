@@ -1,0 +1,280 @@
+저자
+-----
+
+[@berise] - @대전(펄 미팅에 한번 가보고 싶지만 여건상 못가는 지방남), @테니스, github:berise   berise _at _ gmail.com
+
+시작하며
+---------
+소개해 드릴 내용은 지난 펄크리스마스 달력에도 여러 번 등장한 웹 이미지를 저장하는 스크립트입니다.  크리스마스 즈음이 되면 어김없이 찾아오는 스크립트입니다.  원래 신문기사나 겔러리(dcinside) 글을 긁는 용도였지만, 지금은 모니터링으로 용도변경이 되었습니다. 그래서 이름이 dcmon입니다.  네, 생각하시는 그것! 짤방 저장하는 것 맞습니다. 다만, 기존과의 조그만 차이가 있다면 최신 글을 모니터링하여 가져올 수 있습니다.(우리가 잠을 자는 사이에 많은 글들이 생성되고 삭제되지요) 
+
+이 스크립트의 원래 시작은 python으로 시작하였으나, python의 regex, urllib2의 처리 방식이 맘에 들지 않아 perl로 변경하게 되었습니다. python 버전을 포함한 전체 코드는 https://github.com/berise/dcmon에서 다운로드 할 수 있습니다. 
+
+
+준비물
+-----
+ - LWP::Simple 모듈(옵션)
+ - Encode 모듈
+ - WWW::Mechanize 모듈
+ - Web::Scraper 모듈
+ - threads 모듈
+
+이 글을 읽는 분들은 모두 모듈을 자유자재로 설치 가능할 것으로 굳게 믿고 있습니다.
+
+사실 외부모듈 의존을 줄이고자 예전 버전에서는 LWP나 Scraper를 사용하지 않고 html을 파싱하여 필요한 링크나 파일이름을 분리하였지만, 이번에 코드를 수정하면서 선진 모듈을 도입하였습니다.
+
+
+전체 흐름
+---------
+
+우선 전체적인 흐름은 "겔러리 모니터링 -> 게시물 목록 가져오기 -> 최신 글 가져오기 -> 파일이름 링크 분리 -> 이미지 다운로드" 순으로 진행됩니다.
+
+모니터링할 겔러리 목록은 dcmon.cfg 파일에 개행 문자로 구분되며 #은 주석처리입니다. 목록은 해당 웹페이지의 URL에 기록되는 게시판의 이름을 기록해야 합니다. 예를 들면 아래와 같습니다.
+
+    #!plain
+    comedy_new2
+    game_classic
+    #leagueoflegends
+
+
+파일에서 읽은 겔러리 목록은 이미지를 저장할 경로를 만든 후 겔러리마다 별도의 쓰레드를 이용하여 게시판을 모니터링합니다. 
+
+    #!plain
+	foreach my $gallery_name (@lines)
+	{
+        next if $gallery_name =~ /^#/;
+		chomp $gallery_name;
+	    setup_directory($gallery_name);
+
+		print "Monitoring $gallery_name\n"; 
+
+        my $thread = threads->create(\&run_dcmon_with_given_name, $gallery_name);
+        push(@threads, $thread);
+	}
+    foreach my $t (@threads) {
+        $t->join();
+    }
+
+
+게시물 모니터링은 대략 다음과 같이 진행합니다. 겔러리의 게시물 번호를 가져온 후 새로운 게시물이 있는지 판단합니다. 만약 새로운 게시물이 있을 경우 해당 게시물을 가져옵니다. 모니터링 간격은 5 ~ 15초 정도 쉬어가며 수행합니다. dcinside의 경우 너무 빨리 읽으면, 차단되는 경우가 있는 것 같습니다.
+
+    #!plain
+	while(1)
+	{
+		my @new_list = get_recent_number_list($gallery_name); 
+		$curr_index = determine_most_recent_page_number(\@new_list, \@prev_list);
+		$image_count = find_and_get_images($gallery_name, $new_list[$curr_index]);
+
+        @prev_list = @new_list;
+
+        sleep(5 + rand(10));
+    }
+
+
+첨부파일 다운로드 
+-----------------
+본 스크립트의 존재 이유가 되겠습니다. 브라우저에 보이는 이미지와 파일이름이 html 구조상 분리되어 있습니다. 따라서, 각 페이지에서 첨부파일의 이름과 이미지 링크를 찾아야 합니다. dcinside의 게시물에서 첨부 파일은 아래 같이 코딩되어 있습니다.
+
+    #!plain
+    <div class="box_file">
+    <p><b>blablabla&nbsp;<span>(1)</span></b></p>	
+    <ul class="appending_file" style="width:1086px; overflow:hidden; word-wrap:break-word;">
+    <li class="icon_pic"><a href="http://image.dcinside.com/download.php?id=3dbcd4&no=29bcc427b18177a16fb3dab004c86b6f202dc30d4da4684a3e1ac6a7c7ebd7c987208b949b05d1e6c1b5eb4f7980e1ec361160615f&f_no=74e58173b48607f237e98fec4083736dc6302f1fd1fc44dacabf19050a6fd757ff7c2ae69f9e06">981514_496996270395434_1700987382_o.jpg</a></li>						</ul>
+    </div>
+
+이제 Web::Scraper가 힘을 쓸 때 입니다. 이와 같은 경우 Web::Scraper를 이용하여 간단하게 추출할 수 있습니다.
+
+    #!plain
+    sub scrape_href_links
+    {
+        my $html_content = shift;
+
+        my $html_element = scraper {
+            process ".icon_pic > a", "html[]" => 'HTML', "text[]" => 'TEXT';
+        };
+
+        # get html text based on div class="con_substance"
+        my $res = $html_element->scrape( $html_content );
+
+        return $res->{text};
+    }
+
+dcinside의 겔러리의 웹페이지 내부의 이미지 링크는 다음과 같습니다.
+    #!plain
+    <!-- con_substance -->
+    <div class="con_substance">
+    <div class="s_write">
+    <div id='zzbang_div' style='display:none;'></div><pre></pre><table border="0" width="100%"><tr><td><p><br></p><p style="text-align: left;"><img src="http://dcimg1.dcinside.com/viewimage.php?id=3dbcd4&no=29bcc427b18177a16fb3dab004c86b6f202dc30d4da4684a3e1ac6a7c7ebd7c987208b949b05d1e6c1b5eb4f7980e1ec361160615f" class="txc-image" style="clear:none;float:none;" /></p><p>blablablabla<br></p></td></tr></table>
+    </div>
+
+역시 Web::Scraper를 이용하여 간단하게 추출할 수 있습니다. scraper를 이렇게 초보적으로 사용해도 잘 돌아갑니다. 잘 돌아가니 더 이상 개선하지 않습니다. --;
+
+    #!plain
+    sub scrape_links
+    {
+        my $html_content = shift;
+
+        my $html_element = scraper {
+            process ".con_substance", html => 'HTML';
+        };
+
+        # [] for plural
+        my $img_element = scraper {
+            process "img", "src[]" => '@src';
+        };
+
+        # get html text based on div class="con_substance"
+        my $res = $html_element->scrape( $html_content );
+
+        # get img src link which shows real image (in javascript pop window)
+        my $res2 = $img_element->scrape( $res->{html});
+
+        return $res2->{src};
+    }
+
+
+
+이제 게시물 페이지에서 파일이름과 이미지 링크를 추출하였습니다.  이렇게 파일이름과 이미지 링크를 추출할 수 있으면 게임 끝입니다. 
+이제 이 함수를 이용하여 게시물이 포함된 웹 페이지와 첨부파일을 가져오는 함수는 이렇게 작성할 수 있습니다. 단, 파일이름이 없는 경우가 있는데, 이는 가볍게 건너 뜁니다. 아래 함수는 원본 파일의 이름을 그대로 저장하기 때문에 파일이름이 겹치는 경우 기존 파일이 삭제됩니다. 삭제를 윈치 않을 경우에는 파일이름을 유일하게 만들어 저장하는 것이 필요합니다.
+
+    #!plain
+    sub find_and_get_images
+    {
+        my ($gallery_name, $url) = @_;
+        my $html_contents = get($url);
+
+        my $h_filenames =  scrape_href_links($html_contents);
+        my $h_links =  scrape_links($html_contents);
+
+        if (!defined($h_filenames))  # http://zzbang.dcinside.com/pad_temp.jpg is basic image for an article without any image attached
+        {
+            print "[$gallery_name] No image\n" if $opt{debug};
+            return ;
+        }
+
+        my $file_count = @{$h_filenames};
+        my $link_count = @{$h_links};
+        my $image_count = 0;
+
+        #print "# of files : ($file_count), # of links : ($link_count)\n" if $opt{debug};
+        for(my $i = 0; $i < $file_count; $i++)
+        {
+            my $filename_p;
+            $filename_p = encode('cp949', $h_filenames->[$i]);
+            #print " - download $filename_p\n";
+            #print "$h_filenames->[$i], $h_links->[$i]\n" if $opt{debug};
+            download_and_save_as($h_filenames->[$i], $h_links->[$i]);
+        }
+
+        return $file_count;
+    }
+
+
+마지막으로 주어진 파일이름과 링크를 이용하여 이미지를 다운로드 및 저장하는 download_and_save_as 함수입니다. 이것 저것 시험하다 보니 다운로드 하는 방법으로 wget, mechanize, LWP를 사용하는 것들이 구현되어 있습니다. 입맛에 맞는 것으로 사용하면 됩니다. LWP를 사용하는 것은 예전 펄크리스마스 달력의 것(http://lotus.perl.kr/2012/01.html)을 무단 사용하였습니다. 파일 인코딩은 환경에 맞게 변환하면 됩니다.
+
+    #!plain
+    sub download_and_save_as
+    {
+        my ($filename, $link) = @_;
+        my $filename_p = encode('cp949', $filename);
+
+        my $USE_WGET = 0;
+        my $USE_MECHANIZE = 0;
+        my $USE_LWP = 1;
+
+        # 저장할 위치 지정
+        $filename_p = $directory_name . "/" . $filename_p; 
+
+        # 위치를 고정하여 저장한다.
+        #$filename_p = "dcmon/temp/" . $filename_p; 
+
+        if ($USE_WGET eq 1)
+        {
+            my $cmd_wget = "wget \"$link\"";
+            print "Execute $cmd_wget\n";
+
+            # download with wget
+            system($cmd_wget);
+        }
+        elsif ($USE_MECHANIZE eq 1)
+        {
+            # mechanize
+            my $image = get($link);
+
+            if (defined $image)
+            {
+                open(my $fh_out, ">$filename_p");
+                binmode $fh_out;
+                print $fh_out $image;
+                close($fh_out); 
+            }
+        } elsif ($USE_LWP eq 1) { # download with a LWP, ref : http://lotus.perl.kr/2012/01.html
+            my $ua = LWP::UserAgent->new( agent =>
+                'Mozilla/5.0'
+                .' (Windows; U; Windows NT 6.1; en-US; rv:1.9.2b1)'
+                .' Gecko/20091014 Firefox/3.6b1 GTB5'
+            );
+            my $res;
+            eval { $res = $ua->get($link); };
+            if ($@) {
+                warn $@;
+                # next;
+            }
+
+            open my $fh, ">", $filename_p;
+
+            binmode $fh;
+            print $fh $res->content;
+            close $fh;
+        }
+
+        my $filesize = -s $filename_p if -e $filename_p;
+        print " + $filename_p($filesize Bytes)\n" if $opt{debug};
+    }
+
+
+참고로 아래 코드는 Web::Scraper를 사용하기 이전에 정규표현식을 이용하여 파일이름과 링크를 추출하는 코드입니다. 단순 무식하게 코딩하였습니다. dcinside의 웹페이지가 개편되면서 아래 코드는 더 이상 동작하지 않습니다.
+
+    #!plain
+    sub extract_filenames
+    {
+        my $html_contents = shift;
+
+        my $pattern = "<li class=\"icon_pic\"><a href=.*>(.*?.*?)<\/a>";
+        my @files = $html_contents =~ /$pattern/gi;
+
+        foreach my $file (@files) { print "extract_filenames : $file\n" if $opt{debug}; } 
+        return @files;
+    }
+
+    sub extract_links
+    {
+        my $html_contents = shift;
+
+        #my $pattern = "src='(http://dcimg1.dcinside.com/viewimage.php?.*?)'";
+        my $pattern = "<li class=\"icon_pic\"><a href=\"(.*)\">.*?.*?<\/a>";
+        my @links = $html_contents =~ /$pattern/gi;
+
+        foreach my $link (@links) { print "extract_links : @links\n" if $opt{debug}; }
+
+        return @links;
+    }
+
+
+
+Run! & 걸림돌
+-------------
+
+실행하면 현재 디렉토리에 dcmon를 만들어 이 디렉토리 아래에 이미지들이 저장됩니다.
+실행 중인 모습은 아래와 같습니다. 게시물을 타이밍 문제로 놓치는 일도 많겠지만, 별 상관 없습니다. 우린 관대하니까요. 다운로드한 그림은 각자의 취향에 따른 이미지뷰어를 사용하시면 됩니다.
+
+[dcmon_figure1.png]
+
+큰 무리없이 사용할 수 있는 스크립트지만, 간혹 돌아가다 죽는 경우가 발생합니다. 아직 분석을 하지 않아서 무슨 문제로 죽는지는 알 수 없습니다. (흠, 밤새 돌아야 하는 코드인데...)
+
+
+정리하며
+--------
+
+
+한동안 사용하지 않는 코드를 다시 꺼내 실행가능하도록 만드른 것이 역시 쉽지 않습니다. 하지만, 펄의 유연함은 빠른 수정과 실행을 가능하게 합니다. LWP, Mechanize, Scraper 등 펄의 멋진 모듈들이 펄을 더욱 즐겁게 사용할 수 있게 만드는 것 같습니다. 
+
