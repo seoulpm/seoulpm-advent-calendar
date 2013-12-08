@@ -27,11 +27,11 @@ Author:   aanoaa
 plenv vs perlbrew
 ------------------
 
-`perlbrew`와 `plenv` 모두 홈 디렉토리에 펄을 설치하고,
+[perlbrew][home-perlbrew]와 [plenv][home-plenv] 모두 홈 디렉토리에 펄을 설치하고,
 사용하는 쉘에서 마음대로 버전을 바꿔가며 사용할 수 있습니다.
 또 사용하는 펄에 따라 모듈 설치 경로가 바뀝니다.
 
-`plenv` 에는 `perlbrew` 와 차별화되는 두 가지 기능이 있습니다.
+*plenv* 에는 *perlbrew* 와 차별화되는 두 가지 기능이 있습니다.
 
 
 ### 경로별 펄 버전 지정
