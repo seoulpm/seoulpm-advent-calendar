@@ -15,7 +15,7 @@ Author:   aanoaa
 ---------
 
 [perlbrew][home-perlbrew]는 펄 커뮤니티 내에서 널리 사용되는 펄 설치 및 관리 도구입니다.
-[Seoul.pm 크리스마스 달력][advent]에서도 여러번 다뤄지기도 했죠.
+[Seoul.pm 크리스마스 달력][advent]에서 여러번 다뤄지기도 했죠.
 
 - [2011 - 열세번째 날: How to Use CPAN, Actually][advent-2011-13]
 - [2011 - 열여섯번째 날: perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기][advent-2011-13]
@@ -75,6 +75,7 @@ plenv vs perlbrew
 [advent-2011-13]:             http://advent.perl.kr/2011/2011-12-13.html
 [advent-2011-16]:             http://advent.perl.kr/2011/2011-12-16.html
 [advent-2013-03]:             http://advent.perl.kr/2013/2013-12-03.html
+[advent]:                     http://advent.perl.kr
 [github-aanoaa]:              https://github.com/aanoaa
 [home-metacpan-leaderboard]:  http://metacpan.org/favorite/leaderboard
 [home-perlbrew]:              http://perlbrew.pl/
