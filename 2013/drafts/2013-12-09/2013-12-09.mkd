@@ -17,9 +17,9 @@ Author:   aanoaa
 [perlbrew][home-perlbrew] 는 널리 사용되고 있는 설치 관리 도구 입니다.
 seoulpm advent calendar 에서도 몇차례 다룬내용이기도 합니다.
 
-- [2011 - 열세번째 날: How to Use CPAN, Actually][advcal-2011-13]
-- [2011 - 열여섯번째 날: perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기][advcal-2011-13]
-- [2013 - 셋째 날: 좋은 모듈을 고르는 좋은 방법][advcal-2011-13]
+- [2011 - 열세번째 날: How to Use CPAN, Actually][advent-2011-13]
+- [2011 - 열여섯번째 날: perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기][advent-2011-13]
+- [2013 - 셋째 날: 좋은 모듈을 고르는 좋은 방법][advent-2011-13]
 
 이에 강력한 라이벌 [plenv][home-plenv] 가 나타났습니다.
 
@@ -71,11 +71,10 @@ CPAN 에서 가장 높은 평가를 받고 있는 모듈 중 하나 이기도 �
 필요에 따라 적절한 도구를 선택해서 사용하는데 도움이 되었으면 합니다.
 
 
-
+[advent-2011-13]:       http://advent.perl.kr/2011/2011-12-13.html
+[advent-2011-16]:       http://advent.perl.kr/2011/2011-12-16.html
+[advent-2013-03]:       http://advent.perl.kr/2013/2013-12-03.html
+[github-aanoaa]:        https://github.com/aanoaa
 [home-perlbrew]:        http://perlbrew.pl/
 [home-plenv]:           https://github.com/tokuhirom/plenv
 [twitter-aanoaa]:       http://twitter.com/aanoaa
-[github-aanoaa]:        https://github.com/aanoaa
-[advcal-2011-13]:       http://advent.perl.kr/2011/2011-12-13.html
-[advcal-2011-16]:       http://advent.perl.kr/2011/2011-12-16.html
-[advcal-2013-03]:       http://advent.perl.kr/2013/2013-12-03.html
