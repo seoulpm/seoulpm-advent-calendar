@@ -61,26 +61,22 @@ plenv vs perlbrew
     $ PLENV_VERSION=system perl a.pl
 
 
-결론
-----
+정리하며
+---------
 
-`perlbrew` 의 등장으로 system perl 을 더럽히지 않고 사용하게 되면서
-매우 편리해졌습니다.
-
-CPAN 에서 가장 높은 평가를 받고 있는 모듈 중 하나 이기도 합니다.
-
-앞에선 언급하지 않았지만, `lib, upgrade-perl, self-upgrade, ..` 등
-`plenv` 에는 없는 강력한 기능도 있습니다.
-
-`plenv` 는 `perlbrew` 에는 없는 매력적인 기능이 있습니다.
-
-필요에 따라 적절한 도구를 선택해서 사용하는데 도움이 되었으면 합니다.
+4년 전 혜성처럼 등장한 [perlbrew][home-perlbrew] 덕분에 시스템의 펄과는 별개의 펄 환경을
+너무도 손쉽게 구축할 수 있게 되면서 펄 개발 환경은 무척 편리해졌었습니다.
+사실 *perlbrew*는 여전히 [CPAN의 최고 모듈 명단][home-metacpan-leaderboard]의 10위권 안에 들 정도로 여전히 인기있는 모듈입니다.
+앞서 언급하지 않았지만 *perlbrew*에는 `lib`, `upgrade-perl`, `self-upgrade` 등 *plenv*에는 없는 강력한 기능이 많습니다.
+마찬가지로 *plenv* 역시 *perlbrew*를 사용하면서 아쉬웠던 부분을 구석구석 긁어주는 기능이 많죠.
+필요에 따라 적절한 도구를 선택해서 사용하는 것은 여러분의 몫이겠죠? ;-)
 
 
-[advent-2011-13]:       http://advent.perl.kr/2011/2011-12-13.html
-[advent-2011-16]:       http://advent.perl.kr/2011/2011-12-16.html
-[advent-2013-03]:       http://advent.perl.kr/2013/2013-12-03.html
-[github-aanoaa]:        https://github.com/aanoaa
-[home-perlbrew]:        http://perlbrew.pl/
-[home-plenv]:           https://github.com/tokuhirom/plenv
-[twitter-aanoaa]:       http://twitter.com/aanoaa
+[advent-2011-13]:             http://advent.perl.kr/2011/2011-12-13.html
+[advent-2011-16]:             http://advent.perl.kr/2011/2011-12-16.html
+[advent-2013-03]:             http://advent.perl.kr/2013/2013-12-03.html
+[github-aanoaa]:              https://github.com/aanoaa
+[home-metacpan-leaderboard]:  http://metacpan.org/favorite/leaderboard
+[home-perlbrew]:              http://perlbrew.pl/
+[home-plenv]:                 https://github.com/tokuhirom/plenv
+[twitter-aanoaa]:             http://twitter.com/aanoaa
