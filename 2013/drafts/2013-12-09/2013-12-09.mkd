@@ -1,4 +1,4 @@
-Title:    plenv 
+Title:    plenv vs perlbrew
 Package:  Seoul.pm
 Category: perl
 Category: plenv
@@ -24,35 +24,41 @@ Author:   aanoaa
 *perlbrew* 릴리스 이후 거의 4년 만에 강력한 라이벌인 [plenv][home-plenv]가 나타났습니다.
 
 
-본론
-----
+plenv vs perlbrew
+------------------
 
-`perlbrew` 와 `plenv` 모두 홈디렉토리에 펄을 설치하고, shell 에서
-마음대로 버전을 바꿔가며 사용할 수 있습니다. 또 사용하는 펄에 따라
-모듈 설치 경로가 바뀝니다.
+`perlbrew`와 `plenv` 모두 홈 디렉토리에 펄을 설치하고,
+사용하는 쉘에서 마음대로 버전을 바꿔가며 사용할 수 있습니다.
+또 사용하는 펄에 따라 모듈 설치 경로가 바뀝니다.
 
-`plenv` 에는 `perlbrew` 와 차별화되는 두가지 기능이 있습니다.
+`plenv` 에는 `perlbrew` 와 차별화되는 두 가지 기능이 있습니다.
 
-- 특정 경로에 사용될 펄을 강제할 수 있습니다.
 
-      #!bash
-      $ cd /path/to
-      $ plenv local 5.18.1
+### 경로별 펄 버전 지정
 
-  위 두개의 명령은 `/path/to/.perl-version` 파일을 만듭니다.
+*perlbrew*와는 달리 *plenv*는 특정 경로에서 사용할 펄을 강제로 지정할 수 있습니다.
+다음 명령은 `/path/to/.perl-version` 파일을 만듭니다.
 
-      #!bash
-      $ cat /path/to/.perl-version
-      5.18.1
+    #!bash
+    $ cd /path/to
+    $ plenv local 5.18.1
 
-  `.perl-version` 파일이 있는 한 `/path/to` 디렉토리(그 하부까지)는
-  `5.18.1` 버전을 사용하게 됩니다.
+`/path/to/.perl-version` 파일에는 사용할 펄의 버전 정보가 단순한 텍스트 형식으로 담겨집니다.
 
-- `PLENV_VERSION` 환경변수를 사용해서 펄을 switch 하지 않고 다른
-  버전으로 사용할 수 있게 합니다.
+    #!bash
+    $ cat /path/to/.perl-version
+    5.18.1
 
-      #!bash
-      $ PLENV_VERSION=system perl a.pl
+`.perl-version` 파일이 있는 한 `/path/to` 디렉터리 및 그 하부 디렉터리까지 `5.18.1` 버전을 사용하게 됩니다.
+
+
+### 환경 변수로 펄 버전 지정
+
+`PLENV_VERSION` 환경 변수를 사용하면 영구적이 아니라
+환경 변수의 영향 아래서만 다른 버전의 펄을 사용할 수 있습니다.
+
+    #!bash
+    $ PLENV_VERSION=system perl a.pl
 
 
 결론
