@@ -8,10 +8,7 @@ Author:   aanoaa
 저자
 ----
 
-홍형석
-
-- [@aanoaa][twitter-aanoaa]
-- [github:aanoaa][github-aanoaa]
+[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
 
 서론
