@@ -11,17 +11,17 @@ Author:   aanoaa
 [@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
 
-서론
-----
+시작하며
+---------
 
-[perlbrew][home-perlbrew] 는 널리 사용되고 있는 설치 관리 도구 입니다.
-seoulpm advent calendar 에서도 몇차례 다룬내용이기도 합니다.
+[perlbrew][home-perlbrew]는 펄 커뮤니티 내에서 널리 사용되는 펄 설치 및 관리 도구입니다.
+[Seoul.pm 크리스마스 달력][advent]에서도 여러번 다뤄지기도 했죠.
 
 - [2011 - 열세번째 날: How to Use CPAN, Actually][advent-2011-13]
 - [2011 - 열여섯번째 날: perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기][advent-2011-13]
 - [2013 - 셋째 날: 좋은 모듈을 고르는 좋은 방법][advent-2011-13]
 
-이에 강력한 라이벌 [plenv][home-plenv] 가 나타났습니다.
+*perlbrew* 릴리스 이후 거의 4년 만에 강력한 라이벌인 [plenv][home-plenv]가 나타났습니다.
 
 
 본론
