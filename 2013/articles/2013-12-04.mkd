@@ -8,9 +8,7 @@ Author:   aanoaa
 저자
 ----
 
-[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, 아이유 열혈 삼촌팬,
-Perl, Emacs, 콧수염, 야구, 자전거, 낙타, 돌고래, 포청천 마니아.
-[github:aanoaa][github-aanoaa]
+[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
 
 시작하며
