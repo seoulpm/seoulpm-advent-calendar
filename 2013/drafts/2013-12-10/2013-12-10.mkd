@@ -1,7 +1,15 @@
+Title:    dcmon: While You Were Sleeping
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
 저자
 -----
 
-[@berise] - @대전(펄 미팅에 한번 가보고 싶지만 여건상 못가는 지방남), @테니스, github:berise   berise _at _ gmail.com
+@berise - @대전(펄 미팅에 한번 가보고 싶지만 여건상 못가는 지방남),
+테니스, [github:berise][github-berise], berise _at_ gmail.com
+
 
 시작하며
 ---------
@@ -278,3 +286,5 @@ Run! & 걸림돌
 
 한동안 사용하지 않는 코드를 다시 꺼내 실행가능하도록 만드른 것이 역시 쉽지 않습니다. 하지만, 펄의 유연함은 빠른 수정과 실행을 가능하게 합니다. LWP, Mechanize, Scraper 등 펄의 멋진 모듈들이 펄을 더욱 즐겁게 사용할 수 있게 만드는 것 같습니다. 
 
+
+[github-berise]:            https://github.com/berise
