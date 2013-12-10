@@ -2,7 +2,7 @@ Title:    dcmon: While You Were Sleeping
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   keedi
+Author:   berise
 
 저자
 -----
