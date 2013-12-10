@@ -89,7 +89,7 @@ Python 버전을 포함한 전체 코드는 [GitHub의 저장소][github-dcmon]�
 파일에서 읽은 갤러리 목록을 이용해 이미지를 저장할 경로를 만듭니다.
 그 후 갤러리마다 별도의 쓰레드를 생성해 게시판을 모니터링합니다.
 
-    #!plain
+    #!perl
     for my $gallery (@lines) {
         next if $gallery =~ /^#/;
         chomp $gallery;
@@ -108,7 +108,7 @@ Python 버전을 포함한 전체 코드는 [GitHub의 저장소][github-dcmon]�
 갤러리의 게시물 번호를 가져온 후 새로운 게시물이 있는지 판단 후 새로운 게시물이 있을 경우 해당 게시물을 가져옵니다.
 dcinside의 경우 너무 자주 웹페이지를 읽을 경우 차단되므로 5 ~ 15초 가량 쉬어가며 모니터링합니다.
 
-    #!plain
+    #!perl
     while (1) {
         my @new_list = get_recent_number_list($gallery);
         $curr_index  = determine_most_recent_page_number( \@new_list, \@prev_list );
