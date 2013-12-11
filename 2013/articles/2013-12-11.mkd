@@ -200,7 +200,7 @@ Author:   newbcode
 - `\P{속성}`: 그 속성을 가지지 않는 문자에 일치
 - `\p{L}` 또는 `\p{Letter}`: 글자(letter)로 간주되는 모든 문자
 - `\p{M}` 또는 `\p{Mark}`: 그 문자만 쓸수는 없고 다른 기본 문자와 함께 써야만 하는 문자 (예: accents, umlauts, enclosing boxes 등)
-- `\p{Z}` 또는 `\p{Separator}`: 분리하는 역활을 할 뿐 화면에 표시할 수는 없는 문자(예: 공백 문자 등)
+- `\p{Z}` 또는 `\p{Separator}`: 분리하는 역할을 할 뿐 화면에 표시할 수는 없는 문자(예: 공백 문자 등)
 - `\p{S}` 또는 `\p{Symbol}`: 딩뱃(dingbat) 문자 및 기호(딩뱃은 조판 시에 사용하는 장식용 문자 예: ■, ○, ♥, ☎ 등)
 - `\p{N}` 또는 `\p{Number}`: 숫자를 나타내는 문자
 - `\p{P}` 또는 `\p{Punctuation}`: 문장 부호
