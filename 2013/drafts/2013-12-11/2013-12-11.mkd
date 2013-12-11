@@ -2,6 +2,8 @@ Title:    유니코드를 활용한 정규표현식
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
+Category: unicode
+Category: regex
 Author:   newbcode
 
 저자
@@ -14,20 +16,26 @@ Author:   newbcode
 시작하며
 ---------
 
-유니코드란 가장기본적인 수준으로 말하면 숫자와 문자 사이의 논리적인 대응 관계를 뜻합니다. 예를 들어 '펄'이라는 한국어 문자는 숫자(10진수) '54148'에 대응됩니다. 코드포인트(codepoint)라고 하는 이숫자는 보통 앞에 'U+'를 덧붙인 16진수 형태로 표기합니다.
-'54148'을 16진수 형태로 쓰면 D384이며 유니코드 표현으로는 'U+D384'라고 쓸수 있습니다.
+[유니코드(Unicode)][wiki-unicode]는 전 세계의 모든 문자를 컴퓨터에서 일관되게 표현하고 다룰 수 있도록 설계된 문자 집합입니다.
+`펄`이라는 한국어 문자는 10진수 `54148`에 일대일 대응됩니다.
+*코드포인트(codepoint)*라고 하는 이 숫자는 보통 앞에 `U+`를 덧붙인 16진수 형태로 표기합니다.
+`54148`을 16진수로 표현하면 `D384`이며 유니코드 표현으로는 `U+D384`라고 씁니다.
 
-정규표현식을 사용하다보면 한글과 영어를 분리하고 숫자와 문자등을 쉽게 파싱을 하는 방법은 없을까? 하는 고민이 듭니다.
-perl의 내부 유니코드 속성에 대해 조금 깊게 들어다 보고 유니코드의 속성을 활용하여 좀더 정확하고 효율적으로 정규표현식을 활용하는 방법에 대해 알아봅니다.
+정규 표현식을 사용하다보면 *"한글과 영어를 분리하고 숫자와 문자등을 쉽게 파싱을 하는 방법은 없을까?"*하는 고민을 자주하게 됩니다.
+펄의 내부 유니코드 속성에 대해 조금 깊게 들여다 보고 유니코드의 속성을 활용해
+조금 더 정확하고 효율적으로 정규 표현식을 활용하는 방법에 대해 알아봅니다.
+
 
 준비물
 -------
 
 필요한 모듈은 다음과 같습니다.
 
-- [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
 - [CPAN의 Data::Printer 모듈][cpan-data-printer]
+- [CPAN의 Encode 모듈][cpan-encode]
+- [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
 
+`Encode` 모듈은 코어 모듈이므로 별도로 설치할 필요는 없습니다.
 `HTTP::Tiny`의 경우 펄 5.14 이후 버전(정확히는 v5.13.9)의 경우
 코어 모듈로 지정되었으므로 역시 별도로 설치할 필요는 없습니다.
 하지만 `HTTP::Tiny`는 지속적으로 버전이 갱신되고 있으므로 가능하면 최신 버전으로 설치하도록 합니다.
@@ -40,7 +48,6 @@ perl의 내부 유니코드 속성에 대해 조금 깊게 들어다 보고 유�
     #!bash
     $ sudo cpan HTTP::Tiny Data::Printer
 
-
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
@@ -49,151 +56,164 @@ perl의 내부 유니코드 속성에 대해 조금 깊게 들어다 보고 유�
     $ cpan HTTP::Tiny Data::Printer
 
 
-정규표현식 비교의 함정
--------------------------
-perl에서는 특정 유니코드 문자에 매치시키기 위한 용도의 \u라는 메타문자가 있습니다. 
-보통 4자리 16진수로 주어지기 때문에 "\uD384"라고 하면 '펄'에 매치 시킬수가 있습니다. 
-이 때 중요한 것은 "\uD384"는 "U+D384"라는 유니코드 문자를 매치하라는 의미만 가질뿐 입니다. 
-실제로 비교할 바이트에 대한 내용은 전혀 지정하지 않는다는 점입니다. 
-실제 비교할 바이트는 프로그램 내부에서 유니코드 코드 포인트를 표기하기 위해 사용하는 인코딩 방법에 따라 달라지기 때문입니다.
-원래는 유니코드는 코드 포인트와 문자를 1:1로 대응시키기 위해 만든 것이지만 하나의 문자가 여러 방법으로 표현되는 경우도 많이 있습니다.
-예를 들어 'á' 는 a를 나타내는 U+0061과 '`'(액센트)를 나타내는 U+0300으로 구성됩니다. 
-하지만 U+00E0이라는 하나의 코드 포인트로 인코딩 될 수도 있습니다. 
-이렇게 여러 방법으로 인코딩 되기 때문에 실제적으로 정규표현식에의 유니코드 매칭은 달라 질 수 있습니다.
+유니코드와 `length` 내장 함수
+------------------------------
 
-간단히 입력한 문자를 단어 매치하는 프로그램을 만들어서 테스트를 해봅니다.
+펄에서의 문자열은 *바이트 문자열*과 *유니코드 문자열* 두 가지 유형이 있습니다.
+*유니코드 문자열*일 경우 *바이트 문자열*과 비교했을 때 바이트당 글자 길이가 다릅니다.
+다음은 *바이트 문자열*을 사용한 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
 
+    #
+    # FILE: unicode-1.pl
+    #
+
     use strict;
     use warnings;
 
-    chomp (my $input =(<DATA>));
+    my $x = '☺';
+    printf "%s(%d)\n", $x, length($x);
 
-    if ( $input =~ /\w+/ ) {
-        print "Matched $input\n";
-    }
-    else {
-        print "No Matched $input\n";
-    }
+실행하면 `length` 내장 함수는 유니코드가 아닌 경우 해당 문자열의 바이트 크기를 반환합니다.
 
+    #!bash
+    $ perl unicode-1.pl
+    ☺(3)
 
-   __DATA__
-   perl
-
-
-실행결과
-
-  #!bash
-  newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-  Matched perl
-
-입력 문자가 perl같으면 원하는 결과를 출력 할 수 있지만 숫자를 입력 했을때는 조금 이상한 결과가 출력됩니다.
+다음은 *유니코드 문자열*을 사용한 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
 
+    #
+    # FILE: unicode-2.pl
+    #
+
+    use utf8;
+    use strict;
+    use warnings;
+    use Encode qw( encode );
+
+    my $x = '☺';
+    printf "%s(%d)\n", encode( 'utf-8', $x ), length($x);
+
+실행하면 `length` 내장 함수는 유니코드일 경우 해당 문자열의 길이, 즉 글자 수를 반환합니다.
+
+    #!bash
+    $ perl unicode-2.pl
+    ☺(1)
+
+유니코드 문자열을 사용하기 위해 `use utf8;` 선언해서 `utf8` 프라그마를 켜고 있으며
+`Wide character ...` 경고를 방지하기 위해 출력 시점에 `Encode` 모듈을 이용해
+명확하게 출력할 터미널의 문자셋에 맞게 인코딩(예제에서는 리눅스기 때문에 UTF-8로 인코딩)합니다.
+`Wide character ...` 경고는 [2013년 펄 크리스마스 달력의 둘째 날 기사][advent-2013-12-02]를 참고하세요.
+
+
+유니코드와 `\w` 정규 표현식
+----------------------------
+
+펄에서는 특정 유니코드 문자에 일치시키기 위한 용도의 `\u`라는 메타 문자가 있습니다.
+보통 4자리 16진수로 표현하므로 `\uD384`는 유니코드 문자 `펄`에 일치시킬 수 있습니다.
+이 때 `\uD384`는 `U+D384`라는 유니코드 문자를 일치시키라는 의미만 가지며
+실제로 비교할 바이트에 대한 내용은 전혀 지정하지 않는다는 점이 중요합니다.
+실제 비교할 바이트는 프로그램 내부에서 유니코드 코드 포인트를 표기하기 위해 사용하는 인코딩 방법에 따라 달라집니다.
+원래는 유니코드는 코드 포인트와 문자를 1:1로 대응시키기 위해 만든 것이지만 하나의 문자를 다른 코드로 표현할 수도 있습니다.
+예를 들어 `U+00E0`인 `à`는 `a`를 나타내는 `U+0061`과 `̀\`를 나타내는 `U+0300`으로 구성됩니다.
+이렇게 여러 방법으로 인코딩될 수 있기 때문에 실제 정규 표현식에의 유니코드 일치 결과는 예상과 다를 수 있습니다.
+
+다음은 입력한 문자에 대해 단어를 일치시키는 간단한 프로그램입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: unicode-3.pl
+    #
+
+    use v5.14;
     use strict;
     use warnings;
 
-    chomp (my $input =(<DATA>));
+    chomp( my $input =(<DATA>) );
 
     if ( $input =~ /\w+/ ) {
-        print "Matched $input\n";
+        say "matched";
     }
     else {
-        print "No Matched $input\n";
+        say "not matched";
     }
 
     __DATA__
-    777777
+    ááá
 
-실행결과 
+실행 결과는 다음과 같습니다.
 
     #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    Matched 777777
+    $ ./unicode-3.pl
+    not matched
 
-단어(word)가 아님에도 매치가 됩니다.
-
-유니코드 캐릭터수 비교
-------------------------
-
-펄에서의 문자열은 두 가지 유형을 가지고 있습니다. 하나는 바이트 문자열 그리고 유니코드 문자열입니다.
-유니코드 문자열일경우 바이트 문자열보다 용량이 작을수 있습니다.  
-다음 예제를 살펴 봅니다.
-
-일반적인 바이트 스트림의 경우 입니다.
+보통 `\w+`를 이용해서 단어를 일치시키는데 `ááá`는 단어로 인식을 하지 못합니다.
+`\w`는 `[A-Za-z0-9_]`로 63개의 문자를 의미하기 때문에 `á`를 일치시키지 못한 것입니다.
+`length` 때와 마찬가지로 `utf8` 프라그마를 켜주면 `\w`가 알파벳 뿐만 아니라
+유니코드의 글자(letter) 영역까지 일치를 시켜줍니다.
 
     #!perl
     #!/usr/bin/env perl
 
-    use strict;
-    use warnings;
-    use Data::Printer;
+    #
+    # FILE: unicode-4.pl
+    #
 
-    my $x = '☺';
-    print length $x, " $x\n";
-
-출력은 3바이트 입니다.
-
-    #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl
-    3 ☺
-
-유니코드 문자열로 변환했을 경우 입니다.
-
-    #!perl
-    #!/usr/bin/env perl
-
-    use strict;
-    use warnings;
-    use Data::Printer;
+    use v5.14;
     use utf8;
+    use strict;
+    use warnings;
 
-    my $x = '☺';
-    print length $x, " $x\n";
+    chomp( my $input =(<DATA>) );
 
-출력은 1바이트 입니다.
+    if ( $input =~ /\w+/ ) {
+        say "matched";
+    }
+    else {
+        say "not matched";
+    }
+
+    __DATA__
+    ááá
+
+이제는 원하는대로 동작합니다. :)
 
     #!bash
-    Wide character in print at ./unicode.pl line 9.
-    1 ☺
+    $ perl unicode-3.pl
+    matched
 
-위에 Wide character in print at의 경고는 [2013년 펄 크리스마스 달력 2번째 기사][2013-12-02]를 참고 합니다.
-이와같이 유니코드를 사용했을시 여려가지 이점이 있습니다
 
-유니코드의 속성들
-------------------
-유니코드는 겉모양만 본다면 문자와 코드 사이의 대응관계(코드 포인트등)에 불과하다고 할 수도 있지만 유니코드 표준에는 사실 더 많은 내용이 숨어 있습니다.
- 예를 들어 "이 문자는 소문자이다", "이문자는 오른쪽에서 왼쪽으로 써야 한다", "이 문자는 다른 문자와 함께 쓰기 위해 만들어진 기호이다"와 같은 각 문자의 속성도 정의 되어 있습니다.
-perl은 이러한 유니코드의 속성을 활용 할 수 있게 설계되어 있습니다. 
-그 구분자가 바로 이번 주제의 주인공인 *"\pP"* 이 분이십니다.
+유니코드 속성
+--------------
 
-기본적인 속성은 아래와 같습니다.
+유니코드의 겉만 보면 문자와 코드 사이의 대응관계(코드포인트)에 불과하지만 이 안에는 사실 더 많은 내용이 들어있습니다.
+예를 들어 *"이 문자는 소문자이다"*라거나 *"이문자는 오른쪽에서 왼쪽으로 써야 한다"*,
+*"이 문자는 다른 문자와 함께 쓰기 위해 만들어진 기호이다"*와 같은 각 문자의 속성도 정의되어 있습니다.
+펄은 이러한 유니코드의 속성을 활용 할 수 있게 설계되어 있으며 `\p`나 `\P`를 사용해서 표현할 수 있습니다.
 
-- `\p{속성}` : 그 속성을 가지는 문자에 매치
-- `\P{속성}` : 그 속성을 가지지 않는 문자에 매치
-- `\p{L} or \p{Letter}` : 글자(letter)로 간주되는 모든 문자
-- `\p{M} or \p{Mark}` : 그 문자만 쓸수는 없고 다른 기본 문자와 함께 써야만 하는 문자 (e.g. accents, umlauts, enclosing boxes, etc.).
-- `\p{Z} or \p{Separator}` : 분리하는 역활을 할 뿐 화면에 표시할 수는 없는 문자(e.g. 공백문자등)
-- `\p{S} or \p{Symbol}` : 딩뱃(Dingbat) 문자 및 기호(딩맷은 조판 시에 사용하는 장식용 문자 e.g. ■, ○, ♥, ☎ 등)
-- `\p{N} or \p{Number}` : 숫자를 나타내는 문자
-- `\p{P} or \p{Punctuation}` : 문장부호
-- `\p{C} or \p{Other}`: 위에 있는 속성을 제외한 나머지 문자
+기본적인 속성은 다음과 같습니다.
 
-그럼 위의 \p{L}속성을 이용해서 위에 예제를 다시 한번 테스트를 해봅니다.
+- `\p{속성}`: 그 속성을 가지는 문자에 일치
+- `\P{속성}`: 그 속성을 가지지 않는 문자에 일치
+- `\p{L}` 또는 `\p{Letter}`: 글자(letter)로 간주되는 모든 문자
+- `\p{M}` 또는 `\p{Mark}`: 그 문자만 쓸수는 없고 다른 기본 문자와 함께 써야만 하는 문자 (예: accents, umlauts, enclosing boxes 등)
+- `\p{Z}` 또는 `\p{Separator}`: 분리하는 역활을 할 뿐 화면에 표시할 수는 없는 문자(예: 공백 문자 등)
+- `\p{S}` 또는 `\p{Symbol}`: 딩뱃(dingbat) 문자 및 기호(딩뱃은 조판 시에 사용하는 장식용 문자 예: ■, ○, ♥, ☎ 등)
+- `\p{N}` 또는 `\p{Number}`: 숫자를 나타내는 문자
+- `\p{P}` 또는 `\p{Punctuation}`: 문장 부호
+- `\p{C}` 또는 `\p{Other}`: 앞의 속성을 제외한 나머지 모든 문자
 
-    #!perl
-    if ( $input =~ /\w+/ ) {      =>      if ( $input =~ /\p{L}/ ) {    수정합니다.
-
-출력결과
-    #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    Matched perl
-
-정확히 글자만 매칭되어 출력되는 것을 확인할 수 있습니다.
+보통 `\w+`를 이용해서 단어를 일치시키는데 `\w`는 `[A-Za-z0-9_]`로 63개의 문자를 의미합니다.
+`utf8` 모드일 경우에는 알파벳 뿐만 아니라 유니코드의 글자(letter)까지 확장해서 일치를 시킵니다.
+하지만 단어이지만 숫자를 제외하고 일치시키고 싶다면 어떻게 해야할까요?
+`\w+`를 사용하는 대신 `\p{L}+`를 사용하면 되겠죠. :-)
 
 
 유니코드의 스크립트
@@ -206,162 +226,154 @@ perl은 이러한 유니코드의 속성을 활용 할 수 있게 설계되어 �
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: unicode-5.pl
+    #
+
+    use v5.14;
     use strict;
     use warnings;
-    use Data::Printer;
-    
-    binmode STDIN, "encoding(utf8)";
+
+    binmode STDIN,  "encoding(utf8)";
     binmode STDOUT, "encoding(utf8)";
-    
-    chomp (my $input =(<STDIN>));
-    
-    if ( $input =~ /\p{hangul}/ ) {
-    print "Korean Matched $input\n";
-    }
-    elsif ( $input =~ /\p{Latin}/ ) {
-    print "English Matched $input\n";
-    }
-    elsif ( $input =~ /\p{Greek}/ ) {
-    print "Greek Matched $input\n";
-    }
-    else {
-    print "No Matched $input\n";
-    }
-    
-출력(한글)
 
-    #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    당신을 사랑합니다
-    Korean Matched 당신을 사랑합니다
+    chomp( my $input =(<STDIN>) );
 
-출력(영어)
+    say "matched: korean($&)" while $input =~ /\p{Hangul}+/g;
+    say "matched: latin($&)"  while $input =~ /\p{Latin}+/g;
+    say "matched: greek($&)"  while $input =~ /\p{Greek}+/g;
 
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    i love you
-    English Matched i love you
+`binmode`의 두 번째 인자에 `encoding(...)`를 사용하면 지정한 인코딩에 맞게 적절히 인코딩/디코딩을 수행합니다.
+예제의 코드는 표준 입력으로 들어오는 것은 자동으로 디코드하고, 표준 출력으로 나가는 것은 자동으로 인코드합니다.
 
-출력(그리스어)
+다음은 실행 결과입니다.
 
-newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-Σ 'αγαπώ
-Greek Matched Σ 'αγαπώ
+    #!perl
+    $ perl a.pl
+    당신을 사랑합니다.  I love you.  Σ 'αγαπώ.
+    matched: korean(당신을)
+    matched: korean(사랑합니다)
+    matched: latin(I)
+    matched: latin(love)
+    matched: latin(you)
+    matched: greek(Σ)
+    matched: greek(αγαπώ)
 
-
-참고
-
-binmode는 표준입력 파일핸들과 표준출력 파일핸들에다가 encoding tag를 추가합니다.
-binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표준 출력으로 나가는건 자동으로 encode를 진행합니다.
+실행 시 한글과 영어 그리스어를 모두 입력하면 펄이 멋지게 분리시켜줍니다. :)
 
 
 크리스마스 선물 #1: 사전에서의 언어구분
 ----------------------------------------
-웹 문서에서 영어/일본어/한자등을 파싱 하고 싶을때는  \w를 쓰거나 약간 복잡한 /^[A-za-z]+$/ 등을 써야 합니다 .
-하지만 \p형식의 속성을 이용해서 간단히 파싱 할 수 있습니다.
 
-    #!perl
-    if ( $input =~  /^[A-za-z]+$/ ) #일반 정규표현식
-    if ( $input =~ /\p{Latin}/ ) #유니코드 정규표현식
-
-네이버 사전에서 예를 들어 설명 합니다. 아래는 한글/영어/일본어/한자등을 추출합니다.
+웹 문서에서 영어나 일본어, 한자 등을 인식하고 싶을 때는 `\w`를 쓰거나 복잡한 정규 표현식을 사용해야 합니다.
+하지만 `\p` 문법을 이용하면 간단히 일치시킬 수 있습니다.
+[네이버 사전][dic-naver]을 예를 들어보죠.
+다음은 한글과 영어, 일본어, 한자 등의 문자를 추출합니다.
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: naver-dic.pl
+    #
+
     use strict;
     use warnings;
-    use Encode;
-    use Data::Printer;
+
+    use Encode qw( decode );
     use HTTP::Tiny;
-    
-    my $word = shift @ARGV;
-    
+
+    die "Usage: $0 <word>\n" unless @ARGV == 1;
+
+    my $word = shift;
+
     my $url = "http://dic.naver.com/search.nhn?dicQuery=$word&query=$word&target=dic&ie=utf8&query_utf=&isOnlyViewEE=";
-    
+
     my $res = HTTP::Tiny->new->get($url);
-    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
-    
-    my $html = decode ( 'utf-8', $res->{content} );
-    
-    #한글만 가져오기
-    my @korean = $html =~ m{\p{Hangul}+}gsm;
-    print "@korean\n";
-    #영어만 가져오기
-    my @english = $html =~ m{\p{Latin}+}gsm;
-    print "@english\n";
-    #일본어만 가져오기
-    my @japanese = $html =~ m{\p{Katakana}+}gsm;
-    print "@japanese\n";
-    #한자만 가져오기
-    my @chinese = $html =~ m{\p{Han}+}gsm;
-    print "@chinese\n";
+    die "failed($res->{status}): $res->{reason}\n" unless $res->{success};
+
+    my $html = decode( 'utf-8', $res->{content} );
+
+    my @korean   = $html =~ m{\p{Hangul}+}gsm;      # 한글만 가져오기
+    my @english  = $html =~ m{\p{Latin}+}gsm;       # 영어만 가져오기
+    my @japanese = $html =~ m{\p{Katakana}+}gsm;    # 일본어만 가져오기
+    my @chinese  = $html =~ m{\p{Han}+}gsm;         # 한자만 가져오기
+
+이처럼 유니코드와 정규표현식을 잘 활용하면 손쉽게 각 언어별로 글자를 모아 2차 가공을 할 수 있습니다. :)
 
 
-이처럼 각 나라의 언어만을 모아서 2차가공이 쉽게 이루어 질 수 있습니다. 
+크리스마스 선물 #2: 본문 중간의 특수 문자 변경
+-----------------------------------------------
 
-
-크리스마스 선물 #2: 본문 중간에 있는 특수문자 변경
----------------------------------------------------
-
-웹문서나 일반문서를 가지고 가공할 일이 있을때 종종 본문 중간에 특수문자가 있을경우 애를 먹곤 합니다. 
-특수문자를 변경하거나 제거하는 기교를 살펴보겠습니다.
-특수문자를 변경하는 예제
+웹 문서나 일반 문서를 가공할 때 본문 중간에 특수 문자가 있어 애를 먹는 경우가 많습니다.
+이런 특수 문자를 모두 찾아 변경하거나 제거하면 예외 상황이 줄어들어 후처리하기 용이합니다.
+다음은 특수 문자를 변경하거나 제거하는 기교를 부린 짧은 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: love-perl.pl
+    #
+
+    use v5.14;
+    use utf8;
     use strict;
     use warnings;
-    use Data::Printer;
-    use utf8;
-    
+
+    binmode STDIN,  "encoding(utf8)";
+    binmode STDOUT, "encoding(utf8)";
+
     chomp (my $input =(<DATA>));
-    
-    if ( $input =~ s/(\p{Symbol})/Love/ ) {
-    print "$1\n";
-    }
-    print "$input\n";
-    
+
+    say $1 while $input =~ s/(\p{Symbol})/Love/g;
+    say $input;
+
     __DATA__
     I ♡ Perl.
-    
-    출력은 아래와 같습니다.
-    
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    Wide character in print at ./unicode.pl line 14, <DATA> line 1.
+
+다음은 실행한 결과입니다.
+
+    #!bash
+    $ perl a.pl
     ♡
     I Love Perl.
 
-제거하는 부분은 정규표현식 비교에서 Love대신에 $input =~ s/(\p{Symbol})// 와같이 변경 합니다.
 
 정리하며
 ---------
-perl에서는 내부의 유니코드 구현이 utf8로 되어 있기 때문에 유니코드 매칭을 자유롭게 활용 할 수 있습니다.
-유니코드 문자열을 사용하면 좀더 간단히 풍부한 정규표현식을 사용 할수 있습니다.
+
+유니코드 문자열을 사용하면 간단하면서도 풍부한 정규 표현식을 사용할 수 있습니다.
+펄은 내부의 유니코드 구현이 *UTF-8*로 되어있어 너무나도 자유롭게 유니코드 일치를 사용할 수 있죠.
+마치 *유니코드를 사용*하는데 있어 *펄은 거리낌이 없다*는 느낌이랄까요?
+
+Enjoy Unicode & Perl! ;-)
 
 
 참고문서
 ---------
 
-- [Unicode in Perl][unicode-in-perl] - [@aer0][twitter-aer0]
-- [Perl과 한글][perl-and-hangul] - [@gypark][twitter-gypark]
+- [Perl과 한글][aer0-perl-and-hangul] - [@gypark][twitter-gypark]
+- [Unicode in Perl][gypark-unicode-in-perl] - [@aer0][twitter-aer0]
 - [perldoc perlunicode][perldoc-perlunicode]
 - [perldoc perlunifaq][perldoc-perlunifaq]
 - [perldoc utf8][perldoc-utf8]
 
 
+[advent-2013-12-02]:      http://advent.perl.kr/2013/2013-12-02.html
+[aer0-unicode-in-perl]:   https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
 [cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
 [cpan]:                   http://www.cpan.org/
-[home-perlbrew]:                http://perlbrew.pl/
-[perl-and-hangul]:        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
+[dic-naver]:              http://dic.naver.com/
+[gypark-perl-and-hangul]: http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
+[home-perlbrew]:          http://perlbrew.pl/
 [perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
 [perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
 [perldoc-utf8]:           http://perldoc.perl.org/utf8.html
 [twitter-aer0]:           https://twitter.com/aer0
 [twitter-gypark]:         http://twitter.com/gypark
 [twitter-newbcode]:       http://twitter.com/newbcode
-[unicode-in-perl]:        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
+[wiki-unicode]:           http://en.wikipedia.org/wiki/Unicode
 [yes24-11040637]:         http://www.yes24.com/24/goods/11040637
-[2013-12-02]:             http://advent.perl.kr/2013/2013-12-02.html
