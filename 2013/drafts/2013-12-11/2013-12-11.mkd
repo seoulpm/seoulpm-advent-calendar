@@ -46,7 +46,6 @@ Author:   newbcode
     #!bash
     $ sudo cpan HTTP::Tiny Data::Printer
 
-
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
