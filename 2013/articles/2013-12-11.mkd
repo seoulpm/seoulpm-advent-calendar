@@ -31,7 +31,6 @@ Author:   newbcode
 
 필요한 모듈은 다음과 같습니다.
 
-- [CPAN의 Data::Printer 모듈][cpan-data-printer]
 - [CPAN의 Encode 모듈][cpan-encode]
 - [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
 
@@ -39,21 +38,18 @@ Author:   newbcode
 `HTTP::Tiny`의 경우 펄 5.14 이후 버전(정확히는 v5.13.9)의 경우
 코어 모듈로 지정되었으므로 역시 별도로 설치할 필요는 없습니다.
 하지만 `HTTP::Tiny`는 지속적으로 버전이 갱신되고 있으므로 가능하면 최신 버전으로 설치하도록 합니다.
-`Data::Printer` 모듈은 디버깅의 편의를 위해 필요한 모듈입니다.
-`print`나 `say`로도 충분하지만 이런 도구를 잘 활용한다면 자료를 시각적으로
-확인할 수 있기 때문에 문제가 생겼을때 빠른 시간에 문제를 해결할 수 있도록 도와줍니다.
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan HTTP::Tiny Data::Printer
+    $ sudo cpan HTTP::Tiny
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan HTTP::Tiny Data::Printer
+    $ cpan HTTP::Tiny
 
 
 유니코드와 `length` 내장 함수
@@ -363,7 +359,7 @@ Enjoy Unicode & Perl! ;-)
 
 [advent-2013-12-02]:      http://advent.perl.kr/2013/2013-12-02.html
 [aer0-unicode-in-perl]:   https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
-[cpan-data-printer]:      http://metacpan.org/module/Data::Printer
+[cpan-encode]:            http://metacpan.org/module/Encode
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
 [cpan]:                   http://www.cpan.org/
 [dic-naver]:              http://dic.naver.com/
