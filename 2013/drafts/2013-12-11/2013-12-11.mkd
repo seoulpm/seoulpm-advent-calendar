@@ -226,53 +226,41 @@ Author:   newbcode
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: unicode-5.pl
+    #
+
+    use v5.14;
     use strict;
     use warnings;
-    use Data::Printer;
-    
-    binmode STDIN, "encoding(utf8)";
+
+    binmode STDIN,  "encoding(utf8)";
     binmode STDOUT, "encoding(utf8)";
-    
-    chomp (my $input =(<STDIN>));
-    
-    if ( $input =~ /\p{hangul}/ ) {
-    print "Korean Matched $input\n";
-    }
-    elsif ( $input =~ /\p{Latin}/ ) {
-    print "English Matched $input\n";
-    }
-    elsif ( $input =~ /\p{Greek}/ ) {
-    print "Greek Matched $input\n";
-    }
-    else {
-    print "No Matched $input\n";
-    }
-    
-출력(한글)
 
-    #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    당신을 사랑합니다
-    Korean Matched 당신을 사랑합니다
+    chomp( my $input =(<STDIN>) );
 
-출력(영어)
+    say "matched: korean($&)" while $input =~ /\p{Hangul}+/g;
+    say "matched: latin($&)"  while $input =~ /\p{Latin}+/g;
+    say "matched: greek($&)"  while $input =~ /\p{Greek}+/g;
 
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    i love you
-    English Matched i love you
+`binmode`의 두 번째 인자에 `encoding(...)`를 사용하면 지정한 인코딩에 맞게 적절히 인코딩/디코딩을 수행합니다.
+예제의 코드는 표준 입력으로 들어오는 것은 자동으로 디코드하고, 표준 출력으로 나가는 것은 자동으로 인코드합니다.
 
-출력(그리스어)
+다음은 실행 결과입니다.
 
-newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-Σ 'αγαπώ
-Greek Matched Σ 'αγαπώ
+    #!perl
+    $ perl a.pl
+    당신을 사랑합니다.  I love you.  Σ 'αγαπώ.
+    matched: korean(당신을)
+    matched: korean(사랑합니다)
+    matched: latin(I)
+    matched: latin(love)
+    matched: latin(you)
+    matched: greek(Σ)
+    matched: greek(αγαπώ)
 
-
-참고
-
-binmode는 표준입력 파일핸들과 표준출력 파일핸들에다가 encoding tag를 추가합니다.
-binmode는 표준입력으로 들어오는 것은 자동으로 decode하고, 표준 출력으로 나가는건 자동으로 encode를 진행합니다.
+실행 시 한글과 영어 그리스어를 모두 입력하면 펄이 멋지게 분리시켜줍니다. :)
 
 
 크리스마스 선물 #1: 사전에서의 언어구분
