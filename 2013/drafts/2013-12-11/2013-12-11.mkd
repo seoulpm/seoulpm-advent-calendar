@@ -31,9 +31,11 @@ Author:   newbcode
 
 필요한 모듈은 다음과 같습니다.
 
-- [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
 - [CPAN의 Data::Printer 모듈][cpan-data-printer]
+- [CPAN의 Encode 모듈][cpan-encode]
+- [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
 
+`Encode` 모듈은 코어 모듈이므로 별도로 설치할 필요는 없습니다.
 `HTTP::Tiny`의 경우 펄 5.14 이후 버전(정확히는 v5.13.9)의 경우
 코어 모듈로 지정되었으므로 역시 별도로 설치할 필요는 없습니다.
 하지만 `HTTP::Tiny`는 지속적으로 버전이 갱신되고 있으므로 가능하면 최신 버전으로 설치하도록 합니다.
@@ -54,52 +56,56 @@ Author:   newbcode
     $ cpan HTTP::Tiny Data::Printer
 
 
-유니코드 캐릭터수 비교
-------------------------
+유니코드와 `length` 내장 함수
+------------------------------
 
-펄에서의 문자열은 두 가지 유형을 가지고 있습니다. 하나는 바이트 문자열 그리고 유니코드 문자열입니다.
-유니코드 문자열일경우 바이트 문자열보다 용량이 작을수 있습니다.  
-다음 예제를 살펴 봅니다.
-
-일반적인 바이트 스트림의 경우 입니다.
+펄에서의 문자열은 *바이트 문자열*과 *유니코드 문자열* 두 가지 유형이 있습니다.
+*유니코드 문자열*일 경우 *바이트 문자열*과 비교했을 때 바이트당 글자 길이가 다릅니다.
+다음은 *바이트 문자열*을 사용한 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
 
+    #
+    # FILE: unicode.pl
+    #
+
     use strict;
     use warnings;
-    use Data::Printer;
 
     my $x = '☺';
-    print length $x, " $x\n";
+    printf "%s(%d)\n", $x, length($x);
 
-출력은 3바이트 입니다.
+실행하면 `length` 내장 함수는 유니코드가 아닌 경우 해당 문자열의 바이트 크기를 반환합니다.
 
     #!bash
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl
-    3 ☺
+    $ ./unicode.pl
+    ☺(3)
 
-유니코드 문자열로 변환했을 경우 입니다.
+다음은 *유니코드 문자열*을 사용한 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
 
-    use strict;
-    use warnings;
-    use Data::Printer;
     use utf8;
+    use strict;
+    use warnings;
+    use Encode qw( encode );
 
     my $x = '☺';
-    print length $x, " $x\n";
+    printf "%s(%d)\n", encode( 'utf-8', $x ), length($x);
 
-출력은 1바이트 입니다.
+실행하면 `length` 내장 함수는 유니코드일 경우 해당 문자열의 길이, 즉 글자 수를 반환합니다.
 
     #!bash
-    Wide character in print at ./unicode.pl line 9.
-    1 ☺
+    $ ./unicode.pl
+    ☺(1)
 
-위에 Wide character in print at의 경고는 [2013년 펄 크리스마스 달력 2번째 기사][2013-12-02]를 참고 합니다.
-이와같이 유니코드를 사용했을시 여려가지 이점이 있습니다
+유니코드 문자열을 사용하기 위해 `use utf8;` 선언해서 `utf8` 프라그마를 켜고 있으며
+`Wide character ...` 경고를 방지하기 위해 출력 시점에 `Encode` 모듈을 이용해
+명확하게 출력할 터미널의 문자셋에 맞게 인코딩(예제에서는 리눅스기 때문에 UTF-8로 인코딩)합니다.
+`Wide character ...` 경고는 [2013년 펄 크리스마스 달력의 둘째 날 기사][advent-2013-12-02]를 참고하세요.
+
 
 유니코드의 속성들
 ------------------
@@ -288,10 +294,11 @@ perl에서는 내부의 유니코드 구현이 utf8로 되어 있기 때문에 �
 - [perldoc utf8][perldoc-utf8]
 
 
+[advent-2013-12-02]:      http://advent.perl.kr/2013/2013-12-02.html
 [cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
 [cpan]:                   http://www.cpan.org/
-[home-perlbrew]:                http://perlbrew.pl/
+[home-perlbrew]:          http://perlbrew.pl/
 [perl-and-hangul]:        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 [perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
 [perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
@@ -302,4 +309,3 @@ perl에서는 내부의 유니코드 구현이 utf8로 되어 있기 때문에 �
 [unicode-in-perl]:        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
 [wiki-unicode]:           http://en.wikipedia.org/wiki/Unicode
 [yes24-11040637]:         http://www.yes24.com/24/goods/11040637
-[2013-12-02]:             http://advent.perl.kr/2013/2013-12-02.html
