@@ -351,8 +351,8 @@ Enjoy Unicode & Perl! ;-)
 참고문서
 ---------
 
-- [Perl과 한글][aer0-perl-and-hangul] - [@gypark][twitter-gypark]
-- [Unicode in Perl][gypark-unicode-in-perl] - [@aer0][twitter-aer0]
+- [Perl과 한글][gypark-perl-and-hangul] - [@gypark][twitter-gypark]
+- [Unicode in Perl][aer0-unicode-in-perl] - [@aer0][twitter-aer0]
 - [perldoc perlunicode][perldoc-perlunicode]
 - [perldoc perlunifaq][perldoc-perlunifaq]
 - [perldoc utf8][perldoc-utf8]
