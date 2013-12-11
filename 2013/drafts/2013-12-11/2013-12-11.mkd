@@ -265,112 +265,115 @@ Author:   newbcode
 
 크리스마스 선물 #1: 사전에서의 언어구분
 ----------------------------------------
-웹 문서에서 영어/일본어/한자등을 파싱 하고 싶을때는  \w를 쓰거나 약간 복잡한 /^[A-za-z]+$/ 등을 써야 합니다 .
-하지만 \p형식의 속성을 이용해서 간단히 파싱 할 수 있습니다.
 
-    #!perl
-    if ( $input =~  /^[A-za-z]+$/ ) #일반 정규표현식
-    if ( $input =~ /\p{Latin}/ ) #유니코드 정규표현식
-
-네이버 사전에서 예를 들어 설명 합니다. 아래는 한글/영어/일본어/한자등을 추출합니다.
+웹 문서에서 영어나 일본어, 한자 등을 인식하고 싶을 때는 `\w`를 쓰거나 복잡한 정규 표현식을 사용해야 합니다.
+하지만 `\p` 문법을 이용하면 간단히 일치시킬 수 있습니다.
+[네이버 사전][dic-naver]을 예를 들어보죠.
+다음은 한글과 영어, 일본어, 한자 등의 문자를 추출합니다.
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: naver-dic.pl
+    #
+
     use strict;
     use warnings;
-    use Encode;
-    use Data::Printer;
+
+    use Encode qw( decode );
     use HTTP::Tiny;
-    
-    my $word = shift @ARGV;
-    
+
+    die "Usage: $0 <word>\n" unless @ARGV == 1;
+
+    my $word = shift;
+
     my $url = "http://dic.naver.com/search.nhn?dicQuery=$word&query=$word&target=dic&ie=utf8&query_utf=&isOnlyViewEE=";
-    
+
     my $res = HTTP::Tiny->new->get($url);
-    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
-    
-    my $html = decode ( 'utf-8', $res->{content} );
-    
-    #한글만 가져오기
-    my @korean = $html =~ m{\p{Hangul}+}gsm;
-    print "@korean\n";
-    #영어만 가져오기
-    my @english = $html =~ m{\p{Latin}+}gsm;
-    print "@english\n";
-    #일본어만 가져오기
-    my @japanese = $html =~ m{\p{Katakana}+}gsm;
-    print "@japanese\n";
-    #한자만 가져오기
-    my @chinese = $html =~ m{\p{Han}+}gsm;
-    print "@chinese\n";
+    die "failed($res->{status}): $res->{reason}\n" unless $res->{success};
+
+    my $html = decode( 'utf-8', $res->{content} );
+
+    my @korean   = $html =~ m{\p{Hangul}+}gsm;      # 한글만 가져오기
+    my @english  = $html =~ m{\p{Latin}+}gsm;       # 영어만 가져오기
+    my @japanese = $html =~ m{\p{Katakana}+}gsm;    # 일본어만 가져오기
+    my @chinese  = $html =~ m{\p{Han}+}gsm;         # 한자만 가져오기
+
+이처럼 유니코드와 정규표현식을 잘 활용하면 손쉽게 각 언어별로 글자를 모아 2차 가공을 할 수 있습니다. :)
 
 
-이처럼 각 나라의 언어만을 모아서 2차가공이 쉽게 이루어 질 수 있습니다. 
+크리스마스 선물 #2: 본문 중간의 특수 문자 변경
+-----------------------------------------------
 
-
-크리스마스 선물 #2: 본문 중간에 있는 특수문자 변경
----------------------------------------------------
-
-웹문서나 일반문서를 가지고 가공할 일이 있을때 종종 본문 중간에 특수문자가 있을경우 애를 먹곤 합니다. 
-특수문자를 변경하거나 제거하는 기교를 살펴보겠습니다.
-특수문자를 변경하는 예제
+웹 문서나 일반 문서를 가공할 때 본문 중간에 특수 문자가 있어 애를 먹는 경우가 많습니다.
+이런 특수 문자를 모두 찾아 변경하거나 제거하면 예외 상황이 줄어들어 후처리하기 용이합니다.
+다음은 특수 문자를 변경하거나 제거하는 기교를 부린 짧은 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
-    
+
+    #
+    # FILE: love-perl.pl
+    #
+
+    use v5.14;
+    use utf8;
     use strict;
     use warnings;
-    use Data::Printer;
-    use utf8;
-    
+
+    binmode STDIN,  "encoding(utf8)";
+    binmode STDOUT, "encoding(utf8)";
+
     chomp (my $input =(<DATA>));
-    
-    if ( $input =~ s/(\p{Symbol})/Love/ ) {
-    print "$1\n";
-    }
-    print "$input\n";
-    
+
+    say $1 while $input =~ s/(\p{Symbol})/Love/g;
+    say $input;
+
     __DATA__
     I ♡ Perl.
-    
-    출력은 아래와 같습니다.
-    
-    newbcode@newb-dt:~/perl_test$ ./unicode.pl 
-    Wide character in print at ./unicode.pl line 14, <DATA> line 1.
+
+다음은 실행한 결과입니다.
+
+    #!bash
+    $ perl a.pl
     ♡
     I Love Perl.
 
-제거하는 부분은 정규표현식 비교에서 Love대신에 $input =~ s/(\p{Symbol})// 와같이 변경 합니다.
 
 정리하며
 ---------
-perl에서는 내부의 유니코드 구현이 utf8로 되어 있기 때문에 유니코드 매칭을 자유롭게 활용 할 수 있습니다.
-유니코드 문자열을 사용하면 좀더 간단히 풍부한 정규표현식을 사용 할수 있습니다.
+
+유니코드 문자열을 사용하면 간단하면서도 풍부한 정규 표현식을 사용할 수 있습니다.
+펄은 내부의 유니코드 구현이 *UTF-8*로 되어있어 너무나도 자유롭게 유니코드 일치를 사용할 수 있죠.
+마치 *유니코드를 사용*하는데 있어 *펄은 거리낌이 없다*는 느낌이랄까요?
+
+Enjoy Unicode & Perl! ;-)
 
 
 참고문서
 ---------
 
-- [Unicode in Perl][unicode-in-perl] - [@aer0][twitter-aer0]
-- [Perl과 한글][perl-and-hangul] - [@gypark][twitter-gypark]
+- [Perl과 한글][aer0-perl-and-hangul] - [@gypark][twitter-gypark]
+- [Unicode in Perl][gypark-unicode-in-perl] - [@aer0][twitter-aer0]
 - [perldoc perlunicode][perldoc-perlunicode]
 - [perldoc perlunifaq][perldoc-perlunifaq]
 - [perldoc utf8][perldoc-utf8]
 
 
 [advent-2013-12-02]:      http://advent.perl.kr/2013/2013-12-02.html
+[aer0-unicode-in-perl]:   https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
 [cpan-data-printer]:      http://metacpan.org/module/Data::Printer
 [cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
 [cpan]:                   http://www.cpan.org/
+[dic-naver]:              http://dic.naver.com/
+[gypark-perl-and-hangul]: http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 [home-perlbrew]:          http://perlbrew.pl/
-[perl-and-hangul]:        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
 [perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
 [perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
 [perldoc-utf8]:           http://perldoc.perl.org/utf8.html
 [twitter-aer0]:           https://twitter.com/aer0
 [twitter-gypark]:         http://twitter.com/gypark
 [twitter-newbcode]:       http://twitter.com/newbcode
-[unicode-in-perl]:        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
 [wiki-unicode]:           http://en.wikipedia.org/wiki/Unicode
 [yes24-11040637]:         http://www.yes24.com/24/goods/11040637
