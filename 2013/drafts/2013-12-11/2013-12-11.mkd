@@ -67,7 +67,7 @@ Author:   newbcode
     #!/usr/bin/env perl
 
     #
-    # FILE: unicode.pl
+    # FILE: unicode-1.pl
     #
 
     use strict;
@@ -79,13 +79,17 @@ Author:   newbcode
 실행하면 `length` 내장 함수는 유니코드가 아닌 경우 해당 문자열의 바이트 크기를 반환합니다.
 
     #!bash
-    $ ./unicode.pl
+    $ perl unicode-1.pl
     ☺(3)
 
 다음은 *유니코드 문자열*을 사용한 예제입니다.
 
     #!perl
     #!/usr/bin/env perl
+
+    #
+    # FILE: unicode-2.pl
+    #
 
     use utf8;
     use strict;
@@ -98,13 +102,92 @@ Author:   newbcode
 실행하면 `length` 내장 함수는 유니코드일 경우 해당 문자열의 길이, 즉 글자 수를 반환합니다.
 
     #!bash
-    $ ./unicode.pl
+    $ perl unicode-2.pl
     ☺(1)
 
 유니코드 문자열을 사용하기 위해 `use utf8;` 선언해서 `utf8` 프라그마를 켜고 있으며
 `Wide character ...` 경고를 방지하기 위해 출력 시점에 `Encode` 모듈을 이용해
 명확하게 출력할 터미널의 문자셋에 맞게 인코딩(예제에서는 리눅스기 때문에 UTF-8로 인코딩)합니다.
 `Wide character ...` 경고는 [2013년 펄 크리스마스 달력의 둘째 날 기사][advent-2013-12-02]를 참고하세요.
+
+
+유니코드와 `\w` 정규 표현식
+----------------------------
+
+펄에서는 특정 유니코드 문자에 일치시키기 위한 용도의 `\u`라는 메타 문자가 있습니다.
+보통 4자리 16진수로 표현하므로 `\uD384`는 유니코드 문자 `펄`에 일치시킬 수 있습니다.
+이 때 `\uD384`는 `U+D384`라는 유니코드 문자를 일치시키라는 의미만 가지며
+실제로 비교할 바이트에 대한 내용은 전혀 지정하지 않는다는 점이 중요합니다.
+실제 비교할 바이트는 프로그램 내부에서 유니코드 코드 포인트를 표기하기 위해 사용하는 인코딩 방법에 따라 달라집니다.
+원래는 유니코드는 코드 포인트와 문자를 1:1로 대응시키기 위해 만든 것이지만 하나의 문자를 다른 코드로 표현할 수도 있습니다.
+예를 들어 `U+00E0`인 `à`는 `a`를 나타내는 `U+0061`과 `̀\`를 나타내는 `U+0300`으로 구성됩니다.
+이렇게 여러 방법으로 인코딩될 수 있기 때문에 실제 정규 표현식에의 유니코드 일치 결과는 예상과 다를 수 있습니다.
+
+다음은 입력한 문자에 대해 단어를 일치시키는 간단한 프로그램입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: unicode-3.pl
+    #
+
+    use v5.14;
+    use strict;
+    use warnings;
+
+    chomp( my $input =(<DATA>) );
+
+    if ( $input =~ /\w+/ ) {
+        say "matched";
+    }
+    else {
+        say "not matched";
+    }
+
+    __DATA__
+    ááá
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./unicode-3.pl
+    not matched
+
+보통 `\w+`를 이용해서 단어를 일치시키는데 `ááá`는 단어로 인식을 하지 못합니다.
+`\w`는 `[A-Za-z0-9_]`로 63개의 문자를 의미하기 때문에 `á`를 일치시키지 못한 것입니다.
+`length` 때와 마찬가지로 `utf8` 프라그마를 켜주면 `\w`가 알파벳 뿐만 아니라
+유니코드의 글자(letter) 영역까지 일치를 시켜줍니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: unicode-4.pl
+    #
+
+    use v5.14;
+    use utf8;
+    use strict;
+    use warnings;
+
+    chomp( my $input =(<DATA>) );
+
+    if ( $input =~ /\w+/ ) {
+        say "matched";
+    }
+    else {
+        say "not matched";
+    }
+
+    __DATA__
+    ááá
+
+이제는 원하는대로 동작합니다. :)
+
+    #!bash
+    $ perl unicode-3.pl
+    matched
 
 
 유니코드 속성
