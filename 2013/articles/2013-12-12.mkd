@@ -4,6 +4,10 @@ Category: perl
 Category: Seoul.pm
 Author:   John Kang
 
+## 저자
+
+John_Kang - SE, Seoul.pm의 철권 2번 타자
+
 
 시작하며
 ---------
