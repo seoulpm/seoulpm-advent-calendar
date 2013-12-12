@@ -20,34 +20,41 @@ Author:   John Kang
 외부 명령어를 실행하는지에 대한 의문은 각각의 차이점을 먼저 비교해보고 설명하겠습니다.
 
 
-system() 함수
---------------
+system 내장 함수
+-----------------
 
-system 함수는 perl의 코어 함수로써 외부명령어를 실행 시킬 수 있습니다.
-
-`사용방법`
-    system LIST
-    system PROGRAM LIST
+`system` 함수는 펄의 내장 함수로써 외부 명령어를 실행시킬 수 있습니다.
+사용방법은 다음과 같습니다.
 
     #!perl
+    #
+    # system LIST
+    # system PROGRAM LIST
+    #
     my $exit_status = system('ls');
-    - return : $exit_status, $?
-    - stdout : STDOUT
-    - stderr : STDERR
+    #
+    # return : $exit_status, $?
+    # stdout : STDOUT
+    # stderr : STDERR
+    #
  
-system() 함수의 리턴은 외부명령어가 반환한 종료 값입니다.
-따라서 $exit_status 는 ls 명령어의 종료값을 담게 됩니다.
-성공적으로 명령어가 종료 됬다면, 0값이 담기게 됩니다.
+`system` 함수의 반환값은 외부 명령어가 반환한 종료값입니다.
+따라서 `$exit_status`는 `ls` 명령어의 종료값을 담습니다.
+대부분의 운영제체에서 외부 명령어의 정상적인 종료 코드는 `0`이기 때문에 `system` 함수에서
+실행한 외부 명령이 성공적으로 종료되면 `system`의 반환값은 `0`이 됩니다.
 
-system() 함수는 fork를 통해서 자식 프로세스를 생성하고 자식프로세스에서 외부 명령어를 실행합니다.
-init --> perl --> ls
-이때 사용자가 임의로 표준출력과 표준에러의 파일핸들을 수정하지 않았다면,
-ls 명령어의 표준출력은 펄의 STDOUT(1)으로, 에러는 펄의 STDERR(2)로 보내집니다.
+`system` 함수는 `fork`를 이용해 자식 프로세스를 생성하고 자식 프로세스에서 외부 명령어를 실행합니다.
 
-fileno 함수를 이용하면 해당 파일 핸들의 fd 값을 알수 있습니다.
+    #!plain
+    init --> perl --> ls
+
+이 때 사용자가 임의로 표준 출력과 표준 에러의 파일 핸들을 수정하지 않았다면,
+`ls` 명령어의 표준 출력은 *펄의 표준 출력(1)*으로, 에러는 *펄의 표준 에러(2)*를 상속 받습니다.
+[fileno 내장 함수][perldoc-fileno]를 이용하면 해당 파일 핸들의 파일 디스크립터 값을 알 수 있습니다.
 
     #!perl
     print fileno STDOUT ## 1
+
 
 빽틱 (``)
 ----------
@@ -283,9 +290,10 @@ SunOS, Solaris, HP-UX의 O/S 에서는 이를 고려 하여야 합니다.
 
 _EOT_
 
-[cpan]:                 https://metacpan.org
 [cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
 [cpan-leaderboard]:     https://metacpan.org/favorite/leaderboard
+[cpan]:                 https://metacpan.org
+[perldoc-fileno]:       http://perldoc.perl.org/functions/fileno.html
 [perldoc-open]:         http://perldoc.perl.org/functions/open.html
 [perldoc-system]:       http://perldoc.perl.org/functions/system.html
 [perlop-string]:        http://perldoc.perl.org/perlop.html#%60STRING%60
