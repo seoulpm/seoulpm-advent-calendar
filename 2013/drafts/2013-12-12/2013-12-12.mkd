@@ -153,32 +153,44 @@ system 내장 함수
 Capture::Tiny
 --------------
 
-위의 방법만으로도 충분히 외부 명령어를 실행 시키는데 큰 무리는 없습니다.
+사실 위의 방법만으로도 외부 명령어를 실행 시키기에 충분하며 별 무리는 없습니다.
+하지만 어떤 외부 명령어는 실행 중 표준 출력과 표준 에러가 동시에 발생하며
+이것을 각각 별도로 처리해야 할 경우도 있죠.
+지금까지 설명한 방법으로 표준 출력과 표준 에러 및 반환값까지 각각 처리하려면
+꽤 세부적인 이해와 많은 양의 코드가 필요(불가능하다는 뜻이 아님)합니다.
 
-허나 어떤 외부명령어는 실행중 표준출력과 표준에러가 동시에 발생하기도 합니다.
+하지만 이런 류의 일은 꽤나 전형적이죠.
+이미 이런 상황을 대비한 모듈이 CPAN에는 있지 않을까요? :-)
 
-위의 방법으로는 표준출력과 에러를 다른 변수에 각각 저장하기에는 프로그래머의 많은 코딩을 요구 합니다.
-(사실 어떤 노력이 필요 한지 모릅니다;;)
+지금부터 살펴 볼 모듈은 [CPAN의 Capture::Tiny 모듈][cpan-capture-tiny]입니다.
+[2013년 펄 크리스마스 달력의 셋째 날 기사][advent-2013-12-03]를 참고해보면
+`Capture::Tiny`는 [43위에 랭크][leaderboard-cpan] 되어있습니다.
+수없이 많은 모듈 중 100위권 안의 모듈은 어느 정도 안심하고 사용할 수 있겠죠?
 
-펄에는 CPAN 이 있습니다!!
+`Capture::Tiny` 모듈은 다음과 같은 장점을 가집니다.
 
-JEEN_LEE 님께서 작성해주신 셋째날의 기사를 참고해보면 Capture::Tiny는 [43위에 랭크][cpan-leaderboard] 되어있고, 아래와 같은 이점이 있습니다.
+- 이식성이 높음
+- 펄과 XS 코드, 외부 명령어에서 반환하는 표준 출력과 표준 에러를 갈무리함
+- `tee` 함수를 사용해 표준 출력, 표준 에러를 변수에 담는 것은 물론 동시에 원래의 표준 출력과 표준 에러로 출력함
 
-- Perl, XS 코드 또는 외부명령어에서 반환하는 표준출력과 표준에러를 Capture 하는 portable한 방법을 제공.
-- tee라는 함수를 사용하여 표준출력, 표준에러를 변수에 담는것은 물론 동시에 원래의 STDOUT, STDERR로 출력.
+다음은 `Capture::Tiny` 모듈을 사용한 간단한 예제입니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
     use autodie;
     use Capture::Tiny ':all';
 
     my @cmd = qw( find /proc -type f );
-    my ($stdout, $stderr, $exit) = capture {
+    my ( $stdout, $stderr, $exit ) = capture {
         system @cmd;
     };
 
- system() 함수의 결과를 통해 capture함수가 표준출력, 표준에러 그리고 외부명령어의 종료값을 반환합니다.
+`capture`함수가 `system` 함수의 표준 출력, 표준 에러 그리고 외부 명령어의 종료값을 반환합니다.
 
- 그리고 우리는 표준출력과 에러를 구분해서 사용할 수 있습니다.
+심지어 `capture` 함수에 `stdout`과 `stderr` 인자를 넘겨주면 표준 출력과 표준 에러를 구분해서 사용할 수 있습니다.
 
     #!perl
     my $out_fh = IO::File->new("out.log", "w+");
@@ -186,22 +198,18 @@ JEEN_LEE 님께서 작성해주신 셋째날의 기사를 참고해보면 Captur
 
     my @cmd = qw( find /proc -type f );
     capture { system @cmd } stdout => $out_fh, stderr => $err_fh;
-
-위와 같이 capture 함수에 옵션을 제공함으로써 stdout과 stderr를 파일에 쓸수 있습니다.
  
-어떤 명령어는 실행 도중에 변수에도 저장하고 기존의 표준출력과 에러의 출력방향은 모니터를 통해
-실시간으로 확인하고 싶을 수도 있습니다.
+어떤 명령어는 실행 도중에 출력 결과를 변수에도 저장하고 기존의 표준 출력과 표준 에러로
+계속 출력시켜 실시간으로 확인하고 싶을 수도 있습니다.
 
     #!perl
     my @cmd = qw( find /proc -type f );
-    my ($stdout, $stderr, @result) = tee {
+    my ( $stdout, $stderr, @result ) = tee {
         system @cmd;
     };
 
-위의 tee 함수가 그러한 역활을 하고 있습니다. 각각의 출려과 에러를 $stdout, $stderr에 저장하며
- 기존의 출력방향으로 그 내용을 출력해 줍니다.
- 
-위의 언급한 두가자의 특징을 [Capture::Tiny][cpan-capture-tiny]를 통해 좀 더 디테일하게(표준 출력 혹은 에러만 핸들링) 사용 하실수 있습니다.
+`tee` 함수는 각각의 표준 출력과 에러를 `$stdout`과 `$stderr`에
+저장함과 동시에 기존의 출력 방향으로도 그대로 출력해줍니다.
  
 
 그밖의 주의 사항!
@@ -290,10 +298,12 @@ SunOS, Solaris, HP-UX의 O/S 에서는 이를 고려 하여야 합니다.
 
 _EOT_
 
+
+[advent-2013-12-03]:    http://advent.perl.kr/2013/2013-12-03.html
 [cpan-autodie]:         https://metacpan.org/favorite/autodie
 [cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
-[cpan-leaderboard]:     https://metacpan.org/favorite/leaderboard
 [cpan]:                 https://metacpan.org
+[leaderboard-cpan]:     https://metacpan.org/favorite/leaderboard
 [perldoc-fileno]:       http://perldoc.perl.org/functions/fileno.html
 [perldoc-open]:         http://perldoc.perl.org/functions/open.html
 [perldoc-system]:       http://perldoc.perl.org/functions/system.html
