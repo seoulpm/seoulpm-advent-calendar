@@ -105,44 +105,49 @@ system 내장 함수
     my $output_string = qx'ps $$';
 
 
-open() 함수를 이용하여 pipe 열기
----------------------------------
+`open` 함수로 파이프 열기
+--------------------------
 
-pipe를 이용하여 외부 명령어와 데이터를 주고받을수 있습니다.
+전통적으로 파이프를 이용하면 외부 명령어와 데이터를 주고받을 수 있습니다.
+`open` 내장 함수로 파이프를 열 수 있는데 이때 두 번째 인자에 따라
+파이프 생성 및 모드를 지정할 수 있습니다.
+두번째 인자의 앞 부분에 `|` 기호를 사용하면 쓰기 모드로 파이프를 생성하며
+뒷 부분에 `|` 기호가 오면 읽기 모드로 파이프를 생성합니다.
 
-open 함수로 pipe를 열때 두번째 인자를 검사합니다.
-
-두번째 인자의
-
-앞부분에 | 기호가 오면 쓰기 모드로 pipe를 생성하며
-
-뒷부분에 | 기호가 오면 읽기 모드로 pipe를 생성합니다.
-
-현재 디렉토리에서 30일이 지난 파일(.log)을 삭제 하는 간단한 프로그램을 만들어 보겠습니다.
+다음은 현재 디렉터리에서 30일이 지난 로그 파일을 삭제하는 간단한 프로그램입니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
     open( my $pipe, 'ls |' ) or die "Can't open a pipe : $!\n";
     while (<$pipe>) {
         chomp;                    ## 파일명뒤의 개행(\n) 삭제
+
         next unless -f;           ## 파일만 추출
         next unless /\.log$/i;    ## *.log 파일만 추출
+
         unlink if -M > 30;        ## -M 으로 파일변경시간 확인(in day)후 삭제
     }
-    
-open 함수의 에러 발생시 $! 변수를 통하여 에러 확인을 할 수 있습니다.
 
+`open` 함수를 실행하는 중에 오류가 발생할 경우 `$!` 변수를 확인해 어떤 오류가 발생했는지 확인할 수 있습니다.
 
-/bin/mail 을 통해 간단한 메일 보내기
+다음은 `/bin/mail` 명령을 이용해 메일을 보내는 예제입니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
     use autodie;
+
     open( my $body, '| /bin/mail -s Subject mail@domail.com' );
     print {$body} 'Hi There, I hope you are doing well :)';
 
-
-autodie 프라그마를 통해 open 함수의 에러 핸들링을 자동화 했습니다.
- 
-$body 라는 파이프를 통해 입력 결과를 /bin/mail 에게 전달하였습니다.
+예제는 `$body` 파이프를 통해 입력 결과를 `/bin/mail`에게 전달합니다.
+[autodie 프라그마][cpan-autodie]를 통해 `open` 함수의 오류 제어를 자동화하면 편리합니다.
 
 
 Capture::Tiny
@@ -285,6 +290,7 @@ SunOS, Solaris, HP-UX의 O/S 에서는 이를 고려 하여야 합니다.
 
 _EOT_
 
+[cpan-autodie]:         https://metacpan.org/favorite/autodie
 [cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
 [cpan-leaderboard]:     https://metacpan.org/favorite/leaderboard
 [cpan]:                 https://metacpan.org
