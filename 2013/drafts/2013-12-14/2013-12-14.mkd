@@ -1,0 +1,652 @@
+Title:    Mojo Start
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   rumidier
+
+
+저자
+-----
+
+[@rumidier][twitter-rumidier] - 서산 야생마 가슴속에 화난새 키우는 어른이
+
+
+시작하며
+---------
+
+Perl에는 많은 웹프레임워크가 있습니다.
+그중에서 [Catalyst][cpan-catalyst] [Dancer][cpan-dancer] [Mojolicious][mojolicious]
+세가지를 많이 거론합니다.
+
+무거운 웹페이지는 Catalyst로 작지만 강한 Dancer
+기사에서 다룰 즐거운 웹개발을 위한 Mojolicious(이하 Mojo)
+가깝게 [Seoul.pm 크리스마스 달력][advent-calendar]이 Mojo로 작성되었습니다.
+
+Mojo는 가볍고 다루기 쉽다고 말합니다.
+가볍고 다루기 쉬운 Mojo이고 [Mojolicious][mojolicious]에 문서화가 잘되있어 튜토리얼만 따라해도
+사용 가능하지만 웹에 무지 하다면 사용하기 까다롭습니다.
+
+문서를 보고 어떻게 시작해야 될지 모르는 분들에게 이글을 바칩니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [Mojolicious::Lite][cpan-mojolicious-lite]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Mojolicious::Lite
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Mojolicious::Lite
+    
+
+사용 방법
+----------
+
+다음의`generate` 명령어를 사용해 `myapp.pl`을 생성합니다.
+
+    #!bash
+    mojo-test $ mojo generate lite_app myapp.pl
+      [exist] /Users/mojo-test
+      [write] /Users/mojo-test/myapp.pl
+      [chmod] myapp.pl 744
+
+
+기본으로 생성되는 `myapp.pl` 실행은 다음과 같습니다.
+`http://*:3000`이 사용됩니다.
+
+    #!bash
+    $ morbo myapp.pl
+    Listening at "http://*:3000".
+    Server available at http://127.0.0.1:3000.
+
+
+포트를 지정하고자 하면 다음과 같습니다.
+
+    #!bash
+    $ morbo myapp.pl -l http://*:5001
+    Listening at "http://*:5001".
+    Server available at http://127.0.0.1:5001.
+
+접속시 다음과 같이 화면을 확인할 수 있습니다.
+
+![Mojolicious Lite 실행화면][img-1-resize]
+*그림 1.* Mojolicious Lite 실행화면 ([원본][img-1])
+
+Mojo를 사용할 수 있는 환경이 마련되었습니다.
+'GET/POST'를 활용한 '읽기', '쓰기', '수정', '삭제' 기능을
+게시판 형식을 만들어 가며 익혀보겠습니다.
+
+
+쓰기
+-----
+
+웹페이지에서 쓰기 기능을 사용하기 위해서는 글쓰기 양식을
+확인하는 페이지와 양식에서 입력 되는 정보를 저장하는 기능이
+필요합니다
+
+GET/POST
+입력을 위한 페이지는 `GET`으로 호출합니다.
+
+    #!perl
+    get '/write' => sub {
+      my $self = shift;
+    
+      $self->render('write');
+    };
+
+![Memo 쓰기화면][img-2-resize]
+*그림 2.* Memo 쓰기화면 ([원본][img-2])
+
+메모 쓰기 html 양식 입니다.
+'이름', '제목', '내용' 세가지를 입력합니다.
+
+    #!perl
+    @@ write.html.ep
+    % layout 'default';
+    % title 'WRITE';
+
+      <form action="/write" method="post">
+        <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
+          <tr>
+            <td height=20 colspan=4 align=center bgcolor=#999999>
+              <font color=white><b>글쓰기</b></font>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor=white>
+              <table bgcolor=white>
+                <tr>
+                  <td>이름</td>
+                  <td><input type="text" name="name"></td>
+                </tr>
+                <tr>
+                  <td>제목</td>
+                  <td><input type="text" name="title"></td>
+                </tr>
+                <tr>
+                  <td>내용</td>
+                  <td colspan=4>
+                    <textarea name="content" cols=80 rows=5></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan=10 align=center>
+                    <input type="submit" value="저장">
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        <tr>
+          <td bgcolor=#999999>
+            <table width=100%>
+              <tr>
+                <td>
+                  <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        </table>
+      </form>
+
+`POST`로 전달된 값들은 `$self->param('name');`으로 값을 얻을수 있습니다.
+`GET`으로 하느냐 `POST`로 하느냐에 따라서 같은 `'/write'` 경로라도 분리되서
+동작합니다.
+
+    #!perl
+    post '/write' => sub {
+        my $self = shift;
+    
+        my $name    = $self->param('name');
+        my $title   = $self->param('title');
+        my $content = $self->param('content');
+    
+        my $sth = $DBH->prepare(qq{
+            INSERT INTO `memo` (`name`,`title`,`content`) VALUES (?,?,?)
+        });
+        $sth->execute( $name, $title, $content );
+    
+        $self->redirect_to( $self->url_for('/list') );
+    };
+
+글 확인, 수정, 삭제의 동작을 위해 어딘가에 저장합니다.
+[DBI][cpan-dbi]를 사용해 DB에 저장하도록 합니다.
+
+DB 사용을 위해 `mysql`을 사용합니다.
+database 이름을 `Book`을 생성합니다.
+
+    #!bash
+    $ mysql -u root -p
+    mysql $ create database Book;
+
+생성된 database에 `memo` 테이블을 생성합니다.
+
+    #!sql
+    CREATE TABLE `memo` (
+      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+      `name` varchar(20) NOT NULL DEFAULT '',
+      `title` varchar(70) NOT NULL,
+      `content` text NOT NULL,
+      `wdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+   
+Mojo에서 db연결 방법입니다 다음을 추가합니다.
+
+    #!perl
+    use DBI;
+    
+    my $DBH = DBI->connect(
+        'dbi:mysql:Book',
+        'root',
+        q{},
+        {
+            RaiseError        => 1,
+            AutoCommit        => 1,
+            mysql_enable_utf8 => 1,
+        },
+    );
+
+`param` 으로 얻어진 값을 `DBI` 명령어를 통해 저장합니다. 사용법은 다음과 같습니다.
+
+    #!perl
+    my $sth = $DBH->prepare(qq{
+    	INSERT INTO `memo` (`name`,`title`,`content`) VALUES (?,?,?)
+    });
+    $sth->execute( $name, $title, $content );
+
+`DBI`가 옳바르게 동작하면 `DB`에 다음과 같이 저장됩니다.
+
+    #!plain
+    mysql> mysql> select * from memo where id=1;
+    +----+----------+--------------+------------------------------------------------------------------+---------------------+
+    | id | name     | title        | content                                                          | wdate               |
+    +----+----------+--------------+------------------------------------------------------------------+---------------------+
+    |  1 | rumidier | book-test-01 | 웹페이지 제작을 위해 Mojo를 사용하고 있습니다.                   | 2013-11-01 20:00:00 |
+    +----+----------+--------------+------------------------------------------------------------------+---------------------+
+
+
+읽기
+-----
+
+정상적으로 값들을 읽어 저장을 했다면 그 내용을 확인할 수 있습니다.
+확인을 위해 `/list`를 작성합니다.
+`root`경로는 사용하지 않으므로 다음과 같이 수정합니다.
+
+[수정전]
+
+    #!perl
+    get '/' => sub {
+      my $self = shift;
+      
+      $self->render('index')
+    };
+
+[수정후]
+
+    #!perl
+    get '/' => sub {
+      my $self = shift;
+      
+      $self->redirect_to( $self->url_for('/list') );
+    };
+
+템플릿에 값 전달을 위해 `get '/list'`를 아래와 같이 작성합니다.
+
+    #!perl
+    get '/list' => sub {
+	my $self = shift;
+
+	my $sth = $DBH->prepare(qq{ SELECT id, name, title, content, wdate FROM memo });
+	$sth->execute();
+
+	my %articles;
+	while ( my @row = $sth->fetchrow_array ) {
+	    my ( $id, $name, $title, $content, $date ) = @row;
+	    my ($wdate) = split / /, $date;
+
+	    $articles{$id} = {
+		name    => $name,
+		title   => $title,
+		content => $content,
+		wdate   => $wdate,
+	    };
+	}
+
+	$self->stash( articles => \%articles );
+    };
+
+`DB`에서 읽어오는 정보를 `\%articles` 해쉬레퍼런스로 템플릿에 전달합니다.
+
+    #!perl
+    @@ list.html.ep
+    % layout 'default';
+    % title 'LIST';
+
+      <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#999999>
+	<tr height=20 colspan=4 align=center bgcolor=#CCCCCC >
+	  <td color=white>No. </td>
+	  <td>제목</td>
+	  <td>글쓴이</td>
+	  <td>date</td>
+	</tr>
+	% foreach my $id ( keys %$articles ) {
+	<tr bgcolor="white">
+	  <td><%= $id %></td>
+	  <td><a href="/read/<%= $id %>"><%= $articles->{$id}{title} %></a></td>
+	  <td><%= $articles->{$id}{name} %></td>
+	  <td><%= $articles->{$id}{wdate} %></td>
+	</tr>
+	% }
+	<tr>
+	  <td colspan=4 bgcolor=#999999>
+	    <table width=100%>
+	      <tr>
+		<td width=2000 align=center height=20>
+		  <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
+		</td>
+	      </tr>
+	    </table>
+	  </td>
+	</tr>
+      </table>
+
+준비된 데이터를 출력해보면 `DB`의 `id`를 `key`로된 출력시키게 됩니다.
+이때 `key`는 정렬되지 않은채 무작위로 출력됩니다.
+
+![해쉬 무작위 정렬][img-3-resize]
+*그림 3.* 해쉬 무작위 정렬 ([원본][img-3])
+
+정렬 연산자인 `sort`를 추가합니다. `sort`만으로는 가장 처음에 입력된 `id=1`인 값이
+맨위로 올라오므로 역순으로 출력하기위해 `reverse`도 같이 사용합니다.
+
+    #!perl
+    % foreach my $id ( reverse sort keys %$articles )
+
+![역순 정렬][img-4-resize]
+*그림 4.* 역순 정렬 ([원본][img-4])
+
+무엇인가 이상합니다. 1번이 맨아래로 갔지만 10번 이상이 중간에 섞여 있습니다.
+이를 보완하기 위해 숫자정렬을 합니다. 우주선 연산자(`<=>`)를 사용합니다.  자세한
+사항은 [거침없이 배우는 펄][leaning-perl] 286페이지 고급정렬을 정독합니다.
+
+    #!perl
+    % foreach my $id ( reverse sort { $a <=> $b } keys %$articles )
+
+![숫자 고급정렬][img-5-resize]
+*그림 5.* 숫자 고급정렬 ([원본][img-5])
+
+저장한 글 목록이 List 화면에 출력됩니다. `content` 내용을 확인하기 위해
+제목을 클릭합니다.
+
+`get '/read/:id'`를 추가합니다.
+
+    #!perl
+    get '/read/:id' => sub {
+	my $self = shift;
+
+	my $input_id = $self->param('id');
+
+	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id});
+	$sth->execute();
+
+	my %articles;
+	my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+	my ($wdate) = split / /, $date;
+
+	$articles{$id} = {
+	    name    => $name,
+	    title   => $title,
+	    content => $content,
+	    wdate   => $wdate,
+	};
+
+	$self->stash(
+	    articles => \%articles,
+	    id       => $id,
+	);
+	$self->render('read');
+    };
+
+화면 출력을 위한 `html`도 추가합니다.
+
+    #!perl
+    @@ read.html.ep
+    % layout 'default';
+    % title 'READ';
+
+	<table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
+	  <tr>
+	    <td height=20 colspan=4 align=center bgcolor=#999999>
+	      <font color=white><b><%= $articles->{$id}{title} %></b></font>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td width=50 height=20 align=center bgcolor=#EEEEEE> 글쓴이 </td>
+	    <td width=240 bgcolor=white> <%= $articles->{$id}{name} %> </td>
+	    <td width=50 height=20 align=center bgcolor=#EEEEEE> 날짜 </td>
+	    <td width=240 bgcolor=white> <%= $articles->{$id}{wdate} %> </td>
+	  </tr>
+	  <tr>
+	    <td bgcolor=white colspan=4>
+	      <font color=black>
+		<pre><%= $articles->{$id}{content} %></pre>
+	      </font>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan=4 bgcolor=#999999>
+	      <table width=100%>
+		<tr>
+		  <td width=2000 align=left height=20>
+		    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
+		    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
+		    <a href='/edit/<%= $id %>' style="text-decoration:none;"><font color=white>[수정]</font></a>
+		    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
+		  </td>
+		</tr>
+	      </table>
+	    </td>
+	  </tr>
+	</table>
+
+다음과 같이 저장된 `content` 정보까지 표시됩니다.
+![전체 내용보기][img-6-resize]
+*그림 6.* 전체 내용보기 ([원본][img-6])
+
+
+수정
+-----
+
+쓰고 읽은후 마음에 들지 않는다면 수정 기능이 있어야합니다.
+수정할 내용을 확인하기 위해 `get '/edit/:id'`를 추가합니다.
+
+    #!perl
+    get '/edit/:id' => sub {
+	my $self = shift;
+
+	my $input_id = $self->param('id');
+
+	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id});
+	$sth->execute();
+
+	my %articles;
+	my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+	my ($wdate) = split / /, $date;
+
+	$articles{$id} = {
+	    name    => $name,
+	    title   => $title,
+	    content => $content,
+	    wdate   => $wdate,
+	};
+
+	$self->stash(
+	    articles => \%articles,
+	    id       => $id,
+	);
+
+	$self->render('edit');
+    };
+
+수정하는 페이지는 쓰기와 유사하지만 쓰기와는 다르게
+기존의 정보가 표시됩니다.
+
+    #!perl
+    @@ edit.html.ep
+    % layout 'default';
+    % title 'EDIT';
+
+	<form action="/edit" method="post">
+	  <input type="hidden" name="id" value="<%= $id %>">
+	  <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
+	    <tr>
+	      <td height=20 colspan=4 align=center bgcolor=#999999>
+		<font color=white><b>수정</b></font>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td bgcolor=white>
+		<table bgcolor=white>
+		  <tr>
+		    <td>이름</td>
+		    <td><input type="text" name="name" value="<%= $articles->{$id}{name} %>"></td>
+		  </tr>
+		  <tr>
+		    <td>제목</td>
+		    <td><input type="text" name="title" value="<%= $articles->{$id}{title} %>"></td>
+		  </tr>
+		  <tr>
+		    <td>내용</td>
+		    <td colspan=4>
+		      <textarea name="content" cols=80 rows=5><%= $articles->{$id}{content} %></textarea>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td colspan=10 align=center>
+		      <input type="submit" value="수정확인">
+		    </td>
+		  </tr>
+		</table>
+	      </td>
+	    </tr>
+	  <tr>
+	    <td bgcolor=#999999>
+	      <table width=100%>
+		<tr>
+		  <td>
+		    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
+		    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
+		    <a href='/read/<%= $id %>' style="text-decoration:none;"><font color=white>[취소]</font></a>
+		    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
+		  </td>
+		</tr>
+	      </table>
+	    </td>
+	  </tr>
+	  </table>
+	</form>
+
+수정할 내용을 추가후 `post`로 전달 합니다.
+`DBI` 명령어로 `UPDATE`를 사용합니다.
+
+    #!perl
+    post '/edit' => sub {
+	my $self = shift;
+
+	my $id      = $self->param('id');
+	warn $id;
+	my $name    = $self->param('name');
+	my $title   = $self->param('title');
+	my $content = $self->param('content');
+
+	my $sth = $DBH->prepare(qq{
+	    UPDATE `memo` SET `name`=?,`title`=?,`content`=? WHERE `id`=$id
+	});
+	$sth->execute( $name, $title, $content );
+
+	$self->redirect_to( $self->url_for('/list') );
+    };
+
+![수정된 1번 내용][img-7-resize]
+*그림 7.* 수정된 1번 내용 ([원본][img-7])
+
+
+삭제
+-----
+
+삭제를 위한 코드 추가
+삭제를 위해 `DELETE`를 사용합니다.
+
+    #!perl
+    get '/delete/:id' => sub {
+	my $self = shift;
+
+	my $id = $self->param('id');
+
+	my $sth = $DBH->prepare(qq{ DELETE FROM `memo` WHERE `id`=$id });
+	$sth->execute();
+
+	$self->redirect_to( $self->url_for('/list') );
+    };
+
+
+Helper 사용하기
+----------------
+
+`/read/$id`와 `/edit/$id` 에서 동일한 코드를 사용합니다.
+불필요한 코드를 줄이기 위해 `helper`를 사용합니다.
+다음과 같이 동일 코드를 `helper`로 작성합니다.
+
+    #!perl
+    helper db_select => sub {
+	my ( $self, $input_id ) = @_;
+
+	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id});
+	$sth->execute();
+
+	my %articles;
+	my ( $db_id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+	my ($wdate) = split / /, $date;
+
+	$articles{$db_id} = {
+	    name    => $name,
+	    title   => $title,
+	    content => $content,
+	    wdate   => $wdate,
+	};
+
+	return \%articles;
+    };
+
+`helper`의 사용법
+중복된 코드를 지우고 `$self->db_select`로 `helper`를 호출합니다.
+
+    #!perl
+    my $articles = $self->db_select ( $input_id );
+    my ($id)     = keys %$articles;
+
+    $self->stash(
+        articles => $articles,
+        id       => $id,
+    );
+
+
+정리하며
+---------
+
+웹에 대한 많은 이해와 실전 경험이 있다면 잘 정리된 `Mojolicious` 문서만 보더라도
+쉽고 빠르게 이해하고 응용할 수 있습니다.
+
+다만 웹에 대해 익숙치 않은 사용자 또는 다른 언어의 책을 공부하면서 perl로 변환
+하고자 하는 분들이라면 문서만 보았을때 응용이 힘든점이 있습니다.(제가 힘듭니다..)
+
+제가 도움이 되어서 다른분들 에게도 도움이 되겠지 라는 생각이 맞았으면 좋겠습니다.
+
+전체 코드와 Mysql 테이블
+
+- [myapp.pl][gist-myapp]
+- [memo.sql][gist-memo]
+
+[gist-myapp]: https://gist.github.com/rumidier/7940143
+[gist-memo]: https://gist.github.com/rumidier/7940167
+
+[img-1]:        2013-12-14-1.png
+[img-2]:        2013-12-14-2.png
+[img-3]:        2013-12-14-3.png
+[img-4]:        2013-12-14-4.png
+[img-5]:        2013-12-14-5.png
+[img-6]:        2013-12-14-6.png
+[img-7]:        2013-12-14-7.png
+
+[img-1-resize]: 2013-12-14-1_r.png
+[img-2-resize]: 2013-12-14-2_r.png
+[img-3-resize]: 2013-12-14-3_r.png
+[img-4-resize]: 2013-12-14-4_r.png
+[img-5-resize]: 2013-12-14-5_r.png
+[img-6-resize]: 2013-12-14-6_r.png
+[img-7-resize]: 2013-12-14-7_r.png
+
+
+[advent-calendar]:       http://advent.perl.kr
+[cpan-catalyst]:         https://metacpan.org/pod/Catalyst
+[cpan-dancer]:           https://metacpan.org/pod/Dancer
+[cpan-dbi]:              http://www.metacpan.org/pod/DBI
+[cpan-mojolicious-lite]: https://metacpan.org/pod/Mojolicious::Lite
+[cpan]:                  http://www.cpan.org/
+[home-perlbrew]:         http://perlbrew.pl/
+[leaning-perl]:          http://www.yes24.com/24/goods/4433208
+[mojolicious]:           http://mojolicio.us/
+[twitter-rumidier]:      http://twitter.com/rumidier
