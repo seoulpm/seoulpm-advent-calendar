@@ -232,10 +232,7 @@ Perl 자료 형태로 변환해서 `/devices/0/id`(`devices` 배열 항목의 �
 
 
 [img-1]:          2013-12-16-1.png
-[img-2]:          2013-12-16-2.png
-
 [img-1-resize]:   2013-12-16-1_r.png
-[img-2-resize]:   2013-12-16-2_r.png
 
 
 [cpan-carton]:              https://metacpan.org/module/Carton
