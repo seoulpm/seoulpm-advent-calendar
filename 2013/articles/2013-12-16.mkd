@@ -47,9 +47,9 @@ Author:   JEEN_LEE
     done_testing();
 
 
-#### 컨트롤러의 기능별 추가
+### 컨트롤러의 기능별 추가
 
-그리고 각 컨트롤러의 기능(API Endpoint) 별로 요청을 보내고 응답을
+그리고 각 컨트롤러의 기능(API endpoint) 별로 요청을 보내고 응답을
 분석해서 *이런 값이 있어야 되겠지*하면서 한 줄, 한 줄 적어갔었습니다.
 
     #!perl
@@ -235,16 +235,17 @@ Perl 자료 형태로 변환해서 `/devices/0/id`(`devices` 배열 항목의 �
 [img-1-resize]:   2013-12-16-1_r.png
 
 
-[cpan-carton]:              https://metacpan.org/module/Carton
-[cpan-mojo-useragent]:      https://metacpan.org/pod/Mojo::UserAgent
-[cpan-test-ika]:            https://metacpan.org/module/Test::Ika
-[cpan-test-mojo]:           https://metacpan.org/module/Test::Mojo
-[cpan-test-more]:           https://metacpan.org/module/Test::More
-[github-jeen]:              https://github.com/jeen
-[home-jenkins]:             http://jenkins-ci.org/
-[home-kpw2012]:             http://event.perl.kr/kpw2012/
-[home-mojolicious]:         http://mojolicio.us/
-[home-rspec]:               http://rspec.info/
-[rfc-6901]:                 http://tools.ietf.org/html/rfc6901
-[twitter-jeen_lee]:         http://twitter.com/#!/JEEN_LEE
-[wiki-tap]:                 http://en.wikipedia.org/wiki/Test_Anything_Protocol
+[cpan-carton]:                https://metacpan.org/module/Carton
+[cpan-mojo-useragent]:        https://metacpan.org/pod/Mojo::UserAgent
+[cpan-test-ika]:              https://metacpan.org/module/Test::Ika
+[cpan-test-mojo]:             https://metacpan.org/module/Test::Mojo
+[cpan-test-more]:             https://metacpan.org/module/Test::More
+[github-jeen]:                https://github.com/jeen
+[home-jenkins]:               http://jenkins-ci.org/
+[home-kpw2012]:               http://event.perl.kr/kpw2012/
+[home-mojolicious]:           http://mojolicio.us/
+[home-rspec]:                 http://rspec.info/
+[kpw2012-perl-web-app-test]:  http://www.slideshare.net/JEEN/perl-web-app
+[rfc-6901]:                   http://tools.ietf.org/html/rfc6901
+[twitter-jeen_lee]:           http://twitter.com/#!/JEEN_LEE
+[wiki-tap]:                   http://en.wikipedia.org/wiki/Test_Anything_Protocol
