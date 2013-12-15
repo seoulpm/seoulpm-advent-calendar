@@ -1,0 +1,478 @@
+Title:    출력 가능한 바코드
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+최근 [후원하는 단체][home-opencloset]의 내부 물류를 전산화하는 시스템을 구축하는 부분을 맡아 작업하다보니
+관련해 돕고 있다보니 자연스레 [바코드(barcode)][wiki-barcode]를 다룰 일이 많아졌습니다.
+덕분에 [올해 크리스마스 달력 첫째 날 기사][advent-2013-12-01]에서는
+바코드를 HTML로 표현하는 기법을 다루었는데, 이 HTML 형태로 바코드를 표현하면 웹브라우저를
+사용할 수 있는 환경이라면 데스크탑은 물론 스마트폰까지도 문제없이 화면에 나타낼 수 있는 점이 장점입니다.
+다만 이렇게 HTML 형태로 나타낼 경우 HTML 자체가 출력에 특화된 형식이 아니다보니
+원하는 위치에 정확히 몇가지의 바코드를 이렇게, 저렇게 출력하는 것은 여간 어렵지 않습니다.
+이번 기사에서는 대량의 바코드를 프린터 출력에 적합한 형식으로 생성해내는 기법을 다룹니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 PDF::Reuse 모듈][cpan-pdf-reuse]
+- [CPAN의 PDF::Reuse::Barcode 모듈][cpan-pdf-reuse-barcode]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan PDF::Reuse PDF::Reuse::Barcode
+
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan PDF::Reuse PDF::Reuse::Barcode
+
+
+요구 조건
+----------
+
+전산화 대상이었던 물류는 대부분이 의류였고 그 중에서도 상/하의였습니다.
+이런 대부분의 의류에는 출력 전문 업체에 의류 전용 태그에
+바코드 출력을 의뢰해 이 태그를 붙여 각각의 항목을 구분하죠.
+다만 구두나 벨트 등 항목이 작고 그래서 의류 전용 태그가 눈에 너무 잘 띄거나
+태그로 인해 착용이 불편해지는 경우 이러한 태그를 붙이기가 난감합니다.
+이런 경우를 대비해 예외 항목들에 한해 카탈로그를 만들어 바코드를 정리한 다음
+바코드를 식별해주는 조그마한 기호를 예외 항목에 작게 붙이거나 표시하기로 합니다.
+
+    #!plain
+    > 보낸사람: Han Manil (theopencloset)
+    > 받는사람: Keedi Kim
+    > 참조:     Yu Yongbin
+    >           notifications@github.com
+    > 날짜:     2013년 12월 5일 오후 4:24
+    > 제목:     책자(?)로 만들 바코드 보내드립니다.
+    > 
+    > 안녕하세요.
+    > 
+    > 다른 제품의 경우에는 바코드를 직접 부착할 수 있을 것 같은데.
+    > 구두는 그게 어려울 것 같아요.
+    > 구두만 선택하여 뽑은 150개의 데이터만 보내드립니다.
+    > 
+    > 바코드 만들어 주시면 저희가 폼텍으로 뽑아 정리한 뒤
+    > 코팅해서 만들겠습니다.
+    > 
+    > 부탁드릴게요 :) 
+
+우선 선정된 150개의 데이터는 순차 데이터로 바코드로 변환되기 전의 문자열 값입니다.
+이 값은 36진법 숫자로 `A000` 부터 `A045`까지의 150개의 항목입니다.
+
+
+PDF::Reuse::Barcode
+--------------------
+
+[CPAN][cpan]에는 PDF를 생성할 수 있는 무척 많은 모듈이 있습니다.
+사실 익숙하지 않다면 이 중 어떤 모듈을 사용해야 할지 알아내는 것조차 큰 일이죠.
+[올해 크리스마스 달력 셋째 날 기사][advent-2013-12-03]를 참조하면 모듈을 고를때 많은 도움이 됩니다.
+하지만 어떤 경우는 모듈이 이미 필요한 기능이 구현이 완료되었거나 더이상
+특별히 수정해야 할 버그가 없기 때문에 추가적인 릴리스가 없는 경우도 있습니다.
+더불어 자신이 처한 상황이나 모듈이 필요한 이유가 그리 범용적이지 않기 때문에 추천 수가 많지 않을 수도 있죠.
+따라서 항상 여러가지 요소는 참고는 하되 정말 쓸만한 모듈인지 여부는 역시 직접 부딪혀 보는 수 밖에 없습니다.
+
+[PDF::Reuse::Barcode 모듈][cpan-pdf-reuse-bracode]은 [PDF::Reuse 모듈][cpan-pdf-reuse]의
+플러그인 형태의 모듈로 `PDF::Reuse` 모듈을 사용해서 PDF 문서를 생성할 때 손쉽게
+바코드 이미지와 텍스트를 넣을 수 있게 도와줍니다.
+다음은 `A000` 문자열을 바코드 이미지로 나타내고 PDF 문서로 생성하는 코드입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use v5.14;
+    use utf8;
+    use strict;
+    use warnings;
+
+    use PDF::Reuse;
+    use PDF::Reuse::Barcode;
+
+    prFile('opencloset.pdf');
+
+    my $code = 'A000';
+    PDF::Reuse::Barcode::Code128(
+        value => $code,
+    );
+
+    prEnd();
+
+놀라울 정도로 간단하지 않나요? :-)
+
+
+대량의 바코드
+--------------
+
+프로그램을 작성하다보면 *0 또는 1의 상황*과 *1 또는 N의 상황*에 처하는 경우가 많습니다.
+*0 또는 1의 상황*이라면 출력 가능한 바코드를 생성해내느냐 또는 못해내느냐의 문제일테고,
+*1 또는 N의 상황*이라면 하나의 바코드를 생성해내느냐 또는 N개의 바코드를 생성해내느냐의 문제겠죠.
+N개의 바코드를 생성해볼까요?
+
+    #!perl
+    ...
+
+    prFile('opencloset.pdf');
+
+    while ( my $code = <DATA> ) {
+        PDF::Reuse::Barcode::Code128(
+            value => $code,
+        );
+    }
+
+    prEnd();
+
+    __DATA__
+    A000
+    A001
+    A002
+    ...
+    A043
+    A044
+    A045
+
+
+낭비되는 여백!
+---------------
+
+여기까지 실제로 실행해보면 바코드를 담은 PDF가 쉽게(너무도 김빠지게) 생성되죠.
+하지만 자세히 살펴보면 지금 그대로 출력을 했다간 아마 큰 일이 날지도 모릅니다.
+
+    #!plain
+    > 바코드 만들어 주시면 저희가 폼텍으로 뽑아 정리한 뒤
+    > 코팅해서 만들겠습니다.
+
+이거 잘못하다간 값비싼 폼텍 용지가 몇장이나 버려질지 모르겠군요. :)
+아무런 설정없이 PDF로 찍어내보면 수직으로 바코드가 정렬이 되버립니다.
+PDF는 출력을 위한 형식이기 때문에 꽤나 정확히 출력할 위치를 지정해야 합니다.
+더불어 폼텍 용지를 아끼는 것도 의미가 있지만 너무 바코드를 다닥다닥 붙여서
+바코드 리더기가 인식하는데 문제가 있다면 이것도 적절하지 않겠죠.
+A4 용지 기준으로 3열, 즉 가로 방향으로는 3개 단위로 바코드를 출력해보죠.
+
+    #!perl
+    ...
+
+    prFile('opencloset.pdf');
+
+    for ( my $i = 0; $i < @codes / 3; ++$i ) {
+        prPage() if $i && $i % 9 == 0;
+        for ( my $j = 0; $j < 3; ++$j ) {
+            my $code = $codes[ $i * 3 + $j ];
+            last unless $code;
+
+            PDF::Reuse::Barcode::Code128(
+                x          => 40 + 190 * $j,
+                y          => 740 - 86 * ($i % 9),
+                value      => $code,
+                size       => 1.5,
+            );
+        }
+    }
+
+    prEnd();
+
+    __DATA__
+    A000
+    A001
+    A002
+    ...
+    A043
+    A044
+    A045
+
+이전 코드와 비교해 추가된 부분은 다음과 같습니다.
+
+- A4 용지 기준 3열 단위로 구성
+- A4 용지 기준 9행 단위로 구성
+- 27의 바코드 출력 후 강제 페이지 전환
+
+이것을 가능하게 하기 위해 `PDF::Reuse::Barcode::Code128()` 함수 호출시
+`x` 좌표와 `y` 좌표를 세밀하게 계산 후 수동으로 지정해줍니다.
+더불어 생성하는 바코드가 많으니 출력 후 재단하기 편하게 각각의 바코드 마다 음영을 약간 넣어보죠.
+
+    #!perl
+    PDF::Reuse::Barcode::Code128(
+        x          => 40 + 190 * $j,
+        y          => 740 - 86 * ($i % 9),
+        value      => $code,
+        size       => 1.5,
+        background => '0.99 0.97 0.97',
+    );
+
+완성입니다! :)
+
+
+글꼴 지정 패치
+---------------
+
+반드시 필요한 부분은 아니지만 글꼴이 조금 아쉽군요.
+시스템에 따라 다르지만 제 경우 생성된 PDF에서 기본으로 사용하는
+글꼴이 `0`과 `O`를 구분하기에 부족합니다.
+물론 구분이 가능하더라도 다른 글꼴을 사용하고 싶을 수도 있구요.
+글꼴을 변경하려면 간단히 `prTTFont()` 함수를 이용합니다.
+
+    #!perl
+    prFile('opencloset.pdf');
+    prTTFont( '/usr/share/fonts/truetype/nanum-coding/NanumGothic_Coding.ttf' );
+
+    chomp( my @codes = <DATA> );
+
+어이쿠! 분명히 글꼴을 변경했는데 바코드에 변경한 글꼴이 적용되지 않는군요.
+사실 이 부분은 `PDF::Reuse::Barcode` 모듈 제작자가 미처 고려하지 못한 부분입니다.
+간단한 패치를 적용해 트루타입 폰트를 바코드용 문자열에 적용해보죠.
+
+    #!perl
+    ...
+
+    use PDF::Reuse;
+    use PDF::Reuse::Barcode;
+
+    {
+        package PDF::Reuse::Barcode;
+
+        use strict;
+        use warnings;
+
+        no warnings 'redefine';
+
+        our ($str, $xsize, $ysize, $height, $sPtn, @sizes, $length, $value, %default);
+
+        sub init {
+            %default = (
+                value          => '0000000',
+                x              => 0,
+                y              => 0,
+                size           => 1,
+                xsize          => 1,
+                ysize          => 1,
+                rotate         => 0,
+                background     => '1 1 1',
+                drawbackground => 1,
+                text           => 'yes',
+                text_font      => 'C',
+                prolong        => 0,
+                hide_asterisk  => 0,
+                mode           => 'Type3'
+            );
+            $str    = '';
+            $xsize  = 1;
+            $ysize  = 1;
+            $height = 37;
+            $sPtn   = '';
+            @sizes  = ();
+            $length = 0;
+            $value  = '';
+        }
+
+        sub general1 {
+            $default{'xsize'} = 1 unless ( $default{'xsize'} != 0 );
+            $default{'ysize'} = 1 unless ( $default{'ysize'} != 0 );
+            $default{'size'}  = 1 unless ( $default{'size'} != 0 );
+            $xsize = $default{'xsize'} * $default{'size'};
+            $ysize = $default{'ysize'} * $default{'size'};
+            $str   = "q\n";
+            $str .= "$xsize 0 0 $ysize $default{'x'} $default{'y'} cm\n";
+            if ( $default{'rotate'} != 0 ) {
+                my $radian
+                    = sprintf( "%.6f", $default{'rotate'} / 57.2957795 );    # approx.
+                my $Cos = sprintf( "%.6f", cos($radian) );
+                my $Sin = sprintf( "%.6f", sin($radian) );
+                my $negSin = $Sin * -1;
+                $str .= "$Cos $Sin $negSin $Cos 0 0 cm\n";
+            }
+        }
+
+        sub general2 {
+            $length = 20 + ( length($sPtn) * 0.9 );
+            my $height  = 38;
+            my $step    = 9;
+            my $prolong = 0;
+            if ( $default{'prolong'} > 1 ) {
+                $prolong = $default{'prolong'};
+                $height = 26 + ( $prolong * 12 );
+            }
+            if ( $default{'drawbackground'} ) {
+                $str .= "$default{'background'} rg\n";
+                $str .= "0 0 $length $height re\n";
+                $str .= 'f*' . "\n";
+                $str .= "0 0 0 rg\n";
+            }
+
+            prAdd($str);
+
+            @sizes = prFontSize(12);
+
+            if ( $default{'mode'} eq 'Type3' ) {
+                prBar( 10, $step, $sPtn );
+            }
+            else    # graphic mode
+            {
+                $str = Bar( 10, $step, $sPtn );
+            }
+
+            $prolong--;
+
+            if ( $prolong > 0 ) {
+                $sPtn =~ s/G/1/go;
+                while ( $prolong > 0 ) {
+                    if ( $prolong > 1 ) {
+                        $prolong--;
+                        $step += 12;
+                    }
+                    else {
+                        $step += ( 12 * $prolong );
+                        $prolong = 0;
+                    }
+                    if ( $default{'mode'} eq 'Type3' ) {
+                        prBar( 10, $step, $sPtn );
+                    }
+                    else    # graphic mode
+                    {
+                        $str .= Bar( 10, $step, $sPtn );
+                    }
+                }
+            }
+
+            # print the graphic mode bars
+            if ( $default{'mode'} ne 'Type3' ) {
+                $str .= "B\n";
+                prAdd($str);
+            }
+
+        }
+
+        sub general3 {
+            $str = "Q\n";
+            prAdd($str);
+            prFontSize( $sizes[1] );
+        }
+
+        sub standardEnd {
+            general2();
+
+            if ( $default{'text'} ) {
+                my @vec = prFont($default{'text_font'});
+                prFontSize(10);
+                my $textLength = length($value) * 6;
+                my $start      = ( $length - $textLength ) / 2;
+                prText( $start, 1.5, $value );
+                prFont( $vec[3] );
+            }
+            general3();
+
+            1;
+        }
+
+        sub Code128 {
+            eval 'require Barcode::Code128';
+            init();
+            my %param = @_;
+            for ( keys %param ) {
+                my $lc = lc($_);
+                if ( exists $default{$lc} ) {
+                    $default{$lc} = $param{$_};
+                }
+                else {
+                    print STDERR "Unknown parameter $_ , not used \n";
+                }
+            }
+            $value = $default{'value'};
+
+            general1();
+
+            my $oGDBar = Barcode::Code128->new();
+            if ( !$oGDBar ) {
+                die "The translation of $value to barcodes didn't succeed, aborts\n";
+            }
+            else {
+                $sPtn = $oGDBar->barcode($value);
+                $sPtn =~ tr/#/1/;
+                $sPtn =~ tr/ /0/;
+            }
+            standardEnd();
+            1;
+        }
+    }
+
+    prFile('opencloset.pdf');
+    prTTFont( '/usr/share/fonts/truetype/nanum-coding/NanumGothic_Coding.ttf' );
+
+    ...
+
+`{ package PDF::Reuse::Barcode; ... }` 영역의 코드를 추가하고 `Code128()` 함수 호출 시
+추가로 글꼴을 지정하면 `prTTFont`로 적재한 글꼴을 사용해서 바코드를 생성할 수 있습니다.
+
+    #!perl
+    PDF::Reuse::Barcode::Code128(
+        x          => 40 + 190 * $j,
+        y          => 740 - 86 * ($i % 9),
+        value      => $code,
+        size       => 1.5,
+        background => '0.99 0.97 0.97',
+        text_font  => 'NanumGothicCoding',
+    );
+
+자! 이제 PDF 리더기로 한번 열어보죠.
+
+![생성한 출력용 바코드][img-1-resize]
+*그림 1.* 생성한 출력용 바코드 ([원본][img-1])
+
+와우! 정말 끝났네요. ;-)
+
+
+정리하며
+---------
+
+다양한 장비에서 일관되게 보여주기 위해 HTML로 바코드를 표현하는 것 뿐만 아니라
+바코드의 특성상 출력을 위해 출력에 적합하게 표현해야 할 때도 있습니다.
+특히 출력을 대비한다면 대량의 바코드를 출력하거나 또는 각각의 항목을
+고객 또는 사용자가 원하는 용도에 맞게 미려하게 꾸며야 하기도 합니다.
+단순하게 [PDF::Reuse 모듈][cpan-pdf-reuse]을 이용해서 PDF를 생성하고
+[PDF::Reuse::Barcode 모듈][cpan-pdf-reuse-barcode]을 이용해서 쉽게 바코드를
+출력한 것은 물론 상황에 맞게 PDF 내에서 바코드를 적절히 배치해 대량의
+바코드 출력을 대비하고 판독이 용이한 폰트를 사용하는 방법을 살펴보았습니다.
+비단 PDF와 바코드 뿐만 아니라 어떤 경우든 펄은 여러분이 최소의 노력으로
+최대의 효과를 낼 수 있도록 도와줄 것입니다.
+
+Enjoy Your Perl! ;-)
+
+![EOT][img-2]
+
+_EOT_
+
+
+[img-1]:          2013-12-15-1.png
+[img-2]:          2013-12-15-2.png
+
+[img-1-resize]:   2013-12-15-1_r.png
+[img-2-resize]:   2013-12-15-2_r.png
+
+
+[advent-2013-12-01]:            http://advent.perl.kr/2013/2013-12-01.html
+[advent-2013-12-03]:            http://advent.perl.kr/2013/2013-12-03.html
+[cpan-pdf-reuse-barcode]:       https://metacpan.org/module/PDF::Reuse::Barcode
+[cpan-pdf-reuse]:               https://metacpan.org/module/PDF::Reuse
+[cpan]:                         http://www.cpan.org/
+[home-opencloset]:              http://theopencloset.net/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-barcode]:                 http://en.wikipedia.org/wiki/Barcode
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
