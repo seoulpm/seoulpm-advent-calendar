@@ -755,11 +755,10 @@ Helper 사용하기
 
 웹에 대한 많은 이해와 실전 경험이 있다면 잘 정리된 `Mojolicious` 문서만 보더라도 금방 이해하고 응용할 수 있습니다.
 다만 웹이 익숙치 않다면 문서만 보았을때 힘든 부분이 꽤 많습니다(제가 힘듭니다).
-간단하고 짧긴 하지만 이 예제와 글이 저처럼 문서를 보다가 헤매시는 다른 분들께도 작은 도움이 되었으면 합니다.
+비록 CSS나 자바스크립트도 사용하지 않고 구식의 HTML 코드를 사용하고는 있지만
+간단하고 짧기 때문에 이해하기에는 더 용이하지 않을까 바래봅니다.
+이 예제와 글이 저처럼 문서를 보다가 헤매시는 다른 분들께도 작은 도움이 되었으면 합니다.
 
-
-[gist-myapp]: https://gist.github.com/rumidier/7940143
-[gist-memo]: https://gist.github.com/rumidier/7940167
 
 [img-1]:        2013-12-14-1.png
 [img-2]:        2013-12-14-2.png
@@ -782,6 +781,8 @@ Helper 사용하기
 [cpan-dbi]:               https://metacpan.org/module/DBI
 [cpan-mojolicious]:       https://metacpan.org/module/Mojolicious
 [cpan]:                   http://www.cpan.org/
+[gist-memo]:              https://gist.github.com/rumidier/7940167
+[gist-myapp]:             https://gist.github.com/rumidier/7940143
 [home-catalyst]:          http://www.catalystframework.org/
 [home-dancer]:            http://perldancer.org/
 [home-mojolicious]:       http://mojolicio.us/
