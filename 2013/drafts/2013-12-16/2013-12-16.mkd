@@ -14,12 +14,14 @@ Author:   JEEN_LEE
 시작하며
 ---------
 
-어떻게 하면 테스트 코드를 잘 쓸 수 있을까 하는 고민은 업계에 들어오고, 엉망진창인 테스트코드를 쓰면서도 계속되는 것이었습니다.
-그렇다면 "잘 쓴 테스트 코드"는 어떤 것이어야 하는 것일까요?
-그걸 알면 제가 이걸 쓰고 있겠습니까?
-결론은 좋은 테스트 도구를 만나면 이전과는 다른 "보다 좋은" 테스트를 쓸 수 있지 않을까하고 생각했습니다.
-바로 [Test::Mojo](https://metacpan.org/pod/Test::Mojo) 를 사용하면서 말이죠.
-그렇기에 이 기사에서 다룰 테스트 어플리케이션은 [Mojolicious](http://mojolicio.us/) 로 만들어 졌다는 것을 전제로 합니다.
+업계에 들어오고, 엉망진창인 테스트 코드를 쓰면서도 계속되는 고민은
+*어떻게 하면 테스트 코드를 잘 쓸 수 있을까?*였습니다.
+그렇다면 *잘 쓴 테스트 코드*는 과연 어떤 것일까요?
+물론 제가 그것을 알고 있다면 이런 기사를 쓰고 있지는 않겠죠.
+*좋은 테스트 도구를 만나면* 이전과는 다른 *보다 좋은 테스트를 쓸 수 있지 않을까*와 같은 나름의 결론을 내려보았습니다.
+바로 [Test::Mojo][cpan-test-mojo]를 사용하면서 말이죠.
+따라서 이 기사에서 다룰 테스트 어플리케이션은
+[Mojolicious][home-mojolicious]로 만들어졌다는 것을 전제로 합니다.
 
 
 예전의 테스트 코드
@@ -229,5 +231,7 @@ $ carton exec prove t
 두번 이상 반복될 것들은 기계에서 맡기며 다른 일들에 눈을 돌리는 조바심내는 개발자가 되기를 바랍니다(제가).
 
 
-[github-jeen]:                    https://github.com/jeen
-[twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
+[cpan-test-mojo]:           https://metacpan.org/module/Test::Mojo
+[github-jeen]:              https://github.com/jeen
+[home-mojolicious]:         http://mojolicio.us/
+[twitter-jeen_lee]:         http://twitter.com/#!/JEEN_LEE
