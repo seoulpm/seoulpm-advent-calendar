@@ -4,9 +4,12 @@ Category: perl
 Category: Seoul.pm
 Author:   JEEN_LEE
 
-## 저자
 
-@JEEN_LEE - 좋은 아빠 워너비
+저자
+-----
+
+[@JEEN_LEE][twitter-jeen_lee] - 좋은 아빠 워너비, [github:jeen][github-jeen]
+
 
 ## 시작하며
 
@@ -220,3 +223,7 @@ $ carton exec prove t
 
 누가(기계가), 언제(커밋/특정시간), 어디서(개발서버), 무엇을(이런 저런 항목들을), 어떻게(요래조래), 왜(마음의 평화를 위해)...
 두번 이상 반복될 것들은 기계에서 맡기며 다른 일들에 눈을 돌리는 조바심내는 개발자가 되기를 바랍니다(제가).
+
+
+[github-jeen]:                    https://github.com/jeen
+[twitter-jeen_lee]:               http://twitter.com/#!/JEEN_LEE
