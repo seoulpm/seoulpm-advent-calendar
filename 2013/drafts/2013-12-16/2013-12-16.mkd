@@ -27,61 +27,63 @@ Author:   JEEN_LEE
 예전의 테스트 코드
 -------------------
 
-그렇다면 "보다 좋게" 쓰기 이전의 테스트코드는 어땠을까요?
+그렇다면 *보다 좋게* 쓰기 이전의 테스트 코드는 어땠을까요?
 
-### 컨트롤러/모델 하나하나의 컴파일 테스트
 
-컨트롤러 하나하나 마다 `.t` 파일을 만들어서 정상적으로 컴파일되는 지에 대한 테스트를 확인했었습니다.
+### 컨트롤러/모델 하나 하나의 컴파일 테스트
 
-``` 
-# t/100-controller-user.t
-use strict;
-use warnings;
-use Test::More;
+컨트롤러 하나하나 마다 `.t` 파일을 만들어서 정상적으로 컴파일되는지에 대한 테스트를 확인했었습니다.
 
-use Catalyst::Test 'MyApp::Web';
-use_ok "MyApp::Web::Controller::User";
+    #!perl
 
-done_testing();
-```
+    # t/100-controller-user.t
+    use strict;
+    use warnings;
+    use Test::More;
+
+    use Catalyst::Test 'MyApp::Web';
+    use_ok "MyApp::Web::Controller::User";
+
+    done_testing();
+
 
 #### 컨트롤러의 기능별 추가
 
-그리고 각 컨트롤러의 기능(API Endpoint) 별로 리퀘스트를 날리고,
-그에 따른 결과를 파싱해서 이런 값이 있어야 되겠지 하면서 한줄한줄 적어갔었습니다.
+그리고 각 컨트롤러의 기능(API Endpoint) 별로 요청을 보내고 응답을
+분석해서 *이런 값이 있어야 되겠지*하면서 한 줄, 한 줄 적어갔었습니다.
 
-```
-# t/101-controller-user-get.t
-use strict;
-use warnings;
-use Test::More;
-use HTTP::Request::Common;
+    #!perl
+    # t/101-controller-user-get.t
+    use strict;
+    use warnings;
+    use Test::More;
+    use HTTP::Request::Common;
 
-use Catalyst::Test 'MyApp::Web';
-use JSON::XS;
+    use Catalyst::Test 'MyApp::Web';
+    use JSON::XS;
 
-my $res = request(
-  GET "/user/1",
-    "X-MyApp-Token" => "f9a077fae03cf63bc4b351344531bde91f0f26c9",
-);
+    my $res = request(
+        GET "/user/1",
+        "X-MyApp-Token" => "f9a077fae03cf63bc4b351344531bde91f0f26c9",
+    );
 
-my $data = JSON::XS::decode_json($res->content);
-ok($data->{user}, "Got User Data");
-ok(defined $data->{user}->{rate}, "Got User-Rate");
-ok(defined $data->{user}->{photo}, "Got-User-Photo");
-ok(defined $data->{user}->{count}, "Got-User-Counts");
-ok(defined $data->{isFriend}, "ok");
-ok(defined $data->{user}->{count}, "Ok");
-ok(defined $data->{me}, "OK");
-done_testing();
-```
+    my $data = JSON::XS::decode_json($res->content);
+    ok($data->{user}, "Got User Data");
+    ok(defined $data->{user}->{rate}, "Got User-Rate");
+    ok(defined $data->{user}->{photo}, "Got-User-Photo");
+    ok(defined $data->{user}->{count}, "Got-User-Counts");
+    ok(defined $data->{isFriend}, "ok");
+    ok(defined $data->{user}->{count}, "Ok");
+    ok(defined $data->{me}, "OK");
+    done_testing();
+
 
 ### 모듈/어플리케이션의 의존성관리
 
-가끔 테스트를 돌리려면 `Can't locate XXX/XXX.pm ....` 이라는 아주 친숙한 에러가 반길때가 있습니다.
-그렇습니다. 바로 의존성관리를 제대로 하지 못해서 발생하게 되는 것이었습니다.
-어플리케이션의 배포를 위해서 `Makefile.PL` 에 일일이 의존모듈을 추가해주고
-`cpanm --installdeps .` 를 통해서 의존이 걸린 모듈들을 매번 설치해줘야 할 필요가 있었습니다.
+가끔 테스트를 돌리려면 `Can't locate XXX/XXX.pm ....` 와 같은 아주 친숙한 오류가
+종종 발생하는데 이것은 바로 의존성 관리를 제대로 하지 못해서 발생하는 오류입니다.
+어플리케이션의 배포를 위해 `Makefile.PL`에 일일이 의존 모듈을 추가하고
+`cpanm --installdeps .` 명령을 사용해 의존 모듈을 매번 설치해야 했습니다.
 
 
 그렇다면 어떻게 바뀌었나?
@@ -162,8 +164,8 @@ describe "Noop" => sub {
 
     it "인증토큰을 가지지 않은 채로 무작업 응답 요청시에 400을 표시해야 함" => sub {
         $t->get_ok('/noop/auth')
-	       ->status_is(400)
-	       ->json_has('/message');
+         ->status_is(400)
+         ->json_has('/message');
     };
 
     it "인증토큰을 가지고 있을 때는 무작업 응답 요청에 답해야 함" => sub {
@@ -173,10 +175,10 @@ describe "Noop" => sub {
         });
 
         $t->get_ok('/noop/auth')
-	       ->status_is(200)
-	       ->json_has('/noop')
-	       ->json_has('/result/ok')
-	       ->json_has('/devices/0/id')
+         ->status_is(200)
+         ->json_has('/noop')
+         ->json_has('/result/ok')
+         ->json_has('/devices/0/id')
     };
 };
 ```
