@@ -89,133 +89,132 @@ Author:   JEEN_LEE
 그렇다면 어떻게 바뀌었나?
 --------------------------
 
-### `lib` 디렉토리 아래의 모듈파일의 전체 컴파일 테스트
+### `lib` 디렉토리 아래 모듈 파일의 전체 컴파일 테스트
 
-프로젝트를 구성하는 모든 네임스페이스의 모듈을 한번에 테스트하도록 합니다.
-이를 통해서 컨트롤러 하나하나, 모델 하나하나에 들였던 불필요한 시간은 날아가버립니다.
- 
-동시에 프로젝트에서 주로 사용하던 동적 클래스 로딩으로 호출되던 많은 모듈들도 한번에 처리할 수 있습니다.
+프로젝트를 구성하는 모든 이름 공간의 모듈을 한번에 테스트하도록 합니다.
+이를 통해 컨트롤러 하나 하나, 모델 하나 하나에 들였던 불필요한 시간이 사라집니다.
+동시에 프로젝트에서 주로 사용하던 동적 클래스 적재로 호출되던 많은 모듈도 한번에 처리할 수 있습니다.
 
+    #!perl
+    # t/000-compile.t
+    use utf8;
+    use Test::Ika;
+    use Test::More;
+    use Path::Class::Rule;
 
-```
-# t/000-compile.t
-use Test::Ika;
-use Test::More;
-use Path::Class::Rule;
-use utf8;
+    BEGIN { binmode STDOUT, ":utf8" };
 
-BEGIN { binmode STDOUT, ":utf8" };
-
-describe "Compile" => sub {
-    it "모든 패키지는 정상적으로 로딩되어야 한다" => sub {
-        my $rule = Path::Class::Rule->new;
-        $rule->file->name(qr/\.pm$/);  # .pm 파일들 만을 뽑아냄
-        $rule->file->size('>10');  # 네임스페이스 선정을 위해서 가끔 개발도중에 0byte 모듈 파일을 형식상으로 만들어두던 습관때문에...
-        my $iter = $rule->iter('lib');  # lib 디렉토리 하위의 모든 파일들에 대해
-        while(my $file = $iter->()) {
-            my $pkg = $file;
-            $pkg =~ s!^lib/!!;
-            $pkg =~ s!\.pm$!!;
-            $pkg =~ s!/!::!g;
-            use_ok $pkg;
-        }
+    describe "Compile" => sub {
+        it "모든 패키지는 정상적으로 로딩되어야 한다" => sub {
+            my $rule = Path::Class::Rule->new;
+            $rule->file->name( qr/\.pm$/ );  # .pm 파일만 추출
+            $rule->file->size('>10');        # 이름 공간 선정을 위해 가끔 개발 도중에
+                                             # 0 byte 모듈 파일을 형식상 만들어두던 습관 때문에...
+            my $iter = $rule->iter('lib');   # lib 디렉토리 하위의 모든 파일들에 대해
+            while ( my $file = $iter->() ) {
+                my $pkg = $file;
+                $pkg =~ s!^lib/!!;
+                $pkg =~ s!\.pm$!!;
+                $pkg =~ s!/!::!g;
+                use_ok $pkg;
+            }
+        };
     };
-};
-```
+
 
 ### 각 테스트 단위의 서술
 
-Ruby 의 RSpec 의 표현식을 빌려서 사용할 수 있는 [Test::Ika](https://metacpan.org/pod/Test::Ika) 모듈을
-통해서 위처럼 테스트를 정의할 수 있습니다. 
+[Ruby RSpec][home-rspec]의 표현식을 빌려 사용할 수 있는 [Test::Ika 모듈][cpan-test-ika]을
+통해서 앞에서 살펴본 테스트 예제 코드처럼 정의할 수 있습니다. 
+`Test::Ika` 모듈을 통해 기존 단순 명료했던 [TAP][wiki-tap]의 출력 결과와는 달리
+각 테스트 코드에서 서술된 표현들을 깔끔하게 표시해줍니다.
 
-이를 사용해서 기존 단순명료했던 `TAP` 의 출력결과와는 달리 각 테스트코드들에서 서술된 표현들을 깔끔하게 표시해줍니다.
+![Test::Ika 모듈의 테스트 결과 출력][img-1-resize]
+*그림 1.* Test::Ika 모듈의 테스트 결과 출력 ([원본][img-1])
 
-![](https://dl.dropboxusercontent.com/u/262117/adv-pic-003.png)
+예전의 테스트 코드에서는 [Test::More 모듈][cpan-test-more]의 `subtest`를 사용해서 이런 식의 서술을 했었지요.
+이처럼 테스트 단위의 서술을 기재함으로써 테스트 코드를 통해 문서화를 병용할 수 있다는 점이 장점입니다.
+테스트 코드에서 얻을 수 있는 부분과는 다른 문서를 별도로 쓰고 있긴 하지만,
+*나름 잘 구분해서 사용하면 효과적이지 않을까*라고 생각합니다.
 
-이전의 테스트코드에서는 [Test::More#subtest](https://metacpan.org/pod/Test::More) 를 사용해서 이런 식의 서술을 했었지요.
-
-이처럼 테스트 단위의 서술을 기재함으로 얻는 이점이란, 테스트코드를 통해서 문서화를 병용할 수 있다는 점이라고...
-테스트 코드에서 얻을 수 있는 그런 부분과는 다른 문서를 별도로 쓰고 있지만...
-나름 잘 구분해서 사용하면 효과적이지 않을까 하고 생각합니다.
 
 ### `Test::Mojo`
 
-HTTP Client 중에 정말 간결하게 사용할 수 있는 것이 [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) 인데,
-이 타이틀에서 주로 다루는 Web API Server 에서 주로 다루게 되는 응답결과인
-JSON의 각 항목들을 테스트하기 위해서는 정말 이만한 게 없었습니다.
-물론 여기에서 사용되는 `Test::Mojo` 자체가 `Mojo::UserAgent` 를 래핑하는 형식을 취하고 있습니다만.
+[Mojo::UserAgent][cpan-mojo-useragent]는 HTTP 클라이언트 중 정말 간결하게 사용할 수 있습니다.
+특히나 웹 API 서버가 주로 다루는 응답 결과인 JSON의 각 항목을 테스트하는데는 정말 이만한 모듈이 없습니다.
+물론 여기에서 사용하는 `Test::Mojo` 자체가 `Mojo::UserAgent`를 래핑하는 형태를 취하고 있죠.
 
-```
-use Mojo::Base -strict;
-use Test::Ika;
-use Test::Mojo;
+    #!perl
+    use Mojo::Base -strict;
+    use Test::Ika;
+    use Test::Mojo;
 
-BEGIN { binmode STDOUT, ":utf8" };
+    BEGIN { binmode STDOUT, ":utf8" };
 
-my $t = Test::Mojo->new('MyApp::Web');
+    my $t = Test::Mojo->new('MyApp::Web');
 
-describe "Noop" => sub {
+    describe "Noop" => sub {
 
-    it "서버간의 연결확인 등의 목적으로 하는 무작업 응답이 필요함" => sub {
-        $t->get_ok('/noop')
-           ->status_is(200)
-           ->json_has('/noop');
+        it "서버간의 연결확인 등의 목적으로 하는 무작업 응답이 필요함" => sub {
+            $t
+                ->get_ok('/noop')
+                ->status_is(200)
+                ->json_has('/noop')
+                ;
+        };
+
+        it "인증토큰을 가지지 않은 채로 무작업 응답 요청시에 400을 표시해야 함" => sub {
+            $t
+                ->get_ok('/noop/auth')
+                ->status_is(400)
+                ->json_has('/message')
+                ;
+        };
+
+        it "인증토큰을 가지고 있을 때는 무작업 응답 요청에 답해야 함" => sub {
+            $t->ua->on( start => sub {
+                my ($ua, $tx) = @_;
+                $tx->req->headers->header('X-MyApp-Token', 'xxxxxxxxxxxx');
+            });
+
+            $t
+                ->get_ok('/noop/auth')
+                ->status_is(200)
+                ->json_has('/noop')
+                ->json_has('/result/ok')
+                ->json_has('/devices/0/id')
+                ;
+        };
     };
 
-    it "인증토큰을 가지지 않은 채로 무작업 응답 요청시에 400을 표시해야 함" => sub {
-        $t->get_ok('/noop/auth')
-         ->status_is(400)
-         ->json_has('/message');
-    };
+앞의 테스트 코드처럼 HTTP 응답이 JSON일 경우 `json_has()` 메소드를 통해 반환되는 JSON 자료를
+Perl 자료 형태로 변환해서 `/devices/0/id`(`devices` 배열 항목의 첫번 째 요소의 `id` 키값)가
+있는지 여부 등을 확인할 수 있는 것입니다.
+이런 데이터 접근방식을 [JSON 포인터(RFC 6901)][rfc-6901]라고 부릅니다.
 
-    it "인증토큰을 가지고 있을 때는 무작업 응답 요청에 답해야 함" => sub {
-        $t->ua->on( start => sub {
-            my ($ua, $tx) = @_;
-            $tx->req->headers->header('X-MyApp-Token', 'xxxxxxxxxxxx');
-        });
-
-        $t->get_ok('/noop/auth')
-         ->status_is(200)
-         ->json_has('/noop')
-         ->json_has('/result/ok')
-         ->json_has('/devices/0/id')
-    };
-};
-```
-
-위의 테스트코드처럼 `->json_has` 를 통해서 HTTP Response 가 JSON 이었을 시에,
-반환되는 JSON 데이터를 Perl 데이터구조로 받아들여서,
-`/devices/0/id` (`devices` 배열 항목의 첫번째 요소의 `id` 키값) 이 있는 지 여부 등을 확인할 수 있는 것입니다.
-이런 데이터접근방식을 `JSON Pointer` 라고 부릅니다 
-
-- [RFC 9601  JavaScript Object Notation (JSON) Pointer](http://tools.ietf.org/html/rfc6901)
-
-위에서 볼 수 있듯이 `Test::Mojo` 자체는 메소드 체이닝으로 동작하기에
-보기에는 나름 깔끔하게(또는 여느 때처럼 보는 펄 같지 않는 것처럼) 느껴지기도 합니다.
+예제에서 볼 수 있듯이 `Test::Mojo` 객체는 메소드 연쇄(method chaining)로 동작하므로
+나름 깔끔하게(또는 보통의 펄 코드같지 않게) 느껴지기도 합니다.
  
 
 ### 프로젝트/모듈의 의존성 관리
 
-`Carton` 과 `cpanfile` 을 사용합니다.
-기본적으로 위의 `t/000-compile.t` 에서 모든 모듈들의 컴파일 테스트시에
-반드시 의존모듈의 누락여부를 확인할 수 있고,
-그때그때 큰 죄의식없이 `cpanfile` 에 필요한 의존모듈을 추가하면 됩니다.
+[Carton][cpan-carton]과 `cpanfile`을 사용합니다.
+기본적으로 앞에서 살펴본 `t/000-compile.t` 테스트 코드에서 모든 모듈의
+컴파일 테스트 시 반드시 의존 모듈의 누락 여부를 확인할 수 있기 때문에
+그때 그때 큰 죄의식없이 `cpanfile` 에 필요한 의존 모듈을 추가하면 됩니다.
 
-매회의 테스트는 아래의 커맨드로 실행됩니다.
+테스트를 수행하는 명령은 다음과 같습니다.
 
-```
-$ carton install
-$ carton exec prove t
-```
+    #!bash
+    $ carton install
+    $ carton exec prove t
 
-`Carton` 및 `cpanfile` 는 여기에서 다루지 않는 것으로 합니다.
 
 ### 테스트 자동화
 
-배포되는 모듈/어플리케이션의 모든 테스트는 Jenkins 상에서 커밋단위 && 일단위로 이뤄집니다.
-이에 대한 이야기는 KPW2012 의 발표에서 다룬 적이 있으므로 추가로 언급하지 않습니다.
+배포되는 모듈/어플리케이션의 모든 테스트는 [Jenkins][home-jenkins] 상에서 *커밋 단위* 및 *일 단위*로 이뤄집니다.
+관련한 이야기는 [Korean Perl Workshop 2012][home-kpw2012]의 [발표 자료][kpw2012-perl-web-app-test]를 참고하세요.
 
-- [Perl Web App 테스트 전략 : Slideshare ](http://www.slideshare.net/JEEN/perl-web-app)
 
 정리하며
 ---------
@@ -233,7 +232,23 @@ $ carton exec prove t
 두번 이상 반복될 것들은 기계에서 맡기며 다른 일들에 눈을 돌리는 조바심내는 개발자가 되기를 바랍니다(제가).
 
 
+[img-1]:          2013-12-16-1.png
+[img-2]:          2013-12-16-2.png
+
+[img-1-resize]:   2013-12-16-1_r.png
+[img-2-resize]:   2013-12-16-2_r.png
+
+
+[cpan-carton]:              https://metacpan.org/module/Carton
+[cpan-mojo-useragent]:      https://metacpan.org/pod/Mojo::UserAgent
+[cpan-test-ika]:            https://metacpan.org/module/Test::Ika
 [cpan-test-mojo]:           https://metacpan.org/module/Test::Mojo
+[cpan-test-more]:           https://metacpan.org/module/Test::More
 [github-jeen]:              https://github.com/jeen
+[home-jenkins]:             http://jenkins-ci.org/
+[home-kpw2012]:             http://event.perl.kr/kpw2012/
 [home-mojolicious]:         http://mojolicio.us/
+[home-rspec]:               http://rspec.info/
+[rfc-6901]:                 http://tools.ietf.org/html/rfc6901
 [twitter-jeen_lee]:         http://twitter.com/#!/JEEN_LEE
+[wiki-tap]:                 http://en.wikipedia.org/wiki/Test_Anything_Protocol
