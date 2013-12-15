@@ -17,11 +17,11 @@ Author:   rumidier
 펄에는 수 많은 웹프레임워크가 있습니다.
 그 중 근래에 가장 많이 사용하는 프레임워크는 [Catalyst][home-catalyst]와
 [Dancer][home-dancer], [Mojolicious][home-mojolicious] 세 가지 입니다.
-복잡한 엔터프라이즈 환경은 Catalyst를 많이 사용하고 비교적 규모가 작은
-웹 사이트는 Dancer나 Mojolicious를 많이 사용한다고 합니다.
-Mojolicious는 [공식 홈페이지][home-mojolicious]에 문서화가 잘되있고 다루기 쉽다고 하지만
+복잡한 엔터프라이즈 환경은 *Catalyst*를 많이 사용하고 비교적 규모가 작은
+웹 사이트는 *Dancer*나 *Mojolicious*를 많이 사용한다고 합니다.
+*Mojolicious*는 [공식 홈페이지][home-mojolicious]에 문서화가 잘 되있고 다루기 쉽다고 하지만
 정말 아무 것도 모른채로 시작한다면 막히는 곳이 한 두 군데가 아닙니다.
-문서를 보고 어떻게 시작해야 될지 모르는 분들에게 이 글을 바칩니다.
+문서를 보고도 어떻게 시작해야 될지 헤매실 분들에게 이 글을 바칩니다.
 
 
 준비물
@@ -36,14 +36,14 @@ Mojolicious는 [공식 홈페이지][home-mojolicious]에 문서화가 잘되있
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan Mojolicious
+    $ sudo cpan Mojolicious DBI DBD::mysql
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan Mojolicious
+    $ cpan Mojolicious DBI DBD::mysql
 
 
 사용 방법
@@ -363,7 +363,7 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
 
     #!perl
     my $sth = $DBH->prepare(qq{
-    	INSERT INTO `memo` (`name`,`title`,`content`) VALUES (?,?,?)
+        INSERT INTO `memo` (`name`,`title`,`content`) VALUES (?,?,?)
     });
     $sth->execute( $name, $title, $content );
 
@@ -395,25 +395,25 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
 
     #!perl
     get '/list' => sub {
-	my $self = shift;
+        my $self = shift;
 
-	my $sth = $DBH->prepare(qq{ SELECT id, name, title, content, wdate FROM memo });
-	$sth->execute();
+        my $sth = $DBH->prepare(qq{ SELECT id, name, title, content, wdate FROM memo });
+        $sth->execute();
 
-	my %articles;
-	while ( my @row = $sth->fetchrow_array ) {
-	    my ( $id, $name, $title, $content, $date ) = @row;
-	    my ($wdate) = split / /, $date;
+        my %articles;
+        while ( my @row = $sth->fetchrow_array ) {
+            my ( $id, $name, $title, $content, $date ) = @row;
+            my ($wdate) = split / /, $date;
 
-	    $articles{$id} = {
-		name    => $name,
-		title   => $title,
-		content => $content,
-		wdate   => $wdate,
-	    };
-	}
+            $articles{$id} = {
+            name    => $name,
+            title   => $title,
+            content => $content,
+            wdate   => $wdate,
+            };
+        }
 
-	$self->stash( articles => \%articles );
+        $self->stash( articles => \%articles );
     };
 
 `$self->stash()` 함수를 이용해 템플릿 쪽으로 `\%articles` 해시 레퍼런스를 전달합니다.
@@ -485,29 +485,29 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
 
     #!perl
     get '/read/:id' => sub {
-	my $self = shift;
+        my $self = shift;
 
-	my $input_id = $self->param('id');
+        my $input_id = $self->param('id');
 
-	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id });
-	$sth->execute();
+        my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id });
+        $sth->execute();
 
-	my %articles;
-	my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
-	my ($wdate) = split / /, $date;
+        my %articles;
+        my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+        my ($wdate) = split / /, $date;
 
-	$articles{$id} = {
-	    name    => $name,
-	    title   => $title,
-	    content => $content,
-	    wdate   => $wdate,
-	};
+        $articles{$id} = {
+            name    => $name,
+            title   => $title,
+            content => $content,
+            wdate   => $wdate,
+        };
 
-	$self->stash(
-	    articles => \%articles,
-	    id       => $id,
-	);
-	$self->render('read');
+        $self->stash(
+            articles => \%articles,
+            id       => $id,
+        );
+        $self->render('read');
     };
 
 다음은 `/read/N`으로 접속했을 때 처리할 수 있는 템플릿 코드입니다.
@@ -517,40 +517,40 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
     % layout 'default';
     % title 'READ';
 
-	<table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
-	  <tr>
-	    <td height=20 colspan=4 align=center bgcolor=#999999>
-	      <font color=white><b><%= $articles->{$id}{title} %></b></font>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td width=50 height=20 align=center bgcolor=#EEEEEE> 글쓴이 </td>
-	    <td width=240 bgcolor=white> <%= $articles->{$id}{name} %> </td>
-	    <td width=50 height=20 align=center bgcolor=#EEEEEE> 날짜 </td>
-	    <td width=240 bgcolor=white> <%= $articles->{$id}{wdate} %> </td>
-	  </tr>
-	  <tr>
-	    <td bgcolor=white colspan=4>
-	      <font color=black>
-		<pre><%= $articles->{$id}{content} %></pre>
-	      </font>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td colspan=4 bgcolor=#999999>
-	      <table width=100%>
-		<tr>
-		  <td width=2000 align=left height=20>
-		    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
-		    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
-		    <a href='/edit/<%= $id %>' style="text-decoration:none;"><font color=white>[수정]</font></a>
-		    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
-		  </td>
-		</tr>
-	      </table>
-	    </td>
-	  </tr>
-	</table>
+        <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
+          <tr>
+            <td height=20 colspan=4 align=center bgcolor=#999999>
+              <font color=white><b><%= $articles->{$id}{title} %></b></font>
+            </td>
+          </tr>
+          <tr>
+            <td width=50 height=20 align=center bgcolor=#EEEEEE> 글쓴이 </td>
+            <td width=240 bgcolor=white> <%= $articles->{$id}{name} %> </td>
+            <td width=50 height=20 align=center bgcolor=#EEEEEE> 날짜 </td>
+            <td width=240 bgcolor=white> <%= $articles->{$id}{wdate} %> </td>
+          </tr>
+          <tr>
+            <td bgcolor=white colspan=4>
+              <font color=black>
+                <pre><%= $articles->{$id}{content} %></pre>
+              </font>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=4 bgcolor=#999999>
+              <table width=100%>
+                <tr>
+                  <td width=2000 align=left height=20>
+                    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
+                    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
+                    <a href='/edit/<%= $id %>' style="text-decoration:none;"><font color=white>[수정]</font></a>
+                    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
 
 이제 글 목록에서 각각의 글 제목을 클릭하면 글의 내용을 확인할 수 있습니다.
 
@@ -566,30 +566,30 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
 
     #!perl
     get '/edit/:id' => sub {
-	my $self = shift;
+        my $self = shift;
 
-	my $input_id = $self->param('id');
+        my $input_id = $self->param('id');
 
-	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id });
-	$sth->execute();
+        my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id });
+        $sth->execute();
 
-	my %articles;
-	my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
-	my ($wdate) = split / /, $date;
+        my %articles;
+        my ( $id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+        my ($wdate) = split / /, $date;
 
-	$articles{$id} = {
-	    name    => $name,
-	    title   => $title,
-	    content => $content,
-	    wdate   => $wdate,
-	};
+        $articles{$id} = {
+            name    => $name,
+            title   => $title,
+            content => $content,
+            wdate   => $wdate,
+        };
 
-	$self->stash(
-	    articles => \%articles,
-	    id       => $id,
-	);
+        $self->stash(
+            articles => \%articles,
+            id       => $id,
+        );
 
-	$self->render('edit');
+        $self->render('edit');
     };
 
 수정하는 페이지는 쓰기 페이지와 유사하지만 기존의 정보가 표시되야 한다는 차이점이 있습니다.
@@ -600,79 +600,79 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
     % layout 'default';
     % title 'EDIT';
 
-	<form action="/edit" method="post">
-	  <input type="hidden" name="id" value="<%= $id %>">
-	  <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
-	    <tr>
-	      <td height=20 colspan=4 align=center bgcolor=#999999>
-		<font color=white><b>수정</b></font>
-	      </td>
-	    </tr>
-	    <tr>
-	      <td bgcolor=white>
-		<table bgcolor=white>
-		  <tr>
-		    <td>이름</td>
-		    <td><input type="text" name="name" value="<%= $articles->{$id}{name} %>"></td>
-		  </tr>
-		  <tr>
-		    <td>제목</td>
-		    <td><input type="text" name="title" value="<%= $articles->{$id}{title} %>"></td>
-		  </tr>
-		  <tr>
-		    <td>내용</td>
-		    <td colspan=4>
-		      <textarea name="content" cols=80 rows=5><%= $articles->{$id}{content} %></textarea>
-		    </td>
-		  </tr>
-		  <tr>
-		    <td colspan=10 align=center>
-		      <input type="submit" value="수정확인">
-		    </td>
-		  </tr>
-		</table>
-	      </td>
-	    </tr>
-	  <tr>
-	    <td bgcolor=#999999>
-	      <table width=100%>
-		<tr>
-		  <td>
-		    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
-		    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
-		    <a href='/read/<%= $id %>' style="text-decoration:none;"><font color=white>[취소]</font></a>
-		    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
-		  </td>
-		</tr>
-	      </table>
-	    </td>
-	  </tr>
-	  </table>
-	</form>
+        <form action="/edit" method="post">
+          <input type="hidden" name="id" value="<%= $id %>">
+          <table width=580 border=0 cellpadding=2 cellspacing=1 bgcolor=#777777>
+            <tr>
+              <td height=20 colspan=4 align=center bgcolor=#999999>
+                <font color=white><b>수정</b></font>
+              </td>
+            </tr>
+            <tr>
+              <td bgcolor=white>
+                <table bgcolor=white>
+                  <tr>
+                    <td>이름</td>
+                    <td><input type="text" name="name" value="<%= $articles->{$id}{name} %>"></td>
+                  </tr>
+                  <tr>
+                    <td>제목</td>
+                    <td><input type="text" name="title" value="<%= $articles->{$id}{title} %>"></td>
+                  </tr>
+                  <tr>
+                    <td>내용</td>
+                    <td colspan=4>
+                      <textarea name="content" cols=80 rows=5><%= $articles->{$id}{content} %></textarea>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan=10 align=center>
+                      <input type="submit" value="수정확인">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          <tr>
+            <td bgcolor=#999999>
+              <table width=100%>
+                <tr>
+                  <td>
+                    <a href='/list' style="text-decoration:none;"><font color=white>[목록보기]</font></a>
+                    <a href='/write' style="text-decoration:none;"><font color=white>[글쓰기]</font></a>
+                    <a href='/read/<%= $id %>' style="text-decoration:none;"><font color=white>[취소]</font></a>
+                    <a href='/delete/<%= $id %>' style="text-decoration:none;"><font color=white>[삭제]</font></a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          </table>
+        </form>
 
 내용을 수정한 후 `POST`로 전달하므로 그에 맞는 컨트롤러가 필요합니다.
 
     #!perl
     post '/edit' => sub {
-	my $self = shift;
+        my $self = shift;
 
-	my $id      = $self->param('id');
-	my $name    = $self->param('name');
-	my $title   = $self->param('title');
-	my $content = $self->param('content');
+        my $id      = $self->param('id');
+        my $name    = $self->param('name');
+        my $title   = $self->param('title');
+        my $content = $self->param('content');
 
-	my $sth = $DBH->prepare(qq{
-	    UPDATE `memo` SET `name`=?,`title`=?,`content`=? WHERE `id`=$id
-	});
-	$sth->execute( $name, $title, $content );
+        my $sth = $DBH->prepare(qq{
+            UPDATE `memo` SET `name`=?,`title`=?,`content`=? WHERE `id`=$id
+        });
+        $sth->execute( $name, $title, $content );
 
-	$self->redirect_to( $self->url_for('/list') );
+        $self->redirect_to( $self->url_for('/list') );
     };
 
 수정이 끝난 후 `/list`로 페이지를 이동시키는 부분을 유의해주세요.
 페이지를 리다이렉트 시킬 때는 `$self->redirect_to()` 함수를 이용합니다.
 
-	$self->redirect_to( $self->url_for('/list') );
+        $self->redirect_to( $self->url_for('/list') );
 
 ![수정된 1번 내용][img-7-resize]
 *그림 7.* 수정된 1번 내용 ([원본][img-7])
@@ -688,14 +688,14 @@ MySQL 접속 계정은 `memouser`, 비밀 번호는 `memopass`라고 가정합�
 
     #!perl
     get '/delete/:id' => sub {
-	my $self = shift;
+        my $self = shift;
 
-	my $id = $self->param('id');
+        my $id = $self->param('id');
 
-	my $sth = $DBH->prepare(qq{ DELETE FROM `memo` WHERE `id`=$id });
-	$sth->execute();
+        my $sth = $DBH->prepare(qq{ DELETE FROM `memo` WHERE `id`=$id });
+        $sth->execute();
 
-	$self->redirect_to( $self->url_for('/list') );
+        $self->redirect_to( $self->url_for('/list') );
     };
 
 삭제 후 `/list`로 이동하기 때문에 따로 템플릿 코드가 필요하지 않죠.
@@ -710,23 +710,23 @@ Helper 사용하기
 
     #!perl
     helper db_select => sub {
-	my ( $self, $input_id ) = @_;
+        my ( $self, $input_id ) = @_;
 
-	my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id});
-	$sth->execute();
+        my $sth = $DBH->prepare(qq{ SELECT * FROM memo WHERE id=$input_id});
+        $sth->execute();
 
-	my %articles;
-	my ( $db_id, $name, $title, $content, $date ) = $sth->fetchrow_array;
-	my ($wdate) = split / /, $date;
+        my %articles;
+        my ( $db_id, $name, $title, $content, $date ) = $sth->fetchrow_array;
+        my ($wdate) = split / /, $date;
 
-	$articles{$db_id} = {
-	    name    => $name,
-	    title   => $title,
-	    content => $content,
-	    wdate   => $wdate,
-	};
+        $articles{$db_id} = {
+            name    => $name,
+            title   => $title,
+            content => $content,
+            wdate   => $wdate,
+        };
 
-	return \%articles;
+        return \%articles;
     };
 
 방금 작성한 헬퍼 코드를 호출하려면 `$self->db_select()` 형식으로 사용합니다.
