@@ -12,11 +12,14 @@ Author:   corund
 
 [@corund][twitter-corund] - 요즘 체력이 부족함을 느끼고 있는 Computer Programmer
 
+
+시작하며
+---------
+
 가상화를 이용하여 개발 환경을 실제 운영될 서버 환경과 비슷하게 관리하는 일이 많아졌습니다.
 개발자들의 데스크탑이 서로 다른 환경이더라도 가상화를 이용하면 개발 환경을 쉽게 통일할 수 있습니다.
-`Rex/Boxes`를 이용하여 이런 가상 환경을 쉽게 설정하고 공유할 수 있습니다.
-
-같은 작업을 하는 도구로 [Vagrant](http://www.vagrantup.com/)라는 도구가 유명합니다.
+*Rex/Boxes*를 이용해 이런 가상 환경을 쉽게 설정하고 공유할 수 있습니다.
+같은 작업을 하는 도구로는 [Vagrant][home-vagrant]가 유명합니다.
 
 
 ## 설치하기
@@ -288,4 +291,5 @@ ova 이미지가 준비되면 이 이미지를 http나 ftp로 다운로드할 �
 `Rex/Boxes`를 이용하여 쉽게 자동화할 수 있습니다.
 
 
+[home-vagrant]:         http://www.vagrantup.com/
 [twitter-corund]:       http://twitter.com/#!/corund
