@@ -82,27 +82,32 @@ Author:   corund
 관련해서는 더 자세히 알아보죠.
 
 
-## Rexfile
+Rexfile
+--------
 
-`rex`는 `Rexfile`이라는 파일로 작업을 설정합니다. 이 파일은 일반 Perl 구문이며 `rex` 패키지가 제공하는 서브루틴들을
-명령어처럼 사용할 수 있게 되어 있습니다. 위의 예제에서 실행한 `rexify ...` 명령은 box 작업을 하는 `Rexfile` 뼈대를
-생성하는 작업입니다. 이 파일을 적절히 수정하여 자신이 원하는 작업을 합니다.
+[Rex][home-rex]는 `Rexfile` 파일을 이용해 작업을 설정합니다.
+이 파일은 일반 펄 구문이며 `rex` 패키지가 제공하는 서브루틴을 명령어처럼 사용할 수 있게 되어 있습니다.
+위의 예제에서 실행한 `rexify ...` 명령은 box 작업을 하는 `Rexfile` 뼈대를 생성하는 작업입니다.
+이 파일을 적절히 수정하여 자신이 원하는 작업을 합니다.
 
-`Rexfile`에서 작업의 단위는 태스크(task)입니다. 위의 예제에서 `rex init`도 `init` 태스크를 실행한 것입니다.
-이 태스크는 `task` 명령어로 정의할 수 있습니다. `task` 명령어는 다음과 같은 형식입니다.
+`Rexfile`에서 작업의 단위는 *태스크(task)*입니다.
+위의 예제에서 `rex init`도 `init` 태스크를 실행한 것입니다.
+이 태스크는 `task` 명령어로 정의할 수 있습니다.
+`task` 명령어는 다음과 같은 형식입니다.
 
+    #!perl
     task '<task_name>', sub {
         <...>
     };
 
-이제 기본 생성된 파일을 수정하여 원하는 작업을 하도록 하겠습니다.
+이제 기본 생성된 파일을 수정하여 원하는 작업을 수행해보겠습니다.
+먼저 맨 아랫줄에 `require <project_name>;` 줄을 삭제합니다.
+그리고 현재 디렉터리 밑에 `lib` 디렉터리도 삭제합니다.
+`Rexfile`이 커질 경우 `lib` 디렉터리 밑에 따로 태스크를 정의해서
+`Rexfile`을 좀더 구조화시킬 때 이용하는 것이기 때문이 지금은 필요 없습니다.
+최종적으로 만들 `Rexfile`의 첫 부분과 *init 태스크*는 아래와 같습니다.
 
-먼저 맨 아랫줄에 `require <project_name>;` 줄을 삭제합니다. 그리고 현재 디렉터리 밑에 `lib` 디렉터리도
-삭제합니다. `Rexfile`이 커질 경우 `lib` 디렉터리 밑에 따로 태스크들을 정의해서 `Rexfile`을 좀더 구조화시킬
-때 이용하는 것이기 때문이 지금의 경우에는 필요가 없습니다.
-
-최종적으로 만들 `Rexfile`의 첫부분과 init task는 아래와 같습니다.
-
+    #!perl
     use strict;
     use warnings;
 
@@ -118,46 +123,46 @@ Author:   corund
     set -passauth;
 
     use Cwd qw/abs_path/;
-    
+
     my $my_vm_name = 'my_vm_name_wanted';
-    
+
     task 'init', sub {
+        my $param = shift;
 
-       my $param = shift;
+        box {
+            my ($box) = @_;
 
-       box {
-          my ($box) = @_;
-          
-          # vm 이름 지정
-          $box->name($my_vm_name);
+            # vm 이름 지정
+            $box->name($my_vm_name);
 
-          # vm 이미지를 다운로드하는 주소 지정.
-          # 명령행으로 지정할 경우 그 값을 사용하며 없으면 미리 지정한 값을 사용한다.
-          my $url = $param->{url} || 'http://<myserver>/<my_vm_image>.ova';
-          $box->url($url); # vm 이미지를 다운로드할 주소를 지정한다.
+            # vm 이미지를 다운로드할 주소를 지정
+            # 명령행으로 지정할 경우 그 값을 사용하며 없으면 미리 지정한 값을 사용
+            my $url = $param->{url} || 'http://<myserver>/<my_vm_image>.ova';
+            $box->url($url);
 
-          # 사용할 포트를 지정한다.
-          $box->forward_port(
-              ssh => [2222 => 22],
-              http => [8080 => 80],
-          );
+            # 사용할 포트를 지정
+            $box->forward_port(
+                ssh  => [2222 => 22],
+                http => [8080 => 80],
+            );
 
-          # 공유 폴더 지정. 현재 디렉터리를 share 라는 이름으로 공유한다.
-          $box->share_folder('share' => abs_path());
+            # 공유 폴더 지정
+            # 현재 디렉터리를 share 라는 이름으로 공유
+            $box->share_folder('share' => abs_path());
 
-          # vm 접속 정보. 설정한 값으로 바꾼다.
-          $box->auth(
-             user => "root",
-             password => "box",
-          );
+            # vm 접속 정보
+            # 설정한 값으로 변경
+            $box->auth(
+                user     => "root",
+                password => "box",
+            );
 
-          # on_init 태스크를 호출하여 프로비전 작업을 수행한다.
-          $box->setup(qw/on_init/);
-       };
+            # on_init 태스크를 호출해 프로비전 작업을 수행
+            $box->setup(qw/ on_init /);
+        };
     };
 
-
-기본 생성한 `Rexfile`에서는 vm 이름을 명령행으로 지정하지만 여기에서는 따로 내부에서 정의해줍니다.
+기본 생성한 `Rexfile`에서는 VM 이름을 명령행으로 지정하지만 여기에서는 따로 내부에서 정의해줍니다.
 많은 경우 프로젝트 별로 이름을 지정하면 되기 때문에 이렇게 지정하는 것이 더 좋습니다.
 
 
