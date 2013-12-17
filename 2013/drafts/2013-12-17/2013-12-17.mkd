@@ -28,21 +28,33 @@ Author:   luzluna
 
 필요한 모듈은 다음과 같습니다.
 
-- [CPAN의 DBIx::Simple 모듈][cpan-dbix-simple]
 - [CPAN의 DBD::Pg 모듈][cpan-dbd-pg]
+- [CPAN의 DBIx::Simple 모듈][cpan-dbix-simple]
+- [CPAN의 Data::Dump 모듈][cpan-data-dump]
+- [CPAN의 File::Slurp 모듈][cpan-file-slurp]
 - [CPAN의 Mojolicious 모듈][cpan-mojolicious]
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan DBIx::Simple DBD::Pg Mojolicious
+    $ sudo cpan      \
+        DBD::Pg      \
+        DBIx::Simple \
+        Data::Dump   \
+        File::Slurp  \
+        Mojolicious
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan Net::Pcap NetPacket Mojolicious
+    $ cpan           \
+        DBD::Pg      \
+        DBIx::Simple \
+        Data::Dump   \
+        File::Slurp  \
+        Mojolicious
 
 
 데이터베이스 접속 준비
@@ -249,35 +261,39 @@ CREATE 핸들러 추가
     DBD::Pg::st execute failed: ERROR:  invalid input syntax for type json
 
 
-#커멘드라인에서 사용하기
+명령줄에서 사용하기
+--------------------
 
-웹페이지를 통하지 않고 일반 커멘드라인 유틸리티에서도 간단히 사용하실 수 있습니다.
+웹 페이지를 통하지 않고 일반 명령줄 유틸리티에서도 간단히 사용할 수 있습니다.
 
-```
-use strict;
-use warnings;
-use DBIx::Simple;
-use File::Slurp;
-use Data::Dump qw/dump/;
+    #!perl
+    $!/usr/bin/env perl
 
-my $config = eval( read_file('config.conf') );
+    use v5.14;
+    use strict;
+    use warnings;
 
-my $dbh = DBIx::Simple->connect( @{$config->{db}} );
+    use DBIx::Simple;
+    use Data::Dump qw( dump );
+    use File::Slurp;
 
-my $ret= $dbh->query("SELECT * FROM item")->hashes;
+    my $config = eval( read_file('config.conf') );
 
-print dump($ret), "\n";
-```
+    my $dbh = DBIx::Simple->connect( @{$config->{db}} );
 
-실행해보면
+    my $ret= $dbh->query("SELECT * FROM item")->hashes;
 
-```
-$ perl dbis.pl
-[
-  { data => "{\"name\":\"test1\", \"value\":31}", id => 1 },
-  { data => "{\"babo\":\"eee\"}", id => 2 },
-]
-```
+    say dump($ret);
+
+실행한 결과는 다음과 같습니다.
+
+    #!bash
+    $ perl dbis.pl
+    [
+      { data => "{\"name\":\"test1\", \"value\":31}", id => 1 },
+      { data => "{\"babo\":\"eee\"}", id => 2 },
+    ]
+
 
 #결론
 Mojolicious나 Dancer같은 경량 웹프레임워크들을 사용할때에 DBIC(DBIx::Class)를 사용하는것인 조금 무겁고 복잡하게 느껴질때가 있습니다.
@@ -287,8 +303,10 @@ Mojolicious나 Dancer같은 경량 웹프레임워크들을 사용할때에 DBIC
 웹페이지를 만드는 용도로 사용중한다면 DBIx::XHTML_Table 모듈을 이용해서 테이블로 그려 볼수도 있고, 커멘드라인에서 사용한다면 Text::Table을 사용하여 조금 더 예쁘게 출력해볼 수도 있습니다. 한번 시도해보세요.
 
 
+[cpan-data-dump]:           https://metacpan.org/module/Data::Dump
 [cpan-dbd-pg]:              https://metacpan.org/module/DBD::Pg
 [cpan-dbix-simple]:         https://metacpan.org/module/DBIx::Simple
+[cpan-file-slurp]:          https://metacpan.org/module/File::Slurp
 [cpan-mojolicious]:         https://metacpan.org/module/Mojolicious
 [cpan]:                     http://www.cpan.org/
 [home-mojolicious]:         http://mojolicio.us/
