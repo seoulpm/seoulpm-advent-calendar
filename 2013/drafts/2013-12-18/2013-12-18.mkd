@@ -118,11 +118,11 @@ Rexfile
 
     use Cwd qw/abs_path/;
 
-    set user => 'root';
+    set user     => 'root';
     set password => 'box';
     set -passauth;
 
-    use Cwd qw/abs_path/;
+    use Cwd qw( abs_path );
 
     my $my_vm_name = 'my_vm_name_wanted';
 
@@ -148,7 +148,7 @@ Rexfile
 
             # 공유 폴더 지정
             # 현재 디렉터리를 share 라는 이름으로 공유
-            $box->share_folder('share' => abs_path());
+            $box->share_folder( share => abs_path() );
 
             # vm 접속 정보
             # 설정한 값으로 변경
@@ -202,20 +202,21 @@ OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 �
 직접 지정하는 방식으로만 사용하는 경우가 많을 것입니다.
 
 
-## 가상머신 설정
+가상 머신 설정
+---------------
 
 보통 많이 사용하는 NAT 방식으로 네트워킹을 사용할 때에는 포트 포워딩 설정만 해주면 됩니다.
-포트 포워딩 설정에서 `ssh` 포트 설정이 반드시 필요합니다. `rex`는 `ssh`로 접속하여
-프로비전 작업을 하기 때문입니다. 이 때 포트 이름으로 `ssh`라는 이름을 써야만 제대로
-작동합니다.
+포트 포워딩 설정에서 SSH 포트 설정이 반드시 필요합니다.
+*Rex*는 SSH로 접속해 프로비전 작업을 수행하기 때문입니다.
+이 때 포트 이름으로 `ssh`라는 이름을 써야만 제대로 작동합니다.
 
 `$box->share_folder`로 호스트 머신과 가상 머신 사이에 폴더 공유를 지정할 수 있습니다.
-`$box->share_folder('<sharename>' => '<호스트 디렉터리 path>');` 형식으로 지정합니다.
-이 예에서는 `Cwd` 모듈의 `abs_path()` 함수로 현재 디렉터리를 공유하도록 설정했습니다.
-`<sharename>`은 가상 머신에서 `mount`할 때 사용합니다.
+`$box->share_folder( '<sharename>' => '<호스트 디렉터리 path>' );` 형식으로 지정합니다.
+앞의 예제에서는 [Cwd 모듈][cpan-cwd]의 `abs_path()` 함수를 이용해 현재 디렉터리를 공유하도록 설정했습니다.
+`<sharename>`은 가상 머신에서 *마운트*할 때 사용합니다.
 
-마지막 설정으로 `$box->setup` 명령으로 가상 머신이 최초로 기동된 후 `rex`로 작업할
-프로비전 작업을 세팅합니다.
+마지막 설정으로 `$box->setup` 명령으로 가상 머신이 최초로 기동된 후
+*Rex*로 처리할 프로비전 작업을 설정합니다.
 
 
 ## 가상 머신을 시작/중지하는 태스크 추가
@@ -313,6 +314,7 @@ OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 �
 `Rex/Boxes`를 이용하여 쉽게 자동화할 수 있습니다.
 
 
+[cpan-cwd]:                 https://metacpan.org/module/Cwd
 [cpan-net-ssh2]:            https://metacpan.org/module/Net::SSH2
 [cpan-rex]:                 https://metacpan.org/module/Rex
 [cpan-xml-simple]:          https://metacpan.org/module/XML::Simple
