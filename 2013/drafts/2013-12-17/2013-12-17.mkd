@@ -30,18 +30,19 @@ Author:   luzluna
 
 - [CPAN의 DBIx::Simple 모듈][cpan-dbix-simple]
 - [CPAN의 DBD::Pg 모듈][cpan-dbd-pg]
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan DBIx::Simple DBD::Pg
+    $ sudo cpan DBIx::Simple DBD::Pg Mojolicious
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan Net::Pcap NetPacket
+    $ cpan Net::Pcap NetPacket Mojolicious
 
 
 데이터베이스 접속 준비
@@ -106,17 +107,32 @@ PostgreSQL 데이터베이스를 기준으로 데이터베이스를 준비합니
     INSERT 0 1
 
 
-#Config파일 생성
+웹 응용을 위한 설정 파일 생성
+------------------------------
 
-file: config.conf
-```
-{
-    db => [
-        "dbi:Pg:dbname=test;host=127.0.0.1;port=5432",
-        'test','test$$'
-    ]
-}
-```
+*Mojolicious*는 기본적으로 설정 파일을 지원합니다.
+`Mojolicious::Lite`를 이용해서 웹 응용을 제작할 경우 웹 응용과
+동일한 파일명에 확장자를 `.conf`로 설정하면 자동으로 읽어들입니다.
+파일을 준비해보죠.
+
+
+    #!bash
+    $ mkdir dbix-simple-example
+    $ cd dbix-simple-example
+    $ touch item.conf
+    $ touch item.pl
+
+`item.conf` 파일을 다음처럼 편집합니다.
+
+    #!perl
+    {
+        db => [
+            "dbi:Pg:dbname=test;host=127.0.0.1;port=5432",
+            'test',
+            'test$$',
+        ]
+    }
+
 
 #Mojolicious::Lite 어플리케이션 작성
 
@@ -269,3 +285,11 @@ Mojolicious나 Dancer같은 경량 웹프레임워크들을 사용할때에 DBIC
 #과제
 웹페이지를 만드는 용도로 사용중한다면 DBIx::XHTML_Table 모듈을 이용해서 테이블로 그려 볼수도 있고, 커멘드라인에서 사용한다면 Text::Table을 사용하여 조금 더 예쁘게 출력해볼 수도 있습니다. 한번 시도해보세요.
 
+
+[cpan-dbd-pg]:              https://metacpan.org/module/DBD::Pg
+[cpan-dbix-simple]:         https://metacpan.org/module/DBIx::Simple
+[cpan-mojolicious]:         https://metacpan.org/module/Mojolicious
+[cpan]:                     http://www.cpan.org/
+[home-mojolicious]:         http://mojolicio.us/
+[home-perlbrew]:            http://perlbrew.pl/
+[twitter-luzluna]:          http://twitter.com/#!/luzluna
