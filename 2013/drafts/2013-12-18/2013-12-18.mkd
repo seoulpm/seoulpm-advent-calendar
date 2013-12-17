@@ -68,7 +68,7 @@ Author:   corund
 처음 실행해보기
 ----------------
 
-다음 명령을 통해 `Rex/Boxes`에서 제공하는 우분투 가상 머신을 등록하고 실행해 볼 수 있습니다.
+다음 명령을 통해 [Rex/Boxes][home-rex-boxes]에서 제공하는 우분투 가상 머신을 등록하고 실행해 볼 수 있습니다.
 
     #!bash
     $ rexify <project_name> --template=box
@@ -96,7 +96,7 @@ Rexfile
 `task` 명령어는 다음과 같은 형식입니다.
 
     #!perl
-    task '<task_name>', sub {
+    task '<task_name>' => sub {
         <...>
     };
 
@@ -126,7 +126,7 @@ Rexfile
 
     my $my_vm_name = 'my_vm_name_wanted';
 
-    task 'init', sub {
+    task 'init' => sub {
         my $param = shift;
 
         box {
@@ -207,7 +207,7 @@ OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 �
 
 보통 많이 사용하는 NAT 방식으로 네트워킹을 사용할 때에는 포트 포워딩 설정만 해주면 됩니다.
 포트 포워딩 설정에서 SSH 포트 설정이 반드시 필요합니다.
-*Rex*는 SSH로 접속해 프로비전 작업을 수행하기 때문입니다.
+[Rex][home-rex]는 SSH로 접속해 프로비전 작업을 수행하기 때문입니다.
 이 때 포트 이름으로 `ssh`라는 이름을 써야만 제대로 작동합니다.
 
 `$box->share_folder`로 호스트 머신과 가상 머신 사이에 폴더 공유를 지정할 수 있습니다.
@@ -219,32 +219,40 @@ OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 �
 *Rex*로 처리할 프로비전 작업을 설정합니다.
 
 
-## 가상 머신을 시작/중지하는 태스크 추가
+가상 머신을 시작/중지하는 태스크 추가
+--------------------------------------
 
-가상 머신을 시작/중지하는 태스크는 다음과 같이 추가합니다.
+가상 머신을 시작/중지하는 태스크는 다음 코드를 이용해 추가할 수 있습니다.
 
-    task 'up', sub {
-        run "VBoxManage startvm \"$my_vm_name\" --type=headless";
+    #!perl
+    task 'up' => sub {
+        run qq{VBoxManage startvm "$my_vm_name" --type=headless};
     };
 
-    task 'down', sub {
-        my $box = Rex::Commands::Box->new(name => $my_vm_name);
+    task 'down' => sub {
+        my $box = Rex::Commands::Box->new( name => $my_vm_name );
         $box->stop;
     }
 
-가상 머신을 시동하는 태스크는 `VBoxManage` 명령어를 직접 사용하였습니다. 현재 `Rex/Boxes` 구현에서는
-`$box->start`로 가상 머신을 시동할 경우 윈도우즈에서는 headless 모드로 동작하지 않고
-가상 머신 창이 뜨게 됩니다. 그래서 직접 `VBoxManage` 명령어를 사용하여 headless 모드로 시동하게 하였습니다.
+가상 머신을 시동하는 태스크는 `VBoxManage` 명령을 직접 사용하였습니다.
+현재 [Rex/Boxes][home-rex-boxes] 구현에서는 `$box->start`로 가상 머신을 시동할 경우
+윈도우즈의 경우 headless 모드로 동작하지 않고 가상 머신 창이 뜨게 됩니다.
+그래서 직접 `VBoxManage` 명령을 사용해 headless 모드로 시동하게 하였습니다.
 
 이제 다음과 같이 가상 머신을 시작/중지할 수 있습니다.
 
+    #!plain
+    #
     # 가상 머신 시작
-    bash$ rex up
+    #
+    $ rex up
 
+    #
     # 가상 머신 중지
-    bash$ rex down
+    #
+    $ rex down
 
-가상 머신을 실행한 후 접속은 포트 포워딩으로 설정한 ssh로 접속하면 됩니다.
+가상 머신을 실행한 후 접속은 포트 포워딩으로 설정한 SSH로 접속하면 됩니다.
 
 
 ## 공유 폴더 마운트
