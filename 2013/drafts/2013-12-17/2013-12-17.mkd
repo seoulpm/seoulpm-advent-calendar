@@ -1,3 +1,10 @@
+Title:    DBIx::Simple
+Package:  Seoul.pm
+Category: database
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
 #개요
 간단히 DB를 사용할 수 있는 모듈인 DBIx::Simple을 소개합니다.
 
