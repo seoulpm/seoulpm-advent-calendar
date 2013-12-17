@@ -189,69 +189,64 @@ Mojolicious::Lite 어플리케이션
 예쁘게 잘 나옵니다. :)
 
 
-#CREATE 핸들러 추가
+CREATE 핸들러 추가
+-------------------
 
-소스 중간에 다음의 get과 post의 핸들러를 추가합니다.
+`item.pl` 웹 응용 코드의 `app;` 바로 위에 다음 코드를 추가합니다.
 
-```
-get '/item/create' => sub {
-    my $self = shift;
-};
-post '/item/create' => sub {
-    my $self = shift;
-    $self->db->query("INSERT INTO item (data) VALUES (?)", $self->param('data'));
-    $self->render(json => {"status"=>"done"});
-};
-```
+    #!perl
+    get  '/item/create' => 'item/create';
+    post '/item/create' => sub {
+        my $self = shift;
 
-그리고 소스의 끝부분에 template을 다음과 같이 추가해줍니다.
+        $self->db->query(
+            "INSERT INTO item (data) VALUES (?)",
+            $self->param('data'),
+        );
 
-```
-__DATA__
+        $self->render(json => {"status"=>"done"});
+    };
 
-@@ itemcreate.html.ep
-<form action="/item/create" method="post">
- <input name="data" type="text">
- <input type="submit">
-</form>
-```
+그리고 `item.pl`의 `app;` 바로 다음에 다음 코드를 추가합니다.
 
-morbo로 실행한 뒤
+    #!perl
+    __DATA__
 
-```
-$ morbo -l http://*:5000 item.pl
-```
+    @@ item/create.html.ep
+    <form action="/item/create" method="post">
+      <input name="data" type="text">
+      <input type="submit">
+    </form>
 
-웹브라우저로 접속해보면
+`morbo`는 변경한 소스를 자동으로 감지해서 새로 서버를 기동시키므로
+별도로 종료 후 다시 기동할 필요는 없습니다.
+이제 웹브라우저를 이용해서 `http://localhost:5000/item/create` 주소로 접속해보면
+아이템을 추가하기 위한 간단한 양식을 볼 수 있습니다.
+양식에 JSON 형식을 입력하면 다음과 같은 결과를 확인할 수 있습니다.
 
-http://localhost:5000/item/create
+    #!plain
+    #
+    # 입력
+    #
+    {"babo":"eee"}
 
-간단한 item을 create하기위한 간단한 폼을 보실 수 있을 것 입니다.
-form에 적당히 JSON 형식으로 입력하면 다음과 같은 결과를 얻을 수 있습니다.
+    #
+    # 결과
+    #
+    {"status":"done"}
 
-입력
-```
-{"babo":"eee"}
-```
+유효하지 않은 JSON 형식을 입력할 경우의 PostgreSQL에서 발생하는 오류를 확인할 수 있습니다.
 
-결과
-```
-{"status":"done"}
-```
+    #!plain
+    #
+    # 입력
+    #
+    bad json format
 
-잘못된 JSON형식을 입력하면...
-
-입력
-```
-bad json format
-```
-
-결과
-```
-DBD::Pg::st execute failed: ERROR:  invalid input syntax for type json
-```
-
-Postgres쪽에서 발생시킨 에러를 확인하실 수 있습니다.
+    #
+    # 결과
+    #
+    DBD::Pg::st execute failed: ERROR:  invalid input syntax for type json
 
 
 #커멘드라인에서 사용하기
