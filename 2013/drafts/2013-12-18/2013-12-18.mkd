@@ -65,18 +65,21 @@ Author:   corund
 반드시 `PATH`에 있어야 하므로 `PATH`도 적절하게 설정합니다.
 
 
-## 처음 실행해보기
+처음 실행해보기
+----------------
 
-다음과 같이 하면 `Rex/Boxes`에서 제공하는 우분투 가상 머신을 등록하고 실행해 볼 수 있습니다.
+다음 명령을 통해 `Rex/Boxes`에서 제공하는 우분투 가상 머신을 등록하고 실행해 볼 수 있습니다.
 
-    bash$ rexify <project_name> --template=box
-    bash$ cd <project_name>
-    bash$ rex init --name=<vmname> --url=http://box.rexify.org/box/ubuntu-server-12.10-amd64.ova
+    #!bash
+    $ rexify <project_name> --template=box
+    $ cd <project_name>
+    $ rex init --name=<vmname> --url=http://box.rexify.org/box/ubuntu-server-12.10-amd64.ova
 
-이 경우 http://box.rexify.org/box/ubuntu-server-12.10-amd64.ova 파일을 다운로드하여 <vmname>이라는
-이름으로 **Virtualbox**에 등록하여 가상 환경을 구성합니다. 가상 환경의 부팅이 완료된 후 id=root, password=box로
-로그인할 수 있습니다. 경우에 따라서 에러가 발생할 수 있습니다. 아직 설정 등이 정확하지 않아서인데 이것에 대해
-자세히 알아보겠습니다.
+이 경우 [Basic Ubuntu Server 12.10 파일][home-rex-boxes-ubunbtu]을 다운로드한 후
+`<vmname>`이라는 이름으로 *Virtualbox*에 등록해 가상 환경을 구성합니다.
+가상 환경의 부팅이 완료된 후 `id=root, password=box`로 로그인할 수 있습니다.
+경우에 따라서 오류가 발생할 수 있는데 이것은 아직 설정 등이 정확하지 않기 때문입니다.
+관련해서는 더 자세히 알아보죠.
 
 
 ## Rexfile
@@ -304,14 +307,15 @@ ova 이미지가 준비되면 이 이미지를 http나 ftp로 다운로드할 �
 `Rex/Boxes`를 이용하여 쉽게 자동화할 수 있습니다.
 
 
-[cpan-net-ssh2]:        https://metacpan.org/module/Net::SSH2
-[cpan-rex]:             https://metacpan.org/module/Rex
-[cpan-xml-simple]:      https://metacpan.org/module/XML::Simple
-[cpan]:                 http://www.cpan.org/
-[home-chef]:            http://www.getchef.com/chef/
-[home-perlbrew]:        http://perlbrew.pl/
-[home-rex-boxes]:       http://box.rexify.org/
-[home-rex]:             http://www.rexify.org/
-[home-vagrant]:         http://www.vagrantup.com/
-[home-virtualbox]:      https://www.virtualbox.org/
-[twitter-corund]:       http://twitter.com/#!/corund
+[cpan-net-ssh2]:            https://metacpan.org/module/Net::SSH2
+[cpan-rex]:                 https://metacpan.org/module/Rex
+[cpan-xml-simple]:          https://metacpan.org/module/XML::Simple
+[cpan]:                     http://www.cpan.org/
+[home-chef]:                http://www.getchef.com/chef/
+[home-perlbrew]:            http://perlbrew.pl/
+[home-rex-boxes-ubunbtu]:   http://box.rexify.org/box/ubuntu-server-12.10-amd64.ova
+[home-rex-boxes]:           http://box.rexify.org/
+[home-rex]:                 http://www.rexify.org/
+[home-vagrant]:             http://www.vagrantup.com/
+[home-virtualbox]:          https://www.virtualbox.org/
+[twitter-corund]:           http://twitter.com/#!/corund
