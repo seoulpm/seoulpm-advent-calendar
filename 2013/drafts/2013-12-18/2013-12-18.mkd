@@ -166,39 +166,40 @@ Rexfile
 많은 경우 프로젝트 별로 이름을 지정하면 되기 때문에 이렇게 지정하는 것이 더 좋습니다.
 
 
-## VirtualBox 이미지 만들기
+VirtualBox 이미지 만들기
+-------------------------
 
-`Rex/Boxes`에서 제공하는 기본 이미지로 가상 머신을 만들고 프로비전(provision) 작업으로
-원하는 설정 작업을 하여 환경을 구성할 수 있습니다. 하지만 기본 이미지로 생성한 가상 머신을
-원하는 환경으로 만들기 위해서 작업할 것이 꽤 많습니다. 특히 기본 이미지가 영어권에서 작성된
-것이므로 한국 환경에 맞추는 작업(로케일, 시간대 설정, 저장소 설정 등)은 추가로 필요합니다.
+[Rex/Boxes][home-rex-boxes]에서 제공하는 기본 이미지로 가상 머신을 만들고
+*프로비전(provision) 작업*으로 원하는 설정 작업을 하여 환경을 구성할 수 있습니다.
+하지만 기본 이미지로 생성한 가상 머신을 원하는 환경으로 만들기 위해서 작업할 것이 꽤 많습니다.
+특히 기본 이미지가 영어권에서 작성된 것이므로 한국 환경에 맞추는
+작업(로케일, 시간대 설정, 저장소 설정 등)이 추가로 필요합니다.
+더구나 설치하는 패키지가 많다면(특히 [Catalyst][home-catalyst]처럼
+대량의 [cpan][home-cpan] 모듈을 설치하는 경우) 프로비전 작업이 오래 걸립니다.
+`rex init`를 수행할 때마다 모든 인원의 데스크탑에서 이런 작업을 반복하는 것은 비효율적입니다.
+이런 류의 작업은 미리 환경을 구성한 이미지를 공유하는 것이 훨씬 효율적입니다.
+[Rex/Boxes][home-rex-boxes]를 사용하면 이런 작업을 매우 쉽게 처리할 수 있습니다.
 
-더구나 설치하는 패키지가 많다면(특히 `Catalyst`와 같이 대량의 `cpan` 모듈을 설치하는 경우)
-프로비전 작업이 오래 걸립니다. `rex init`할 때마다 모든 인원의 데스크탑에서 이런 작업을
-반복하는 것은 비효율적입니다. 이런 것들은 미리 환경을 구성한 이미지를 공유하는 것이 훨씬
-효율적입니다. `Rex/Boxes`는 이런 작업을 매우 쉽게 할 수 있습니다.
+잠깐 곁가지로 [Vagrant][home-vagrant]는 이런 면에서 조금 불편합니다.
+고유의 포맷을 사용하는데다 몇 가지 기능들을 편하게 작동시키기 위해 특별히 설정해야 할 것들이 있습니다.
+*box*를 만드는 일이 보통의 유저에게는 거의 필요없는 일이라고 말하고 있지만 한국 유저에게는 해당되지 않는 말입니다.
 
-(잠깐 곁가지로 `Vagrant`는 이런 면에서 조금 불편합니다. 고유의 포맷을 사용하고 몇가지
-기능들을 편하게 작동하기 위해 특별히 설정해야 할 것들이 있습니다. boxes를 만드는 일이
-보통의 유저에게는 거의 필요없는 일이라고 말하고 있지만 한국 유저에게는 해당되지 않는
-말입니다.)
+[Rex/Boxes][home-rex-boxes]에서는 VirtualBox의 기본 이미지 파일(OVA)을 이미지로 사용합니다.
+따라서 VirtualBox에서 가상 머신을 설치하고 필요한 설정을 마친 후
+`파일 > 가상 시스템 내보내기(export)`로 OVA 이미지를 만들면 간단히 *box*를 만들 수 있습니다.
+가상 머신에 설치할 운영체제는 [Rex][home-rex]가 관리할 수 있는 운영체제이기만 하면 되며 *SSH 서버*만 실행되면 됩니다.
+추가로 호스트 머신과 가상 머신 사이에 폴더를 공유하려면 *Virtualbox Guest Addition*을 설치해 두어야 합니다.
 
-`Rex/Boxes`에서는 VirtualBox의 기본 이미지 파일(ova)을 이미지로 사용합니다. 따라서
-VirtualBox에서 가상 머신을 설치하고 필요한 설정을 마친 후 **파일 > 가상 시스템 내보내기(export)**로
-ova 이미지를 만들기만 하면 됩니다.
+OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 수 있도록 서버에 업로드합니다.
+이 이미지의 주소를 사용해 가상 머신을 생성합니다.
 
-가상 머신에 설치할 운영체제는 `Rex`가 관리할 수 있는 운영체제이면 되며 `ssh` 서버만 실행되어
-있으면 됩니다. 추가로 호스트 머신과 가상 머신 사이에 폴더를 공유하려면 virtualbox
-guest addition을 설치해 두어야 합니다.
-
-ova 이미지가 준비되면 이 이미지를 http나 ftp로 다운로드할 수 있도록 서버에 업로드합니다.
-이 이미지의 주소를 다음과 같이 사용하여 가상 머신을 생성합니다.
-
+    #!perl
     $box->url('http://<my_server>/<my_vm_image_path>.ova');
 
-위의 예제에서는 명령행 인자로 url을 지정하면 그곳에서 다운로드하고 따로 특별히 지정하지 않으면
-미리 지정된 위치의 파일을 사용하도록 설정했습니다. 명령행 인자를 사용하는 예를 보이기 위해
-추가한 것이므로 실제 사용할 때에는 직접 지정하는 방식으로만 사용하는 경우가 많을 것입니다.
+앞의 예제에서는 명령행 인자로 URL을 지정하면 그곳에서 다운로드하고
+따로 특별히 지정하지 않으면 미리 지정된 위치의 파일을 사용하도록 설정했습니다.
+명령행 인자를 사용하는 예를 보이기 위해 추가한 것이므로 실제 사용할 때는
+직접 지정하는 방식으로만 사용하는 경우가 많을 것입니다.
 
 
 ## 가상머신 설정
@@ -316,11 +317,13 @@ ova 이미지가 준비되면 이 이미지를 http나 ftp로 다운로드할 �
 [cpan-rex]:                 https://metacpan.org/module/Rex
 [cpan-xml-simple]:          https://metacpan.org/module/XML::Simple
 [cpan]:                     http://www.cpan.org/
+[home-catalyst]:            http://www.catalystframework.org/
 [home-chef]:                http://www.getchef.com/chef/
 [home-perlbrew]:            http://perlbrew.pl/
 [home-rex-boxes-ubunbtu]:   http://box.rexify.org/box/ubuntu-server-12.10-amd64.ova
 [home-rex-boxes]:           http://box.rexify.org/
 [home-rex]:                 http://www.rexify.org/
+[home-vagrant]:             http://www.vagrantup.com/
 [home-vagrant]:             http://www.vagrantup.com/
 [home-virtualbox]:          https://www.virtualbox.org/
 [twitter-corund]:           http://twitter.com/#!/corund
