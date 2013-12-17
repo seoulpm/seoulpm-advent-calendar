@@ -44,8 +44,8 @@ Author:   luzluna
     $ cpan Net::Pcap NetPacket
 
 
-데이터베이스 준비
-------------------
+데이터베이스 접속 준비
+-----------------------
 
 PostgreSQL 데이터베이스를 기준으로 데이터베이스를 준비합니다.
 
@@ -81,34 +81,30 @@ PostgreSQL 데이터베이스를 기준으로 데이터베이스를 준비합니
     $
 
 
-#테이블 준비
-
-test계정으로 test db에 접속
-```
-$ psql -U test test
-psql (9.3beta2)
-Type "help" for help.
-```
-
 테이블 생성
+------------
 
-*postgres 9.3이후 디폴트로 포함된 데이터타입인 JSON 타입으로 데이터 필드를 선언해보았습니다. 내부적으로 TEXT타입과 같지만 타입체크및 엘리먼트 접근이 가능하고 특정 엘리먼트에 index를 걸 수도 있어서 NOSQL처럼 사용할 수 있다는 장점이 있습니다.*
-```
-test=> CREATE TABLE item ( id SERIAL PRIMARY KEY, data JSON );
-CREATE TABLE
-```
+테이블을 생성하기 위해 `test` 계정으로 `test` 데이터베이스에 접속합니다.
 
-샘플데이터 추가
-```
-test=> INSERT INTO item (data) VALUES ('{"name":"test1", "value":31}');
-INSERT 0 1
-```
+    #!plain
+    $ psql -U test test
+    psql (9.3beta2)
+    Type "help" for help.
 
-psql 종료
-```
-test=> \q
-$
-```
+*postgres 9.3이후 디폴트로 포함된 데이터타입인 JSON 타입*으로 데이터 필드를 선언해보았습니다.
+내부적으로 `TEXT` 타입과 같지만 타입 체크 및 요소별 접근이 가능하고
+특정 요소에 인덱스를 걸 수 있어서 *NOSQL처럼 사용할 수 있다는 장점*이 있습니다.
+
+    #!plain
+    test=> CREATE TABLE item ( id SERIAL PRIMARY KEY, data JSON );
+    CREATE TABLE
+
+샘플 자료를 추가해보죠.
+
+    #!plain
+    test=> INSERT INTO item (data) VALUES ('{"name":"test1", "value":31}');
+    INSERT 0 1
+
 
 #Config파일 생성
 
