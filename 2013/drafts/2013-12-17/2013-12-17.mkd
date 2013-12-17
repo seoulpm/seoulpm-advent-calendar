@@ -168,26 +168,26 @@ Mojolicious::Lite 어플리케이션
     app;
 
 
-#확인
+실행
+-----
 
-##실행
+실행하는 명령은 다음과 같습니다.
 
-```
-$ morbo -l http://*:5000 item.pl
-[Mon Dec  9 18:15:17 2013] [debug] Reading config file "/home/user/dev/dbix_simple/config.conf".
-[Mon Dec  9 18:15:17 2013] [info] Listening at "http://*:5000".
-Server available at http://127.0.0.1:5000.
-```
+    #!bash
+    $ morbo -l http://*:5000 item.pl
+    [Mon Dec  9 18:15:17 2013] [debug] Reading config file "/home/user/dev/dbix_simple/config.conf".
+    [Mon Dec  9 18:15:17 2013] [info] Listening at "http://*:5000".
+    Server available at http://127.0.0.1:5000.
 
-##웹브라우저로 접속
+`-l http://*:5000` 옵션을 이용해 `5000`번 포트로 실행했으므로
+웹 브라우저로 접속할 때도 `http://localhost:5000` 주소로 접속해야 합니다.
+웹 브라우저로 `http://localhost:5000/item/list` 주소로 접속해보세요.
 
-http://localhost:5000/item/list
+    #!plain
+    [{"id":1,"data":{"value":31,"name":"test1"}}]
 
-```
-[{"id":1,"data":{"value":31,"name":"test1"}}]
-```
+예쁘게 잘 나옵니다. :)
 
-예쁘게 잘 나옵니다.
 
 #CREATE 핸들러 추가
 
