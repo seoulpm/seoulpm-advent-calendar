@@ -295,20 +295,30 @@ CREATE 핸들러 추가
     ]
 
 
-#결론
-Mojolicious나 Dancer같은 경량 웹프레임워크들을 사용할때에 DBIC(DBIx::Class)를 사용하는것인 조금 무겁고 복잡하게 느껴질때가 있습니다.
-그렇다고 그냥 DBI인터페이스를 통해서 날쿼리를 쓰는건 불편합니다. 이런때에 간단히 DBIx::Simple을 이용해보시는건 어떨까요?
+정리하며
+---------
 
-#과제
-웹페이지를 만드는 용도로 사용중한다면 DBIx::XHTML_Table 모듈을 이용해서 테이블로 그려 볼수도 있고, 커멘드라인에서 사용한다면 Text::Table을 사용하여 조금 더 예쁘게 출력해볼 수도 있습니다. 한번 시도해보세요.
+웹페이지를 만드는 용도로 사용한다면 [DBIx::XHTML_Table 모듈][cpan-dbix-xhtml-table]을 이용해서 테이블로 그려 볼수도 있고,
+명령줄에서 사용한다면 [Text::Table][cpan-text-table]을 사용해 예쁘게 출력해볼 수도 있습니다.
+이 부분은 과제로 남겨두죠. :)
+
+[Mojolicious][home-mojolicious]나 [Dancer][home-dancer] 같은 경량 웹프레임워크를
+사용하다보면 [DBIx::Class 모듈][cpan-dbix-class]이 조금 무겁게 느껴질 때가 있습니다.
+그렇다고 그냥 [DBI 모듈][cpan-dbi]로 직접 쿼리를 날리는 것은 불편하구요.
+이런때에 간단히 [DBIx::Simple 모듈][cpan-dbix-simple]을 이용해보는건 어떨까요? ;-)
 
 
 [cpan-data-dump]:           https://metacpan.org/module/Data::Dump
 [cpan-dbd-pg]:              https://metacpan.org/module/DBD::Pg
+[cpan-dbi]:                 https://metacpan.org/module/DBI
+[cpan-dbix-class]:          https://metacpan.org/module/DBIx::Class
 [cpan-dbix-simple]:         https://metacpan.org/module/DBIx::Simple
+[cpan-dbix-xhtml-table]:    https://metacpan.org/module/DBIx::XTML_Table
 [cpan-file-slurp]:          https://metacpan.org/module/File::Slurp
 [cpan-mojolicious]:         https://metacpan.org/module/Mojolicious
+[cpan-text-table]:          https://metacpan.org/module/Text::Table
 [cpan]:                     http://www.cpan.org/
+[home-dancer]:              http://perldancer.org/
 [home-mojolicious]:         http://mojolicio.us/
 [home-perlbrew]:            http://perlbrew.pl/
 [twitter-luzluna]:          http://twitter.com/#!/luzluna
