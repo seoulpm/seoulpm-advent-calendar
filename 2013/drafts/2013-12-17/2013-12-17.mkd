@@ -1,0 +1,232 @@
+#개요
+간단히 DB를 사용할 수 있는 모듈인 DBIx::Simple을 소개합니다.
+
+#DB준비
+
+DB에 접속
+```
+$ psql -U postgres
+psql (9.3beta2)
+Type "help" for help.
+```
+
+유저 생성
+```
+postgres=# CREATE USER test WITH PASSWORD 'test$$';
+CREATE ROLE
+```
+
+데이터베이스 생성
+```
+postgres=# CREATE DATABASE test;
+CREATE DATABASE
+```
+
+생성한 유저에게 접근 권한 부여
+```
+postgres=# GRANT ALL PRIVILEGES ON DATABASE test to test;
+GRANT
+```
+
+psql 프로그램 종료
+```
+postgres=# \q
+$
+```
+
+** DB와 User 준비 완료. **
+
+
+
+#테이블 준비
+
+test계정으로 test db에 접속
+```
+$ psql -U test test
+psql (9.3beta2)
+Type "help" for help.
+```
+
+테이블 생성
+
+*postgres 9.3이후 디폴트로 포함된 데이터타입인 JSON 타입으로 데이터 필드를 선언해보았습니다. 내부적으로 TEXT타입과 같지만 타입체크및 엘리먼트 접근이 가능하고 특정 엘리먼트에 index를 걸 수도 있어서 NOSQL처럼 사용할 수 있다는 장점이 있습니다.*
+```
+test=> CREATE TABLE item ( id SERIAL PRIMARY KEY, data JSON );
+CREATE TABLE
+```
+
+샘플데이터 추가
+```
+test=> INSERT INTO item (data) VALUES ('{"name":"test1", "value":31}');
+INSERT 0 1
+```
+
+psql 종료
+```
+test=> \q
+$
+```
+
+#Config파일 생성
+
+file: config.conf
+```
+{
+    db => [
+        "dbi:Pg:dbname=test;host=127.0.0.1;port=5432",
+        'test','test$$'
+    ]
+}
+```
+
+#Mojolicious::Lite 어플리케이션 작성
+
+file: item.pl
+```
+use Mojolicious::Lite;
+
+use DBI;
+use DBD::Pg;
+use DBIx::Simple;
+use JSON;
+
+my $config = plugin Config => {file => 'config.conf'};
+
+my $dbh = DBIx::Simple->connect( @{$config->{db}} );
+helper db => sub { $dbh };
+
+get '/item/list' => sub {
+        my $self = shift;
+        my $items = $self->db->query("SELECT * FROM item")->hashes;
+    for my $item (@$items) {
+        $item->{data} = JSON::decode_json( $item->{data} );
+    }
+    $self->render(json => $items);
+};
+
+app;
+```
+
+#확인
+
+##실행
+
+```
+$ morbo -l http://*:5000 item.pl
+[Mon Dec  9 18:15:17 2013] [debug] Reading config file "/home/user/dev/dbix_simple/config.conf".
+[Mon Dec  9 18:15:17 2013] [info] Listening at "http://*:5000".
+Server available at http://127.0.0.1:5000.
+```
+
+##웹브라우저로 접속
+
+http://localhost:5000/item/list
+
+```
+[{"id":1,"data":{"value":31,"name":"test1"}}]
+```
+
+예쁘게 잘 나옵니다.
+
+#CREATE 핸들러 추가
+
+소스 중간에 다음의 get과 post의 핸들러를 추가합니다.
+
+```
+get '/item/create' => sub {
+    my $self = shift;
+};
+post '/item/create' => sub {
+    my $self = shift;
+    $self->db->query("INSERT INTO item (data) VALUES (?)", $self->param('data'));
+    $self->render(json => {"status"=>"done"});
+};
+```
+
+그리고 소스의 끝부분에 template을 다음과 같이 추가해줍니다.
+
+```
+__DATA__
+
+@@ itemcreate.html.ep
+<form action="/item/create" method="post">
+ <input name="data" type="text">
+ <input type="submit">
+</form>
+```
+
+morbo로 실행한 뒤
+
+```
+$ morbo -l http://*:5000 item.pl
+```
+
+웹브라우저로 접속해보면
+
+http://localhost:5000/item/create
+
+간단한 item을 create하기위한 간단한 폼을 보실 수 있을 것 입니다.
+form에 적당히 JSON 형식으로 입력하면 다음과 같은 결과를 얻을 수 있습니다.
+
+입력
+```
+{"babo":"eee"}
+```
+
+결과
+```
+{"status":"done"}
+```
+
+잘못된 JSON형식을 입력하면...
+
+입력
+```
+bad json format
+```
+
+결과
+```
+DBD::Pg::st execute failed: ERROR:  invalid input syntax for type json
+```
+
+Postgres쪽에서 발생시킨 에러를 확인하실 수 있습니다.
+
+
+#커멘드라인에서 사용하기
+
+웹페이지를 통하지 않고 일반 커멘드라인 유틸리티에서도 간단히 사용하실 수 있습니다.
+
+```
+use strict;
+use warnings;
+use DBIx::Simple;
+use File::Slurp;
+use Data::Dump qw/dump/;
+
+my $config = eval( read_file('config.conf') );
+
+my $dbh = DBIx::Simple->connect( @{$config->{db}} );
+
+my $ret= $dbh->query("SELECT * FROM item")->hashes;
+
+print dump($ret), "\n";
+```
+
+실행해보면
+
+```
+$ perl dbis.pl
+[
+  { data => "{\"name\":\"test1\", \"value\":31}", id => 1 },
+  { data => "{\"babo\":\"eee\"}", id => 2 },
+]
+```
+
+#결론
+Mojolicious나 Dancer같은 경량 웹프레임워크들을 사용할때에 DBIC(DBIx::Class)를 사용하는것인 조금 무겁고 복잡하게 느껴질때가 있습니다.
+그렇다고 그냥 DBI인터페이스를 통해서 날쿼리를 쓰는건 불편합니다. 이런때에 간단히 DBIx::Simple을 이용해보시는건 어떨까요?
+
+#과제
+웹페이지를 만드는 용도로 사용중한다면 DBIx::XHTML_Table 모듈을 이용해서 테이블로 그려 볼수도 있고, 커멘드라인에서 사용한다면 Text::Table을 사용하여 조금 더 예쁘게 출력해볼 수도 있습니다. 한번 시도해보세요.
+
