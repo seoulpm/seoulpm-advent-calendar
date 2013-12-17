@@ -52,11 +52,13 @@ Author:   corund
 
 윈도우라면 [Strawberry Perl](http://strawberryperl.com/)을 설치한 다음 `perl` 명령창에서 다음 명령을 실행합니다.
 
+    #!bash
     $ cpan Rex
 
 윈도우에서는 터미널 관련하여 설치 중 테스트 에러가 나는 경우가 있습니다.
 테스트에서 에러일 뿐 동작 자체에 문제는 없으므로 다음과 같이 테스트를 무시하고 설치합니다.
 
+    #!bash
     $ cpan -T Rex
 
 [Rex/Boxes][home-rex-boxes]는 [VirtualBox][home-virtualbox]를 이용해서 가상 머신들을 관리합니다.
@@ -175,7 +177,7 @@ VirtualBox 이미지 만들기
 특히 기본 이미지가 영어권에서 작성된 것이므로 한국 환경에 맞추는
 작업(로케일, 시간대 설정, 저장소 설정 등)이 추가로 필요합니다.
 더구나 설치하는 패키지가 많다면(특히 [Catalyst][home-catalyst]처럼
-대량의 [cpan][home-cpan] 모듈을 설치하는 경우) 프로비전 작업이 오래 걸립니다.
+대량의 [cpan][cpan] 모듈을 설치하는 경우) 프로비전 작업이 오래 걸립니다.
 `rex init`를 수행할 때마다 모든 인원의 데스크탑에서 이런 작업을 반복하는 것은 비효율적입니다.
 이런 류의 작업은 미리 환경을 구성한 이미지를 공유하는 것이 훨씬 효율적입니다.
 [Rex/Boxes][home-rex-boxes]를 사용하면 이런 작업을 매우 쉽게 처리할 수 있습니다.
@@ -236,8 +238,8 @@ OVA 이미지가 준비되면 이 이미지를 HTTP나 FTP로 다운로드할 �
 
 가상 머신을 시동하는 태스크는 `VBoxManage` 명령을 직접 사용하였습니다.
 현재 [Rex/Boxes][home-rex-boxes] 구현에서는 `$box->start`로 가상 머신을 시동할 경우
-윈도우즈의 경우 headless 모드로 동작하지 않고 가상 머신 창이 뜨게 됩니다.
-그래서 직접 `VBoxManage` 명령을 사용해 headless 모드로 시동하게 하였습니다.
+윈도우즈의 경우 *headless 모드*로 동작하지 않고 가상 머신 창이 뜨게 됩니다.
+그래서 직접 `VBoxManage` 명령을 사용해 *headless 모드*로 시동하게 하였습니다.
 
 이제 다음과 같이 가상 머신을 시작/중지할 수 있습니다.
 
