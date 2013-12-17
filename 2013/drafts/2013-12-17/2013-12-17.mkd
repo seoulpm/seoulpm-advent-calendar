@@ -122,45 +122,51 @@ PostgreSQL 데이터베이스를 기준으로 데이터베이스를 준비합니
     $ touch item.conf
     $ touch item.pl
 
-`item.conf` 파일을 다음처럼 편집합니다.
+`item.conf` 파일을 다음처럼 작성합니다.
 
     #!perl
     {
         db => [
-            "dbi:Pg:dbname=test;host=127.0.0.1;port=5432",
+            'dbi:Pg:dbname=test;host=127.0.0.1;port=5432',
             'test',
             'test$$',
         ]
     }
 
 
-#Mojolicious::Lite 어플리케이션 작성
+Mojolicious::Lite 어플리케이션
+-------------------------------
 
-file: item.pl
-```
-use Mojolicious::Lite;
+`item.pl` 파일을 다음처럼 작성합니다.
 
-use DBI;
-use DBD::Pg;
-use DBIx::Simple;
-use JSON;
+    #!perl
+    #!/usr/bin/env perl
 
-my $config = plugin Config => {file => 'config.conf'};
+    use Mojolicious::Lite;
 
-my $dbh = DBIx::Simple->connect( @{$config->{db}} );
-helper db => sub { $dbh };
+    use DBD::Pg;
+    use DBI;
+    use DBIx::Simple;
+    use JSON;
 
-get '/item/list' => sub {
+    my $config = plugin Config;
+
+    my $dbh = DBIx::Simple->connect( @{$config->{db}} );
+    helper db => sub { $dbh };
+
+    get '/item/list' => sub {
         my $self = shift;
-        my $items = $self->db->query("SELECT * FROM item")->hashes;
-    for my $item (@$items) {
-        $item->{data} = JSON::decode_json( $item->{data} );
-    }
-    $self->render(json => $items);
-};
 
-app;
-```
+        my $items = $self->db->query("SELECT * FROM item")->hashes;
+        for my $item (@$items) {
+            $item->{data} = JSON::decode_json( $item->{data} );
+        }
+
+        $self->render( json => $items );
+    };
+
+    app;
+
 
 #확인
 
