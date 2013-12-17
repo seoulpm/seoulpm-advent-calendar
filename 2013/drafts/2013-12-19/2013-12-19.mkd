@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>eriny.net / make.pl / Qt&nbsp; </title>
+	<meta http-equiv="Content-Style-Type" content="text/css" charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<style type="text/css">
+	* {-webkit-text-size-adjust:none; }
+	</style>
+	<link rel="stylesheet" href="http://eriny.net/log_style.css" type="text/css" />
+	<link rel="shortcut icon" href="http://np.3.eriny.net/eriny.net/pic/favicon.ico" type="image/x-icon" />
+</head>
+
+<body>
+
+<div id="article-layer">
+	<div class="article-title">Qt&nbsp; </div>
+</div>
+
+<div id="article-layer">
+	<div class="article-text"><p>
+	<b>저자</b><br />
+	<a href="http://twitter.com/yukinpl">@yukinpl</a> - 아는 것이 아무것도 없는 perl 초보<br />
+	&nbsp;<br /></p>
+
+<p>
+	<b>Linux에서의 GUI / Perl 에서의 GUI</b><br />
+	Linux에서 GUI하면 두 가지, GTK와 Qt가 떠오르시나요? 그러나 Perl에서는 Qt가 유독 힘을 쓰지 못하는 것 같습니다. Perl에서 GUI를 표현하기 위한 모듈으로는 wxPerl, Perl-Tk, Perl/Qt or Perl/KDE, gtk2-perl 등이 있는 듯 합니다<sup>[1]</sup>. 그 중에서 Windows 유저들에게는 wxPerl이 환영받는 듯 하고, Linux 유저들에게는 gtk2가 인기 있는 것 같습니다. 대체 왜 그럴까요? 아무래도 Qt는 지속적으로 업데이트 되고 있는 모듈 찾기도 쉽지 않고, 안정화 되어 있어 잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같고 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요!!). 개인적으로는 Linux에서 C++ 프로그램 개발시 GTK보다 Qt로 작업한 것이 더 많은 터라 친근하기도 하고 Perl에서 대우 받지 못하는 것 같아 소개해 보려 합니다.<br />
+	&nbsp;<br /></p>
+
+<p>
+	<b>사용하려면</b><br />
+	Perl에서 Qt를 사용하려면 아래 모듈이 필요합니다.<br />
+	<li><a href="http://search.cpan.org/~cburel/Qt-0.96.0">http://search.cpan.org/~cburel/Qt-0.96.0</a></li>
+	<br />
+	그러나 위 모듈을 사용하려면 아래 준비물들이 우선 필요합니다.<br />
+	<li><b>Qt 4</b> - 위 모듈은 Qt 4를 기준으로 작성되어 있습니다.</li>
+	<li><b>SmokeQt</b> - Scipting Meta Object Kcompiler의 약자로 KDE의 binding 모듈입니다.</li>
+	<li><b>cmake</b> - Makefile.PL이 cmake를 기반으로 동작합니다.</li>
+	&nbsp;<br /></p>
+
+<p>
+	<b>설치하자!</b><br />
+	이제 설치해보겠습니다. 아래 내용은 Ubuntu 12.04 LTS를 기준으로 진행하겠습니다.<br />
+	우선 해당 모듈 설치를 위해 필요한 도구들을 먼저 설치하겠습니다.<br />
+	<pre class="code">
+$ sudo apt-get install cmake
+$ sudo apt-get install libqt4-core libqt4-dbg libqt4-dev libqt4-gui
+$ sudo apt-get install SmokeQt*</pre>
+	컴파일 도구가 준비되어 있지 않다면 아래의 도구들도 함께 설치하겠습니다.<br />
+	<pre class="code">
+$ sudo apt-get install build-essentials
+$ sudo apt-get install gcc
+$ sudo apt-get install g++</pre>
+	여기까지 문제 없이 설치되었다면 이제 모듈을 설치해보겠습니다.<br />
+	<pre class="code">
+$ cd ~/Downloads
+$ tar zxvf Qt-0.96.0.tar.gz 
+$ cd Qt-0.96.0.tar.gz
+$ ./Makefile.PL</pre>
+	Makefile.PL 을 실행시키는 동안 문제가 발생한다면 cmake 또는 SmokeQt가 설치되지 않은 것입니다. 설치과정에서 빠진 것은 아닌지 확인하셔야 합니다.<br />
+	여기까지 문제 없이 진행되었다면 이제 설치는 막바지입니다.<br />
+	<pre class="code">
+$ make
+$ sudo make install</pre>
+</code>
+	&nbsp;<br /></p>
+
+<p>
+	<b>약간의 설정 및 수정</b><br />
+	설치가 완료되었다면 한가지의 설정과 한가지의 수정사항이 남아 있습니다. 첫번째는 PERL5LIB 환경변수 추가에 대한 부분이며, 두번째는 설치된 모듈 파일의 수정입니다.<br />
+	이 부분은 아래 내용을 진행하면서 문제가 발생했을 때 이부분을 참조하셔서 수행하시기 바랍니다.<br />
+	&nbsp;<br />
+	<b>+ PERL5LIB 설정 추가</b> 아래 예제들을 실행하면서 @INC 오류가 발생하면 지금 설치한 모듈이 설치된 디렉토리를 @INC에 추가하시기 바랍니다.<br />
+	<pre class="code">
+export PERL5LIB=/home/yukinpl/perllib:/usr/local/lib/perl/5.14.2</pre>
+	위 설정은 제가 설정한 것으로 앞 부분은 개인적으로 작성한 모듈들을 저장하는 곳이고 Qt가 설치된 디렉토리는 뒷부분입니다.<br />
+	&nbsp;<br />
+	<b>+ QtCore4.pm 수정</b> 아래 예제들을 실행하면서 List::MoreUtils 에 대한 @INC를 요구하는 경우 QtCore4.pm 파일을 수정해야합니다. 설치된 위치에 있는 QtCore4.pm 파일을 아래와 같이 수정하시기 바랍니다.<br />
+	<pre class="code">
+#use List::MoreUtils qw( any );</pre>
+	QtCore4.pm 파일의 799 라인으로 이동하면 List::MoreUtils qw(any) 라는 라인이 있습니다. 이 부분을 주석처리 하시기 바랍니다.<br />
+	&nbsp;<br /></p>
+
+<p>
+	<b>사용해보자</b><br />
+	아래 예제를 실행해 보도록 하겠습니다.<br />
+	<pre class="code">
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use QtCore4;
+use QtGui4;
+use QtCore4::debug qw(ambiguous);
+
+my $app= Qt::Application(\@ARGV);
+my $button= Qt::PushButton('Hello, world!', undef);
+
+$button->resize(200,30);
+$button->show();
+
+exit $app->exec();
+</pre>
+	위 예제 실행시 문제가 없다면 아래와 같이 실행됩니다.<br />
+	<img src="http://np.3.eriny.net/eriny.net/files/2013/20131217/Screenshot from 2013-12-17 15:22:35.png"></img><br />
+	여기까지 잘 진행되었다면 Qt를 사용하는 것에 무리가 없을 것입니다.<br />
+	&nbsp;<br /></p>
+
+<p>
+	<b>글을 마무리하면서</b><br/>
+	위 프로그램 소스를 보시면 Qt도 사용하시기에 그리 어렵지 않다는 사실을 아실 수 있을 것입니다. 개인적으로는 Perl에서 Qt도 많이 사용되는 GUI 프레임워크가 되기를 소망해봅니다. 마지막으로 Perl Advent Calendar를 보고 계시는 분들은 모두 충분히 프로그래밍을 잘 하시는 분들이시니 Qt에 대한 자세한 사용법은 숙제로 남겨두겠습니다. ^^<br />
+	&nbsp;<br /></p>
+
+<p class="footnote">
+	<b>[1]</b> - <a href="http://perl-begin.org/uses/GUI">http://perl-begin.org/uses/GUI</a><br />
+	&nbsp;<br /></p></div>
+</div>
+	
+</div>
+
+</body>
+</html>
+
