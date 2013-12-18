@@ -172,6 +172,8 @@ h3 {
 }
 #cont img {
     display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 #cont blockquote {
     background-color: #f4f4f4;

@@ -35,6 +35,10 @@
 	  var pos = ( link_height > fb_height ? link_height : fb_height ) * -1;
           $('#foot .copyright').css('bottom', pos );
         });
+
+        $(function() {
+          $('#cont p img').parent().css('text-align', 'center');
+        });
       }).call(this);
       </script>
     </div>
