@@ -13,10 +13,22 @@ Author:   yukinpl
 [eriny.net][home-yukinpl]을 운영하고 있다.
 
 
-<p>
-	<b>Linux에서의 GUI / Perl 에서의 GUI</b><br />
-	Linux에서 GUI하면 두 가지, GTK와 Qt가 떠오르시나요? 그러나 Perl에서는 Qt가 유독 힘을 쓰지 못하는 것 같습니다. Perl에서 GUI를 표현하기 위한 모듈으로는 wxPerl, Perl-Tk, Perl/Qt or Perl/KDE, gtk2-perl 등이 있는 듯 합니다<sup>[1]</sup>. 그 중에서 Windows 유저들에게는 wxPerl이 환영받는 듯 하고, Linux 유저들에게는 gtk2가 인기 있는 것 같습니다. 대체 왜 그럴까요? 아무래도 Qt는 지속적으로 업데이트 되고 있는 모듈 찾기도 쉽지 않고, 안정화 되어 있어 잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같고 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요!!). 개인적으로는 Linux에서 C++ 프로그램 개발시 GTK보다 Qt로 작업한 것이 더 많은 터라 친근하기도 하고 Perl에서 대우 받지 못하는 것 같아 소개해 보려 합니다.<br />
-	&nbsp;<br /></p>
+시작하며
+---------
+
+*Linux에서의 GUI / Perl 에서의 GUI*
+
+Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 떠오르시나요?
+그러나 펄에서는 *Qt*가 유독 힘을 쓰지 못하는 것 같습니다.
+[GUI를 표현하기 위한 펄 라이브러리][perl-begin-gui]로는 [wxPerl][home-wxperl],
+[Tk][cpan-tk], [Perl/Qt와 Perl/KDE][perl-qt-kde], [gtk2-perl][home-gtk2-perl] 등이 있습니다.
+그 중에서도 윈도우 사용자는 wxPerl을, Linux 사용자는 GTK+를 선호하는 것 같습니다.
+대체 왜 그럴까요?
+아무래도 Qt는 안정화 되어있다보니 모듈이 지속적으로 업데이트 되고 있지 않고
+잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같습니다.
+더불어 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요! :).
+개인적으로는 Linux에서 C++ 프로그램 개발 시 GTK+보다 Qt로 더 많이 작업한 편이라
+친근하기도 하고 펄에서 널리 사용되 못하는 것 같아 소개해보려 합니다.
 
 <p>
 	<b>사용하려면</b><br />
@@ -223,16 +235,13 @@ sub main {
 	Enjoy your Perl~~~<br />
 	&nbsp;<br /></p>
 
-<p class="footnote">
-	<b>[1]</b> - <a href="http://perl-begin.org/uses/GUI">http://perl-begin.org/uses/GUI</a><br />
-	&nbsp;<br /></p></div>
-</div>
-</div>
 
-
-</body>
-</html>
-
-
+[cpan-tk]:                      https://metacpan.org/module/Tk
+[home-gtk2-perl]:               http://gtk2-perl.sourceforge.net/
+[home-gtk]:                     http://www.gtk.org/
+[home-qt]:                      http://qt-project.org/
+[home-wxperl]:                  http://www.wxperl.it/
 [home-yukinpl]:                 http://eriny.net/
+[perl-begin-gui]:               http://perl-begin.org/uses/GUI
+[perl-qt-kde]:                  http://techbase.kde.org/Development/Languages/Perl
 [twitter-yukinpl]:              http://twitter.com/#!/yukinpl
