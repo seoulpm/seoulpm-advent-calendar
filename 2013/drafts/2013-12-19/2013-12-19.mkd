@@ -97,8 +97,9 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 
 빌드 후 테스트 진행시 [Qt4 모듈][cpan-qt4]과 [Qt 모듈][cpan-qt]의 문제로
 스스로가 빌드한 모듈을 제대로 찾지 못하는 경우가 있습니다.
-`blib/lib` 디렉터리와 `blib/arch` 디렉터리를 검색할 수 있도록 설정해주어야 하는데
-가장 간단한 방법은 `PERL5LIB` 환경 변수를 설정하는 것입니다.
+각각의 모듈 빌드 디렉터리에서 `blib/lib` 디렉터리와 `blib/arch` 디렉터리를
+검색할 수 있도록 설정해주어야 하는데 가장 간단한 방법은
+`PERL5LIB` 환경 변수를 설정하는 것입니다.
 
     #!bash
     $ export PERL5LIB=/path/to/blib/lib:/path/to/blib/arch:$PERL5LIB
