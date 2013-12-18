@@ -22,22 +22,22 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 그러나 펄에서는 *Qt*가 유독 힘을 쓰지 못하는 것 같습니다.
 [GUI를 표현하기 위한 펄 라이브러리][perl-begin-gui]로는 [wxPerl][home-wxperl],
 [Tk][cpan-tk], [Perl/Qt와 Perl/KDE][perl-qt-kde], [gtk2-perl][home-gtk2-perl] 등이 있습니다.
-그 중에서도 윈도우 사용자는 wxPerl을, Linux 사용자는 GTK+를 선호하는 것 같습니다.
+그 중에서도 윈도우 사용자는 *wxPerl*을, Linux 사용자는 *GTK+*를 선호하는 것 같습니다.
 대체 왜 그럴까요?
-아무래도 Qt는 안정화 되어있다보니 모듈이 지속적으로 업데이트 되고 있지 않고
+아무래도 *Qt*는 안정화 되어있다보니 모듈이 지속적으로 업데이트 되고 있지 않고
 잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같습니다.
 더불어 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요! :).
-개인적으로는 Linux에서 C++ 프로그램 개발 시 GTK+보다 Qt로 더 많이 작업한 편이라
+개인적으로는 Linux에서 C++ 프로그램 개발 시 *GTK+*보다 *Qt*로 더 많이 작업한 편이라
 친근하기도 하고 펄에서 널리 사용되 못하는 것 같아 소개해보려 합니다.
 
 
 준비물
 -------
 
-펄에서 Qt를 사용하려면 필요한 항목은 다음과 같습니다.
+펄에서 *Qt*를 사용하려면 필요한 항목은 다음과 같습니다.
 
 - Qt 4: 펄의 Qt 모듈은 Qt 4를 기준으로 작성되어 있습니다.
-- SmokeQt: Scipting Meta Object Kcompiler의 약자로 KDE의 binding 모듈입니다.
+- SmokeQt: Scipting Meta Object Kcompiler의 약자로 KDE의 바인딩 모듈입니다.
 - cmake: `Makefile.PL`이 `cmake`를 기반으로 동작합니다.
 
 데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 개발 의존 패키지를 설치합니다.
@@ -54,14 +54,14 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan Qt
+    $ sudo cpan Alien::SmokeQt List::MoreUtils Qt
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan Qt
+    $ cpan Alien::SmokeQt List::MoreUtils Qt
 
 
 문제 해결
@@ -69,7 +69,8 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 
 ### 설치 순서
 
-모듈 설치가 실패하는 경우 다음 순서로 모듈을 하나씩 설치를 진행하도록 합니다.
+모듈 설치가 실패하는 경우 다음 순서로 하나씩 모듈 설치를 진행하면서
+어느 부분에서 문제가 생겼는지 확인하도록 합니다.
 
 - [CPAN의 List::MoreUtils 모듈][cpan-list-moreutils]
 - [CPAN의 Alien::SmokeQt 모듈][cpan-alien-smokeqt]
@@ -159,7 +160,7 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 SIGNAL과 SLOT
 --------------
 
-Qt를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::connect()` 입니다.
+*Qt*를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::connect()` 입니다.
 그리고 *SIGNAL*과 *SLOT*이라는 개념을 이해해야합니다.
 이벤트 지향 프로그래밍을 이해하고 있다면 간단한 내용입니다.
 *SIGNAL*은 이벤트의 발생 조건이고, *SLOT*은 이벤트 처리자라고 생각하면 됩니다.
@@ -318,7 +319,7 @@ Qt를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::c
 
 [Qt][home-qt]에 대한 모든 내용을 다루기보다는 기본적인 설치와 사용 방법에 중점을 두어보았습니다.
 기사를 읽어보면 아시겠지만(물론 이미 알고 계시겠지만 :) *Qt*가 그리 어려운 GUI 프레임워크는 아닙니다.
-개인적으로는 Qt가 펄에서도 많은 사랑을 받았으면 좋겠습니다.
+개인적으로는 *Qt*가 펄에서도 많은 사랑을 받았으면 좋겠습니다.
 
 Enjoy Your Perl! ;-)
 
@@ -335,8 +336,10 @@ Enjoy Your Perl! ;-)
 [cpan-qt4]:                 https://metacpan.org/module/Qt4
 [cpan-qt]:                  https://metacpan.org/module/Qt
 [cpan-tk]:                  https://metacpan.org/module/Tk
+[cpan]:                     http://www.cpan.org/
 [home-gtk2-perl]:           http://gtk2-perl.sourceforge.net/
 [home-gtk]:                 http://www.gtk.org/
+[home-perlbrew]:            http://perlbrew.pl/
 [home-qt]:                  http://qt-project.org/
 [home-wxperl]:              http://www.wxperl.it/
 [home-yukinpl]:             http://eriny.net/
