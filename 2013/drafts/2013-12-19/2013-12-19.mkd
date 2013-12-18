@@ -45,10 +45,6 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
     #!bash
     $ sudo apt-get install build-essentials cmake libqt4-dev
 
-    ?
-    $ sudo apt-get install libqt4-core libqt4-dbg libqt4-gui
-    $ sudo apt-get install SmokeQt*
-
 필요한 모듈은 다음과 같습니다.
 
 - [CPAN의 Alien::SmokeQt 모듈][cpan-alien-smokeqt]
