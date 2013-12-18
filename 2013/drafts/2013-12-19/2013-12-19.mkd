@@ -159,33 +159,41 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
 여기까지 잘 진행되었다면 *Qt*를 사용하는 것에 무리가 없을 것입니다.
 
 
-<p>
-	<b>SIGNAL / SLOT</b><br />
-	Qt를 잘 사용하려면 자주 만나게 될 서브루틴이 있습니다.<br />
-	바로 <code>Qt::Object::connect()</code> 입니다. 그리고 SIGNAL과 SLOT이라는 개념을 이해해야합니다. Event-driven programming을 잘 이해하고 계시다면 간단합니다. SIGNAL은 이벤트 발생 조건이고 SLOT은 이벤트 처리자라고 생각하시면 됩니다. 그리고 이것을 묶어주는 역활을 하는 서브루틴이 connect()입니다. 아래 예제는 버튼을 클릭하면 프로그램이 종료되는 간단한 예제입니다. 이 예제를 보면 쉽게 이해할 수 있으리라 예상됩니다.<br />
-	<pre class="code">
-#!/usr/bin/env perl
-use warnings;
-use strict;
-use QtCore4;
-use QtGui4;
-use QtCore4::debug qw(ambiguous);
+SIGNAL과 SLOT
+--------------
 
-main();
+Qt를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::connect()` 입니다.
+그리고 *SIGNAL*과 *SLOT*이라는 개념을 이해해야합니다.
+이벤트 지향 프로그래밍을 이해하고 있다면 간단한 내용입니다.
+*SIGNAL*은 이벤트의 발생 조건이고, *SLOT*은 이벤트 처리자라고 생각하면 됩니다.
+그리고 `connect()` 함수가 이 둘을 묶어주는 역할을 합니다.
+버튼을 클릭하면 프로그램이 종료되는 간단한 예제를 살펴보죠.
 
-sub main {
-  my $app= Qt::Application(\@ARGV);
-  my $btnQuit= Qt::PushButton("Quit");
+    #!perl
+    #!/usr/bin/env perl
 
-  $btnQuit->resize(200, 30);
-  Qt::Object::connect($btnQuit, SIGNAL "clicked()", $app, SLOT "quit()");
+    use strict;
+    use warnings;
 
-  $btnQuit->show();
-  return $app->exec();
-}
-</pre>
-	위 코드를 보면서 이해하셨겠지만 설명하자면 connect는 이벤트 발생 객체, 이벤트, 이벤트 처리 객체, 이벤트 처리자 순으로 입력하도록 되어 있습니다.<br />
-	&nbsp;<br /></p>
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw(ambiguous);
+
+    main();
+
+    sub main {
+        my $app     = Qt::Application(\@ARGV);
+        my $btnQuit = Qt::PushButton("Quit");
+
+        $btnQuit->resize( 200, 30 );
+        Qt::Object::connect( $btnQuit, SIGNAL "clicked()", $app, SLOT "quit()" );
+
+        $btnQuit->show;
+        return $app->exec;
+    }
+
+`Qt::Object::connect()` 함수는 *이벤트 발생 객체*, *이벤트*, *이벤트 처리 객체*, *이벤트 처리자*를 인자로 받습니다.
+
 
 <p>
 	<b>화면 구성 1</b><br />
