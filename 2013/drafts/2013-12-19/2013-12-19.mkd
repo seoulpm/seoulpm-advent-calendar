@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>eriny.net / make.pl / Qt&nbsp; </title>
+	<title>Qt 사용하기</title>
 	<meta http-equiv="Content-Style-Type" content="text/css" charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<style type="text/css">
@@ -13,10 +13,6 @@
 </head>
 
 <body>
-
-<div id="article-layer">
-	<div class="article-title">Qt&nbsp; </div>
-</div>
 
 <div id="article-layer">
 	<div class="article-text"><p>
@@ -108,16 +104,138 @@ exit $app->exec();
 	&nbsp;<br /></p>
 
 <p>
+	<b>SIGNAL / SLOT</b><br />
+	Qt를 잘 사용하려면 자주 만나게 될 서브루틴이 있습니다.<br />
+	바로 <code>Qt::Object::connect()</code> 입니다. 그리고 SIGNAL과 SLOT이라는 개념을 이해해야합니다. Event-driven programming을 잘 이해하고 계시다면 간단합니다. SIGNAL은 이벤트 발생 조건이고 SLOT은 이벤트 처리자라고 생각하시면 됩니다. 그리고 이것을 묶어주는 역활을 하는 서브루틴이 connect()입니다. 아래 예제는 버튼을 클릭하면 프로그램이 종료되는 간단한 예제입니다. 이 예제를 보면 쉽게 이해할 수 있으리라 예상됩니다.<br />
+	<pre class="code">
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use QtCore4;
+use QtGui4;
+use QtCore4::debug qw(ambiguous);
+
+main();
+
+sub main {
+  my $app= Qt::Application(\@ARGV);
+  my $btnQuit= Qt::PushButton("Quit");
+
+  $btnQuit->resize(200, 30);
+  Qt::Object::connect($btnQuit, SIGNAL "clicked()", $app, SLOT "quit()");
+
+  $btnQuit->show();
+  return $app->exec();
+}
+</pre>
+	위 코드를 보면서 이해하셨겠지만 설명하자면 connect는 이벤트 발생 객체, 이벤트, 이벤트 처리 객체, 이벤트 처리자 순으로 입력하도록 되어 있습니다.<br />
+	&nbsp;<br /></p>
+
+<p>
+	<b>화면 구성 1</b><br />
+	지금까지의 예제는 컨트롤 하나(PushButton)만을 만들었는데 버젓한 화면을 구성하려면 어떻게 해야 할까요? 기본적으로 제공되는 컨트롤들은 parent 컨트롤를 설정할 수 있습니다. 아래 코드에 보시면 btnQt(PushButton)을 window(Widget)에 붙이는 것을 확인하실 수 있습니다.<br />
+	<pre class="code">
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use QtCore4;
+use QtGui4;
+use QtCore4::debug qw(ambiguous);
+
+main();
+
+sub main {
+  my $app= Qt::Application(\@ARGV);
+  my $window= Qt::Widget();
+
+  $window->resize(200, 50);
+
+  my $btnQuit= Qt::PushButton("Quit", $window);
+  $btnQuit->setGeometry(10, 10, 180, 30);
+
+  Qt::Object::connect($btnQuit, SIGNAL "clicked()", $app, SLOT "quit()");
+
+  $btnQuit->show();
+  return $app->exec();
+}
+</pre>	
+	&nbsp;<br /></p>
+
+<p>
+	<b>화면 구성2</b><br />
+	여기까지 다다르고 나서 무언가 만들려고 하면 어떻게 해야할까? 를 고민하게 하는 문제가 있습니다. Widget에 컨트롤을 붙이기는 했는데 버튼을 눌렀을 때 기존 컨트롤들이 가지고 있는 동작이 아닌 다른 동작을 하려면 어떻게 해야할 까요? 아니면 Widget의 형태를 미리 만들어 둘 수는 없을까요? 이를 위해서는 서브 클래싱 방식을 이해해야합니다. 이는 생각보다 간단합니다.<br />
+	<pre class="code">
+use QtCore4::isa qw(Qt::Widget);</pre>
+	위와 같이 <code>QtCore4::isa</code>를 통하여 서브 클래싱할 객체를 선택합니다. 그 후<br />
+	<pre class="code">
+sub NEW {
+  shift->SUPER::NEW(@_);
+}</pre>
+	위와 같이 NEW를 재구현합니다. 일단은 이로써 기본은 끝입니다. 서브루틴 NEW를 수정하거나 다른 서브루틴을 추가하면 됩니다. 이때 유의해야하는 것은 기본적은 SIGNAL과 SLOT 이외에 추가하는 것은 아래와 같은 방법으로 명시해줘야합니다.<br />
+	<pre class="code">
+use QtCore4::slots viewMessage => [];</pre>
+	&nbsp;<br />
+	이를 이용하여 버튼을 눌렀을 때 'Hello World'를 보여주는 프로그램을 작성해 봅시다.<br />
+	<pre class="code">
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+package ExWidget;
+use QtCore4;
+use QtGui4;
+use QtCore4::debug qw(ambiguous);
+use QtCore4::isa qw(Qt::Widget);
+use QtCore4::slots viewMessage => [];
+
+sub NEW {
+  shift->SUPER::NEW(@_);
+}
+
+sub viewMessage {
+  my $msgbox= Qt::MessageBox();
+  $msgbox->setText("Hello World");
+  return $msgbox->exec();
+}
+
+package main;
+use QtCore4;
+use QtGui4;
+use QtCore4::debug qw(ambiguous);
+use ExWidget;
+
+main();
+
+sub main {
+  my $app= Qt::Application(\@ARGV);
+  my $window= ExWidget();
+
+  $window->resize(200, 50);
+
+  my $btnQuit= Qt::PushButton("View", $window);
+  $btnQuit->setGeometry(10, 10, 180, 30);
+
+  Qt::Object::connect($btnQuit, SIGNAL "clicked()", $window, SLOT "viewMessage()");
+
+  $window->show();
+  return $app->exec();
+}</pre>
+	<img src="http://np.3.eriny.net/eriny.net/files/2013/20131217/Screenshot from 2013-12-18 16:57:20.png"></img><br />
+	&nbsp;<br /></p>
+
+<p>
 	<b>글을 마무리하면서</b><br/>
-	위 프로그램 소스를 보시면 Qt도 사용하시기에 그리 어렵지 않다는 사실을 아실 수 있을 것입니다. 개인적으로는 Perl에서 Qt도 많이 사용되는 GUI 프레임워크가 되기를 소망해봅니다. 마지막으로 Perl Advent Calendar를 보고 계시는 분들은 모두 충분히 프로그래밍을 잘 하시는 분들이시니 Qt에 대한 자세한 사용법은 숙제로 남겨두겠습니다. ^^<br />
+	Qt에 대한 모든 내용을 다루기보다는 기본적인 설치와 사용방법에 중점을 두어 글을 작성했습니다. 글을 읽어보셨다면 아시겠지만(물론 이미 알고 계시겠지만) Qt가 그리 어려운 Framework는 아닙니다. 개인적으로는 perl에서 Qt도 많은 사랑을 받았으면 좋겠습니다. <br />
+	&nbsp;<br />
+	Enjoy your Perl~~~<br />
 	&nbsp;<br /></p>
 
 <p class="footnote">
 	<b>[1]</b> - <a href="http://perl-begin.org/uses/GUI">http://perl-begin.org/uses/GUI</a><br />
 	&nbsp;<br /></p></div>
 </div>
-	
 </div>
+
 
 </body>
 </html>
