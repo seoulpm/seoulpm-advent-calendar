@@ -1,18 +1,11 @@
+Title:    Qt 사용하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Category: Qt
+Category: GUI
+Author:   yukinpl
 
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Qt 사용하기</title>
-	<meta http-equiv="Content-Style-Type" content="text/css" charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-	<style type="text/css">
-	* {-webkit-text-size-adjust:none; }
-	</style>
-	<link rel="stylesheet" href="http://eriny.net/log_style.css" type="text/css" />
-	<link rel="shortcut icon" href="http://np.3.eriny.net/eriny.net/pic/favicon.ico" type="image/x-icon" />
-</head>
-
-<body>
 
 <div id="article-layer">
 	<div class="article-text"><p>
