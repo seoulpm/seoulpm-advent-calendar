@@ -128,29 +128,36 @@ Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 �
     Qt-0.96.0/qtcore/t/qabstractitemmodel.t:        return Qt::this()->SUPER::flags($index);
 
 
-<p>
-	<b>사용해보자</b><br />
-	아래 예제를 실행해 보도록 하겠습니다.<br />
-	<pre class="code">
-#!/usr/bin/env perl
-use warnings;
-use strict;
-use QtCore4;
-use QtGui4;
-use QtCore4::debug qw(ambiguous);
+사용해보자!
+------------
 
-my $app= Qt::Application(\@ARGV);
-my $button= Qt::PushButton('Hello, world!', undef);
+다음 예제를 실행해 보죠.
 
-$button->resize(200,30);
-$button->show();
+    #!perl
+    #!/usr/bin/env perl
 
-exit $app->exec();
-</pre>
-	위 예제 실행시 문제가 없다면 아래와 같이 실행됩니다.<br />
-	<img src="http://np.3.eriny.net/eriny.net/files/2013/20131217/Screenshot from 2013-12-17 15:22:35.png"></img><br />
-	여기까지 잘 진행되었다면 Qt를 사용하는 것에 무리가 없을 것입니다.<br />
-	&nbsp;<br /></p>
+    use strict;
+    use warnings;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw( ambiguous );
+
+    my $app    = Qt::Application(\@ARGV);
+    my $button = Qt::PushButton( 'Hello, world!', undef );
+
+    $button->resize( 200, 30 );
+    $button->show;
+
+    exit $app->exec;
+
+앞의 예제를 실행했을 때의 결과는 다음과 같습니다.
+
+![버튼 생성 예제][img-1-resize]
+*그림 1.* 버튼 생성 예제 ([원본][img-1])
+
+여기까지 잘 진행되었다면 *Qt*를 사용하는 것에 무리가 없을 것입니다.
+
 
 <p>
 	<b>SIGNAL / SLOT</b><br />
@@ -279,6 +286,10 @@ sub main {
 	Enjoy your Perl~~~<br />
 	&nbsp;<br /></p>
 
+
+[img-1]:          2013-12-19-1.png
+
+[img-1-resize]:   2013-12-19-1_r.png
 
 [cpan-alien-smokeqt]:           https://metacpan.org/module/Alien::SmokeQt
 [cpan-list-moreutils]:          https://metacpan.org/module/List::MoreUtils
