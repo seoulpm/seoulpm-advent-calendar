@@ -1,124 +1,348 @@
+Title:    Qt 사용하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Category: Qt
+Category: GUI
+Author:   yukinpl
 
-<!DOCTYPE html>
-<html>
-<head>
-	<title>eriny.net / make.pl / Qt&nbsp; </title>
-	<meta http-equiv="Content-Style-Type" content="text/css" charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-	<style type="text/css">
-	* {-webkit-text-size-adjust:none; }
-	</style>
-	<link rel="stylesheet" href="http://eriny.net/log_style.css" type="text/css" />
-	<link rel="shortcut icon" href="http://np.3.eriny.net/eriny.net/pic/favicon.ico" type="image/x-icon" />
-</head>
+저자
+-----
 
-<body>
+[@yukinpl][twitter-yukinpl] - 아는 것이 아무것도 없는 Perl 초보,
+[eriny.net][home-yukinpl]을 운영하고 있다.
 
-<div id="article-layer">
-	<div class="article-title">Qt&nbsp; </div>
-</div>
 
-<div id="article-layer">
-	<div class="article-text"><p>
-	<b>저자</b><br />
-	<a href="http://twitter.com/yukinpl">@yukinpl</a> - 아는 것이 아무것도 없는 perl 초보<br />
-	&nbsp;<br /></p>
+시작하며
+---------
 
-<p>
-	<b>Linux에서의 GUI / Perl 에서의 GUI</b><br />
-	Linux에서 GUI하면 두 가지, GTK와 Qt가 떠오르시나요? 그러나 Perl에서는 Qt가 유독 힘을 쓰지 못하는 것 같습니다. Perl에서 GUI를 표현하기 위한 모듈으로는 wxPerl, Perl-Tk, Perl/Qt or Perl/KDE, gtk2-perl 등이 있는 듯 합니다<sup>[1]</sup>. 그 중에서 Windows 유저들에게는 wxPerl이 환영받는 듯 하고, Linux 유저들에게는 gtk2가 인기 있는 것 같습니다. 대체 왜 그럴까요? 아무래도 Qt는 지속적으로 업데이트 되고 있는 모듈 찾기도 쉽지 않고, 안정화 되어 있어 잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같고 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요!!). 개인적으로는 Linux에서 C++ 프로그램 개발시 GTK보다 Qt로 작업한 것이 더 많은 터라 친근하기도 하고 Perl에서 대우 받지 못하는 것 같아 소개해 보려 합니다.<br />
-	&nbsp;<br /></p>
+*Linux에서의 GUI / Perl 에서의 GUI*
 
-<p>
-	<b>사용하려면</b><br />
-	Perl에서 Qt를 사용하려면 아래 모듈이 필요합니다.<br />
-	<li><a href="http://search.cpan.org/~cburel/Qt-0.96.0">http://search.cpan.org/~cburel/Qt-0.96.0</a></li>
-	<br />
-	그러나 위 모듈을 사용하려면 아래 준비물들이 우선 필요합니다.<br />
-	<li><b>Qt 4</b> - 위 모듈은 Qt 4를 기준으로 작성되어 있습니다.</li>
-	<li><b>SmokeQt</b> - Scipting Meta Object Kcompiler의 약자로 KDE의 binding 모듈입니다.</li>
-	<li><b>cmake</b> - Makefile.PL이 cmake를 기반으로 동작합니다.</li>
-	&nbsp;<br /></p>
+Linux에서 GUI 툴킷하면 두 가지, [GTK+][home-gtk]와 [Qt][home-qt]가 떠오르시나요?
+그러나 펄에서는 *Qt*가 유독 힘을 쓰지 못하는 것 같습니다.
+[GUI를 표현하기 위한 펄 라이브러리][perl-begin-gui]로는 [wxPerl][home-wxperl],
+[Tk][cpan-tk], [Perl/Qt와 Perl/KDE][perl-qt-kde], [gtk2-perl][home-gtk2-perl] 등이 있습니다.
+그 중에서도 윈도우 사용자는 wxPerl을, Linux 사용자는 GTK+를 선호하는 것 같습니다.
+대체 왜 그럴까요?
+아무래도 Qt는 안정화 되어있다보니 모듈이 지속적으로 업데이트 되고 있지 않고
+잘 알려진 모듈도 흔하지 않은 것이 가장 큰 이유인 것 같습니다.
+더불어 라이센스 문제도 있겠지요(원인을 잘 아신다면 제게 알려주세요! :).
+개인적으로는 Linux에서 C++ 프로그램 개발 시 GTK+보다 Qt로 더 많이 작업한 편이라
+친근하기도 하고 펄에서 널리 사용되 못하는 것 같아 소개해보려 합니다.
 
-<p>
-	<b>설치하자!</b><br />
-	이제 설치해보겠습니다. 아래 내용은 Ubuntu 12.04 LTS를 기준으로 진행하겠습니다.<br />
-	우선 해당 모듈 설치를 위해 필요한 도구들을 먼저 설치하겠습니다.<br />
-	<pre class="code">
-$ sudo apt-get install cmake
-$ sudo apt-get install libqt4-core libqt4-dbg libqt4-dev libqt4-gui
-$ sudo apt-get install SmokeQt*</pre>
-	컴파일 도구가 준비되어 있지 않다면 아래의 도구들도 함께 설치하겠습니다.<br />
-	<pre class="code">
-$ sudo apt-get install build-essentials
-$ sudo apt-get install gcc
-$ sudo apt-get install g++</pre>
-	여기까지 문제 없이 설치되었다면 이제 모듈을 설치해보겠습니다.<br />
-	<pre class="code">
-$ cd ~/Downloads
-$ tar zxvf Qt-0.96.0.tar.gz 
-$ cd Qt-0.96.0.tar.gz
-$ ./Makefile.PL</pre>
-	Makefile.PL 을 실행시키는 동안 문제가 발생한다면 cmake 또는 SmokeQt가 설치되지 않은 것입니다. 설치과정에서 빠진 것은 아닌지 확인하셔야 합니다.<br />
-	여기까지 문제 없이 진행되었다면 이제 설치는 막바지입니다.<br />
-	<pre class="code">
-$ make
-$ sudo make install</pre>
-</code>
-	&nbsp;<br /></p>
 
-<p>
-	<b>약간의 설정 및 수정</b><br />
-	설치가 완료되었다면 한가지의 설정과 한가지의 수정사항이 남아 있습니다. 첫번째는 PERL5LIB 환경변수 추가에 대한 부분이며, 두번째는 설치된 모듈 파일의 수정입니다.<br />
-	이 부분은 아래 내용을 진행하면서 문제가 발생했을 때 이부분을 참조하셔서 수행하시기 바랍니다.<br />
-	&nbsp;<br />
-	<b>+ PERL5LIB 설정 추가</b> 아래 예제들을 실행하면서 @INC 오류가 발생하면 지금 설치한 모듈이 설치된 디렉토리를 @INC에 추가하시기 바랍니다.<br />
-	<pre class="code">
-export PERL5LIB=/home/yukinpl/perllib:/usr/local/lib/perl/5.14.2</pre>
-	위 설정은 제가 설정한 것으로 앞 부분은 개인적으로 작성한 모듈들을 저장하는 곳이고 Qt가 설치된 디렉토리는 뒷부분입니다.<br />
-	&nbsp;<br />
-	<b>+ QtCore4.pm 수정</b> 아래 예제들을 실행하면서 List::MoreUtils 에 대한 @INC를 요구하는 경우 QtCore4.pm 파일을 수정해야합니다. 설치된 위치에 있는 QtCore4.pm 파일을 아래와 같이 수정하시기 바랍니다.<br />
-	<pre class="code">
-#use List::MoreUtils qw( any );</pre>
-	QtCore4.pm 파일의 799 라인으로 이동하면 List::MoreUtils qw(any) 라는 라인이 있습니다. 이 부분을 주석처리 하시기 바랍니다.<br />
-	&nbsp;<br /></p>
+준비물
+-------
 
-<p>
-	<b>사용해보자</b><br />
-	아래 예제를 실행해 보도록 하겠습니다.<br />
-	<pre class="code">
-#!/usr/bin/env perl
-use warnings;
-use strict;
-use QtCore4;
-use QtGui4;
-use QtCore4::debug qw(ambiguous);
+펄에서 Qt를 사용하려면 필요한 항목은 다음과 같습니다.
 
-my $app= Qt::Application(\@ARGV);
-my $button= Qt::PushButton('Hello, world!', undef);
+- Qt 4: 펄의 Qt 모듈은 Qt 4를 기준으로 작성되어 있습니다.
+- SmokeQt: Scipting Meta Object Kcompiler의 약자로 KDE의 binding 모듈입니다.
+- cmake: `Makefile.PL`이 `cmake`를 기반으로 동작합니다.
 
-$button->resize(200,30);
-$button->show();
+데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 개발 의존 패키지를 설치합니다.
 
-exit $app->exec();
-</pre>
-	위 예제 실행시 문제가 없다면 아래와 같이 실행됩니다.<br />
-	<img src="http://np.3.eriny.net/eriny.net/files/2013/20131217/Screenshot from 2013-12-17 15:22:35.png"></img><br />
-	여기까지 잘 진행되었다면 Qt를 사용하는 것에 무리가 없을 것입니다.<br />
-	&nbsp;<br /></p>
+    #!bash
+    $ sudo apt-get install build-essentials cmake libqt4-dev
 
-<p>
-	<b>글을 마무리하면서</b><br/>
-	위 프로그램 소스를 보시면 Qt도 사용하시기에 그리 어렵지 않다는 사실을 아실 수 있을 것입니다. 개인적으로는 Perl에서 Qt도 많이 사용되는 GUI 프레임워크가 되기를 소망해봅니다. 마지막으로 Perl Advent Calendar를 보고 계시는 분들은 모두 충분히 프로그래밍을 잘 하시는 분들이시니 Qt에 대한 자세한 사용법은 숙제로 남겨두겠습니다. ^^<br />
-	&nbsp;<br /></p>
+    ?
+    $ sudo apt-get install libqt4-core libqt4-dbg libqt4-gui
+    $ sudo apt-get install SmokeQt*
 
-<p class="footnote">
-	<b>[1]</b> - <a href="http://perl-begin.org/uses/GUI">http://perl-begin.org/uses/GUI</a><br />
-	&nbsp;<br /></p></div>
-</div>
-	
-</div>
+필요한 모듈은 다음과 같습니다.
 
-</body>
-</html>
+- [CPAN의 Alien::SmokeQt 모듈][cpan-alien-smokeqt]
+- [CPAN의 List::MoreUtils 모듈][cpan-list-moreutils]
+- [CPAN의 Qt 모듈][cpan-qt]
 
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Qt
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Qt
+
+
+문제 해결
+----------
+
+### 설치 순서
+
+모듈 설치가 실패하는 경우 다음 순서로 모듈을 하나씩 설치를 진행하도록 합니다.
+
+- [CPAN의 List::MoreUtils 모듈][cpan-list-moreutils]
+- [CPAN의 Alien::SmokeQt 모듈][cpan-alien-smokeqt]
+- [CPAN의 Qt4 모듈][cpan-qt4]
+- [CPAN의 Qt 모듈][cpan-qt]
+
+
+### libperl.so 확인
+
+[Qt 모듈][cpan-qt]을 설치하려면 사용하는 펄이 공유 라이브러리 형태로 빌드되어 있어야 합니다.
+시스템에서 제공하는 대부분의 펄은 공유 라이브러리 형태로 빌드 되어 있습니다.
+자신만의 펄을 사용하는 경우는 펄 빌드 옵션에서 `useshrplib` 항목을 확인 후
+자신이 설치한 펄 디렉터리 내부에 `libperl.so` 파일이 있는지 확인해야 합니다.
+
+    #!bash
+    $ perl -V | grep useshrplib
+        config_args='
+            -de -Dprefix=/home/askdna/perl5/perlbrew/perls/perl-5.18.1-so
+            -Dusethreads -Duseshrplib -Dcccdlflags=-fPIC
+            -Aeval:scriptdir=/home/askdna/perl5/perlbrew/perls/perl-5.18.1-so/bin'
+        libc=, so=so, useshrplib=true, libperl=libperl.so
+
+
+### PERL5LIB 설정
+
+빌드 후 테스트 진행시 [Qt4 모듈][cpan-qt4]과 [Qt 모듈][cpan-qt]의 문제로
+스스로가 빌드한 모듈을 제대로 찾지 못하는 경우가 있습니다.
+`blib/lib` 디렉터리와 `blib/arch` 디렉터리를 검색할 수 있도록 설정해주어야 하는데
+가장 간단한 방법은 `PERL5LIB` 환경 변수를 설정하는 것입니다.
+
+    #!bash
+    $ export PERL5LIB=/path/to/blib/lib:/path/to/blib/arch:$PERL5LIB
+    $ make test
+
+테스트가 끝나면 `PERL5LIB` 환경 변수에서 추가한 두 항목을 제거하도록 합니다.
+
+
+### `qstringlistmodel.t`와 `qabstractitemmodel.t` 테스트 실패
+
+현재 [Qt4 모듈][cpan-qt4]과 [Qt 모듈][cpan-qt]의 문제로 인해 상속받은 가상 함수를 호출하는 테스트는 실패하는 경우가 있습니다.
+따라서 다음 파일 목록을 확인하고 해당 테스트에서 실패할 경우 일단은 강제로 설치를 진행하도록 합니다.
+
+    #!bash
+    $ rgrep 'Qt::this()->SUPER::' Qt4-0.99.0 Qt-0.96.0
+    Qt4-0.99.0/qtgui/t/qstringlistmodel.t:        return Qt::this()->SUPER::buddy($index);
+    Qt4-0.99.0/qtgui/t/qstringlistmodel.t:        return Qt::this()->SUPER::flags($index);
+    Qt4-0.99.0/qtcore/t/qabstractitemmodel.t:        return Qt::this()->SUPER::buddy($index);
+    Qt4-0.99.0/qtcore/t/qabstractitemmodel.t:        return Qt::this()->SUPER::flags($index);
+    Qt-0.96.0/qtgui/t/qstringlistmodel.t:        return Qt::this()->SUPER::buddy($index);
+    Qt-0.96.0/qtgui/t/qstringlistmodel.t:        return Qt::this()->SUPER::flags($index);
+    Qt-0.96.0/qtcore/t/qabstractitemmodel.t:        return Qt::this()->SUPER::buddy($index);
+    Qt-0.96.0/qtcore/t/qabstractitemmodel.t:        return Qt::this()->SUPER::flags($index);
+
+
+사용해보자!
+------------
+
+다음 예제를 실행해 보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw( ambiguous );
+
+    my $app    = Qt::Application(\@ARGV);
+    my $button = Qt::PushButton( 'Hello, world!', undef );
+
+    $button->resize( 200, 30 );
+    $button->show;
+
+    exit $app->exec;
+
+앞의 예제를 실행했을 때의 결과는 다음과 같습니다.
+
+![버튼 생성 예제][img-1-resize]
+*그림 1.* 버튼 생성 예제 ([원본][img-1])
+
+여기까지 잘 진행되었다면 *Qt*를 사용하는 것에 무리가 없을 것입니다.
+
+
+SIGNAL과 SLOT
+--------------
+
+Qt를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::connect()` 입니다.
+그리고 *SIGNAL*과 *SLOT*이라는 개념을 이해해야합니다.
+이벤트 지향 프로그래밍을 이해하고 있다면 간단한 내용입니다.
+*SIGNAL*은 이벤트의 발생 조건이고, *SLOT*은 이벤트 처리자라고 생각하면 됩니다.
+그리고 `connect()` 함수가 이 둘을 묶어주는 역할을 합니다.
+버튼을 클릭하면 프로그램이 종료되는 간단한 예제를 살펴보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw(ambiguous);
+
+    main();
+
+    sub main {
+        my $app     = Qt::Application(\@ARGV);
+        my $btnQuit = Qt::PushButton("Quit");
+
+        $btnQuit->resize( 200, 30 );
+        Qt::Object::connect( $btnQuit, SIGNAL "clicked()", $app, SLOT "quit()" );
+
+        $btnQuit->show;
+        return $app->exec;
+    }
+
+`Qt::Object::connect()` 함수는 *이벤트 발생 객체*, *이벤트*, *이벤트 처리 객체*, *이벤트 처리자*를 인자로 받습니다.
+
+
+화면 구성 #1
+-------------
+
+지금까지의 예제는 하나의 컨트롤(PushButton)만 만들었는데 버젓한 화면을 구성하려면 어떻게 해야할까요?
+기본적으로 제공되는 컨트롤은 부모 컨트롤를 설정할 수 있습니다.
+다음은 `$btnQuit` *PushButton*을 `$window` *Widget*에 붙이는 예제입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw(ambiguous);
+
+    main();
+
+    sub main {
+        my $app    = Qt::Application(\@ARGV);
+        my $window = Qt::Widget;
+
+        $window->resize( 200, 50 );
+
+        my $btnQuit= Qt::PushButton( "Quit", $window );
+        $btnQuit->setGeometry( 10, 10, 180, 30 );
+
+        Qt::Object::connect( $btnQuit, SIGNAL "clicked()", $app, SLOT "quit()" );
+        $btnQuit->show;
+
+        return $app->exec;
+    }
+
+
+화면 구성 #2
+-------------
+
+여기까지 다다르면 무언가 만들려고 할 때 고민이 한 가지 생깁니다.
+*Widget*에 컨트롤을 붙이기는 했는데 버튼을 눌렀을 때
+기존 컨트롤의 동작이 아닌 다른 동작을 수행하려면 어떻게 해야할 까요?
+*Widget*의 형태를 미리 만들어 둘 수는 없을까요?
+바로 이런 경우 사용하는 것이 *상속(Subclassing)*입니다.
+*Qt*의 위젯을 상속하는 방법은 다음과 같습니다.
+
+    #!perl
+    use QtCore4::isa qw( Qt::Widget );
+
+앞의 코드와 같이 `QtCore4::isa` 함수를 사용해 상속받을 객체를 선택합니다.
+그 후 생성자인 `NEW()` 메소드를 재정의(overloading)합니다.
+
+    #!perl
+    sub NEW {
+        shift->SUPER::NEW(@_);
+    }
+
+이로써 기본적인 상속 과정은 끝납니다.
+더 필요한 부분이 있다면 `NEW()` 메소드를 수정하거나 다른 메소드를 추가합니다.
+이 때 *기본적인 SIGNAL과 SLOT 이외의 것을 추가할 경우*
+다음과 같은 방법으로 명시해야 한다는 점을 *유의*해야 합니다.
+
+    #!perl
+    use QtCore4::slots viewMessage => [];
+
+이제 버튼을 눌렀을 때 *Hello World*를 보여주는 프로그램을 작성해 봅시다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    package ExWidget;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw( ambiguous );
+    use QtCore4::isa   qw( Qt::Widget );
+    use QtCore4::slots viewMessage => [];
+
+    sub NEW {
+        shift->SUPER::NEW(@_);
+    }
+
+    sub viewMessage {
+        my $msgbox = Qt::MessageBox();
+        $msgbox->setText("Hello World");
+
+        return $msgbox->exec;
+    }
+
+    package main;
+
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw( ambiguous );
+    use ExWidget;
+
+    main();
+
+    sub main {
+        my $app    = Qt::Application(\@ARGV);
+        my $window = ExWidget();
+
+        $window->resize( 200, 50 );
+
+        my $btnQuit= Qt::PushButton( "View", $window );
+        $btnQuit->setGeometry( 10, 10, 180, 30 );
+
+        Qt::Object::connect( $btnQuit, SIGNAL "clicked()", $window, SLOT "viewMessage()" );
+
+        $window->show;
+        return $app->exec;
+    }
+
+실행한 결과는 다음과 같습니다.
+
+![상속받은 창을 띄우는 예제][img-2-resize]
+*그림 2.* 상속받은 창을 띄우는 예제 ([원본][img-2])
+
+
+정리하며
+---------
+
+[Qt][home-qt]에 대한 모든 내용을 다루기보다는 기본적인 설치와 사용 방법에 중점을 두어보았습니다.
+기사를 읽어보면 아시겠지만(물론 이미 알고 계시겠지만 :) *Qt*가 그리 어려운 GUI 프레임워크는 아닙니다.
+개인적으로는 Qt가 펄에서도 많은 사랑을 받았으면 좋겠습니다.
+
+Enjoy Your Perl! ;-)
+
+
+[img-1]:          2013-12-19-1.png
+[img-2]:          2013-12-19-2.png
+
+[img-1-resize]:   2013-12-19-1_r.png
+[img-2-resize]:   2013-12-19-2_r.png
+
+
+[cpan-alien-smokeqt]:       https://metacpan.org/module/Alien::SmokeQt
+[cpan-list-moreutils]:      https://metacpan.org/module/List::MoreUtils
+[cpan-qt4]:                 https://metacpan.org/module/Qt4
+[cpan-qt]:                  https://metacpan.org/module/Qt
+[cpan-tk]:                  https://metacpan.org/module/Tk
+[home-gtk2-perl]:           http://gtk2-perl.sourceforge.net/
+[home-gtk]:                 http://www.gtk.org/
+[home-qt]:                  http://qt-project.org/
+[home-wxperl]:              http://www.wxperl.it/
+[home-yukinpl]:             http://eriny.net/
+[perl-begin-gui]:           http://perl-begin.org/uses/GUI
+[perl-qt-kde]:              http://techbase.kde.org/Development/Languages/Perl
+[twitter-yukinpl]:          http://twitter.com/#!/yukinpl
