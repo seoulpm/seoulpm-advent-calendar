@@ -195,35 +195,40 @@ Qt를 사용하다보면 자주 만나게 되는 함수가 바로 `Qt::Object::c
 `Qt::Object::connect()` 함수는 *이벤트 발생 객체*, *이벤트*, *이벤트 처리 객체*, *이벤트 처리자*를 인자로 받습니다.
 
 
-<p>
-	<b>화면 구성 1</b><br />
-	지금까지의 예제는 컨트롤 하나(PushButton)만을 만들었는데 버젓한 화면을 구성하려면 어떻게 해야 할까요? 기본적으로 제공되는 컨트롤들은 parent 컨트롤를 설정할 수 있습니다. 아래 코드에 보시면 btnQt(PushButton)을 window(Widget)에 붙이는 것을 확인하실 수 있습니다.<br />
-	<pre class="code">
-#!/usr/bin/env perl
-use warnings;
-use strict;
-use QtCore4;
-use QtGui4;
-use QtCore4::debug qw(ambiguous);
+화면 구성 #1
+-------------
 
-main();
+지금까지의 예제는 하나의 컨트롤(PushButton)만 만들었는데 버젓한 화면을 구성하려면 어떻게 해야할까요?
+기본적으로 제공되는 컨트롤은 부모 컨트롤를 설정할 수 있습니다.
+다음은 `$btnQuit` *PushButton*을 `$window` *Widget*에 붙이는 예제입니다.
 
-sub main {
-  my $app= Qt::Application(\@ARGV);
-  my $window= Qt::Widget();
+    #!perl
+    #!/usr/bin/env perl
 
-  $window->resize(200, 50);
+    use strict;
+    use warnings;
 
-  my $btnQuit= Qt::PushButton("Quit", $window);
-  $btnQuit->setGeometry(10, 10, 180, 30);
+    use QtCore4;
+    use QtGui4;
+    use QtCore4::debug qw(ambiguous);
 
-  Qt::Object::connect($btnQuit, SIGNAL "clicked()", $app, SLOT "quit()");
+    main();
 
-  $btnQuit->show();
-  return $app->exec();
-}
-</pre>
-	&nbsp;<br /></p>
+    sub main {
+        my $app    = Qt::Application(\@ARGV);
+        my $window = Qt::Widget;
+
+        $window->resize( 200, 50 );
+
+        my $btnQuit= Qt::PushButton( "Quit", $window );
+        $btnQuit->setGeometry( 10, 10, 180, 30 );
+
+        Qt::Object::connect( $btnQuit, SIGNAL "clicked()", $app, SLOT "quit()" );
+        $btnQuit->show;
+
+        return $app->exec;
+    }
+
 
 <p>
 	<b>화면 구성2</b><br />
