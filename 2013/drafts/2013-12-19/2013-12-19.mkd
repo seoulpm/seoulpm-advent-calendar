@@ -6,12 +6,12 @@ Category: Qt
 Category: GUI
 Author:   yukinpl
 
+저자
+-----
 
-<div id="article-layer">
-	<div class="article-text"><p>
-	<b>저자</b><br />
-	<a href="http://twitter.com/yukinpl">@yukinpl</a> - 아는 것이 아무것도 없는 perl 초보<br />
-	&nbsp;<br /></p>
+[@yukinpl][twitter-yukinpl] - 아는 것이 아무것도 없는 Perl 초보,
+[eriny.net][home-yukinpl]을 운영하고 있다.
+
 
 <p>
 	<b>Linux에서의 GUI / Perl 에서의 GUI</b><br />
@@ -233,3 +233,6 @@ sub main {
 </body>
 </html>
 
+
+[home-yukinpl]:                 http://eriny.net/
+[twitter-yukinpl]:              http://twitter.com/#!/yukinpl
