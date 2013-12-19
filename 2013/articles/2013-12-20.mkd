@@ -76,7 +76,7 @@ Gearman에 대하여
 ----------
 
 제가 처리해야 할 작업은 다음과 같습니다.
-디렉터리 안에 다수의 ZIP 형식의 압축 파일들이 있는 상태에서 각 압축 파일을 열고,
+디렉터리 안에 다수의 ZIP 형식의 압축 파일이 있는 상태에서 각 압축 파일을 열고,
 `LIST.txt` 파일을 추출한 후, 그 파일 안에 `Perl`이라는 문자열이 존재하는지 검사합니다.
 이 문자열이 없다면 그 압축 파일에 문제가 있는 것이므로 로그에 따로 기록을 합니다.
 
@@ -125,7 +125,7 @@ Gearman에 대하여
 
     close $fh;
 
-이 스크립트를 실행하면, 검사한 압축 파일들의 이름이 로그 파일에 기록됩니다.
+이 스크립트를 실행하면, 검사한 압축 파일의 이름이 로그 파일에 기록됩니다.
 
     #!bash
     [/Users/gypark/temp/gearman/data/00001.zip]
@@ -141,7 +141,7 @@ Gearman에 대하여
 Gearman으로 옮기기
 -------------------
 
-이제 2만 개의 파일 목록을 쪼개어서 여러 워커에서 작업할 수 있도록 옮겨보죠.
+이제 *2만 개의 파일 목록*을 쪼개어서 여러 워커에서 작업할 수 있도록 옮겨보죠.
 
 
 ### Gearman 클라이언트
@@ -150,7 +150,7 @@ Gearman으로 옮기기
 주요 흐름은 작년 기사에서 예제로 나왔던 합계 구하기 코드와 거의 유사합니다.
 실제로 문제가 되는 것은 *작업을 어떻게 쪼갤 것인가*입니다.
 처리해야 할 작업이 다수의 파일에 동일한 일을 수행하는 것이므로
-*2만개의 전체 파일들을 1천개씩 나누어서 파일 이름의 목록 스무 개를 워커에 넘겨주는 것*으로
+*2만개의 전체 파일을 1천개씩 나누어서 파일 이름의 목록 스무 개를 워커에 넘겨주는 것*으로
 쉽게 작업을 분할할 수 있었습니다.
 
     #!perl
@@ -206,7 +206,7 @@ Gearman으로 옮기기
 그 목록에 있는 파일을 열고 검사하는 실제 작업을 수행합니다.
 
 따라서 워커가 하는 일은 앞에서 보았던 순차 처리 스크립트의 내용을 고스란히 포함하고 있습니다.
-다만 이번에는 여러 워커가 동시에 일을 하기 때문에 추출한 파일들이 서로 겹치지 않도록
+다만 이번에는 여러 워커가 동시에 일을 하기 때문에 추출한 파일이 서로 겹치지 않도록
 *각 워커가 임시 디렉터리를 만들어서 그 안에서 작업*하도록 합니다.
 또한 *로그 파일도 각 작업마다 따로 만들어서 기록*하도록 합니다.
 
@@ -305,8 +305,7 @@ Gearman으로 옮기기
 
 ### Gearman 서버 실행
 
-여기서는 20000만 포트를 통하여 통신하도록 하고 있기 때문에
-서버를 실행할 때도 포트 번호를 지정해줍니다.
+여기서는 `20000` 포트로 통신하기 때문에 서버를 실행할 때도 *포트 번호*를 *지정*해줍니다.
 
     #!bash
     $ gearmand -p 20000
@@ -314,7 +313,7 @@ Gearman으로 옮기기
 
 ### Gearman 워커 실행
 
-워커를 몇 대나 띄워야 비용 대비 효과가 제일 클 것인가는 아마도 상황마다 다를 것 같습니다.
+*워커를 몇 대나 띄워야 비용 대비 효과가 제일 클 것인가?*는 아마도 상황마다 다를 것 같습니다.
 이와 관련해서 [작년의 16일자 기사][advent-2012-12-16]에서는 워커를 관리하는 용도로 쓸 수 있는
 [Gearman::SlotManager][cpan-gearman-slotmanager] 모듈을 소개하고 있습니다.
 
@@ -411,7 +410,7 @@ Gearman으로 옮기기
 여전히 순차 처리 스크립트에 비해 압도적으로 빠르더군요.
 이건 아무래도 이상하다 싶어서, 순차 처리 스크립트 쪽을 수정해보았습니다.
 2만 번의 루프를 도는 것을 기어맨을 쓸 때처럼 천 번씩 20회 반복을 시켜보기도 하고,
-렉시컬 변수들의 스코프를 조절해보기도 하고,
+렉시컬 변수의 스코프를 조절해보기도 하고,
 로그 파일을 나눠서 기록하게 해보기도 하다가 결국은 무엇을 발견했냐 하면...
 
 
@@ -505,17 +504,19 @@ Gearman으로 옮기기
 [img-1]:          2013-12-20-1.png
 [img-1-resize]:   2013-12-20-1_r.png
 
-[advent-2012]:              http://advent.perl.kr/2012
 [advent-2012-12-15]:        http://advent.perl.kr/2012/2012-12-15.html
 [advent-2012-12-16]:        http://advent.perl.kr/2012/2012-12-16.html
+[advent-2012]:              http://advent.perl.kr/2012
 [cpan-archive-zip]:         https://metacpan.org/module/Archive::Zip
 [cpan-file-slurp]:          https://metacpan.org/module/File::Slurp
-[cpan-time-hires]:          https://metacpan.org/module/Time::HiRes
 [cpan-gearman-client]:      https://metacpan.org/module/Gearman::Client
 [cpan-gearman-server]:      https://metacpan.org/module/Gearman::Server
 [cpan-gearman-slotmanager]: https://metacpan.org/module/Gearman::SlotManager
 [cpan-gearman-worker]:      https://metacpan.org/module/Gearman::Worker
+[cpan-time-hires]:          https://metacpan.org/module/Time::HiRes
+[cpan]:                     http://www.cpan.org/
 [home-gearman]:             http://gearman.org/
 [home-gypark-perl]:         http://gypark.pe.kr/wiki/Perl
+[home-perlbrew]:            http://perlbrew.pl/
 [perldoc-storable]:         http://perldoc.perl.org/Storable.html
 [twitter-gypark]:           http://twitter.com/gypark
