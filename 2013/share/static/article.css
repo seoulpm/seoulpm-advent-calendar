@@ -127,8 +127,10 @@ h3 {
 #cont table {
     margin: 0 auto 1.6em auto;
     border: 1px solid #b4b4b4;
+    border-collapse: collapse;
     padding: 0.2em;
     font-family: 'NanumMyeongjoWeb';
+    width: 80%;
 }
 #cont table thead {
     background-color: #e8e8e8;
@@ -139,6 +141,11 @@ h3 {
 #cont table tbody {
     font-family: 'NanumMyeongjoWeb';
     font-size: 0.9em;
+}
+#cont table thead th,
+#cont table tbody td {
+    padding: 0.2em;
+    border: 1px solid #c5c5c5;
 }
 #cont ul {
     margin-top: -0.6em;
