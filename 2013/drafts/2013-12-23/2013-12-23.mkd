@@ -2,7 +2,9 @@ Title: 오타를 허용하는 Text matching
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author: Skyloader
+Category: search
+Category: n-gram
+Author: skyloader
 
 ## 저자
 
