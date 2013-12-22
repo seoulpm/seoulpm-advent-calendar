@@ -184,7 +184,7 @@ String::Trigram 모듈
             push(
                 @result,
                 sprintf(
-                    "%-30s -> %-30s : similarity = %02f",
+                    "%-26s -> %-26s : similarity = %02f",
                     $s,
                     $max_smlty_item,
                     $max_smlty,
@@ -199,25 +199,25 @@ String::Trigram 모듈
 
     #!plain
     Text A
-    Green Box : Bat                -> Box:Green:Bat                  : similarity = 0.333333
-    Green Box : Gloove             -> Box:Green:Gloove               : similarity = 0.407407
-    Green Box : Uniform            -> Box:Green:Uniform              : similarity = 0.428571
-    Puple Box : Chocolate          -> Box:Puple:Chocolate            : similarity = 0.466667
-    Puple Box : Mint Candy         -> Box:Puple:Mint Candy           : similarity = 0.483871
-    Puple Box : Apple Jelly        -> Box:Puple:Apple Jelly          : similarity = 0.500000
-    Blue  Box : Brush-middle       -> Box:Blue:Brush-middle          : similarity = 0.531250
-    Blue  Box : Brush-wide         -> Box:Blue:Brush-wide            : similarity = 0.500000
-    Blue  Box : Black Ink          -> Box:Blue:Black Ink             : similarity = 0.482759
+    Green Box : Bat            -> Box:Green:Bat              : similarity = 0.333333
+    Green Box : Gloove         -> Box:Green:Gloove           : similarity = 0.407407
+    Green Box : Uniform        -> Box:Green:Uniform          : similarity = 0.428571
+    Puple Box : Chocolate      -> Box:Puple:Chocolate        : similarity = 0.466667
+    Puple Box : Mint Candy     -> Box:Puple:Mint Candy       : similarity = 0.483871
+    Puple Box : Apple Jelly    -> Box:Puple:Apple Jelly      : similarity = 0.500000
+    Blue  Box : Brush-middle   -> Box:Blue:Brush-middle      : similarity = 0.531250
+    Blue  Box : Brush-wide     -> Box:Blue:Brush-wide        : similarity = 0.500000
+    Blue  Box : Black Ink      -> Box:Blue:Black Ink         : similarity = 0.482759
     Text B
-    Green Box : Bat                -> Grean Box : Bat                : similarity = 0.700000
-    Green Box : Gloove             -> Grean Box : Glove              : similarity = 0.625000
-    Green Box : Uniform            -> Grean Box : Uniform            : similarity = 0.750000
-    Puple Box : Chocolate          -> Pufle Cox : Chocholate         : similarity = 0.468750
-    Puple Box : Mint Candy         -> Puple Box : Mint Dandy         : similarity = 0.777778
-    Puple Box : Apple Jelly        -> Pulpe Box : Aple Jelly         : similarity = 0.633333
-    Blue  Box : Brush-middle       -> Bule  Box : Brush-middle       : similarity = 0.733333
-    Blue  Box : Brush-wide         -> Blue  Bix : Brush-wide         : similarity = 0.777778
-    Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 0.880000
+    Green Box : Bat            -> Grean Box : Bat            : similarity = 0.700000
+    Green Box : Gloove         -> Grean Box : Glove          : similarity = 0.625000
+    Green Box : Uniform        -> Grean Box : Uniform        : similarity = 0.750000
+    Puple Box : Chocolate      -> Pufle Cox : Chocholate     : similarity = 0.468750
+    Puple Box : Mint Candy     -> Puple Box : Mint Dandy     : similarity = 0.777778
+    Puple Box : Apple Jelly    -> Pulpe Box : Aple Jelly     : similarity = 0.633333
+    Blue  Box : Brush-middle   -> Bule  Box : Brush-middle   : similarity = 0.733333
+    Blue  Box : Brush-wide     -> Blue  Bix : Brush-wide     : similarity = 0.777778
+    Blue  Box : Black Ink      -> Blue  Box : Black Iink     : similarity = 0.880000
 
 와우, 놀랍군요!
 수정본에 오타가 있든 순서가 바뀌어 있든 꽤나 눈으로 비교하는 것과
