@@ -1,0 +1,168 @@
+Title: 오타를 허용하는 Text matching
+Package: Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author: Skyloader
+
+## 저자
+
+skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Perl을 배운다는 후문이 사실,
+[@JEEN_LEE][twitter-jeen_lee]와 동갑, skyloader _at_ gmail.com
+
+
+## 시작하며
+
+Perl은 Text를 다루는데 아주 효율적인 언어이기 때문에, 필자의 회사에서 Text를 다뤄야 할 일이 생기면 으레 `use strict;` 으로 시작하는 Perl code를 짜곤 합니다. <br>
+하지만, 회사의 모든 사람이 Perl이나 기타 Phython 같은 언어를 알아서 script를 작성하여 Text를 자동화하여 다루는 것은 아닙니다. <br>
+회사에서도 다수의 사람들은 이런저런 이유로 직접 손으로 Text를 다루는 일이 많게 됩니다.
+문제는 여기서 생깁니다. Text를 손으로 다루게 되면 오타가 생기게 되거나, 원래 주어진 Text를 주관을 갖고 해석하여 다르게 사용하는 경우가 종종 생기게 됩니다. <br>
+이렇게 재생산된 Text를 다시 받아 원본 Text와 매칭하며 사용한다고 했을 때, 사소한 오타와 미묘한 단어의 재배치로인해서 단순 Regex통한 명확하게 지정된 Text matching으로는 원본과 Matching이 되지 않는 상황이 발생합니다. 이런 경우 대부분은 눈으로 확인하면 쉽게 구분이 가는 경우지만, script를 통한 자동화는 그 방법이 좀 애매해지기 일쑤이죠. <br>
+지금부터 이러한 상황을 극복하고 원하는 작업을 수행하게 도와주는 Algorithm과 Perl module을 소개할까 합니다.
+
+
+## n-Gram Algorithm 
+
+n-Gram Algorithm은 통계, 확률을 바탕으로한 색인분석 등에 널리 쓰이는 방식으로 초기 검색사이트가 취한 색인 검색 Algorithm의 하나입니다. 요즘엔 생명공학 분야의 염기서열이나, 분자구조 분석에 자주 등장하는 듯 합니다.<br>
+이론이 간단하고 빠르기 때문에 여러 학문에 적용하기 안성맞춤이지요.
+n-Gram의 기본 적인 방법은 이러 합니다.
+
+```
+[ ] : n == 3 window
+
+algorithm
+[ ]---------> alg
+  [ ]-------> lgo
+   [ ]------> gor
+    [ ]-----> ori
+     [ ]----> rit
+      [ ]---> ith
+       [ ]--> thm
+```
+
+위와 같이 n width character의 Window를 만들어 string을 왼쪽에서 오른쪽으로 한 단위씩 움직이면서 추출되는 character item set 의 출현을 수집합니다. 
+이러한 방식으로 두개의 string의 각기 character item set을 수집하고, 출현빈도를 비교함으로써 두 string간의 비교를 수치로 수행합니다. <br>
+이때 n의 값은 의미가 있다고 생각하는 음절의 수로 지정하면 되는데, 이 값이 1인 경우는 unigram, 2인 경우는 bigram, 3인 경우는 trigram이라고 부릅니다. <br>
+오늘 소개하는 Module의 이름은 `String::Trigram` 인데요. 이름에서도 알 수 있듯이 n 값으로 3을 기본으로하는 module입니다. 
+
+
+## 간단한 예제
+
+예를 들어 봅시다.
+다음과 같은 Item Box list가 있다고 합시다.
+
+```
+Green Box : Bat
+Green Box : Gloove
+Green Box : Uniform
+Puple Box : Chocolate
+Puple Box : Mint Candy
+Puple Box : Apple Jelly
+Blue  Box : Brush-middle
+Blue  Box : Brush-wide
+Blue  Box : Black Ink
+```
+
+A라는 사람은 자기만의 방식으로 이렇게 받아 적었습니다.
+
+```
+Box:Blue:Brush-middle
+Box:Green:Gloove
+Box:Puple:Mint Candy
+Box:Puple:Apple Jelly
+Box:Blue:Black Ink
+Box:Green:Uniform
+Box:Puple:Chocolate
+Box:Green:Bat
+Box:Blue:Brush-wide
+```
+
+그리고 B라는 사람은 오타를 좀 냈군요.
+
+```
+Grean Box : Uniform
+Pufle Cox : Chocholate
+Puple Box : Mint Dandy
+Pulpe Box : Aple Jelly
+Grean Box : Bat
+Grean Box : Glove
+Bule  Box : Brush-middle
+Blue  Bix : Brush-wide
+Blue  Box : Black Iink
+```
+
+어떤가요. 눈으로 보면 어떤 항목이 원본의 어떤 항목을 나타내는지 알 수 있지만, 이를 매칭시키는 script를 짜라고 하면, 금방 머리에 방법이 떠오르나요? 떠오른다 해도 방법이 쉽지만은 않아 보입니다. <br>
+그럼 이쯤에서 module을 출동시켜 보겠습니다.
+
+
+## Code
+
+`String::Trigram`의 compare class method는 두개의 string을 인자로 받아 그 유사성을 1보다 작은 소수값으로 판별하여 반환해 주는 함수 입니다. <br>
+우리에게 필요한 것은 단지 이것 하나 뿐입니다.
+
+```
+use String::Trigram;
+use Path::Tiny;
+
+my $raw  = path('raw.input');
+my $mr_a = path('a.input');
+my $mr_b = path('b.input');
+my @list_raw  = $raw->lines( {chomp => 1} );
+my @list_mr_a = $mr_a->lines( {chomp => 1} );
+my @list_mr_b = $mr_b->lines( {chomp => 1} );
+
+print "Text A\n";
+print cmp_list_similarity( \@list_raw, \@list_mr_a);
+print "Text B\n";
+print cmp_list_similarity( \@list_raw, \@list_mr_b);
+
+sub cmp_list_similarity {
+    my $list_raw = shift;
+    my $list_cmp = shift;
+    my @result;
+    for my $raw_item (@$list_raw) {
+        my $max_smlty = 0;
+        my $max_smlty_item;
+        for my $cmp_item (@$list_cmp) {
+            my $smlty  = String::Trigram::compare($raw_item, $cmp_item);
+            $max_smlty = $smlty and $max_smlty_item = $cmp_item  if $smlty > $max_smlty;
+        }
+        push @result, sprintf ( "%-30s -> %-30s : similarity = %02f\n",$raw_item, $max_smlty_item, $max_smlty );
+    }
+
+    return @result;
+}                                                                                                                                                             
+```
+
+```
+Text A
+Green Box : Bat                -> Box:Green:Bat                  : similarity = 0.333333
+Green Box : Gloove             -> Box:Green:Gloove               : similarity = 0.407407
+Green Box : Uniform            -> Box:Green:Uniform              : similarity = 0.428571
+Puple Box : Chocolate          -> Box:Puple:Chocolate            : similarity = 0.466667
+Puple Box : Mint Candy         -> Box:Puple:Mint Candy           : similarity = 0.483871
+Puple Box : Apple Jelly        -> Box:Puple:Apple Jelly          : similarity = 0.500000
+Blue  Box : Brush-middle       -> Box:Blue:Brush-middle          : similarity = 0.531250
+Blue  Box : Brush-wide         -> Box:Blue:Brush-wide            : similarity = 0.500000
+Blue  Box : Black Ink          -> Box:Blue:Black Ink             : similarity = 0.482759
+Text B
+Green Box : Bat                -> Grean Box : Bat                : similarity = 0.700000
+Green Box : Gloove             -> Grean Box : Glove              : similarity = 0.625000
+Green Box : Uniform            -> Grean Box : Uniform            : similarity = 0.750000
+Puple Box : Chocolate          -> Pufle Cox : Chocholate         : similarity = 0.468750
+Puple Box : Mint Candy         -> Puple Box : Mint Dandy         : similarity = 0.777778
+Puple Box : Apple Jelly        -> Pulpe Box : Aple Jelly         : similarity = 0.633333
+Blue  Box : Brush-middle       -> Bule  Box : Brush-middle       : similarity = 0.733333
+Blue  Box : Brush-wide         -> Blue  Bix : Brush-wide         : similarity = 0.777778
+Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 0.880000
+```
+
+완전하게 원하는 것들을 찾아주는 것을 확인 할 수 있습니다.
+
+
+## 마치면서
+
+물론, n-Gram이 모든 경우에 있어서 최소의 해결책은 아닙니다. 여러분이 Naver, Daum에 이은 Daver 같은 새로운 검색 포탈과 엔진을 만들고자 한다며, 반드시 다른 해결책을 더 많이 찾아보아야 할 것 입니다. <br>
+n-Gram 단지 여러분이 갓 내린 커피 몇잔과 비스켓으로 마음 여유를 찾는데 도움을 줄 시간을 조금 더 마련해 줄 뿐입니다.
+오타를 낸 사람에 대해 더이상 분노 섞인 메일을 보내지 않아도 된다는 것은 덤이지요.
+ 
+[twitter-jeen_lee]:        http://twitter.com/JEEN_LEE
