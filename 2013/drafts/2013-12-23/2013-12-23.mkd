@@ -1,4 +1,4 @@
-Title: 오타를 허용하는 Text matching
+Title: 오타를 허용하는 문자열 일치
 Package: Seoul.pm
 Category: perl
 Category: Seoul.pm
