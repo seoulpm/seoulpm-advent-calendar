@@ -27,13 +27,13 @@ Author:   gypark
 "Modification of a read-only value attempted" 오류가 나는 흔한 경우
 --------------------------------------------------------------------
 
-(원문: [Common Causes for "Modification of a read-only value attempted"][perlmonks-article] by imp, 2006.9.1)
+원문: [Common Causes for "Modification of a read-only value attempted"][perlmonks-article] by imp, 2006.9.1
 
 여러분이 직접적으로 또는 간접적으로 상수의 값을 수정하려고 할 때 이 오류가 발생합니다.
 이런 형태의 오류는 발생된 지점이 멀리 떨어져 있어서 추적하기 어려울 때가 많습니다.
 때로는 `$_` 변수의 마술이 관련되지만 여기에 책임을 물을 수는 없습니다.
 
-흔한 경우들을 언급해보면 다음과 같습니다:
+흔한 경우들을 언급해보면 다음과 같습니다.
 
 - 반복문 변수를 *L값*으로 다루는 경우
 - `foreach`, `map`, `grep` 안에서 `$_` 변수를 수정하는 경우
@@ -131,7 +131,7 @@ Author:   gypark
 이어서 `prompt_user`를 호출했는데 이 함수는 `STDIN`에서 한 라인을 읽고
 그 내용을 여전히 `1`의 별칭인 `$_`에 저장하려고 시도하면서 오류가 발생합니다.
 
-이 오류는 다음과 같이 더 간단하게 만든 시나리오에서도 나타납니다:
+이 오류는 다음과 같이 더 간단하게 만든 시나리오에서도 나타납니다.
 
     #!perl
     for ( 1, 2 ) {
@@ -157,7 +157,7 @@ Author:   gypark
 이 문서의 내용을 따라가는 동안 수정 가능한 대상을 만드는
 표현식이 어떤 것인지 이해하는 것이 중요합니다.
 
-다음 표현식에는 상수가 들어 있습니다:
+다음 표현식에는 상수가 들어 있습니다.
 
     #!perl
     $_++ for ( 1, 2 );
