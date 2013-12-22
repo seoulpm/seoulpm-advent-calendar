@@ -6,13 +6,15 @@ Category: search
 Category: n-gram
 Author: skyloader
 
-## 저자
+저자
+-----
 
 skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Perl을 배운다는 후문이 사실,
 [@JEEN_LEE][twitter-jeen_lee]와 동갑, skyloader _at_ gmail.com
 
 
-## 시작하며
+시작하며
+---------
 
 Perl은 Text를 다루는데 아주 효율적인 언어이기 때문에, 필자의 회사에서 Text를 다뤄야 할 일이 생기면 으레 `use strict;` 으로 시작하는 Perl code를 짜곤 합니다. <br>
 하지만, 회사의 모든 사람이 Perl이나 기타 Phython 같은 언어를 알아서 script를 작성하여 Text를 자동화하여 다루는 것은 아닙니다. <br>
@@ -22,7 +24,8 @@ Perl은 Text를 다루는데 아주 효율적인 언어이기 때문에, 필자�
 지금부터 이러한 상황을 극복하고 원하는 작업을 수행하게 도와주는 Algorithm과 Perl module을 소개할까 합니다.
 
 
-## n-Gram Algorithm 
+n-Gram 알고리즘
+----------------
 
 n-Gram Algorithm은 통계, 확률을 바탕으로한 색인분석 등에 널리 쓰이는 방식으로 초기 검색사이트가 취한 색인 검색 Algorithm의 하나입니다. 요즘엔 생명공학 분야의 염기서열이나, 분자구조 분석에 자주 등장하는 듯 합니다.<br>
 이론이 간단하고 빠르기 때문에 여러 학문에 적용하기 안성맞춤이지요.
@@ -47,7 +50,8 @@ algorithm
 오늘 소개하는 Module의 이름은 `String::Trigram` 인데요. 이름에서도 알 수 있듯이 n 값으로 3을 기본으로하는 module입니다. 
 
 
-## 간단한 예제
+간단한 예제
+------------
 
 예를 들어 봅시다.
 다음과 같은 Item Box list가 있다고 합시다.
@@ -96,7 +100,8 @@ Blue  Box : Black Iink
 그럼 이쯤에서 module을 출동시켜 보겠습니다.
 
 
-## Code
+구현
+-----
 
 `String::Trigram`의 compare class method는 두개의 string을 인자로 받아 그 유사성을 1보다 작은 소수값으로 판별하여 반환해 주는 함수 입니다. <br>
 우리에게 필요한 것은 단지 이것 하나 뿐입니다.
@@ -161,7 +166,8 @@ Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 
 완전하게 원하는 것들을 찾아주는 것을 확인 할 수 있습니다.
 
 
-## 마치면서
+정리하며
+---------
 
 물론, n-Gram이 모든 경우에 있어서 최소의 해결책은 아닙니다. 여러분이 Naver, Daum에 이은 Daver 같은 새로운 검색 포탈과 엔진을 만들고자 한다며, 반드시 다른 해결책을 더 많이 찾아보아야 할 것 입니다. <br>
 n-Gram 단지 여러분이 갓 내린 커피 몇잔과 비스켓으로 마음 여유를 찾는데 도움을 줄 시간을 조금 더 마련해 줄 뿐입니다.
