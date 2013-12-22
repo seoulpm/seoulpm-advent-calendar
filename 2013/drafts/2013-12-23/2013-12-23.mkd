@@ -64,56 +64,54 @@ n-gram 알고리즘은 `n`개의 문자열 크기만큼의 창(window)을 만들
 이 값이 *1인 경우*는 *unigram*, *2인 경우*는 *bigram*, *3인 경우*는 *trigram*이라고 부릅니다.
 
 
-간단한 예제
+당면한 문제
 ------------
 
-예를 들어 봅시다.
-다음과 같은 Item Box list가 있다고 합시다.
+예를 들어 다음과 같은 여러 요소를 담는 박스 목록이 있다고 해보죠.
 
-```
-Green Box : Bat
-Green Box : Gloove
-Green Box : Uniform
-Puple Box : Chocolate
-Puple Box : Mint Candy
-Puple Box : Apple Jelly
-Blue  Box : Brush-middle
-Blue  Box : Brush-wide
-Blue  Box : Black Ink
-```
+    #!plain
+    Green Box : Bat
+    Green Box : Gloove
+    Green Box : Uniform
+    Puple Box : Chocolate
+    Puple Box : Mint Candy
+    Puple Box : Apple Jelly
+    Blue  Box : Brush-middle
+    Blue  Box : Brush-wide
+    Blue  Box : Black Ink
 
-A라는 사람은 자기만의 방식으로 이렇게 받아 적었습니다.
+동료 *A*는 이것을 굳이 자신만의 방식으로 기록했네요.
 
-```
-Box:Blue:Brush-middle
-Box:Green:Gloove
-Box:Puple:Mint Candy
-Box:Puple:Apple Jelly
-Box:Blue:Black Ink
-Box:Green:Uniform
-Box:Puple:Chocolate
-Box:Green:Bat
-Box:Blue:Brush-wide
-```
+    #!plain
+    Box:Blue:Brush-middle
+    Box:Green:Gloove
+    Box:Puple:Mint Candy
+    Box:Puple:Apple Jelly
+    Box:Blue:Black Ink
+    Box:Green:Uniform
+    Box:Puple:Chocolate
+    Box:Green:Bat
+    Box:Blue:Brush-wide
 
-그리고 B라는 사람은 오타를 좀 냈군요.
+아... 그리고 동료 *B*는 오타가 어마어마합니다.
 
-```
-Grean Box : Uniform
-Pufle Cox : Chocholate
-Puple Box : Mint Dandy
-Pulpe Box : Aple Jelly
-Grean Box : Bat
-Grean Box : Glove
-Bule  Box : Brush-middle
-Blue  Bix : Brush-wide
-Blue  Box : Black Iink
-```
+    #!plain
+    Grean Box : Uniform
+    Pufle Cox : Chocholate
+    Puple Box : Mint Dandy
+    Pulpe Box : Aple Jelly
+    Grean Box : Bat
+    Grean Box : Glove
+    Bule  Box : Brush-middle
+    Blue  Bix : Brush-wide
+    Blue  Box : Black Iink
 
-어떤가요. 눈으로 보면 어떤 항목이 원본의 어떤 항목을 나타내는지 알 수 있지만
-이를 매칭시키는 script를 짜라고 하면, 금방 머리에 방법이 떠오르나요?
-떠오른다 해도 방법이 쉽지만은 않아 보입니다.
-그럼 이쯤에서 module을 출동시켜 보겠습니다.
+휴... 어떤가요?
+눈으로 살펴보면 동료 *A*와 *B*가 기록한 항목이 원본의 어떤 항목을
+염두에 두고 기록했는지 대충 알수는 있지만 이것을 프로그램으로
+일관되게 일치되는 것끼리 엮어주려면 어떻게 해야할까요?
+방법이 떠오르시나요?
+물론 가능은 하겠지만 그리 녹녹하지만은 않아보입니다. :(
 
 
 String::Trigram 모듈
