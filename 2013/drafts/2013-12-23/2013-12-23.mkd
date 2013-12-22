@@ -50,10 +50,10 @@ algorithm
        [ ]--> thm
 ```
 
-위와 같이 n width character의 Window를 만들어 string을 왼쪽에서 오른쪽으로 한 단위씩 움직이면서 추출되는 character item set 의 출현을 수집합니다. 
+위와 같이 n width character의 Window를 만들어 string을 왼쪽에서 오른쪽으로 한 단위씩 움직이면서 추출되는 character item set 의 출현을 수집합니다.
 이러한 방식으로 두개의 string의 각기 character item set을 수집하고, 출현빈도를 비교함으로써 두 string간의 비교를 수치로 수행합니다.
 이때 n의 값은 의미가 있다고 생각하는 음절의 수로 지정하면 되는데, 이 값이 1인 경우는 unigram, 2인 경우는 bigram, 3인 경우는 trigram이라고 부릅니다.
-오늘 소개하는 Module의 이름은 `String::Trigram` 인데요. 이름에서도 알 수 있듯이 n 값으로 3을 기본으로하는 module입니다. 
+오늘 소개하는 Module의 이름은 `String::Trigram` 인데요. 이름에서도 알 수 있듯이 n 값으로 3을 기본으로하는 module입니다.
 
 
 간단한 예제
@@ -145,7 +145,7 @@ sub cmp_list_similarity {
     }
 
     return @result;
-}                                                                                                                                                             
+}
 ```
 
 ```
@@ -182,6 +182,6 @@ Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 
 반드시 다른 해결책을 더 많이 찾아보아야 할 것 입니다.
 n-Gram 단지 여러분이 갓 내린 커피 몇잔과 비스켓으로 마음 여유를 찾는데 도움을 줄 시간을 조금 더 마련해 줄 뿐입니다.
 오타를 낸 사람에 대해 더이상 분노 섞인 메일을 보내지 않아도 된다는 것은 덤이지요.
- 
+
 
 [twitter-jeen_lee]:        http://twitter.com/JEEN_LEE
