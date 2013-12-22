@@ -78,9 +78,10 @@ skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Pe
 
 휴... 어떤가요?
 눈으로 살펴보면 동료 *A*와 *B*가 기록한 항목이 원본의 어떤 항목을
-염두에 두고 기록했는지 대충 알수는 있지만 이것을 프로그램으로
-일관되게 일치되는 것끼리 엮어주려면 어떻게 해야할까요?
-방법이 떠오르시나요?
+염두에 두고 기록했는지 대충 알수는 있을 것 같긴 하군요.
+하지만 이 양이 몇 천 또는 몇 만줄이라면 어떨까요?
+또 이렇게 비교해야 할 파일이 수십 개라면 어떨까요?
+결국 이것을 프로그램으로 작성해 일관되게 일치되는 것끼리 엮어주어야 할텐데 방법이 잘 떠오르시나요?
 물론 가능은 하겠지만 그리 녹녹하지만은 않아보입니다. :(
 
 
@@ -120,67 +121,86 @@ String::Trigram 모듈
 오늘 소개할 [String::Trigram 모듈][cpan-string-trigram]은 이름에서 알 수 있듯이
 `n` 값이 3인 trigram 모듈이지만 원한다면 `n` 값을 변경해 n-gram으로 사용할 수도 있습니다.
 
-`String::Trigram`의 compare class method는 두개의 string을 인자로 받아 그 유사성을 1보다 작은 소수값으로 판별하여 반환해 주는 함수 입니다.
-우리에게 필요한 것은 단지 이것 하나 뿐입니다.
+`String::Trigram` 모듈의 `compare()` 클래스 메소드는 인자로 받은
+두 개의 문자열의 그 유사성을 `1`보다 작은 소수값으로 계산해 반환하는 함수입니다.
+우리에게 필요한 것은 단지 이것 하나 뿐입니다! :)
 
-```
-use String::Trigram;
-use Path::Tiny;
+    #!perl
+    #!/usr/bin/env perl
 
-my $raw  = path('raw.input');
-my $mr_a = path('a.input');
-my $mr_b = path('b.input');
-my @list_raw  = $raw->lines( {chomp => 1} );
-my @list_mr_a = $mr_a->lines( {chomp => 1} );
-my @list_mr_b = $mr_b->lines( {chomp => 1} );
+    use v5.16;
+    use strict;
+    use warnings;
 
-print "Text A\n";
-print cmp_list_similarity( \@list_raw, \@list_mr_a);
-print "Text B\n";
-print cmp_list_similarity( \@list_raw, \@list_mr_b);
+    use Path::Tiny;
+    use String::Trigram;
 
-sub cmp_list_similarity {
-    my $list_raw = shift;
-    my $list_cmp = shift;
-    my @result;
-    for my $raw_item (@$list_raw) {
-        my $max_smlty = 0;
-        my $max_smlty_item;
-        for my $cmp_item (@$list_cmp) {
-            my $smlty  = String::Trigram::compare($raw_item, $cmp_item);
-            $max_smlty = $smlty and $max_smlty_item = $cmp_item  if $smlty > $max_smlty;
+    my @raw  = path('raw.input')->lines( { chomp => 1 } );
+    my @ed_a = path('a.input'  )->lines( { chomp => 1 } );
+    my @ed_b = path('b.input'  )->lines( { chomp => 1 } );
+
+    say "Text A";
+    say for get_similarity( \@raw, \@ed_a);
+
+    say "Text B\n";
+    say for get_similarity( \@raw, \@ed_b);
+
+    sub get_similarity {
+        my $src  = shift;
+        my $dest = shift;
+
+        my @result;
+        for my $s (@$src) {
+            my $max_smlty = 0;
+            my $max_smlty_item;
+            for my $d (@$dest) {
+                my $smlty = String::Trigram::compare($s, $d);
+                next unless $smlty > $max_smlty;
+
+                $max_smlty      = $smlty;
+                $max_smlty_item = $d
+            }
+            push(
+                @result,
+                sprintf(
+                    "%-30s -> %-30s : similarity = %02f",
+                    $s,
+                    $max_smlty_item,
+                    $max_smlty,
+                );
+            );
         }
-        push @result, sprintf ( "%-30s -> %-30s : similarity = %02f\n",$raw_item, $max_smlty_item, $max_smlty );
+
+        return @result;
     }
 
-    return @result;
-}
-```
+실행 결과는 다음과 같습니다.
 
-```
-Text A
-Green Box : Bat                -> Box:Green:Bat                  : similarity = 0.333333
-Green Box : Gloove             -> Box:Green:Gloove               : similarity = 0.407407
-Green Box : Uniform            -> Box:Green:Uniform              : similarity = 0.428571
-Puple Box : Chocolate          -> Box:Puple:Chocolate            : similarity = 0.466667
-Puple Box : Mint Candy         -> Box:Puple:Mint Candy           : similarity = 0.483871
-Puple Box : Apple Jelly        -> Box:Puple:Apple Jelly          : similarity = 0.500000
-Blue  Box : Brush-middle       -> Box:Blue:Brush-middle          : similarity = 0.531250
-Blue  Box : Brush-wide         -> Box:Blue:Brush-wide            : similarity = 0.500000
-Blue  Box : Black Ink          -> Box:Blue:Black Ink             : similarity = 0.482759
-Text B
-Green Box : Bat                -> Grean Box : Bat                : similarity = 0.700000
-Green Box : Gloove             -> Grean Box : Glove              : similarity = 0.625000
-Green Box : Uniform            -> Grean Box : Uniform            : similarity = 0.750000
-Puple Box : Chocolate          -> Pufle Cox : Chocholate         : similarity = 0.468750
-Puple Box : Mint Candy         -> Puple Box : Mint Dandy         : similarity = 0.777778
-Puple Box : Apple Jelly        -> Pulpe Box : Aple Jelly         : similarity = 0.633333
-Blue  Box : Brush-middle       -> Bule  Box : Brush-middle       : similarity = 0.733333
-Blue  Box : Brush-wide         -> Blue  Bix : Brush-wide         : similarity = 0.777778
-Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 0.880000
-```
+    #!plain
+    Text A
+    Green Box : Bat                -> Box:Green:Bat                  : similarity = 0.333333
+    Green Box : Gloove             -> Box:Green:Gloove               : similarity = 0.407407
+    Green Box : Uniform            -> Box:Green:Uniform              : similarity = 0.428571
+    Puple Box : Chocolate          -> Box:Puple:Chocolate            : similarity = 0.466667
+    Puple Box : Mint Candy         -> Box:Puple:Mint Candy           : similarity = 0.483871
+    Puple Box : Apple Jelly        -> Box:Puple:Apple Jelly          : similarity = 0.500000
+    Blue  Box : Brush-middle       -> Box:Blue:Brush-middle          : similarity = 0.531250
+    Blue  Box : Brush-wide         -> Box:Blue:Brush-wide            : similarity = 0.500000
+    Blue  Box : Black Ink          -> Box:Blue:Black Ink             : similarity = 0.482759
+    Text B
+    Green Box : Bat                -> Grean Box : Bat                : similarity = 0.700000
+    Green Box : Gloove             -> Grean Box : Glove              : similarity = 0.625000
+    Green Box : Uniform            -> Grean Box : Uniform            : similarity = 0.750000
+    Puple Box : Chocolate          -> Pufle Cox : Chocholate         : similarity = 0.468750
+    Puple Box : Mint Candy         -> Puple Box : Mint Dandy         : similarity = 0.777778
+    Puple Box : Apple Jelly        -> Pulpe Box : Aple Jelly         : similarity = 0.633333
+    Blue  Box : Brush-middle       -> Bule  Box : Brush-middle       : similarity = 0.733333
+    Blue  Box : Brush-wide         -> Blue  Bix : Brush-wide         : similarity = 0.777778
+    Blue  Box : Black Ink          -> Blue  Box : Black Iink         : similarity = 0.880000
 
-완전하게 원하는 것들을 찾아주는 것을 확인 할 수 있습니다.
+와우, 놀랍군요!
+수정본에 오타가 있든 순서가 바뀌어 있든 꽤나 눈으로 비교하는 것과
+비슷한 수준으로 원하는 것들을 찾아서 일치시켜주고 있죠? ;-)
 
 
 정리하며
@@ -193,5 +213,6 @@ n-gram 단지 여러분이 갓 내린 커피 몇잔과 비스켓으로 마음 �
 오타를 낸 사람에 대해 더이상 분노 섞인 메일을 보내지 않아도 된다는 것은 덤이지요.
 
 
+[cpan-string-trigram]:    https://metacpan.org/module/String::Trigram
 [twitter-jeen_lee]:       http://twitter.com/JEEN_LEE
 [wiki-n-gram]:            http://en.wikipedia.org/wiki/N-gram
