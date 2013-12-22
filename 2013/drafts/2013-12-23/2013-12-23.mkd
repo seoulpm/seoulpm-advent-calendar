@@ -9,7 +9,7 @@ Author: skyloader
 저자
 -----
 
-skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Perl을 배운다는 후문이 사실,
+skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Perl을 배운다는 후문,
 [@JEEN_LEE][twitter-jeen_lee]와 동갑, skyloader _at_ gmail.com
 
 
