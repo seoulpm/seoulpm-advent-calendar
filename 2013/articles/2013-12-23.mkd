@@ -61,41 +61,41 @@ skyloader - 심지어 게으른 만년 Perl 초보자, 치킨을 먹기위해 Pe
 예를 들어 다음과 같은 여러 요소를 담는 박스 목록이 있다고 해보죠.
 
     #!plain
-    Green Box : Bat
-    Green Box : Gloove
-    Green Box : Uniform
-    Puple Box : Chocolate
-    Puple Box : Mint Candy
-    Puple Box : Apple Jelly
-    Blue  Box : Brush-middle
-    Blue  Box : Brush-wide
-    Blue  Box : Black Ink
+    Green  Box : Bat
+    Green  Box : Gloove
+    Green  Box : Uniform
+    Purple Box : Chocolate
+    Purple Box : Mint Candy
+    Purple Box : Apple Jelly
+    Blue   Box : Brush-middle
+    Blue   Box : Brush-wide
+    Blue   Box : Black Ink
 
 동료 *A*는 이것을 굳이 자신만의 방식으로 기록했네요.
 
     #!plain
     Box:Blue:Brush-middle
     Box:Green:Gloove
-    Box:Puple:Mint Candy
-    Box:Puple:Apple Jelly
+    Box:Purple:Mint Candy
+    Box:Purple:Apple Jelly
     Box:Blue:Black Ink
     Box:Green:Uniform
-    Box:Puple:Chocolate
+    Box:Purple:Chocolate
     Box:Green:Bat
     Box:Blue:Brush-wide
 
 아... 그리고 동료 *B*는 오타가 어마어마합니다.
 
     #!plain
-    Grean Box : Uniform
-    Pufle Cox : Chocholate
-    Puple Box : Mint Dandy
-    Pulpe Box : Aple Jelly
-    Grean Box : Bat
-    Grean Box : Glove
-    Bule  Box : Brush-middle
-    Blue  Bix : Brush-wide
-    Blue  Box : Black Iink
+    Grean  Box : Uniform
+    Purfle Cox : Chocholate
+    Purple Box : Mint Dandy
+    Purlpe Box : Aple Jelly
+    Grean  Box : Bat
+    Grean  Box : Glove
+    Bule   Box : Brush-middle
+    Blue   Bix : Brush-wide
+    Blue   Box : Black Iink
 
 휴... 어떤가요?
 눈으로 살펴보면 동료 *A*와 *B*가 기록한 항목이 원본의 어떤 항목을
@@ -199,25 +199,25 @@ String::Trigram 모듈
 
     #!plain
     Text A
-    Green Box : Bat            -> Box:Green:Bat              : similarity = 0.33
-    Green Box : Gloove         -> Box:Green:Gloove           : similarity = 0.41
-    Green Box : Uniform        -> Box:Green:Uniform          : similarity = 0.43
-    Puple Box : Chocolate      -> Box:Puple:Chocolate        : similarity = 0.47
-    Puple Box : Mint Candy     -> Box:Puple:Mint Candy       : similarity = 0.48
-    Puple Box : Apple Jelly    -> Box:Puple:Apple Jelly      : similarity = 0.50
-    Blue  Box : Brush-middle   -> Box:Blue:Brush-middle      : similarity = 0.53
-    Blue  Box : Brush-wide     -> Box:Blue:Brush-wide        : similarity = 0.50
-    Blue  Box : Black Ink      -> Box:Blue:Black Ink         : similarity = 0.48
+    Green  Box : Bat            -> Box:Green:Bat              : similarity = 0.33
+    Green  Box : Gloove         -> Box:Green:Gloove           : similarity = 0.41
+    Green  Box : Uniform        -> Box:Green:Uniform          : similarity = 0.43
+    Purple Box : Chocolate      -> Box:Purple:Chocolate       : similarity = 0.47
+    Purple Box : Mint Candy     -> Box:Purple:Mint Candy      : similarity = 0.48
+    Purple Box : Apple Jelly    -> Box:Purple:Apple Jelly     : similarity = 0.50
+    Blue   Box : Brush-middle   -> Box:Blue:Brush-middle      : similarity = 0.53
+    Blue   Box : Brush-wide     -> Box:Blue:Brush-wide        : similarity = 0.50
+    Blue   Box : Black Ink      -> Box:Blue:Black Ink         : similarity = 0.48
     Text B
-    Green Box : Bat            -> Grean Box : Bat            : similarity = 0.70
-    Green Box : Gloove         -> Grean Box : Glove          : similarity = 0.63
-    Green Box : Uniform        -> Grean Box : Uniform        : similarity = 0.75
-    Puple Box : Chocolate      -> Pufle Cox : Chocholate     : similarity = 0.47
-    Puple Box : Mint Candy     -> Puple Box : Mint Dandy     : similarity = 0.78
-    Puple Box : Apple Jelly    -> Pulpe Box : Aple Jelly     : similarity = 0.63
-    Blue  Box : Brush-middle   -> Bule  Box : Brush-middle   : similarity = 0.73
-    Blue  Box : Brush-wide     -> Blue  Bix : Brush-wide     : similarity = 0.78
-    Blue  Box : Black Ink      -> Blue  Box : Black Iink     : similarity = 0.88
+    Green  Box : Bat            -> Grean  Box : Bat           : similarity = 0.70
+    Green  Box : Gloove         -> Grean  Box : Glove         : similarity = 0.63
+    Green  Box : Uniform        -> Grean  Box : Uniform       : similarity = 0.75
+    Purple Box : Chocolate      -> Purfle Cox : Chocholate    : similarity = 0.47
+    Purple Box : Mint Candy     -> Purple Box : Mint Dandy    : similarity = 0.78
+    Purple Box : Apple Jelly    -> Purlpe Box : Aple Jelly    : similarity = 0.63
+    Blue   Box : Brush-middle   -> Bule   Box : Brush-middle  : similarity = 0.73
+    Blue   Box : Brush-wide     -> Blue   Bix : Brush-wide    : similarity = 0.78
+    Blue   Box : Black Ink      -> Blue   Box : Black Iink    : similarity = 0.88
 
 와우, 놀랍군요!
 수정본에 오타가 있든 순서가 바뀌어 있든 꽤나 눈으로 비교하는 것과
