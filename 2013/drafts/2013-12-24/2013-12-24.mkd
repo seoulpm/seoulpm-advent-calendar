@@ -1,3 +1,11 @@
+Title:    DAG 기반의 태스크 스케줄러
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Category: DAG
+Category: scheduler
+Author:   saillinux
+
 Perl이 제공 하는 이득과 혜택 덕분에 작성한 툴과 서비스를 헤아리면
 끝이 없을 정도로 많은 일을 헤쳐 나갔습니다. 뒤돌아 보면 Perl 없이
 어떻게 처리 했을고 하고 아찔 해 하곤 하네요.
