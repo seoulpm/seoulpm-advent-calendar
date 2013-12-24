@@ -588,7 +588,7 @@ Enjoy Perl~!! ;-)
 [home-perlbrew]:                http://perlbrew.pl/
 [home-redis]:                   http://redis.io/
 [home-zookeeper]:               http://zookeeper.apache.org/
-[twitter-saillinux]:            http://twitter.com/#!/keedi
+[twitter-saillinux]:            http://twitter.com/#!/saillinux
 [wiki-dag]:                     http://en.wikipedia.org/wiki/Directed_acyclic_graph
 [wiki-flow-based-programming]:  http://en.wikipedia.org/wiki/Flow-based_programming
 [wiki-topological-sorting]:     http://en.wikipedia.org/wiki/Topological_sorting
