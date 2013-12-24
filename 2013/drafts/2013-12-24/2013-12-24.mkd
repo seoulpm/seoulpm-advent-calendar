@@ -18,6 +18,9 @@ Perl로 MMORPG를 만들어보겠다는 꿈을 갖고 있지만
 건강을 최고의 신조로 여기고 있다.
 
 
+시작하며
+---------
+
 Perl이 제공 하는 이득과 혜택 덕분에 작성한 툴과 서비스를 헤아리면
 끝이 없을 정도로 많은 일을 헤쳐 나갔습니다. 뒤돌아 보면 Perl 없이
 어떻게 처리 했을고 하고 아찔 해 하곤 하네요.
@@ -61,15 +64,15 @@ Figure 1. Stock winner test
 첫번째 타스크는 야후 파이낸스 API 서비스를 이용하여 요즘 관심 가져
 보고 있는 주식인 Twitter, Facebook, Tesla등의 데이터를 가져 옵니다.
 
-데이터를 무사히 가져 오면 Task2,3은 retrieve_stock component를
+데이터를 무사히 가져 오면 Task2,3은 `retrieve_stock` component를
 실행하여 twitter와 facebook이 Change 값을 참고 하여 가져 옵니다.
 
-retrieve_stock 함수를 참조.
+`retrieve_stock` 함수를 참조.
 
 이렇게 해서 얻은 Change값을 비교화여 어떤 주식이 오늘 이득을 많이
-볼수 있었는지 aggregator component를 통해 출력 합니다.
+볼수 있었는지 `aggregator` component를 통해 출력 합니다.
 
-aggregator 함수를 참조.
+`aggregator` 함수를 참조.
 
 이를 구현 하기 위해서는 각 Task가 사용 하는 component 구현과
 스케쥴러를 디자인 해 보도록 합니다.
@@ -87,7 +90,8 @@ library중에서는 최고라고 자부 할수 있을 정도로 모든 필요한
 구조체를 생성 하였고 여기에 node 구조체로 정의된 타스크를 vertex로
 그래프에 저장합니다.
 
-my $g0 = Graph->new;
+    #!perl
+    my $g0 = Graph->new;
 
 각 노드는 해쉬 키로 지정하여 가져 올수 있으면 각 노드 구조체는 다음과 같은 Property를 가집니다.
 - action: 실제로 타스크가 수행해야 하는 command tool 혹은 callback 함수를 정의 합니다.
@@ -96,68 +100,72 @@ my $g0 = Graph->new;
 - state: 현재 타스크의 상태를 저장합니다. e.g. WAITING, RUNNING, DONE, FAIL
 - stdout, stderr, error: action의 수행 결과물들을 나중에 명령 수행 후 저장합니다. 
 
-my %nodes = (
-  "Task1" => {
-    "action" => "curl",
-    "params" => ["http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22TWTR%22%2C%22FB%22%2C%22TSLA%22%2C%22XOM%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="],
-    "start_time" => 0,
-    "end_time" => 0,
-    "state" => WAITING,
-  },
-  "Task2" => {
-    "action" => \&retrieve_stock,
-    "params" => ["TWTR", "Change"],
-    "start_time" => 0,
-    "end_time" => 0,
-    "state" => WAITING,
-  },
-  "Task3" => {
-    "action" => \&retrieve_stock,
-    "params" => ["FB", "Change"],
-    "start_time" => 0,
-    "end_time" => 0,
-    "state" => WAITING,
-  },
-  "Task4" => {
-    "action" => \&aggregator,
-    "params" => [],
-    "start_time" => 0,
-    "end_time" => 0,
-    "state" => WAITING,
-  },
-);
+    #!perl
+    my %nodes = (
+        Task1 => {
+            action     => "curl",
+            params     => ["http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%22TWTR%22%2C%22FB%22%2C%22TSLA%22%2C%22XOM%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="],
+            start_time => 0,
+            end_time   => 0,
+            state      => WAITING,
+        },
+        Task2 => {
+            action     => \&retrieve_stock,
+            params     => ["TWTR", "Change"],
+            start_time => 0,
+            end_time   => 0,
+            state      => WAITING,
+        },
+        Task3 => {
+            action     => \&retrieve_stock,
+            params     => ["FB", "Change"],
+            start_time => 0,
+            end_time   => 0,
+            state      => WAITING,
+        },
+        Task4 => {
+            action     => \&aggregator,
+            params     => [],
+            start_time => 0,
+            end_time   => 0,
+            state      => WAITING,
+        },
+    );
 
-# add each task to the graph as node
-foreach my $task (keys %nodes) {
-  $g0->add_vertex($task);
-}
-
+    # add each task to the graph as node
+    foreach my $task (keys %nodes) {
+        $g0->add_vertex($task);
+    }
 
 그리고 의존성을 edge로 표현하여 아래와 같이 표현하고 더하도록
 하겠습니다. 아래의 구조체를 간단히 설명 하자면 %edges의 키중 하나인
 Task1은 Task2, Task3와 연결 한다고 정의 해보았습니다. 이를
-add_edge함수를 이용하여 더해 보았습니다.
+`add_edge`함수를 이용하여 더해 보았습니다.
 
-my %edges = (
-  "Task1" => [ "Task2", "Task3" ],
-  "Task2" => [ "Task4" ],
-  "Task3" => [ "Task4" ],
-  "Task4" => [ ],
-);
+    #!perl
+    my %edges = (
+        Task1 => [ "Task2", "Task3" ],
+        Task2 => [ "Task4" ],
+        Task3 => [ "Task4" ],
+        Task4 => [ ],
+    );
 
-o# connect each task
-foreach my $task (keys %edges) {
-  foreach my $dep (@{$edges{$task}}) {
-    $g0->add_edge($task, $dep);
-  }
-}
+    # connect each task
+    for my $task (keys %edges) {
+        for my $dep ( @{$edges{$task}} ) {
+            $g0->add_edge($task, $dep);
+        }
+    }
 
-그래프 객체인 $g0를 그대로 아래와같이 출력 하면 그래프 구조를 바로 아래와 같이 보여 줍니다.
+그래프 객체인 `$g0`를 그대로 아래와같이 출력 하면 그래프 구조를 바로 아래와 같이 보여 줍니다.
 
-print "INFO: The graph is $g0\n";
+    #!perl
+    print "INFO: The graph is $g0\n";
 
 출력물:
-INFO: The graph is Task1-Task2,Task1-Task3,Task2-Task4,Task3-Task4
+
+    #!bash
+    INFO: The graph is Task1-Task2,Task1-Task3,Task2-Task4,Task3-Task4
 
 
 타스크들을 실행하기 앞서 몇개의 validation을 거치도록 하겠습니다.
@@ -166,40 +174,42 @@ INFO: The graph is Task1-Task2,Task1-Task3,Task2-Task4,Task3-Task4
 node 사이를 연결해 주는 모든 edge가 방향성을 가지고 있는지 아래를 통해
 확인 하도록 합니다.
 
-  unless ($DAG->is_dag) {
-    print "FATAL: This graph is not a directed and acyclic graph so exiting...\n";
-    exit;
-  }
+    #!perl
+    unless ( $DAG->is_dag ) {
+        print "FATAL: This graph is not a directed and acyclic graph so exiting...\n";
+        exit;
+    }
 
 둘째로 그래프 자체에 cycle을 가지는 의존성이 있는지 확인 합니다. 만약
 node들 사이 중에 loop가 존재한다면 무한적으로 타스크를 실행하게 되는
 문제가 발생됨으로 아래의 테스트를 미연에 방지를 합니다.
 
-  if ($DAG->is_cyclic) {
-    print "FATAL: This graph contains a cycle which forms a loop in execution.\n";
-    exit;
-  }
+    #!perl
+    if ( $DAG->is_cyclic ) {
+        print "FATAL: This graph contains a cycle which forms a loop in execution.\n";
+        exit;
+    }
 
 마지막으로 타스크를 시작 하는 지점이 여러군데가 존재하는지 확인
 합니다. 물론 여러 시작 지점이 있는것에 문제가 있는 것은 아니지만 간단한
 구현을 위해 일단 확인 하도록 하겠습니다. 가장 간단한 방법은 노드들 중에
-in_degree가 없는 즉 의존성이 없는 타스크가 하나 이상 존재 한다면 시작
+`in_degree`가 없는 즉 의존성이 없는 타스크가 하나 이상 존재 한다면 시작
 지점이 여러군데인걸로 체크하는 예제입니다.
 
-  my @heads = ();
-  my @tasks = $DAG->vertices;
-  foreach my $task ( @tasks ) {
-    my $in_degree = $DAG->in_degree($task);
-    unless ($in_degree) {
-      push @heads, $task;
+    #!perl
+    my @heads;
+    my @tasks = $DAG->vertices;
+    for my $task (@tasks) {
+        my $in_degree = $DAG->in_degree($task);
+        unless ($in_degree) {
+            push @heads, $task;
+        }
     }
-  }
 
-  if (@heads > 1) {
-    print "FATAL: There is more than one execution start points\n";
-    exit;
-  }
-
+    if ( @heads > 1 ) {
+        print "FATAL: There is more than one execution start points\n";
+        exit;
+    }
 
 모든 validation이 통과 했으면 실제로 타스크를 실행 시켜 주는 스케쥴러를
 구현 하도록 합니다.
@@ -207,33 +217,37 @@ in_degree가 없는 즉 의존성이 없는 타스크가 하나 이상 존재 �
 첫째로 Graph ($DAG)에 위상정렬(topological sorting)을 실행 하여
 수행해야 하는 타스크의 순서를 가져 오도록 합니다.
 
-  my @ts = $DAG->topological_sort;
+    #!perl
+    my @ts = $DAG->topological_sort;
 
 위상정렬에 대한 상세한 내용은 여기에서 http://ko.wikipedia.org/wiki/%EC%9C%84%EC%83%81%EC%A0%95%EB%A0%AC
 
 순서가 정해진 타스크를 @ts에 저장하여 이를 하나 하나 실행 하도록 합니다.
 
-  foreach my $task ( @ts ) {
-    if ( $DAG->in_degree($task) ) {
-      print "INFO: check whether predecessors of [$task] were executed successfully\n";
-      foreach my $predecessor ( $DAG->predecessors($task) ) {
-	if ( $nodes{$predecessor}->{'state'} == FAIL ) {
-	  print "FATAL: The predecessor [$predecessor] of $task was failed so exiting...\n";
-	  exit;
-	} elsif ( $nodes{$predecessor}->{'state'} == DONE ) {
-	  print "INFO: The predecessor [$predecessor] of $task ran successful so continuing...\n";
-	} else {
-	  print "FATAL: something went wrong exiting...\n";
-	  exit;
-	}
-      }
-    } else {
-      print "INFO: $task is the head, starting this task now\n";
+    #!perl
+    for my $task (@ts) {
+        if ( $DAG->in_degree($task) ) {
+        warn "INFO: check whether predecessors of [$task] were executed successfully\n";
+            for my $predecessor ( $DAG->predecessors($task) ) {
+                if ( $nodes{$predecessor}->{'state'} == FAIL ) {
+                    die "FATAL: The predecessor [$predecessor] of $task was failed so exiting...\n";
+                }
+                elsif ( $nodes{$predecessor}->{'state'} == DONE ) {
+                    warn "INFO: The predecessor [$predecessor] of $task ran successful so continuing...\n";
+                }
+                else {
+                    die "FATAL: something went wrong exiting...\n";
+                }
+            }
+        }
+        else {
+            warn "INFO: $task is the head, starting this task now\n";
+        }
     }
 
 우리는 시작이 먼저 되야 하는 타스크가 무엇인지 확인 하기 위해
-in_degree 체크를 통해 먼저 실행 되어야 하는 타스크가 있는지 확인합니다.
-즉 in_degree가 0이면 시작 지점으로 간주 하여 바로 실행 합니다.
+`in_degree` 체크를 통해 먼저 실행 되어야 하는 타스크가 있는지 확인합니다.
+즉 `in_degree`가 0이면 시작 지점으로 간주 하여 바로 실행 합니다.
 
 의존성을 지니고 있는 타스크가 있다면 predecessors 함수를 사용하여 현재
 타스크가 실행 되기 전에 필요한 타스크를 리스트 하여 해당 타스크의
@@ -242,16 +256,18 @@ in_degree 체크를 통해 먼저 실행 되어야 하는 타스크가 있는지
 
 현재 실행 해야 하는 타스크의 노드 구조체를 가져온후 상태값과 시작 시간을 업데이트 해줍니다.
 
+    #!perl
     my $node = $nodes{$task};
-    print "INFO: running task [$task]\n";
+    warn "INFO: running task [$task]\n";
 
     $node->{'state'} = RUNNING;
     $node->{'start_time'} = time();
 
-
 타스크가 수행해야 하는 작업과 이를 위해 필요한 인자값및 이전에 실행 되었던 타스크 리스트를 준비합니다.
-    my $action = $nodes{$task}->{'action'};
-    my @params = @{$nodes{$task}->{'params'}};
+
+    #!perl
+    my $action       = $nodes{$task}{action};
+    my @params       = @{ $nodes{$task}{params} };
     my @predecessors = $DAG->predecessors($task);
 
 action이 만약 CODE 리퍼런스이면 인자값을 전달하여 함수로 실행 하도록
@@ -261,43 +277,51 @@ command tool로 간주하면 바로 실행 하도록 합니다. 여기서는 Joh
 소개 해 주셨던 Capture::Tiny툴을 이용하여 쉽게 stdout, stderr, exit값을
 가져 왔습니다.
 
+    #!perl
     if ( ref $action eq 'CODE' ) {
-      $action->($task, {
-			"preds"  => \@predecessors,
-			"params" => \@params,
-		       });
-    } else {
-      @$node{'stdout', 'stderr', 'exit'} = capture {
-	system $action, @params;
-      };
+        $action->(
+            $task,
+            {
+                preds  => \@predecessors,
+                params => \@params,
+            },
+        );
+    }
+    else {
+        @$node{ 'stdout', 'stderr', 'exit' } = capture {
+            system $action, @params;
+        };
     }
 
 수행 결과가 완료 되었다면 완료 시간과 수행 결과 상태를 업데이트 해 줍니다.
 
-    $node->{'end_time'} = time();
+    #!perl
+    $node->{'end_time'} = time;
 
-    unless ($node->{'exit'}) {
-      $node->{'state'} = DONE;
+    if ($node->{'exit'}) {
+        $node->{'state'} = FAIL;
     } else {
-      $node->{'state'} = FAIL;
+        $node->{'state'} = DONE;
     }
 
-
 결과물:
-INFO: The graph is Task1-Task2,Task1-Task3,Task2-Task4,Task3-Task4
-INFO: Task1 is the head, starting this task now
-INFO: running task [Task1]
-INFO: check whether predecessors of [Task3] were executed successfully
-INFO: The predecessor [Task1] of Task3 ran successful so continuing...
-INFO: running task [Task3]
-INFO: check whether predecessors of [Task2] were executed successfully
-INFO: The predecessor [Task1] of Task2 ran successful so continuing...
-INFO: running task [Task2]
-INFO: check whether predecessors of [Task4] were executed successfully
-INFO: The predecessor [Task2] of Task4 ran successful so continuing...
-INFO: The predecessor [Task3] of Task4 ran successful so continuing...
-INFO: running task [Task4]
-OUTPUT: The winner is TWTR by change +1.98
+
+    #!plain
+    INFO: The graph is Task1-Task2,Task1-Task3,Task2-Task4,Task3-Task4
+    INFO: Task1 is the head, starting this task now
+    INFO: running task [Task1]
+    INFO: check whether predecessors of [Task3] were executed successfully
+    INFO: The predecessor [Task1] of Task3 ran successful so continuing...
+    INFO: running task [Task3]
+    INFO: check whether predecessors of [Task2] were executed successfully
+    INFO: The predecessor [Task1] of Task2 ran successful so continuing...
+    INFO: running task [Task2]
+    INFO: check whether predecessors of [Task4] were executed successfully
+    INFO: The predecessor [Task2] of Task4 ran successful so continuing...
+    INFO: The predecessor [Task3] of Task4 ran successful so continuing...
+    INFO: running task [Task4]
+    OUTPUT: The winner is TWTR by change +1.98
+
 
 마지막으로 정리하며:
 
