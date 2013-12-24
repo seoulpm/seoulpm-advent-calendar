@@ -6,6 +6,18 @@ Category: DAG
 Category: scheduler
 Author:   saillinux
 
+
+저자
+-----
+
+[@saillinux][author] -
+마음씨 좋은 외국인 노동자, 현재 페이스북에서 옵 엔지니어로 재직 중이다.
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자,
+Perl로 MMORPG를 만들어보겠다는 꿈을 갖고 있지만
+요즘은 현실과 타협해 시스템 트레이딩에 푹 빠져있는 Perl덕후,
+건강을 최고의 신조로 여기고 있다.
+
+
 Perl이 제공 하는 이득과 혜택 덕분에 작성한 툴과 서비스를 헤아리면
 끝이 없을 정도로 많은 일을 헤쳐 나갔습니다. 뒤돌아 보면 Perl 없이
 어떻게 처리 했을고 하고 아찔 해 하곤 하네요.
@@ -304,3 +316,6 @@ OUTPUT: The winner is TWTR by change +1.98
 
 - Zookeeper나 Redis 같은 백엔드를 이용하여 타스크간의 상태 혹은 결과물을 공유 하도록 구현.
 
+
+[twitter-saillinux]:            http://twitter.com/#!/keedi
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
