@@ -381,7 +381,7 @@ _EOT_
 [img-2]:          2013-12-01-2.png
 [img-3]:          2013-12-01-3.png
 [img-4]:          2013-12-01-4.png
-[img-5]:          2013-12-01-5.png
+[img-5]:          2013-12-01-5.png style="margin: 0"
 
 [img-1-resize]:   2013-12-01-1_r.png
 [img-2-resize]:   2013-12-01-2_r.png

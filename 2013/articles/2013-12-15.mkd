@@ -461,7 +461,7 @@ _EOT_
 
 
 [img-1]:          2013-12-15-1.png
-[img-2]:          2013-12-15-2.png
+[img-2]:          2013-12-15-2.png style="margin: 0"
 
 [img-1-resize]:   2013-12-15-1_r.png
 [img-2-resize]:   2013-12-15-2_r.png
