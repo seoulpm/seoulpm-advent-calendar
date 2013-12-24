@@ -30,6 +30,29 @@ Perl로 MMORPG를 만들어보겠다는 꿈을 갖고 있지만
 의존성을 해결할 수 있는 스케줄러를 만들어보면 어떨까요?
 
 
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Capture::Tiny 모듈][cpan-capture-tiny]
+- [CPAN의 Graph 모듈][cpan-graph]
+- [CPAN의 JSON 모듈][cpan-json]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Capture::Tiny Graph JSON
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Capture::Tiny Graph JSON
+
+
+
 근래 관심을 두게 된 방법론이 Flow Based Programming입니다만 쉽게 적용
 할수 없는 이론이라서 그중에 몇가지 아이디어 만을 적용 하여 프로그램을
 작성 해 보도록 하겠습니다.
@@ -338,8 +361,14 @@ command tool로 간주하면 바로 실행 하도록 합니다. 여기서는 Joh
 Enjoy Perl~!! ;-)
 
 
-[twitter-saillinux]:            http://twitter.com/#!/keedi
-[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
+[cpan-capture-tiny]:            https://metacpan.org/module/Capture::Tiny
+[cpan-graph]:                   https://metacpan.org/module/Graph
+[cpan-json]:                    https://metacpan.org/module/JSON
+[cpan]:                         http://www.cpan.org/
 [home-noflo]:                   http://noflojs.org/
+[home-perlbrew]:                http://perlbrew.pl/
 [home-redis]:                   http://redis.io/
 [home-zookeeper]:               http://zookeeper.apache.org/
+[twitter-saillinux]:            http://twitter.com/#!/keedi
+[wiki-dag]:                     http://en.wikipedia.org/wiki/Directed_acyclic_graph
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
