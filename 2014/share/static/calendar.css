@@ -1,0 +1,239 @@
+@import url(//fonts.googleapis.com/css?family=Fira+Mono:400,700);
+* {
+    margin: 0;
+    padding: 0;
+    font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
+}
+.space-20 {
+    height: 20px;
+}
+body {
+    background: url("hr.png") repeat-x scroll -4px 0;
+}
+#wrap {
+    width: 750px;
+    margin: 0 auto;
+    min-height: 100px;
+    overflow: visible;
+}
+#head {
+    height: 650px;
+    margin-left: -150px;
+    padding-top: 50px;
+    text-align: center;
+}
+#head pre {
+    font-family: "Fira Mono", "Monospace";
+    font-size: 0.75em;
+    line-height: 1em;
+    font-weight: bold;
+}
+#head pre span {
+    font-family: "Fira Mono", "Monospace";
+    line-height: 1em;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+}
+#head pre span.star {
+    color: yellow;
+}
+#head pre span.perl {
+    color: cyan;
+}
+#head pre span.host {
+    color: yellow;
+}
+#head pre span.dir {
+    color: blue;
+}
+#head pre span.seoulpm {
+    color: cyan;
+}
+#cont {
+    margin-top: 14px;
+}
+#gifts {
+    display: inline-block;
+    margin: 0 52px 0 40px;;
+}
+#gifts li {
+    float: left;
+    display: block;
+    margin-left: 25px;
+    margin-bottom: 10px;
+    background: url("num.png") no-repeat scroll 0 0 transparent;
+    width: 70px;
+    height: 80px;
+}
+#gifts a { 
+    display: block;
+    width: 70px;
+    height: 80px;
+}
+#foot {
+    position: relative;
+    width: 706px;
+    height: 594px;
+    margin-top: 30px;
+    margin-bottom: 16px;
+    background: url("foot-bg.png") no-repeat scroll 330px 0 transparent;
+}
+#foot .indent {
+    margin-left: 63px;
+}
+#foot #link ul {
+    margin-left: 40px;
+    line-height: 2em;
+    list-style: none;
+}
+#foot #link ul li {
+    margin-left: -36px;
+    padding-left: 36px;
+    background: url("bullet2.png") no-repeat 0 1px transparent;
+}
+#foot ul.icon {
+    margin-top: 30px;
+    list-style: none;
+}
+#foot ul.icon li {
+    float: left;
+    margin-right: 10px;
+}
+#foot ul.like {
+    position: absolute;
+    display: block;
+    list-style: none;
+    top: 520px;
+    left: 400px;
+}
+#foot .copyright {
+    position: absolute;
+    font-size: 12px;
+    bottom: -12px;
+}
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
+#foot a {
+    color: #000;
+}
+#popup {
+    display: none;
+    position: absolute;
+    background: url("popup.png") no-repeat scroll 0 0 transparent;
+    width: 230px;
+    height: 168px;
+}
+#popup .inner {
+    margin-top: 20px;
+    margin-left: 33px;
+    width: 166px;
+    height: 130px;
+    overflow: hidden;
+}
+#popup_text {
+    display: block;
+    margin-top: 50px;
+}
+#popup_text .title {
+    display: block;
+    word-break: keep-all;
+    text-align: center;
+}
+#popup_text .title_small {
+    font-size: 0.8em;
+}
+#popup_text .author {
+    margin-top: 0.8em;
+    margin-right: 0.8em;
+    font-size: 0.8em;
+    float: right;
+}
+.hidden {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    overflow: hidden;
+}
+#preload {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+}
+#gifts .gift_1 { background-position: 0px 0; }
+#gifts .gift_2 { background-position: -70px 0; }
+#gifts .gift_3 { background-position: -140px 0; }
+#gifts .gift_4 { background-position: -210px 0; }
+#gifts .gift_5 { background-position: -280px 0; }
+#gifts .gift_6 { background-position: -350px 0; }
+#gifts .gift_7 { background-position: -420px 0; }
+#gifts .gift_8 { background-position: -490px 0; }
+#gifts .gift_9 { background-position: -560px 0; }
+#gifts .gift_10 { background-position: -630px 0; }
+#gifts .gift_11 { background-position: -700px 0; }
+#gifts .gift_12 { background-position: -770px 0; }
+#gifts .gift_13 { background-position: -840px 0; }
+#gifts .gift_14 { background-position: -910px 0; }
+#gifts .gift_15 { background-position: -980px 0; }
+#gifts .gift_16 { background-position: -1057px 0; }
+#gifts .gift_17 { background-position: -1120px 0; }
+#gifts .gift_18 { background-position: -1198px 0; }
+#gifts .gift_19 { background-position: -1260px 0; }
+#gifts .gift_20 { background-position: -1330px 0; }
+#gifts .gift_21 { background-position: -1400px 0; }
+#gifts .gift_22 { background-position: -1470px 0; }
+#gifts .gift_23 { background-position: -1540px 0; }
+#gifts .gift_24 { background-position: -1610px 0; }
+#gifts .gift_1.bold { background-position: 0px -80px; }
+#gifts .gift_2.bold { background-position: -70px -80px; }
+#gifts .gift_3.bold { background-position: -140px -80px; }
+#gifts .gift_4.bold { background-position: -210px -80px; }
+#gifts .gift_5.bold { background-position: -280px -80px; }
+#gifts .gift_6.bold { background-position: -350px -80px; }
+#gifts .gift_7.bold { background-position: -420px -80px; }
+#gifts .gift_8.bold { background-position: -490px -80px; }
+#gifts .gift_9.bold { background-position: -560px -80px; }
+#gifts .gift_10.bold { background-position: -630px -80px; }
+#gifts .gift_11.bold { background-position: -700px -80px; }
+#gifts .gift_12.bold { background-position: -770px -80px; }
+#gifts .gift_13.bold { background-position: -840px -80px; }
+#gifts .gift_14.bold { background-position: -910px -80px; }
+#gifts .gift_15.bold { background-position: -980px -80px; }
+#gifts .gift_16.bold { background-position: -1050px -80px; }
+#gifts .gift_17.bold { background-position: -1120px -80px; }
+#gifts .gift_18.bold { background-position: -1190px -80px; }
+#gifts .gift_19.bold { background-position: -1260px -80px; }
+#gifts .gift_20.bold { background-position: -1330px -80px; }
+#gifts .gift_21.bold { background-position: -1400px -80px; }
+#gifts .gift_22.bold { background-position: -1470px -80px; }
+#gifts .gift_23.bold { background-position: -1540px -80px; }
+#gifts .gift_24.bold { background-position: -1610px -80px; }
+#gifts .on a:hover { background-image: url("gift.png"); }
+#gifts .gift_1.on a:hover { background-position: 0 0; }
+#gifts .gift_2.on a:hover { background-position: -70px 0; }
+#gifts .gift_3.on a:hover { background-position: -140px 0; }
+#gifts .gift_4.on a:hover { background-position: 0 0; }
+#gifts .gift_5.on a:hover { background-position: -70px 0; }
+#gifts .gift_6.on a:hover { background-position: -140px 0; }
+#gifts .gift_7.on a:hover { background-position: -140px 0; }
+#gifts .gift_8.on a:hover { background-position: 0 0; }
+#gifts .gift_9.on a:hover { background-position: -70px 0; }
+#gifts .gift_10.on a:hover { background-position: -140px 0; }
+#gifts .gift_11.on a:hover { background-position: 0 0; }
+#gifts .gift_12.on a:hover { background-position: -70px 0; }
+#gifts .gift_13.on a:hover { background-position: -70px 0; }
+#gifts .gift_14.on a:hover { background-position: -140px 0; }
+#gifts .gift_15.on a:hover { background-position: 0 0; }
+#gifts .gift_16.on a:hover { background-position: -70px 0; }
+#gifts .gift_17.on a:hover { background-position: -140px 0; }
+#gifts .gift_18.on a:hover { background-position: 0 0; }
+#gifts .gift_19.on a:hover { background-position: 0 0; }
+#gifts .gift_20.on a:hover { background-position: -70px 0; }
+#gifts .gift_21.on a:hover { background-position: -140px 0; }
+#gifts .gift_22.on a:hover { background-position: 0 0; }
+#gifts .gift_23.on a:hover { background-position: -70px 0; }
+#gifts .gift_24.on a:hover { background-position: -140px 0; }
