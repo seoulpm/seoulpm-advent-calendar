@@ -1,0 +1,258 @@
+Title:    Seoul.pm 펄 크리스마스 달력
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+'크리스마스 달력'은 '대림절 달력'(Advent Calendar)을 서울 펄 몽거스식으로
+바꾸어 부르는 일종의 브랜드(?)명입니다. 부르기 더 편하니까요.
+아무튼 대림절 달력의 유래는 독일 19세기 초까지 올라갑니다.
+루터교 사람들은 12월 1일부터 24일까지의 대림절 동안
+하루에 하나씩 분필로 표기하여 재림일을 손꼽아 기다리곤 했답니다.
+
+쩝... 나뭇가지에 개수만큼 흠집을 내는 것도 아니고 말이죠!
+물론 석기 시대에나 볼 수 있을 듯한 이런 구리구리한 방법만 있던 것은 아닙니다.
+멋진 구조물에 24개의 양초를 두기도 했고요. 건물의 창문에 번호를 매기기도 했습니다.
+그것이 진짜 달력 형태로 만들어졌다가 마침내 인쇄물 형식의 대림절 달력이 탄생하게 된 것입니다!
+짜잔!
+
+![대림절 달력][img-1-resize]
+
+이미지 출처: [allthingsbeautiful-charity.blogspot.kr][allthingsbeautiful]
+
+현대 문화는 이 관습을 고스란히 물려받았습니다.
+12월이 다가오면 너나 할 것 없이 온 가정에서 오손도손 모여 대림절 달력을 만듭니다.
+상자 형태로 만들어 스물 네개의 문을 달고요.
+하루에 하나씩 열면! 짜잔~ 깜짝 선물이 나오는 겁니다!
+마지막 24일의 문은 초대형 문에 초대형 선물을 넣는 센스도 발휘합니다.
+가족이 다함께 종이를 씹고 뜯고 붙이며 만드는 재미!
+크리스마스까지 조마조마하게 기다리며 하루에 하나씩 문을 열어보는 재미!
+올해도 크리스마스가 외로우신 분이나, 충성스러운 삶을 보내고 계시는 분까지,
+다함께 글로벌하고 즐거운 (펄) 크리스마스 달력에 빠져보는 건 어떨까요?
+
+자, 지금부터 여러분의 컴퓨터에 Seoul.pm 펄 크리스마스 달력을
+소장하는 법을 여러분에게만 알려드리죠!
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 App::HTTPThis 모듈][cpan-app-httpthis]
+- [CPAN의 HTML::Escape 모듈][cpan-html-escape]
+- [CPAN의 Mojo::DOM 모듈][cpan-mojo-dom]
+- [CPAN의 Text::MultiMarkdown 모듈][cpan-text-multimarkdown]
+- [CPAN의 URI::Escape 모듈][cpan-uri-escape]
+- [CPAN의 WWW::AdventCalendar 모듈][cpan-www-adventcalendar]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+      App::HTTPThis \
+      HTML::Escape \
+      Mojo::DOM \
+      Text::MultiMarkdown \
+      URI::Escape \
+      WWW::AdventCalendar
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+      App::HTTPThis \
+      HTML::Escape \
+      Mojo::DOM \
+      Text::MultiMarkdown \
+      URI::Escape \
+      WWW::AdventCalendar
+
+
+Seoul.pm 크리스마스 달력 저장소 내려받기
+-----------------------------------------
+
+로컬 장비에 달력을 설치하기 위해 [저장소][github-seoulpm-advent-calendar]를 내려받습니다.
+`git`을 이용해 내려받는 명령은 다음과 같습니다.
+
+    #!bash
+    $ git clone https://github.com/seoulpm/seoulpm-advent-calendar.git
+
+내려받은 저장소의 최상위 디렉터리를 살펴보죠.
+
+    #!bash
+    $ cd seoulpm-advent-calendar
+    $ ls -l
+    합계 56
+    drwxr-xr-x 5 askdna askdna  4096 11월 30 16:57 2010
+    drwxr-xr-x 4 askdna askdna  4096 11월 30 16:57 2011
+    drwxr-xr-x 6 askdna askdna  4096 11월 30 16:57 2012
+    drwxr-xr-x 5 askdna askdna  4096 11월 30 17:02 2013
+    drwxr-xr-x 5 askdna askdna  4096 12월  1 00:59 2014
+    -rw-r--r-- 1 askdna askdna 15325 11월 30 20:48 2014-12-01.mkd
+    lrwxrwxrwx 1 askdna askdna    13 12월  1 00:59 Makefile -> 2014/Makefile
+    -rw-r--r-- 1 askdna askdna  1519 11월 30 16:59 Makefile.common
+    lrwxrwxrwx 1 askdna askdna    15 12월  1 00:59 README.mkd -> 2014/README.mkd
+    -rw-r--r-- 1 askdna askdna   161 11월 30 16:59 cpanfile
+    drwxr-xr-x 3 askdna askdna  4096 11월 30 16:57 patch
+
+달력을 빌드하기 위해 `advent.ini` 설정 파일을 추가합니다.
+2014년 달력을 빌드하려면 `2014/advent.ini` 파일을 복사하세요.
+
+    #!bash
+    $ cp 2014/advent.ini advent.ini
+
+
+달력 만들기
+------------
+
+여기까지 문제없이 따라왔다면 달력을 생성하는 법은 무척 간단합니다.
+
+    #!bash
+    $ make
+    perl -E 'symlink "2014/advent.ini", "advent.ini" unless -e "advent.ini"'
+    PERL5LIB=./patch/lib/:/home/askdna/.perlbrew/libs/perl-5.20.1@service/lib/perl5 advcal --config advent.ini --output-dir output-2014 --article-dir 2014/articles --share-dir 2014/share
+    processing article for 2014-12-01...
+
+성공적으로 빌드했다면 `output-YEAR` 디렉터리가 생성됩니다.
+2014년 설정 파일을 사용했기 때문에 아마도 `output-2014` 디렉터리가 만들어졌겠죠?
+
+    #!bash
+    $ ls -l
+    합계 56
+    drwxr-xr-x 5 askdna askdna  4096 11월 30 16:57 2010
+    drwxr-xr-x 4 askdna askdna  4096 11월 30 16:57 2011
+    drwxr-xr-x 6 askdna askdna  4096 11월 30 16:57 2012
+    drwxr-xr-x 5 askdna askdna  4096 11월 30 17:02 2013
+    drwxr-xr-x 5 askdna askdna  4096 12월  1 00:59 2014
+    -rw-r--r-- 1 askdna askdna 15325 11월 30 20:48 2014-12-01.mkd
+    lrwxrwxrwx 1 askdna askdna    13 12월  1 00:59 Makefile -> 2014/Makefile
+    -rw-r--r-- 1 askdna askdna  1519 11월 30 16:59 Makefile.common
+    lrwxrwxrwx 1 askdna askdna    15 12월  1 00:59 README.mkd -> 2014/README.mkd
+    lrwxrwxrwx 1 askdna askdna   145 11월 30 20:49 advent.ini
+    -rw-r--r-- 1 askdna askdna   161 11월 30 16:59 cpanfile
+    drwxr-xr-x 2 askdna askdna  4096 12월  1 06:46 output-2014
+    drwxr-xr-x 3 askdna askdna  4096 11월 30 16:57 patch
+
+`output-2014` 디렉터리에는 Seoul.pm 크리스마스 달력을 운영하는데
+필요한 모든 자원이 빠짐없이 들어가 있습니다.
+여러분이 선호하는 웹서버로 `output-2014` 디렉터리 하부의 정적 파일을
+웹에서 게시할 수 있도록 설정만하면 됩니다.
+
+
+달력 보기
+----------
+
+아! 귀찮으시다구요? 물론 방법이 있습니다.
+
+TMTOWTDI!!
+
+`make run` 명령은 [CPAN의 App::HTTPThis 모듈][cpan-app-httpthis]을 이용해
+로컬 웹서버로 Seoul.pm 크리스마스 달력을 띄워줍니다.
+
+    #!bash
+    $ IFCONFIG=/sbin/ifconfig make run
+    perl -E 'symlink "2014/advent.ini", "advent.ini" unless -e "advent.ini"'
+    PERL5LIB=./patch/lib/:/home/askdna/.perlbrew/libs/perl-5.20.1@service/lib/perl5 advcal --config advent.ini --output-dir output-2014 --article-dir 2014/articles --share-dir 2014/share
+    processing article for 2014-12-01...
+    /sbin/ifconfig | perl -nlE 'do { say $1 } if /inet addr:(\d{1,3}(?:\.\d{1,3}){3})/'
+    192.168.254.254
+    127.0.0.1
+    192.168.123.184
+    http_this  output-2014
+    Exporting 'output-2014', available at:
+       http://127.0.0.1:7007/
+
+마지막 메시지로 유추해보건대 `7007` 포트로 접속하면 될 것 같군요!
+아! 주의할 점으로는 간단한 간이 웹서버인만큼 `index.html` 페이지를 바로 띄워주는 기능은 없답니다.
+`http://localhost:7007/index.html` 주소를 이용해 직접 접속해보세요.
+
+아! 주의할 점이 하나가 더 있군요!
+아마 `index.html` 파일에서 열람할 수 있는 기사들의 링크가 모두 공식 웹사이트
+주소로 연결되어 있는데 이것은 설정 파일을 수정해서 간단히 해결할 수 있습니다.
+`advent.ini` 파일의 `uri` 항목을 다음과 같이 수정합니다.
+
+    #!diff
+    --- a/advent.ini  2014-12-01 00:59:41.009752064 +0900
+    +++ b/advent.ini  2014-12-01 07:00:52.109213243 +0900
+    @@ -1,6 +1,6 @@
+     title  = Seoul.pm Perl Advent Calendar
+     year   = 2014
+    -uri    = http://advent.perl.kr/2014/
+    +uri    = http://localhost:7007/
+     editor = Keedi Kim
+     category = Perl
+     category = Seoul.pm
+
+짜잔!!
+
+![llama@perl][img-2-resize]
+
+멋지군요! ;-)
+
+
+달력 열어보기
+--------------
+
+12월 한 달 동안 Seoul.pm 펄 크리스마스 달력은 매일 매일 자료가 갱신됩니다.
+크리스마스 달력을 하나 하나 열어보듯 펄 크리스마스 달력을 열어보려면
+매일 밤 자정 다음 명령을 실행해보세요.
+
+    #!bash
+    $ git pull
+    Current branch develop is up to date.
+
+아쉽지만 지금은 조금 이른 시간인가 봅니다. :)
+
+
+정리하며
+---------
+
+매년 한정판인 이 달력! 왠지 소장하고 싶지 않았나요?
+항상 애정을 갖고 Seoul.pm 크리스마스 달력을 기다려주시는 분들이라면 놓치지 않으셨으니라 믿습니다.
+
+올해도 여전히 펄에 애정을 가지고 지켜보는 몽거스 및 예비 몽거스 분들을 위해 크리스마스 달력이 열렸습니다.
+기사를 즐겁게 읽거나, 기사에 있는대로 따라해보거나, 기사를 공유하거나
+또는 더욱 적극적으로 [기사를 송고][seoulpm-advent-send-article]한다던가 모두 Seoul.pm을 후원하는 멋진 방법입니다.
+올해, 그리고 내년, 여러분의 기사를 Seoul.pm 펄 크리스마스 달력에서 만날 수 있길 바래봅니다!
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+R.I.P. [@am0c][twitter-am0c]
+
+
+[img-1]:          2014-12-01-1.jpg
+[img-2]:          2014-12-01-2.png
+
+[img-1-resize]:   2014-12-01-1_r.jpg
+[img-2-resize]:   2014-12-01-2_r.png
+
+
+[allthingsbeautiful]:             http://allthingsbeautiful-charity.blogspot.kr/2010/11/advent-calendars.html
+[cpan-app-httpthis]:              https://metacpan.org/module/App::HTTPThis
+[cpan-html-escape]:               https://metacpan.org/module/HTML::Escape
+[cpan-mojo-dom]:                  https://metacpan.org/module/Mojo::DOM
+[cpan-text-multimarkdown]:        https://metacpan.org/module/Text::MultiMarkdown
+[cpan-uri-escape]:                https://metacpan.org/module/URI::Escape
+[cpan-www-adventcalendar]:        https://metacpan.org/module/WWW::AdventCalendar
+[cpan]:                           http://www.cpan.org/
+[github-seoulpm-advent-calendar]: https://github.com/seoulpm/seoulpm-advent-calendar
+[home-perlbrew]:                  http://perlbrew.pl/
+[seoulpm-advent-send-article]:    https://github.com/seoulpm/seoulpm-advent-calendar/blob/develop/2014/README.mkd
+[twitter-am0c]:                   http://twitter.com/#!/am0c
+[twitter-keedi]:                  http://twitter.com/#!/keedi
+[yes24-4433208]:                  http://www.yes24.com/24/goods/4433208
