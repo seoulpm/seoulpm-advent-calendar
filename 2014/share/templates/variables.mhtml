@@ -116,7 +116,7 @@ return {
         },
         {
             title => 'Perl Dancer Advent Calendar',
-            url   => 'http://advent.perldancer.org/2012',
+            url   => 'http://advent.perldancer.org/2014',
         },
         {
             title => 'Future Advent Calendar',
