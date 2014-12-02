@@ -14,10 +14,10 @@ Author:   aanoaa
 시작하며
 ---------
 
-[Postcodify][home-postcodify]는 웹 페이지에서 도로명주소, 지번주소, 영문주소 등을
+[Postcodify][postcodify]는 웹 페이지에서 도로명주소, 지번주소, 영문주소 등을
 편리하게 검색할 수 있도록 해주는 오픈소스 라이브러리입니다.
 PHP 구현물이며, [LGPL-3.0][license-lgpl-3.0] 라이센스이고,
-현재 [GitHub 저장소][home-postcodify]에서 개발이 이루어지고 있습니다.
+현재 [GitHub 저장소][github-postcodify]에서 개발이 이루어지고 있습니다.
 공식 홈페이지의 설명에 따르면 다음과 같은 장점이 있다고합니다.
 
 - 도로명 주소 DB를 직접 구축하거나 관리할 필요가 없음
@@ -48,9 +48,9 @@ Postcodify를 사용하려면 우선 전국 주소 데이터베이스 파일이 
 홈페이지에서 내려받을 수 있습니다.
 
 Postcodify에서 이 파일을 바로 사용할 수 있는 것은 아니고 내려받은 후
-[인덱스 구동 절차][home-postcodify-owndb-indexer]를 거쳐야 합니다.
+[인덱스 구동 절차][postcodify-indexer]를 거쳐야 합니다.
 편리하게도 Postcodify에서는 인덱스까지 생성을 완료한 데이터베이스를
-자체 서버에서 다운로드받을 수 있도록 [링크를 제공][home-postcodify-download]합니다.
+자체 서버에서 다운로드받을 수 있도록 [링크를 제공][postcodify-download]합니다.
 Perl로 포팅한 [p5-postcodify][github-p5-postcodify] 저장소에는
 이 데이터베이스 파일을 다운로드할 수 있도록 스크립트를 제공하고 있습니다.
 다음 명령을 이용해서 데이터베이스 파일을 다운로드 합니다.
@@ -107,33 +107,31 @@ Perl로 포팅한 [p5-postcodify][github-p5-postcodify] 저장소에는
     print $result->json;
 
 
-# 마치며 #
+정리하며
+---------
 
-주소 및 우편번호 검색을 몇개의 명령어를 사용해서 간단하게 만들 수
-있습니다.
+펄과 Postcodify를 이용하면 단 몇 줄의 코드를 이용해
+간단하게 주소 및 우편번호를 검색할 수 있습니다.
+직접 데이터베이스와 서버를 구축하는 것이 번거롭다면
+[무료 Web API Service][postcodify-freeapi]를 사용할 수도 있습니다.
+[p5-postcodify][p5-postcodify]는 [공식 Postcodify jQuery 플러그인][postcodify-jquery]과 호환되므로
+더 자세한 내용을 알고 싶다면 [공식 문서][postcodify-manual]를 확인하세요.
 
-직접 구축하지 않고도 [무료 Web API Service][postcodify-freeapi]
-를 사용할 수 있습니다.
-
-[p5-postcodify][p5-postcodify] 는 [jquery plugin][postcodify-jquery]
-과 호환 가능합니다. 자세한 내용은
-[postcodify manual][postcodify-manual]에서 확인하세요.
-
-마지막으로, 이렇게 훌륭한 서비스를 [여기][postcodify-sponsor]에서
-후원하실 수 있습니다.
+마지막으로 이렇게 훌륭한 라이브러리와 서비스를 만든
+[Postcodify 개발진에게 고마운 마음][postcodify-sponsor]을 전합니다.
 
 
-[Postcodify]:                       https://github.com/kijin/postcodify
-[cpan-cpanm]:                       https://metacpan.org/pod/distribution/App-cpanminus/bin/cpanm
-[cpan]:                             http://www.cpan.org/
-[github-aanoaa]:                    https://github.com/aanoaa
-[github-p5-postcodify]:             https://github.com/aanoaa/p5-postcodify
-[home-juso]:                        http://www.juso.go.kr/support/AddressBuild.htm
-[home-postcodify-download]:         http://storage.poesis.kr/downloads/post/
-[home-postcodify-owndb-indexer]:    http://postcodify.poesis.kr/guide/owndb_indexer
-[license-lgpl-3.0]:                 http://opensource.org/licenses/lgpl-3.0.html
-[postcodify-freeapi]:               http://postcodify.poesis.kr/guide/freeapi
-[postcodify-jquery]:                http://postcodify.poesis.kr/guide/jquery_popup
-[postcodify-manual]:                http://postcodify.poesis.kr/guide/contents
-[postcodify-sponsor]:               http://postcodify.poesis.kr/guide/sponsor
-[twitter-aanoaa]:                   https://twitter.com/aanoaa
+[cpan-cpanm]:           https://metacpan.org/pod/distribution/App-cpanminus/bin/cpanm
+[cpan]:                 http://www.cpan.org/
+[github-aanoaa]:        https://github.com/aanoaa
+[github-p5-postcodify]: https://github.com/aanoaa/p5-postcodify
+[home-juso]:            http://www.juso.go.kr/support/AddressBuild.htm
+[license-lgpl-3.0]:     http://opensource.org/licenses/lgpl-3.0.html
+[postcodify-download]:  http://storage.poesis.kr/downloads/post/
+[postcodify-freeapi]:   http://postcodify.poesis.kr/guide/freeapi
+[postcodify-jquery]:    http://postcodify.poesis.kr/guide/jquery_popup
+[postcodify-manual]:    http://postcodify.poesis.kr/guide/contents
+[postcodify-indexer]:   http://postcodify.poesis.kr/guide/owndb_indexer
+[postcodify-sponsor]:   http://postcodify.poesis.kr/guide/sponsor
+[postcodify]:           http://postcodify.poesis.kr/
+[twitter-aanoaa]:       https://twitter.com/aanoaa
