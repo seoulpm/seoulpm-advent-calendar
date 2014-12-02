@@ -33,7 +33,7 @@ p5-postcodify
 PHP 구현물인 [Postcodify][github-postcodify]를 Perl로 옮긴 프로젝트가
 [p5-postcodify][github-p5-postcodify]입니다.
 자, 지금부터 Postcodify 라이브러리를 펄을 이용해 사용하는 방법을 알아보죠.
-[p5-postcodify][github-p5-postcodify] 모듈은 [CPAN][home-cpan] 모듈이 아니므로
+[p5-postcodify][github-p5-postcodify] 모듈은 [CPAN][cpan] 모듈이 아니므로
 설치를 위해 저장소를 복제합니다.
 
     #!bash
@@ -74,7 +74,7 @@ Perl로 포팅한 [p5-postcodify][github-p5-postcodify] 저장소에는
 의존 모듈 설치
 ---------------
 
-[p5-postcodify][github-p5-postcodify] 모듈은 [CPAN][home-cpan] 모듈이 아니므로
+[p5-postcodify][github-p5-postcodify] 모듈은 [CPAN][cpan] 모듈이 아니므로
 [cpanm][cpan-cpanm]을 이용해 설치하는 것을 추천합니다.
 의존 모듈을 설치하는 명령은 다음과 같습니다.
 
@@ -125,13 +125,14 @@ Perl로 포팅한 [p5-postcodify][github-p5-postcodify] 저장소에는
 [cpan]:                 http://www.cpan.org/
 [github-aanoaa]:        https://github.com/aanoaa
 [github-p5-postcodify]: https://github.com/aanoaa/p5-postcodify
+[github-postcodify]:    https://github.com/kijin/postcodify
 [home-juso]:            http://www.juso.go.kr/support/AddressBuild.htm
 [license-lgpl-3.0]:     http://opensource.org/licenses/lgpl-3.0.html
 [postcodify-download]:  http://storage.poesis.kr/downloads/post/
 [postcodify-freeapi]:   http://postcodify.poesis.kr/guide/freeapi
+[postcodify-indexer]:   http://postcodify.poesis.kr/guide/owndb_indexer
 [postcodify-jquery]:    http://postcodify.poesis.kr/guide/jquery_popup
 [postcodify-manual]:    http://postcodify.poesis.kr/guide/contents
-[postcodify-indexer]:   http://postcodify.poesis.kr/guide/owndb_indexer
 [postcodify-sponsor]:   http://postcodify.poesis.kr/guide/sponsor
 [postcodify]:           http://postcodify.poesis.kr/
 [twitter-aanoaa]:       https://twitter.com/aanoaa
