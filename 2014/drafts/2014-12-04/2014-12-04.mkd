@@ -1,5 +1,5 @@
-file:///C:/exported.html
-Subject: Exported From Confluence 
+file:///C:/419B1174/file1588.htm
+Attachment: Attachment 
 
 
 Attachment: Attachment 
@@ -51,7 +51,9 @@ my @time_l = qw(00:22:07 00:22:57 00:23:22 00:24:07 01:22:17 01:24:07 02:22:22 0
           02:24:07 03:22:32 03:22:57 03:23:42 03:24:07 04:22:37  04:22:57 04:23:47 04:24:07 05:22:42);
       
 my @val_l = qw(53 46 54 48 54 45 54 71 66 45 56 72 66 46 54 71 66 47 55);
-               my $val_size =  @val_l;
+                   
+my $val_size =  @val_l;
+ 
  
 엑셀 파일부터 만들자
  
@@ -99,7 +101,6 @@ my $data = [
 $worksheet->write('A1', $headings, $bold);
 $worksheet->write('A2', $data);
  
- 
 기본적으로, $worksheet->write() 메소드를 이용하여 특정 셀에 원하는 값들을 넣을 수 있습니다. 
  
 Time 값과 Load 값들을 삽입할 것이고,  각 데이터열의 head title로 "Time"과 "Load" 를 삼습니다.
@@ -126,7 +127,7 @@ write() 메소드에 들어가는 파라메터 'A1', 'A2' 등은 짐작하다시
  
  
  
-여기서 팁 하나!, 만일 엑셀 함수 식을  사용하고자 한다면 아래처럼 하면 됩니다.
+여기서 팁 하나, 만일 엑셀 함수 식을  사용하고자 한다면 아래처럼 하면 됩니다.
  
 $worksheet->write('D10', '=sum(D2:D9)');
  
@@ -169,16 +170,11 @@ $chart->add_series(
         values     => [$sheet_name, 1, $val_size+1, 1, 1],
         );
  
- 
 add_series() 메소드 내에서 category와 values 에 들어가야 하는 값으로는 Sheet name과  참조해야 하는 값들의  시작과 끝의 위치입니다(row_start, row_end, col_start, col_end).
  
 이때, 참조하는 위치는 실제 엑셀에서의 데이터가 들어있는 곳의 위치입니다 (저는 개인적으로 이 부분을 이해하는 것이 제일 힘들었습니다).
  
- A1 셀의 위치는 (0,0)이고, B2  셀의 위치는 (1,1)입니다.  이제 여러분이 이 부분에 대해 알 건 다 끝났습니다.
- 
-예제에 따라서는, 시트
- 
- 
+ A1 셀의 위치는 (0,0)이고, B2  셀의 위치는 (1,1)입니다.  이제 여러분이 이 부분에 대해 알 건 다 끝났습니다. 
  
 chart의 사이즈, 시작 위치, 타이틀 스트링, x축/y축에 대한 help string 정도 설정한 다음에, insert_chart() 메소드를 써서 실제 시트에 삽입합니다.
  
@@ -195,7 +191,6 @@ $worksheet->insert_chart( 'D2', $chart, 25, 10 );
  
 #Close Excel writing
 $workbook->close();
- 
  
  
  
