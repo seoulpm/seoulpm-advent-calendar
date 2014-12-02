@@ -11,17 +11,21 @@ Author:   aanoaa
 [@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
 
-# Postcodify 소개 #
+시작하며
+---------
 
-[Postcodify][Postcodify]
+[Postcodify][home-postcodify]는 웹 페이지에서 도로명주소, 지번주소, 영문주소 등을
+편리하게 검색할 수 있도록 해주는 오픈소스 라이브러리입니다.
+PHP 구현물이며, [LGPL-3.0][license-lgpl-3.0] 라이센스이고,
+현재 [GitHub 저장소][home-postcodify]에서 개발이 이루어지고 있습니다.
+공식 홈페이지의 설명에 따르면 다음과 같은 장점이 있다고합니다.
 
-> Postcodify는 웹 페이지에서 도로명주소, 지번주소, 영문주소 등을
-> 편리하게 검색할 수 있도록 해주는 프로그램입니다.
-> 
-> 6백만 건이 넘는 도로명주소 DB를 직접 구축하거나 관리할 필요도 없고,
-> 어렵게 검색 알고리듬을 개발할 필요도 없습니다. 우편번호 검색이
-> 필요한 웹 페이지에 몇 줄의 jQuery 코드를 붙여넣기만 하면 검색창을
-> 뚝딱 만들어 드립니다.
+- 도로명 주소 DB를 직접 구축하거나 관리할 필요가 없음
+- 검색 알고리듬을 개발할 필요가 없음
+- jQuery 몇 줄로 검색창을 만들 수 있음
+
+참, 좋아보이는데 Perl 사용자는 어떻해야 할까요?
+
 
 # p5-postcodify #
 
@@ -91,3 +95,4 @@ Author:   aanoaa
 [postcodify-sponsor]:               http://postcodify.poesis.kr/guide/sponsor
 [postcodify.20141112.v2.sqlite.xz]: http://storage.poesis.kr/downloads/post/postcodify.20141112.v2.sqlite.xz
 [twitter-aanoaa]:                   https://twitter.com/aanoaa
+[license-lgpl-3.0]:                 http://opensource.org/licenses/lgpl-3.0.html
