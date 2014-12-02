@@ -4,6 +4,13 @@ Category: perl
 Category: Seoul.pm
 Author:   aanoaa
 
+
+저자
+-----
+
+[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
+
+
 # Postcodify 소개 #
 
 [Postcodify][Postcodify]
@@ -74,16 +81,13 @@ Author:   aanoaa
 마지막으로, 이렇게 훌륭한 서비스를 [여기][postcodify-sponsor]에서
 후원하실 수 있습니다.
 
-# 저자 #
-
-[@aanoaa][twitter-aanoaa] - ...
-
 [Postcodify]:                       https://github.com/kijin/postcodify
-[p5-postcodify]:                    https://github.com/aanoaa/p5-postcodify
-[twitter-aanoaa]:                   https://twitter.com/aanoaa
 [addressdb]:                        http://www.juso.go.kr/support/AddressBuild.htm
+[github-aanoaa]:                    https://github.com/aanoaa
+[p5-postcodify]:                    https://github.com/aanoaa/p5-postcodify
 [postcodify-freeapi]:               http://postcodify.poesis.kr/guide/freeapi
-[postcodify-sponsor]:               http://postcodify.poesis.kr/guide/sponsor
-[postcodify.20141112.v2.sqlite.xz]: http://storage.poesis.kr/downloads/post/postcodify.20141112.v2.sqlite.xz
 [postcodify-jquery]:                http://postcodify.poesis.kr/guide/jquery_popup
 [postcodify-manual]:                http://postcodify.poesis.kr/guide/contents
+[postcodify-sponsor]:               http://postcodify.poesis.kr/guide/sponsor
+[postcodify.20141112.v2.sqlite.xz]: http://storage.poesis.kr/downloads/post/postcodify.20141112.v2.sqlite.xz
+[twitter-aanoaa]:                   https://twitter.com/aanoaa
