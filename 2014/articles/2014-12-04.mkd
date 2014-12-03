@@ -81,21 +81,24 @@ Excel 파일을 처리하는 내용에만 집중하기 위해 예제 데이터�
     my $val_size = @val_l;
 
 
-Excel 파일부터 만들자
+Excel 파일 만들기
+------------------
 
-'report.xlsx'라는 Excel파일을 만듭니다.
+`Excel::Writer::XLSX` 모듈은 다루려는 Excel을 workbook이라는 객체에 담아서 처리합니다.
+아마도 Excel에 친숙하다면 이런 접근 방식이 더욱 친근하게 느껴질 것입니다.
 
-해당 모듈에서는 다루고 있는 Excel 전체를  workbook이라는 객체에 담아서 처리합니다.
+    #!perl
+    my $fname = "report.xlsx";
 
-아마, Excel에 친숙한 이들은 더욱  친근( ?)하게 느껴질 것입니다.
+    #
+    # Create new xlsx file(workbook) with $fname
+    #
+    my $workbook = Excel::Writer::XLSX->new($fname);
+    die "You got a problem to create new excel file: $!" unless defined $workbook;
 
-my $fname = "report.xlsx";
-#Create new xlsx file(workbook) with $fname
-my $workbook = Excel::Writer::XLSX->new($fname);
-die "You got a problem to create new excel file: $!" unless defined $workbook;
-전체 스크립트의 수행이 끝나면  "report.xlsx"라는 파일이 만들어집니다(물론, 내용은 아무것도 없지요)
-
-하지만, 안전한 종료를 위해서 최종 라인에서는 $workbook->close()를 수행해 주는 것을 권장합니다.
+전체 스크립트의 수행이 끝나면 `report.xlsx`라는 파일이 만들어집니다.
+물론, 아무런 내용도 없는 파일이죠.
+안전한 종료를 위해 마지막에는 항상 `$workbook->close()`를 넣는 것을 권장합니다.
 
 
 
