@@ -22,6 +22,27 @@ Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Kor
 매 월별 데이터 셋과 이에 대한 차트 그래프를 워크 시트에 담은 엑셀 파일을 만든다면,
 리포트 자료까지 만들어지는 셈이라 결국 Perl을 이용한 Excel 처리를 하기로 합니다.
 차후 Perl을 이용한 Excel 문서 작업을 시도해 보려는 분들의 첫걸음에 도움이 되길 바랍니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Excel::Writer::XLSX 모듈][cpan-excel-writer-xlsx]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Excel::Writer::XLSX
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Excel::Writer::XLSX
+
  
 
 모듈 다운 받기
@@ -213,5 +234,8 @@ perldoc Excel::Writer::XLSX
 이러한 작업을 원한다면, 원본 엑셀을 열어서 내용을 담은 다음에, writing할 엑셀 파일을 열어서 수정/추가된 내용을 담는 방식으로 하시길 바랍니다.
 
 
-[home-corpus007]:       http://corpus.egloos.com/
-[twitter-corpus007]:    https://twitter.com/corpus007
+[cpan-excel-writer-xlsx]:       https://metacpan.org/module/Excel::Writer::XLSX
+[cpan]:                         http://www.cpan.org/
+[home-corpus007]:               http://corpus.egloos.com/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-corpus007]:            https://twitter.com/corpus007
