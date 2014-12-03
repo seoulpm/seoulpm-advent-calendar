@@ -4,6 +4,14 @@ Category: perl
 Category: Seoul.pm
 Author:   corpus007
 
+저자
+-----
+
+[@corpus007][twitter-corpus007] - I like:
+Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Korea Girl Group ^__^,
+[홈페이지][home-corpus007]
+
+
 
 배경
  
@@ -206,3 +214,7 @@ perldoc Excel::Writer::XLSX
 참고로, 현재  해당 모듈은 기존 엑셀 문서를 열어서 추가/편집하는 것은 제약이 있습니다.
  
 이러한 작업을 원한다면, 원본 엑셀을 열어서 내용을 담은 다음에, writing할 엑셀 파일을 열어서 수정/추가된 내용을 담는 방식으로 하시길 바랍니다.
+
+
+[home-corpus007]:       http://corpus.egloos.com/
+[twitter-corpus007]:    https://twitter.com/corpus007
