@@ -92,7 +92,7 @@ Excel 파일 만들기
     
     #
     # Create new xlsx file(workbook) with $fname
-    #
+    # 
     my $workbook = Excel::Writer::XLSX->new($fname);
     die "You got a problem to create new excel file: $!" unless defined $workbook;
 
@@ -114,7 +114,7 @@ Excel 파일 만들기
     #!perl
     #
     # Add worksheet
-    # 
+    #  
     my $sheet_name = "Example";
     my $worksheet = $workbook->add_worksheet($sheet_name);
     
