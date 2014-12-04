@@ -167,71 +167,77 @@ Excel 파일 만들기
     $worksheet->write( 'D10', '=sum(D2:D9)' );
 
 
-이제는 차트를 추가해 보자
+차트 추가하기
+--------------
 
-worksheet에 chart를 넣는 메소드는 add_chart() 입니다.  변수로는 chart의 타입(종류)와 문서 내에 embedding 여부에 대한 플래그입니다.
+워크시트에 그래프를 넣으려면 `add_chart()` 메소드를 사용합니다.
+매개변수로 차트의 종류와 내장 여부를 전달합니다.
+지원하는 차트의 종류로는 area, bar, column, line, pie, scatter, stock 등이 있고, 개별 타입에 대한 subtype이 있습니다.
+이때, 내장 여부를 의미하는 `embedded` 매개변수는 선택사항이라 생략이 가능하지만
+생략할 경우 경고를 발생시키므로 제 경우 가능하면 `embedded` 플래그는 설정하는 편입니다.
 
-지원되는 차트의 종류로는 'area, bar, column, line, pie, scatter, stock' 등이 있고, 개별 타입에 대한 subtype 이 있습니다.
+`add_chart()` 메소드를 호출해 반환값으로 차트 객체를 생성한 후에는
+차트 객체 내에 실제 값의 계열(series)을 추가하기 위해 `add_series()` 메소드를 사용합니다.
+매개변수로 계열에 대한 주석 설명과 범주, 실제의 값을 전달합니다.
+차트의 이름을 생략하면 실제 Excel에서 자동으로 생성하듯이
+`Chart1` 따위의 이름으로 차트를 만듭니다.
+여러 개의 계열을 추가하려면 `add_series()` 메소드를 여러번 호출합니다.
 
-이때, embedded 변수는 옵션이라 생략 가능하다고 하지만 생략하면 warring을 내놓기에 쓰도록 합시다 (warring 싫어~)
+    #!perl
+    #
+    # Write chart
+    # -- Create a new chart object as embedded type.
+    # 
+    my $chart = $workbook->add_chart( type => 'line', embedded => 1 );
+    
+    #
+    # Set series name
+    # 
+    my $series_name =  'Stress score';
+    
+    #
+    # -- ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
+    #  
+    $chart->add_series(
+        name       => $series_name,
+        categories => [ $sheet_name, 1, $val_size+1, 0, 0 ],
+        values     => [ $sheet_name, 1, $val_size+1, 1, 1 ],
+    );
 
+`categories`와 `values`에 들어가야 할 값은 워크시트의 이름과
+참조할 값의 시작 및 끝 위치(행 시작, 행 끝, 열 시작, 열 끝)입니다.
+이 때, 참조할 위치는 실제 Excel에서 데이터가 들어있는 곳의 위치임을 주의합니다.
+예를 들면 A1 셀의 위치는 `( 0, 0 )`이고, B2 셀의 위치는 `( 1, 1 )` 입니다.
 
+마지막으로 그래프의 크기와 시작 위치, 제목, x축 및 y축에 대한 도움말 등을
+설정한 후 `insert_chart()` 메소드를 사용해 실제 워크시트에 넣습니다.
 
-add_chart() 메소드의 리턴 값으로 chart 객체가 할당되고 나면,   chart 객체 내에 실제 값들의 계열(series)을 추가해야 합니다.
-
-이때 사용하는 메소는 chart 객체 내의 add_series() 메소드입니다..
-
-파라메터로는  series에 대한 주석설명을 나타내는 'name' 변수,  'category(범주)', 그리고 실제의 값들에 해당하는 'values' 입니다.
-
-만일, 이름을 생략하면 default로 'Chart1' .. 식으로 붙게 됩니다.
-
-
-
-만일, 여러개의 series를 추가하고자 한다면, add_series()를 여러번 호출하면 됩니다.
-
-#Write chart
-# -- Create a new chart object as embedded type.
-#my $chart = $workbook->add_chart( type => 'line' );
-my $chart = $workbook->add_chart( type => 'line', embedded => 1 );
-
-
-# Set series name
-#my $series_name = '=' . $sheet_name . '!$B$1';
-my $series_name =  'Stress score';
-# -- ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
-$chart->add_series(
-        name => $series_name,
-        categories => [$sheet_name, 1, $val_size+1, 0, 0],
-        values     => [$sheet_name, 1, $val_size+1, 1, 1],
-        );
-
-add_series() 메소드 내에서 category와 values 에 들어가야 하는 값으로는 Sheet name과  참조해야 하는 값들의  시작과 끝의 위치입니다(row_start, row_end, col_start, col_end).
-
-이때, 참조하는 위치는 실제 Excel에서의 데이터가 들어있는 곳의 위치입니다 (저는 개인적으로 이 부분을 이해하는 것이 제일 힘들었습니다).
-
- A1 셀의 위치는 (0,0)이고, B2  셀의 위치는 (1,1)입니다.  이제 여러분이 이 부분에 대해 알 건 다 끝났습니다.
-
-chart의 사이즈, 시작 위치, 타이틀 스트링, x축/y축에 대한 help string 정도 설정한 다음에, insert_chart() 메소드를 써서 실제 시트에 삽입합니다.
-
-insert_chart() 는 worksheet에 대해 다루기 때문에 당연히( ?)  worksheet 객체에 소속된 메소드입니다.
-
-$chart->set_title( name => 'Line Chart' );
-$chart->set_x_axis( name => 'Captured Time' );
-$chart->set_y_axis( name => 'load' );
-# Excel chart style
-$chart->set_style( 10 );
-$chart->set_size(width=>840, height=>576);
-# -- Insert chart onto the worksheet
-$worksheet->insert_chart( 'D2', $chart, 25, 10 );
-
-#Close Excel writing
-$workbook->close();
-
-
-
-최종 내용은 아래와 같습니다.
+    #!perl
+    $chart->set_title( name => 'Line Chart' );
+    $chart->set_x_axis( name => 'Captured Time' );
+    $chart->set_y_axis( name => 'load' );
+    
+    #
+    # Excel chart style
+    # 
+    $chart->set_style( 10 );
+    $chart->set_size( width => 840, height => 576 );
+    
+    #
+    # -- Insert chart onto the worksheet
+    # 
+    $worksheet->insert_chart( 'D2', $chart, 25, 10 );
+    
+    #
+    # Close Excel writing
+    # 
+    $workbook->close();
 
 
+*그림 2*는 마지막 완전한 결과물을 보여줍니다.
+
+![final result][img-2-resize]
+*그림 2.* 마지막 결과물 ([원본][img-2])
 
 
 
@@ -249,7 +255,9 @@ perldoc Excel::Writer::XLSX
 
 
 [img-1]:          2014-12-04-1.png
+[img-2]:          2014-12-04-2.png
 [img-1-resize]:   2014-12-04-1_r.png
+[img-2-resize]:   2014-12-04-2_r.png
 
 [cpan-excel-writer-xlsx]:       https://metacpan.org/module/Excel::Writer::XLSX
 [cpan]:                         http://www.cpan.org/
