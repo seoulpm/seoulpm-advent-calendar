@@ -45,36 +45,48 @@ Author:   luzluna
 사용 방법
 ----------
 
- * `new()` : 파일의 경로를 파라미터로 받아서 tail을 준비합니다.
- * `getline()` : 마지막 읽었던 라인에서부터 한줄씩 읽어들입니다.
+사용할 메소드는 다음과 같습니다.
 
+ * `new()`: 파일의 경로를 파라미터로 받아서 tail을 준비합니다.
+ * `getline()`: 마지막 읽었던 라인에서부터 한줄씩 읽어들입니다.
 
 사용하는 예제는 다음과 같습니다.
 
+    #!perl
     #!/usr/bin/env perl
+    
     use strict;
     use warnings;
     use Logfile::Tail;
-
+    
     while (1) {
         my $file=Logfile::Tail->new( "./test.log" );
-
+    
+        #
         # 로그 처리전 시간을 기억해둡니다.
+        # 
         my $start_time = time;
         my $cnt = 0;
+    
+        #
         # 한줄씩 로그를 처리합니다. 파일의 끝에 도달하면 끝납니다.
+        # 
         while( defined(my $tmp = $file->getline) ) {
             $cnt++;
         }
-
+    
         $file->close();
-
+    
+        #
         # 로그처리에 걸린 시간을 계산합니다.
+        # 
         my $end_time = time;
         my $duration = $end_time - $start_time;
         print "duration: $duration ($cnt lines)\n";
-
+    
+        #
         # 10초 간격으로 처리하기 위해 기다릴 시간을 계산합니다.
+        # 
         my $sleep_delay = 10 - $duration;
         if ( $sleep_delay > 0 ) {
             sleep( $sleep_delay );
@@ -98,8 +110,8 @@ Author:   luzluna
     duration: 0 (16929 lines)
     ...
 
-Ctrl+C를 누른 후 다시 실행시켰을 때 마지막 처리했던 곳에서부터
-이어서 다시 처리를 한 것을 확인할 수 있습니다.
+`Ctrl+C`를 누른 후 다시 실행시켰을 때 마지막 처리했던 곳에서부터
+이어서 다시 진행을 한다는 사실을 확인할 수 있습니다. :-)
 
 
 
