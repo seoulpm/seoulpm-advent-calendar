@@ -25,7 +25,7 @@ Author:   luzluna
 -------
 
 필요한 모듈은 다음과 같습니다.
-다른 모듈 디펜던시 등이 없이 아주 간단한 모듈이라서 좋습니다.
+다른 모듈과 의존성이 없는 아주 간단한 모듈인 것이 장점입니다.
 
 - [CPAN의 Logfile::Tail 모듈][cpan-logfile-tail]
 
@@ -117,5 +117,7 @@ Logfile::Tail 모듈을 이용한다면 프로그램을 실행해놓지 않고 �
 _EOT_
 
 [cpan-logfile-tail]:    https://metacpan.org/module/Logfile::Tail
+[cpan]:                 http://www.cpan.org/
+[home-perlbrew]:        http://perlbrew.pl/
 [twitter-luzluna]:      https://twitter.com/luzluna
 [yes24-14061821]:       http://www.yes24.com/24/goods/14061821
