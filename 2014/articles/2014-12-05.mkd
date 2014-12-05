@@ -99,6 +99,7 @@ Author:   luzluna
 
 실행결과는 다음과 같습니다.
 
+    #!bash
     [test@cent5 ~]$ ./tail.pl 
     duration: 0 (16887 lines)
     duration: 0 (16903 lines)
