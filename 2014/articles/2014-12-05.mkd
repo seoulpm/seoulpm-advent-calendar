@@ -71,7 +71,7 @@ Author:   luzluna
         #
         # 한줄씩 로그를 처리합니다. 파일의 끝에 도달하면 끝납니다.
         # 
-        while( defined(my $tmp = $file->getline) ) {
+        while ( defined( my $tmp = $file->getline ) ) {
             $cnt++;
         }
     
