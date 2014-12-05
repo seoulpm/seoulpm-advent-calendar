@@ -1,0 +1,110 @@
+Title:    use Logfile::Tail;
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
+저자
+-----
+
+[@luzlunz][twitter-luzlunz] - C,Perl 엔지니어. 근래엔 Ops에 더 가까운 DevOps.
+[PostgreSQL 성능 최적화][yes24-14061821]의 공동 역자, luzluna _at_ gmail.com
+
+
+시작하며
+---------
+
+실시간으로 로그를 분석하는 프로그램을 만들다보면 마지막으로 본 로그 위치에서부터 로그를 다시 분석하고 싶을때가 있습니다. 요구사항은 꽤 간단한데 막상 해보려면 꽤 귀찮고 어려운 문제들이 자꾸 떠오릅니다. 이런때엔 Logfile::Tail[cpan-logfile-tail] 모듈을 사용하면 쉽게 처리할 수 있습니다.
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다. 다른 모듈 디펜던시 등이 없이 아주 간단한 모듈이라서 좋습니다.
+
+- [CPAN의 Logfile::Tail 모듈][cpan-logfile-tail]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Logfile::Tail
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Logfile::Tail
+
+
+사용 방법
+----------
+
+ * `new()` : 파일의 경로를 파라미터로 받아서 tail을 준비합니다.
+ * `getline()` : 마지막 읽었던 라인에서부터 한줄씩 읽어들입니다.
+
+
+사용하는 예제는 다음과 같습니다.
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Logfile::Tail;
+
+    while (1) {
+        my $file=Logfile::Tail->new( "./test.log" );
+
+        # 로그 처리전 시간을 기억해둡니다.
+        my $start_time = time;
+        my $cnt = 0;
+        # 한줄씩 로그를 처리합니다. 파일의 끝에 도달하면 끝납니다.
+        while( defined(my $tmp = $file->getline) ) {
+            $cnt++;
+        }
+
+        $file->close();
+
+        # 로그처리에 걸린 시간을 계산합니다.
+        my $end_time = time;
+        my $duration = $end_time - $start_time;
+        print "duration: $duration ($cnt lines)\n";
+
+        # 10초 간격으로 처리하기 위해 기다릴 시간을 계산합니다.
+        my $sleep_delay = 10 - $duration;
+        if ( $sleep_delay > 0 ) {
+            sleep( $sleep_delay );
+        }
+        else {
+            print "processing time exceed: $sleep_delay\n"
+        }
+    }
+
+
+실행결과는 다음과 같습니다.
+
+    [test@cent5 ~]$ ./tail.pl 
+    duration: 0 (16887 lines)
+    duration: 0 (16903 lines)
+    duration: 0 (16916 lines)
+    ^C
+    [test@cent5 ~]$ sleep 10
+    [test@cent5 ~]$ ./tail.pl 
+    duration: 0 (33870 lines)
+    duration: 0 (16929 lines)
+    ...
+
+Ctrl+C를 누른 후 다시 실행시켰을 때 마지막 처리했던 곳에서부터 이어서 다시 처리를 한 것을 확인할 수 있습니다.
+
+
+
+정리하며
+---------
+
+로그를 실시간으로 처리하려면 꽤 복작하고 어려운 플랫폼을 필요로 할 수도 있지만 그냥 간단한 처리만을 원할때에는 Tail로 얻어진 정보를 시간단위로 처리해서 원하는 결과를 얻을 수도 있습니다. Logfile::Tail 모듈을 이용한다면 프로그램을 실행해놓지 않고 그냥 crontab에 등록해서 주기적으로 처리할 수도 있습니다. 별건 아니지만 누군가에겐 긴요하게 쓰였으면 좋겠다는 생각을 해봅니다.
+
+
+_EOT_
+
+[cpan-logfile-tail]: https://metacpan.org/module/Logfile::Tail
+
+[twitter-luzluna]:              https://twitter.com/luzluna
+[yes24-14061821]:                http://www.yes24.com/24/goods/14061821
