@@ -7,7 +7,7 @@ Author:   luzluna
 저자
 -----
 
-[@luzlunz][twitter-luzlunz] - C,Perl 엔지니어. 근래엔 Ops에 더 가까운 DevOps.
+[@luzlunz][twitter-luzluna] - C,Perl 엔지니어. 근래엔 Ops에 더 가까운 DevOps.
 [PostgreSQL 성능 최적화][yes24-14061821]의 공동 역자, luzluna _at_ gmail.com
 
 
