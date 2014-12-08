@@ -1,0 +1,294 @@
+Title:    사진의 GPS 정보 활용하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+스마트폰이 대중화 된 것도 벌써 6년이 다되가네요.
+스마트폰이 많은 것을 바꾸었지만 무엇보다도 사람들의 사진 찍는 방식을 크게 바꾸었습니다.
+예전에는 대부분이 디지털 카메라나 DSLR을 이용해서 사직을 찍었다면,
+지금은 간편히 주머니의 휴대폰을 꺼내서 찍는 것으로도 충분해졌달까요?
+그 전에는 디지털 카메라에 GPS를 내장해서 [Exif][wiki-exif]에 넣니마니,
+그런데 겨우 GPS 하나 넣었다고 카메라 가격이 말도 안되게 비싸지고,
+한국에는 구하기도 어렵고, 그랬던 적이 있었지만 이미 GPS를 내장하고 있는
+스마트폰이 나오고 난 뒤로는 이 모든 것이 그닥 의미가 없어져 버렸죠.
+어쨌든 덕분에 요즘 스마트폰으로 찍는 사진들은 특별히 설정을 끄지 않으면
+사진에 GPS 정보를 모두 저장하고 있어 이를 편리하게 이용할 수 있습니다.
+하지만 여전히 스마트폰으로 찍으면서도 아쉬운 부분이 있기에 DSLR이나
+미러리스 급의 카메라를 병행하면서 찍기도 하는데, 문제는 이렇게 병행해서
+찍다보면 어떤 사진에는 GPS 정보가 있지만 어떤 사진에는 GPS 정보가 없죠.
+그냥 없으면 없는대로 내버려두는 것도 나쁘지는 않지만,
+사진을 정리할때 휴대폰으로 찍은 사진을 참고해서 DSLR이나 미러리스로
+찍은 사진의 GPS 정보를 넣어주는 것은 나름 의미가 있을 것 같습니다.
+심지어 이것이 간단하다면 어떨까요? :)
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Image::ExifTool 모듈][cpan-image-exiftool]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Image::ExifTool
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Image::ExifTool
+
+
+스마트폰으로 찍은 사진의 GPS 정보를 추출하자!
+----------------------------------------------
+
+여러분의 스마트폰이 선사시대의 유물이거나,
+여러분이 보안에 민감해 일부러 GPS 태깅 설정을 끄지 않았다면
+스마트폰으로 찍은 사진은 이미 GPS 정보를 포함하고 있을 것입니다.
+사진에 저장하는 GPS 정보는 여러가지가 있는데,
+지금은 간단히 [위도][wiki-latitude]와 [경도][wiki-longitude]만 있으면 충분합니다.
+
+[Exif][wiki-exif]는 이미지나 소리 파일의 메타 데이터를 저장할 수 있는 표준 형식입니다.
+Exif 형식 중 위도와 경도를 의미하는 태그는 `GPSLatitude`와 `GPSLongitude`입니다.
+이제 사진에서 GPS 정보를 추출해보죠.
+
+먼저 필요한 모듈을 적재합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use v5.20;
+    
+    use strict;
+    use warnings;
+    
+    use Image::ExifTool;
+
+명령줄로 파일을 전달 받으면 편하겠죠?
+
+    #!perl
+    my $image = shift;
+    die "Usage: $0 <image file>\n" unless $image && -f $image;
+
+`ExtractInfo()` 메소드를 이용해 사진 파일에서 [Exif][wiki-exif] 정보를 불러옵니다.
+
+    #!perl
+    my $exif = Image::ExifTool->new;
+    $exif->ExtractInfo($image);
+
+`GetValue()` 메소드를 이용해 위도와 경도를 추출합니다.
+
+    #!perl
+    my $latitude      = $exif->GetValue( 'GPSLatitude',     'ValueConv' );
+    my $latitude_ref  = $exif->GetValue( 'GPSLatitudeRef',  'ValueConv' );
+    my $longitude     = $exif->GetValue( 'GPSLongitude',    'ValueConv' );
+    my $longitude_ref = $exif->GetValue( 'GPSLongitudeRef', 'ValueConv' );
+
+이제 남은 것은 출력입니다!
+
+    #!perl
+    if (
+        defined($latitude) && defined($latitude_ref)
+        && defined($longitude) && defined($longitude_ref)
+    )
+    {
+        say "$latitude $longitude";
+        say "$latitude_ref $longitude_ref";
+    }
+    else {
+        say "no GPS information";
+    }
+
+위도와 경도는 각각 `GPSLatitude`, `GPSLongitude`라고 했는데, 뜬금없이
+`GPSLatitudeRef` 값과 `GPSLongitudeRef` 값을 얻어온 이유는 무엇일까요?
+`GPSLatitudeRef`는 `N` 또는 `S` 값을 가지며 이는 북쪽 또는 남쪽을 의미합니다.
+`GPSLongitudeRef` 역시 마찬가지로 `E` 또는 `W` 값을 가지며 이는 동쪽 또는 서쪽을 의미합니다.
+즉 두 값은 각각 `GPSLatitude`와 `GPSLongitude` 값의 기준을 의미합니다.
+보통 북쪽과 동쪽을 기준으로 계산하므로 남쪽과 서쪽일 경우
+위도와 경도를 음수 값으로 표시해야겠죠.
+
+자, 이제 실행해볼까요?
+
+    #!bash
+    $ ./get-gps.pl '2014-09-13 09.35.46.jpg'
+    37.706501 127.391929611111
+    N E
+
+`2014-09-13 09.35.46.jpg` 사진의 경우 북쪽 기준 위도 `37.706501`,
+동쪽 기준 경도 `127.391929611111`에서 촬영한 사진임을 알 수 있습니다.
+`GPSLatitudeRef` 값과 `GPSLongitudeRef` 값을 반영한 위도와 경도를
+표시하도록 코드를 수정하면 다음과 같습니다.
+
+    #!perl
+    printf(
+        "%s%s %s%s\n",
+        ( $latitude_ref  eq 'S' ? q{-} : q{} ), $latitude,
+        ( $longitude_ref eq 'W' ? q{-} : q{} ), $longitude,
+    );
+
+이렇게 쉽게 값을 추출할 수 있다는 점도 놀랍긴 하지만, 사실 위도와
+경도만 보아서는 바로 어딘지 알 수 있는 사람은 없겠죠.
+구글 지도와 연동할 수 있게 바로 URL을 출력하면 어떨까요? :-)
+
+    #!perl
+    my $adj_latitude   = sprintf( '%s%s', ( $latitude_ref  eq 'S' ? q{-} : q{} ), $latitude  );
+    my $adj_longtitude = sprintf( '%s%s', ( $longitude_ref eq 'W' ? q{-} : q{} ), $longitude );
+    printf( "%s %s\n", $adj_latitude, $adj_longtitude );
+    printf(
+        "http://maps.google.com/maps?f=q&q=loc:%s,%s&t=k&spn=0.5,0.5&hl=ko\n",
+        $adj_latitude,
+        $adj_longtitude,
+    );
+
+최종 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./get-gps.pl '2014-09-13 09.35.46.jpg'
+    37.706501 127.391929611111
+    http://maps.google.com/maps?f=q&q=loc:37.706501,127.391929611111&t=k&spn=0.5,0.5&hl=ko
+
+*그림 1*은 출력한 구글 지도 URL로 접속한 화면입니다.
+
+![구글 지도][img-1-resize]
+*그림 1.* 구글 지도 ([원본][img-1])
+
+제법 그럴듯한데요? :)
+
+디지털 카메라로 찍은 사진에 GPS 정보를 주입하자!
+-------------------------------------------------
+
+여기까지 문제없이 따라왔다면 GPS 정보를 사진에 넣는 방법 역시 무척 간단합니다.
+우선 디지털 카메라로 찍은 사진에 GPS 정보가 있는지 없는지 조금 전에 만든
+스크립트를 이용해 확인해 보겠습니다.
+
+    #!bash
+    $ ./get-gps.pl 'IMGP09101.JPG'
+    no GPS information
+    $ 
+
+예상대로 [Exif][wiki-exif] 형식 중 GPS 정보는 빠져있음을 알 수 있습니다.
+여러분의 디지털 카메라에 GPS 칩이 들어있지 않은 이상 당연한 결과겠죠?
+사진 파일과 위도와 경도를 입력하면 Exif 형식으로 기입해주는 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use v5.20;
+    
+    use strict;
+    use warnings;
+    
+    use Image::ExifTool;
+    
+    my ( $image, $latitude, $longitude ) = @ARGV;
+    die "Usage: $0 <image file> <latitude> <longitude>\n"
+        unless
+            $image && -f $image
+            && defined($latitude)
+            && defined($longitude)
+            ;
+    
+    my $exif = Image::ExifTool->new;
+    
+    $exif->SetNewValue(
+        GPSLatitude => abs( $latitude ),
+        Type        => 'ValueConv',
+        Group       => 'GPS',
+    );
+    
+    $exif->SetNewValue(
+        GPSLatitudeRef => $latitude < 0 ? 'S' : 'N',
+        Type           => 'ValueConv',
+        Group          => 'GPS',
+    );
+    
+    $exif->SetNewValue(
+        GPSLongitude => abs( $longitude ),
+        Type         => 'ValueConv',
+        Group        => 'GPS',
+    );
+    
+    $exif->SetNewValue(
+        GPSLongitudeRef => $longitude < 0 ? 'W' : 'E',
+        Type            => 'ValueConv',
+        Group           => 'GPS',
+    );
+    
+    $exif->WriteInfo($image);
+
+이전과 달라진 부분은 크게 세 군데 입니다.
+
+- 명령줄 인자 처리
+- `SetNewValue()` 메소드를 이용한 값 설정
+- `WriteInfo()` 메소드를 이용한 파일에 쓰기
+
+크게 어려운 부분은 없죠?
+
+실행하려면 이미지 파일과 이미지 파일에 기입할 위도와 경도를 같이 입력합니다.
+이 사진은 앞에서 살펴본 스마트폰으로 촬영한 사진과 동일한 장소에서 촬영했으므로
+이전의 위도와 경도를 그대로 활용하겠습니다.
+
+    #!bash
+    $ ./set-gps.pl 'IMGP09101.JPG' 37.706501 127.391929611111
+    $ ./get-gps.pl 'IMGP09101.JPG'
+    37.706501 127.391929611111
+    http://maps.google.com/maps?f=q&q=loc:37.706501,127.391929611111&t=k&spn=0.5,0.5&hl=ko
+    $ 
+
+아! 작성한 코드는 기존 파일에 그대로 덮어쓰는 방식이므로
+항상 백업본으로 테스트해보시길 바랍니다.
+물론 `WriteInfo()` 메소드는 여러가지 옵션을 제공하니 
+[공식 문서][cpan-image-exiftool]를 참고해서 덮어쓰는 방법 이외의
+다른 방법도 있는지 살펴보세요.
+
+
+정리하며
+---------
+
+[CPAN의 Image::ExifTool 모듈][cpan-image-exiftool]은
+[Exif][wiki-exif]의 모든 것을 다루고 있다고 해도 과언이 아닙니다.
+심지어 펄을 사용하지 않는 사람들 조차도 사용하고 있는 모듈이니까요.
+더욱 자세한 사용법이나 다른 메타 태그를 알고 싶다면
+[공식 문서][cpan-image-exiftool]를 꼭 참고하세요.
+[Exif][wiki-exif] 정보를 활용하면 할 수 있는 재미있는 것들이 참 많습니다.
+GPS는 그 중 하나일 뿐이지만, 당장 여러분이 여행을 다녀온 후 [구글 지도][google-map]나
+[오픈스트리트맵][openstreetmap]과 연동해 여행의 궤적을 살펴보고 싶다면,
+오늘 살펴본 주제는 꽤 유용할 것입니다.
+설마 여러분이 여행을 다니면서 스마트폰으로만 사진을 찍진 않겠지요? :)
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+R.I.P. [@am0c][twitter-am0c]
+
+
+[img-1]:          2014-12-06-1.png
+
+[img-1-resize]:   2014-12-06-1_r.png
+
+[cpan-image-exiftool]:            https://metacpan.org/module/Image::ExifTool
+[cpan]:                           http://www.cpan.org/
+[google-map]:                     https://www.google.com/maps
+[home-perlbrew]:                  http://perlbrew.pl/
+[openstreetmap]:                  http://www.openstreetmap.org
+[twitter-am0c]:                   http://twitter.com/#!/am0c
+[twitter-keedi]:                  http://twitter.com/#!/keedi
+[wiki-exif]:                      http://en.wikipedia.org/wiki/Exchangeable_image_file_format
+[wiki-latitude]:                  http://ko.wikipedia.org/wiki/%EC%9C%84%EB%8F%84
+[wiki-longitude]:                 http://ko.wikipedia.org/wiki/%EA%B2%BD%EB%8F%84
+[yes24-4433208]:                  http://www.yes24.com/24/goods/4433208
