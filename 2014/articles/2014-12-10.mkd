@@ -1,0 +1,341 @@
+Title:    Ubic #1: 다양한 서비스 관리
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+다양한 서비스를 관리해야 할 경우 여러분은 어떤 도구를 사용하나요?
+보통 [daemontools][home-daemontools]나 [Supervisor][home-supervisor]를 떠올리겠죠?
+아! [restartd][home-restartd]나 [runit][home-runit], [s6][home-s6]도 빠뜨릴 순 없겠죠.
+하지만 여러분은 펄 프로그래머!
+조금이라도 더 몸에 밴, 익숙할 것 같은 느낌이 강하게 드는 도구가 필요하지 않나요? :)
+
+[Ubic][cpan-ubic]은 다양한 서비스를 관리할 수 있도록 도와주는 경량의 도구입니다.
+Ubic을 이용하면 어떠한 프로그램도 서비스로 구동할 수 있으며,
+`ubic`이라는 명령줄 도구를 이용해서 이를 제어할 수 있습니다.
+펄과 마찬가지로 매우 유연한 도구로 자신의 상황과 시스템의 상황에 맞게
+유연하게 설정할 수 있으며, 필요하다면 플러그인을 제작하는 것도 무척 쉽습니다.
+물론 특별히 무언가를 설정하거나 작성할 필요없이 기본으로 제공하는
+모듈만으로도 대부분의 경우 충분합니다.
+자, 지금부터 Ubic으로 다양한 서비스를 관리하는 방법을 살펴보죠!
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Ubic 모듈][cpan-ubic]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Ubic
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Ubic
+
+
+특징 및 장점
+-------------
+
+무엇보다 [Ubic][cpan-ubic]의 가장 큰 특징이자 강점은 다음과 같습니다.
+
+- 경량의 서비스 관리자
+- 의존성이 거의 없음
+- 루트 권한이 필요없음
+- 사용자 계정 별로 설치 및 설정 가능
+- 유닉스 계열의 시스템 관리자가 이해하기 쉬움
+- 손쉽게 확장이 가능
+
+사용하는 사람마다 다르겠지만 루트 권한 없이 사용자 계정 별로
+설치 및 설정해서 서비스를 관리할 수 있다는 유연한 점은 큰 장점입니다.
+
+
+기본 설정
+----------
+
+Ubic의 설치가 끝났다면 사용하기 위해 기본적인 설정을 해야합니다.
+명령줄에서 `ubic-admin setup` 명령을 실행합니다.
+
+    #!bash
+    $ ubic-admin setup
+    Ubic can be installed either in your home dir or into standard system paths (/etc, /var).
+    You need to be root to install it into system.
+    Would you like to configure as much as possible automatically? [Y/n]
+    Installing dirs...
+    Installing ubic.ping service...
+    Installing ubic.watchdog service...
+    Installing ubic.update service...
+    Installing cron jobs...
+    Installing /home/wote/.ubic.cfg...
+    Starting ubic.watchdog...
+    Starting ubic.watchdog... started (pid 11717)
+    Installation complete.
+    $
+
+무언가 복잡한 내용이 출력되면서 설치가 완료됩니다.
+`ubic-admin setup` 명령이 수행하는 과정은 다음과 같습니다.
+
+- 디렉터리 구성
+- `ubic.ping` 설치
+- `ubic.watchdog` 설치
+- `ubic.update` 설치
+- 크론 등록
+- 기본 설정 파일 생성
+
+
+디렉터리 구조
+--------------
+
+설치가 완료된 후 Ubic이 사용하는 디렉터리 구조는 다음과 같습니다.
+
+    #!bash
+    $ tree ~/ubic
+    /home/wote/ubic
+    ├── data
+    │   ├── lock
+    │   │   ├── ubic.ping
+    │   │   ├── ubic.update
+    │   │   └── ubic.watchdog
+    │   ├── simple-daemon
+    │   │   └── pid
+    │   │       └── ubic.watchdog
+    │   │           ├── lock
+    │   │           └── pid
+    │   ├── status
+    │   │   ├── ubic.watchdog
+    │   │   └── ubic.watchdog.lock
+    │   ├── tmp
+    │   ├── ubic-daemon
+    │   └── watchdog
+    │       ├── lock
+    │       │   ├── ubic.ping
+    │       │   ├── ubic.update
+    │       │   └── ubic.watchdog
+    │       └── status
+    ├── log
+    │   ├── watchdog.err.log
+    │   ├── watchdog.err.log.1
+    │   ├── watchdog.log
+    │   └── watchdog.log.1
+    └── service
+        └── ubic
+            ├── ping
+            ├── update
+            └── watchdog
+    
+    14 directories, 17 files
+    $
+
+`~/ubic/data` 디렉터리 하부는 Ubic이 내부적으로 동작하면서 필요한 자료를 저장하는 공간입니다.
+특별히 Ubic을 해킹할 것이 아니라면 따로 눈여겨 볼 필요는 없습니다.
+`~/ubic/log`는 기본으로 설치한 서비스가 사용하는 로그 디렉터리입니다.
+아마 여러분이 앞으로 구동할 서비스 역시 `~/ubic/log/*` 하부에 로그를 둔다면,
+추후 로그를 확인할 때마다 어느 디렉터리를 찾아헤매야 할지 고민이 줄어들겠죠.
+`~/ubic/service`는 구동할 서비스를 구동하기 위한 부분으로, 기본적으로 `ping`과
+`update`, `watchdog` 서비스가 자동으로 설치됩니다.
+앞으로는 여러분이 서비스하려는 명령에 대해 `~/ubic/service` 하부에
+일종의 래퍼 스크립트를 만들어서 서비스를 관리하는 것입니다.
+위치시키는 곳입니다.
+
+
+서비스 상태 관리
+-----------------
+
+기본으로 설치한 서비스가 무려(?) 세 가지나 되는데 눈으로 한번 확인해보죠.
+명령줄에서 `ubic status`를 입력하면 현재 Ubic에 등록한 서비스의 현황을 한번에 확인할 수 있습니다.
+
+    #!bash
+    $ ubic status
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 11717)
+    $
+
+호오. 직감적으로 `ubic`이라는 그룹 안에 `ubic.ping`과 `ubic.update`,
+`ubic.watchdog` 서비스가 있으며, 그 중 `ubic.watchdog`이 `11717`의
+프로세스 아이디를 가지고 구동되고 있고, 나머지 서비스는 꺼져있음을 알 수 있겠죠?
+과연 Ubic이 명색이 서비스 관리자인데 등록한 서비스의 사활을 잘 관리하는지 확인해볼까요?
+우선 잘 구동하고 있는 `ubic.watchdog` 서비스를 강제 종료시킵니다.
+
+    #!bash
+    $ ubic status
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 11717)
+    $ kill 11717
+    $ ubic status
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       not running
+    $
+
+`ubic.watchdog` 서비스가 동작하지 않음을 알 수 있습니다.
+다른 `ubic.ping`이나 `ubic.update`가 `off`라고 상태를 표시하는데 반해
+`ubic.watchdog`은 `not running`이라고 표시하는 점을 주목하세요.
+즉 `not running`은 서비스에 무언가 문제가 생겨서 현재 서비스가
+돌고 있지 않다는 것을 의미합니다.
+1여분 기다린 다음 다시 서비스 상태를 확인해보죠.
+
+    #!bash
+    $ ubic status
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 14993)
+
+`14993`의 프로세스 아이디로 다시 서비스가 구동되었음을 확인할 수 있습니다.
+제법이군요. :)
+
+
+크론
+-----
+
+눈치가 빠른 분이라면 설치 과정에 알아차리셨겠지만 Ubic은 크론을 기반으로 동작합니다.
+조금 구식의 방법처럼 보일 수는 있겠지만 생각해보면 무엇보다 확실하기도 하지요.
+Ubic이 어떤 식으로 크론을 활용하는지 살펴보기 위해 어떤 동작이
+크론에 등록되어 있는지 확인해보죠.
+
+    #!perl
+    $ crontab -l
+    * * * * * PERL5LIB="/home/wote/perl5/lib/perl5" /home/wote/perl5/bin/ubic-watchdog ubic.watchdog >>/home/wote/ubic/log/watchdog.log 2>>/home/wote/ubic/log/watchdog.err.log
+
+여러분이 사용하는 펄 환경에 따라 조금씩 다를 수는 있지만 크론에 등록되는
+내용은 `ubic-watchdog` 스크립트를 1분에 한 번씩 실행시키는 것입니다.
+물론 Ubic이 사용하는 크론은 이 한 줄이 전부이고 나머지는 Ubic이 알아서
+잘(?) 서비스 관리를 수행합니다.
+크론에 등록하는 것은 Ubic 입장에선 일종의 마지막 보험이라고 볼 수 있습니다.
+여러분이 크론을 수정하거나 더 추가해야 할 내용은 없으니 걱정하지 마세요. :)
+
+
+서비스 등록
+------------
+
+멀리 둘러왔습니다만, Ubic이 등록하고 설치하는 서비스가 무엇이든 간에
+결국 우리가 원하는 것은 우리만의 서비스를 등록해서 관리하는 것입니다.
+
+우선 간단히 10초마다 현재 시간을 `~/time.log` 파일에 출력하는 스크립트를
+만든 후 이것을 Ubic을 이용해서 서비스로 관리해보죠.
+`~/bin/time.pl`의 내용은 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    use Path::Tiny;
+    use Time::Piece;
+    
+    while (1) {
+        my $t = localtime;
+        path('~/time.log')->append("$t\n");
+        sleep 10;
+    }
+
+Ubic에 등록하기 위한 `~/ubic/service/time` 파일을 내용은 다음과 같습니다.
+
+    #!perl
+    use Ubic::Service::SimpleDaemon;
+    
+    Ubic::Service::SimpleDaemon->new(
+        bin => [ '/home/wote/bin/time.pl' ],
+    );
+
+서비스가 잘 등록되었는지 명령줄에서 확인해봅니다.
+
+    #!bash
+    $ ubic status
+    time    off
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 14993)
+
+`time`이라는 서비스가 등록되었으며 현재 구동하지 않은 상태임을 알 수 있습니다.
+
+
+서비스 관리
+------------
+
+여기까지 성공적으로 진행했다면 서비스 관리는 정말 쉽습니다.
+
+- `status`: 서비스의 현황 파악
+- `start`: 서비스 시작
+- `stop`: 서비스 중지
+- `restart`: 서비스 재시작
+
+직접 만들고 등록한 `time` 서비스를 기동하려면 명령줄에서 다음 명령을 입력하세요.
+
+    #!bash
+    $ ubic start time
+    $ ubic status
+    time    running (pid 16962)
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 14993)
+
+`time` 서비스를 중지하려면 명령줄에서 다음 명령을 입력하세요.
+
+    #!bash
+    $ ubic stop time
+    $ ubic status
+    time    off
+    ubic
+        ubic.ping   off
+        ubic.update off
+        ubic.watchdog       running (pid 14993)
+
+
+정리하며
+---------
+
+지금까지 [Ubic][cpan-ubic]을 설치 및 설정하는 방법 그리고 자신만의
+서비스를 등록하는 방법과 기초적인 관리 방법을 살펴보았습니다.
+생각보다 가볍고 간단한 시스템이기 때문에 설치나 설정이 어려운 편은 아닙니다.
+무엇보다 유닉스 시스템에 익숙한 프로그래머나 시스템 관리자라면
+굉장히 빠르게 적응할 수 있는 것이 큰 장점입니다.
+Ubic 시리즈 중 첫 번째 편으로 간단한 내용이면서 초급자 분이시라면
+별 문제 없었겠지만, 오히려 초급 딱지를 막 땐 펄 중급자들이라면
+여지없이 빠질만한 함정이 곳곳에 있는데, 눈치 채셨는지 모르겠네요. :)
+
+다음 편 부터는 본격적으로 Ubic을 활용하는 방법과, 중급자 이상이
+쉽게 빠져서 헤어나오지 못하는 함정을 탈출하는 방법을 집중적으로
+살펴보겠습니다.
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+R.I.P. [@am0c][twitter-am0c]
+
+
+[cpan-ubic]:                      https://metacpan.org/module/Ubic
+[cpan]:                           http://www.cpan.org/
+[home-daemontools]:               http://cr.yp.to/daemontools.html
+[home-perlbrew]:                  http://perlbrew.pl/
+[home-restartd]:                  https://github.com/ajraymond/restartd
+[home-runit]:                     http://smarden.org/runit/
+[home-s6]:                        http://www.skarnet.org/software/s6/
+[home-supervisor]:                http://supervisord.org/
+[twitter-am0c]:                   http://twitter.com/#!/am0c
+[twitter-keedi]:                  http://twitter.com/#!/keedi
+[yes24-4433208]:                  http://www.yes24.com/24/goods/4433208
