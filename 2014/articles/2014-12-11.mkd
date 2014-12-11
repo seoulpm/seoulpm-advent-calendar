@@ -50,8 +50,8 @@ Author:   h00ray
 더 자세한 내용이 궁금하다면 [ROP(Return Oriented Programming) Exploit][home-teamcrak-rop] 문서를 참고하세요.
 
 
-공격 대상
-----------
+공격!!
+-------
 
 지금부터 메모리 보호기법을 적용하지않은 (고대의?) 리눅스 커널을 대상으로 간단한 해킹을 해보죠.
 
