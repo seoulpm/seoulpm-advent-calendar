@@ -5,7 +5,10 @@ Category: Seoul.pm
 Author:   h00ray
 
 저자
-@h00ray - 시험기간에 공부 안하고 프로그래밍 하는 잉여잉여한 학생
+-----
+
+@h00ray - 시험기간에 공부 안하고 프로그래밍 하는 잉여잉여한 학생, javaapi86 _at_ gmail.com
+
 
 시작하며
 --------
