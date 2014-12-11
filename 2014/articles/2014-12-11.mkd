@@ -1,3 +1,9 @@
+Title:    익스플로잇과 펄
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   h00ray
+
 저자
 @h00ray - 시험기간에 공부 안하고 프로그래밍 하는 잉여잉여한 학생
 
