@@ -20,29 +20,38 @@ Author:   h00ray
 메모리 버그의 일종인 [버퍼 오버플로우(BOF, Buffer Overflow)][wiki-bof]를
 이용한 해킹 기법을 살펴보겠습니다.
 
-예제
 
-우선 공격할 리눅스 정보입니다.
+배경 지식
+----------
 
-$uname -a
-Linux localhost.localdomain 2.2.14-5.0 #1 Tue Mar 7 21:07:39 EST 2000 i686 unknown
+우선 공격할 리눅스 정보를 살펴볼까요?
 
-버전이 매우 낮다는걸 알수있는데 사실 일부로 낮은 버전을 선택했습니다.
-현재 최신 리눅스 커널은 해커들의 공격을 막기위해 많은 보호기법을 도입하고있는데 
-그 예로는 
-공격프로그램(exploit)이 스택이나 힙에서 실행되지 않도록하는 Nx-bit
-메모리상의 공격을 방어하기위해 스택 주소를 랜덤하게 바꾸는 ASLR
-상위주소를 \x00 값으로시작하게하는 즉 NULL처리를 시켜서 공격이 불가능하도록 하는 Ascii-armor
-buffer와 return address에 사이의 임의의 값이 변하면 프로그램을 종료시켜버리는 Canary
-Canary에 대해 더 설명을 하자면 해킹에 성공하기위해서는 eip를 제어해야하는데 eip를 제어할려면 return address를 덮어 씌어야합니다.
-하지만 canary라는 보호기법이 return address를 모니터링하면서 값이 변하면 프로그램을 종료시켜 버리기때문에 한번에 공격할수있는 확률이 줄어들고 난이도도 올라가게됩니다.
- 
+    #!bash
+    $uname -a
+    Linux localhost.localdomain 2.2.14-5.0 #1 Tue Mar 7 21:07:39 EST 2000 i686 unknown
 
-이처럼 다양한 보호기법이 적용되면서 공격이 힘들지만 우회하는 방법이있습니다.
-ROP(Return Oriented Programming)라는 공격기법입니다. 
-이런 무지막지한 보호기법을 우회하려다 보니 매우 복잡하고 어렵다보니 이 달력에서는 설명하지않겠습니다.
-rop에 관한 자세한 내용은 아래 링크를 참조해주세요.
-http://teamcrak.tistory.com/332
+후아! 고대의 유물과 같은 버전이군요.
+커널의 버전이 매우 낮다는 것을 알 수 있는데 사실 일부로 낮은 버전을 선택했습니다.
+현재 최신의 리눅스 커널은 해커들의 공격을 막기위해 많은 보호 기법을 도입하고 있습니다.
+
+이러한 보호 기법으로는
+공격프로그램(exploit)이 스택이나 힙에서 실행되지 않도록 하는 [NX-bit][wiki-nx-bit],
+메모리상의 공격을 방어하기위해 스택 주소를 무작위로 바꾸는 [ASLR][wiki-aslr],
+상위주소를 `\x00` 값으로시작하게하는 즉 NULL처리를 시켜서 공격이 불가능하도록 하는 [ASCII armor][wiki-binary-to-text-encoding]
+버퍼와 반환 주소 사이의 임의의 값이 변하면 프로그램을 종료시켜버리는 [canary][wiki-canary] 등이 있습니다.
+[canary][wiki-canary]의 경우 해킹에 성공하려면 `eip`를 제어해야하는데,
+이를 위해 반환 주소를 덮어써야 합니다.
+하지만 canary 보호 기법이 반환 주소를 모니터링하면서, 값이 변하면 프로그램을 종료시켜 버리므로
+한번에 공격할수있는 확률이 줄어들어 공격 난이도가 올라갑니다.
+
+이처럼 다양한 보호기법이 적용되면서 예전의 방법으로 공격하기는 힘들지만,
+[ROP(Return-oriented Programming)][wiki-rop]와 같은 공격 기법등 여전히 우회하는 방법은 있습니다.
+이런 무지막지한 보호 기법을 우회하려는 방법인 만큼 매우 복잡하겠죠?
+더 자세한 내용이 궁금하다면 [ROP(Return Oriented Programming) Exploit][home-teamcrak-rop] 문서를 참고하세요.
+
+
+공격 대상
+----------
 
 그럼 지금부터 메모리 보호기법이 적용되어있지않은 리눅스 커널을 대상으로 간단한 해킹을 해보도록 하겠습니다.
 
@@ -137,6 +146,12 @@ bash$
 아 그리고 읽어주셔서 감사합니다!!
 
 
-[wiki-bof]:             http://en.wikipedia.org/wiki/Buffer_overflow
-[wiki-heartbleed]:      http://en.wikipedia.org/wiki/Heartbleed
-[wiki-shellshock]:      http://en.wikipedia.org/wiki/Shellshock_%28software_bug%29
+[home-teamcrak-rop]:                http://teamcrak.tistory.com/332
+[wiki-aslr]:                        http://en.wikipedia.org/wiki/Address_space_layout_randomization
+[wiki-binary-to-text-encoding]:     http://en.wikipedia.org/wiki/Binary-to-text_encoding
+[wiki-bof]:                         http://en.wikipedia.org/wiki/Buffer_overflow
+[wiki-canary]:                      http://en.wikipedia.org/wiki/Buffer_overflow_protection#Canaries
+[wiki-heartbleed]:                  http://en.wikipedia.org/wiki/Heartbleed
+[wiki-nx-bit]:                      http://en.wikipedia.org/wiki/NX_bit
+[wiki-rop]:                         http://en.wikipedia.org/wiki/Return-oriented_programming
+[wiki-shellshock]:                  http://en.wikipedia.org/wiki/Shellshock_%28software_bug%29
