@@ -164,7 +164,7 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다.
 아무 것도 화면에 보이지는 않습니다만, `ps`로 확인해보면 잘 실행되고 있음을 알 수 있습니다.
 
     #!bash
-    test@ubuntu:~/src/MyDancer$ ps axf
+    $ ps axf
     ...
     10251 ?        S      0:00 /home/test/uwsgi-perl --psgi /home/test/src/MyDance
     10252 ?        S      0:00  \_ /home/test/uwsgi-perl --psgi /home/test/src/MyD
@@ -182,7 +182,7 @@ Ubuntu 패키지로도 있지만, 패키지 설치시 perlbrew 환경도 지원�
 아마도 시스템 기본 펄에만 연동되겠지요.
 
     #!bash
-    test@ubuntu:~/src/MyDancer$ apt-cache show uwsgi-plugin-psgi
+    $ apt-cache show uwsgi-plugin-psgi
     Package: uwsgi-plugin-psgi
     Priority: extra
     Section: universe/web
@@ -207,7 +207,7 @@ Nginx에서 처리하는 것이 아닌 uWSGI로 요청을 넘겨줍니다.
 Nginx를 설치하는 명령은 다음과 같습니다.
 
     #!bash
-    test@ubuntu:~$ sudo apt-get install nginx
+    $ sudo apt-get install nginx
 
 `/etc/nginx/sites-enabled/default` 설정을 수정합니다.
 
@@ -249,9 +249,9 @@ Nginx를 설치하는 명령은 다음과 같습니다.
 Nginx를 재기동합니다.
 
     #!bash
-    test@ubuntu:~$ sudo /etc/init.d/nginx reload
+    $ sudo /etc/init.d/nginx reload
      * Reloading nginx configuration nginx                                   [ OK ]
-    test@ubuntu:~$
+    $
 
 이제 웹브라우저로 접속해보시면 잘 되는것을 확인하실 수 있습니다.
 아마 2012년 기사의 웹 앱을 작성하는 것이 번거로워 Dancer 기본 App을
