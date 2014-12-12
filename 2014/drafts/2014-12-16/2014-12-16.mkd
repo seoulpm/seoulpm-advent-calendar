@@ -8,46 +8,58 @@ Author:   JellyPo
 저자
 -----
 
-[@JellyPooo][twitter-JellyPooo] - 짤방 수집가.
+[@JellyPooo][twitter-jellypooo] - 짤방 수집가.
 
 
 시작하며
 ---------
-2012년 펄 워크샵 때 [@yuni_kim][twitter-yuni_kim] 님이 발표하신 [Perl을 위한 Web App 실행 환경 꾸미기][kpw2012_uwsgi] 을 [Ubuntu][ubuntu] 14.04에서 직접 적용한 내용입니다.
+
+2012년 펄 워크샵 때 [@yuni_kim][twitter-yuni_kim]님이 발표한
+[Perl을 위한 Web App 실행 환경 꾸미기][kpw2012_uwsgi]를 [Ubuntu][ubuntu]
+14.04에 직접 적용한 내용입니다.
+
 
 준비물
------
+-------
+
+필요한 준비물은 다음과 같습니다.
+
  - Ubuntu 14.04
  - perlbrew 환경
  - Nginx 패키지 설치
  - uWSGI 컴파일 설치
 
+
 HTTP 서버랑 웹 앱 서버랑 왜 분리하죠?
--------------------------------------
-정적 웹 페이지(Static web page)와 Dynamic web page 가 있다고 가정합시다(정확한 용어인지 자신이 없네요.).
+--------------------------------------
 
-정적/동적의 기준은 사용자가 웹 브라우저에서 볼 때가 아니라, 서버에서 제공하는 파일의 상태를 뜻합니다.
+정적 웹 페이지와 동적 웹 페이지가 있다고 가정해보죠.
+정/동적의 기준은 사용자가 웹 브라우저에서 볼 때가 아니라, 서버에서 제공하는 파일의 상태를 뜻합니다.
+보통 GIF, JPG, PNG 등의 파일은 서버 관리자(개발자)가 변경하지 않는 한 바뀐 부분이 없습니다.
+하지만 게시판 내용 및 검색 페이지등의 내용은 항상 변하죠.
+사용자가 요청하면, 서버에서 DB를 검색해서 결과를 받아오고,
+그것을 다시 HTML 태그를 씌워서 사용자에게 보내줘야 합니다.
 
-GIF, JPG, PNG 등의 파일은 서버 관리자(개발자)가 변경하지 않는 한 변경점이 없습니다.
-
-하지만 게시판 내용, 검색 페이지 등은 고정된 내용이 없죠. 사용자가 요청하면 - 서버에서 DB를 검색해서 결과를 받아오고 - 그걸 다시 HTML 태그를 씌워서 사용자에게 보내줘야 하죠.
-
-단순 파일 전송을 하는데 웹 앱 서버를 쓰는 것은 좀 아깝다 싶어 따로 분리하는게 아닌가 싶네요. Nginx가 단순 파일 전송에 강점이 있다고 하니...
-
-따로 벤치마크 등을 하진 않았습니다. 좋다고 하니까 그냥 uwsgi랑 Nginx를 써본거라 ...저는 이 설정을 잘못 해서 웹 데몬과 웹 앱 양쪽에서 파일 전송을 하고 있었습니다........ 아....
+단순 파일 전송을 하는데 웹 앱 서버를 쓰는 것은 좀 아깝다싶어 따로 분리하는게 아닐까 싶습니다.
+Nginx가 단순 파일 전송에 강점이 있다고도 하구요.
+따로 벤치마크 등을 하진 않았습니다.
+좋다고 하니까 그냥 uwsgi랑 Nginx를 써본거라...
+저는 이 설정을 잘못 해서 웹 데몬과 웹 앱 양쪽에서 파일 전송을 하고 있었습니다. 아...
 
 
-perl 설치
----------
+펄 설치
+--------
 
 미리 필요한 패키지들을 설치해둡니다.
 
-    test@ubuntu:~$ sudo apt-get install zip
-    test@ubuntu:~$ sudo apt-get install build-essential
+    #!bash
+    $ sudo apt-get install zip
+    $ sudo apt-get install build-essential
 
 일단 perlbrew를 설치합니다.
 
-    test@ubuntu:~$ curl -kL http://install.perlbrew.pl | bash
+    #!bash
+    $ curl -kL http://install.perlbrew.pl | bash
     ...
     Happy brewing!
     
@@ -55,68 +67,77 @@ perl 설치
     
     ## Done.
 
-일단 설치는 잘 끝났습니다. bash 환경설정을 하고..
+설치가 잘 끝나면 Bash 쉘 환경 설정을 해줍니다.
 
-    test@ubuntu:~$ echo 'source ~/perl5/perlbrew/etc/bashrc' >> .bash_profile
-    test@ubuntu:~$ source .bash_profile
+    #!bash
+    $ echo 'source ~/perl5/perlbrew/etc/bashrc' >> .bash_profile
+    $ source .bash_profile
 
-이제 최신 stable버전의 perl을 설치합니다.
+이제 최신 안정 버전의 펄을 설치합니다.
+지금 최신 안정 버전은 5.20.1이네요.
 
-    test@ubuntu:~$ perlbrew install stable
+    #!bash
+    $ perlbrew install stable
     Fetching perl 5.20.1 as /home/test/perl5/perlbrew/dists/perl-5.20.1.tar.bz2
     ...
     perl-5.20.1 is successfully installed.
     
-성공... 그 다음엔 cpanm을 설치합니다.
+이제는 `cpanm`을 설치합니다.
 
-    test@ubuntu:~$ perlbrew install-cpanm
+    #!bash
+    $ perlbrew install-cpanm
      
     cpanm is installed to
      
         /home/test/perl5/perlbrew/bin/cpanm
 
-굿~~ 이제 설치된 펄을 사용합니다. 지금 최신 안정 버전은 5.20.1이네요.
+다음은 설치한 펄을 사용하도록 설정합니다.
 
-    test@ubuntu:~$ perlbrew list
+    #!bash
+    $ perlbrew list
       perl-5.20.1
-    test@ubuntu:~$ perlbrew switch perl-5.20.1
+    $ perlbrew switch perl-5.20.1
 
 
 uWSGI 설치
-----------
+-----------
+
 이제 uWSGI를 설치합니다.
 
-    bilbo@ubuntu:~$ curl http://uwsgi.it/install | bash -s psgi ~/uwsgi-perl
+    #!bash
+    $ curl http://uwsgi.it/install | bash -s psgi ~/uwsgi-perl
     ...
     ############## end of uWSGI configuration #############
     total build time: 10 seconds
     *** uWSGI is ready, launch it with /home/test/uwsgi-perl ***
 
-홈디렉토리 아래에 uwsgi-perl 이라는 이름으로 잘 설치되었습니다.
+홈디렉토리 아래에 `uwsgi-perl`이라는 이름으로 잘 설치되었습니다.
+
 
 uWSGI 실행
----------
+-----------
 
-[2012년도 크리스마스 캘린더에서 작성했던 서비스][perl-advent-kr-20121204]를 uWSGI로 운영하도록 해보겠습니다.
+[2012년도 크리스마스 캘린더에서 작성했던 서비스][advent-2012-12-04]를 uWSGI로 운영해보죠.
+굳이 예전 기사의 웹 앱을 따라하는 것이 귀찮다면 직접 샘플 펄 Dancer 웹 앱을 만들어도 상관없습니다.
 
-2012년으로 돌아가기가 귀찮으신 분은 잠시 다음의 내용을 따라서 실행하시멘 샘플 Perl Dancer App을 만드실 수 있습니다.
-
-    test@ubuntu:~/$ cpanm YAML
-    test@ubuntu:~/$ cpanm Dancer
+    #!bash
+    $ cpanm YAML
+    $ cpanm Dancer
     ...
-    test@ubuntu:~/$ cd src
-    test@ubuntu:~/src$ dancer -a MyDancer
-    test@ubuntu:~/src$ mkdir MyDancer/logs
+    $ cd src
+    $ dancer -a MyDancer
+    $ mkdir MyDancer/logs
+
+실행 스크립트를 살펴보겠습니다.
+[nginx & uwsgi(psgi) & perlbrew & mojolicious][mojo-nginx-uwsgi-perlbrew-mojo]를
+수정해 uWSGI를 실행하는 스크립트를 간단히 만들어 보았습니다.
+Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다.
+이 편이 성능이 좀 더 낫다고 합니다.
+물론 이 경우는 웹 데몬과 웹 앱 서버가 같은 곳에 있을 때이고, TCP 소켓을 써야할 수도 있습니다.
 
 
-
-일단 실행 스크립트를 보도록 하겠습니다.
-[nginx & uwsgi(psgi) & perlbrew & mojolicious][ref01]를 수정해서 uWSGI를 실행하는 스크립트를 간단히 만들어 보았습니다.
-
-Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성능이 좀 더 낫다고 합니다. 물론 이 경우는 웹 데몬과 웹 앱 서버가 같은 곳에 있을 때이고, TCP 소켓을 써야할 수도 있습니다.
-
-
-    test@ubuntu:~/src/MyDancer$ cat app.start
+    #!bash
+    $ cat app.start
     #!/bin/bash
     # $ mojo generate app Service1
     SERVICE_ROOT=/home/test/src/MyDancer
@@ -134,13 +155,15 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성�
 
     ~/uwsgi-perl --psgi $SERVICE_SCRIPT --enable-threads --processes=8 --master  --daemonize=$LOG --pidfile=$PID_FILE --uwsgi-socket=$SOCK.$NUM_SOCK
 
+드디어 실행입니다!
 
-그리고 실행을 해보겠습니다.
+    #!bash
+    $ ./app.start
+    $
 
-    bilbo@ubuntu:~/src$ ./app.start
+아무 것도 화면에 보이지는 않습니다만, `ps`로 확인해보면 잘 실행되고 있음을 알 수 있습니다.
 
-뭐 아무것도 떨어지는게 없습니다만.. ps로 확인해보시면 잘 실행된것을 보실 수 있습니다.
-
+    #!bash
     test@ubuntu:~/src/MyDancer$ ps axf
     ...
     10251 ?        S      0:00 /home/test/uwsgi-perl --psgi /home/test/src/MyDance
@@ -153,10 +176,12 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성�
     10258 ?        S      0:00  \_ /home/test/uwsgi-perl --psgi /home/test/src/MyD
     10259 ?        S      0:00  \_ /home/test/uwsgi-perl --psgi /home/test/src/MyD
 
+설정의 uwsgi 실행 파일 위치를 보면 알겠지만,
+위에서 직접 컴파일한 바이너리로 실행하는 중입니다.
+Ubuntu 패키지로도 있지만, 패키지 설치시 perlbrew 환경도 지원하는지는 확인해보지 않아서 모르겠습니다.
+아마도 시스템 기본 펄에만 연동되겠지요.
 
-
-설정의 uwsgi 실행파일 위치를 보시면 알겠지만 위에서 직접 컴파일한 바이너리로 실행하는 중입니다. Ubuntu 패키지로도 있습니다...만 패키지 설치시 perlbrew 환경도 지원 되는지 모르겠네요. 아마도 시스템에 설치된 펄에만 연동되겠지요...
-
+    #!bash
     test@ubuntu:~/src/MyDancer$ apt-cache show uwsgi-plugin-psgi
     Package: uwsgi-plugin-psgi
     Priority: extra
@@ -172,137 +197,108 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성�
 
 
 Nginx 설정
----------
-Nginx 설정파일 /etc/nginx/sites-enabled/deafult 파일 server 블럭 안에 아래 내용을 추가 합니다. 아래와 같이 설정할 경우 http://myhost/jjal 에 접속시 Nginx에서 처리하는 것이 아닌 uWSGI로 요청을 넘겨주게 됩니다.
+-----------
 
-nginx 설치
+Nginx 설정 파일 `/etc/nginx/sites-enabled/deafult` 파일의
+`server` 블럭 안에 아래 내용을 추가 합니다.
+아래와 같이 설정할 경우 `http://myhost/jjal`에 접속시
+Nginx에서 처리하는 것이 아닌 uWSGI로 요청을 넘겨줍니다.
 
+Nginx를 설치하는 명령은 다음과 같습니다.
+
+    #!bash
     test@ubuntu:~$ sudo apt-get install nginx
 
-설정 수정
+`/etc/nginx/sites-enabled/default` 설정을 수정합니다.
 
-    bilbo@ubuntu:~$ sudo vi /etc/nginx/sites-enabled/default
-
-
-	#!vim
-        location /jjal {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                #try_files $uri $uri/ /index.html;
-                # Uncomment to enable naxsi on this location
-                # include /etc/nginx/naxsi.rules
-                include uwsgi_params;
-                uwsgi_pass unix:/tmp/uwsgi.sock.1;
-                # uwsgi_pass 127.0.0.1:3000;
-                uwsgi_modifier1 5;
-                root /home/test/src/MyDancer/;
-        }
+    #!plain
+    location /jjal {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        #try_files $uri $uri/ /index.html;
+        # Uncomment to enable naxsi on this location
+        # include /etc/nginx/naxsi.rules
+        include uwsgi_params;
+        uwsgi_pass unix:/tmp/uwsgi.sock.1;
+        # uwsgi_pass 127.0.0.1:3000;
+        uwsgi_modifier1 5;
+        root /home/test/src/MyDancer/;
+    }
 
 
-include uwsgi_params 란 내용이 있는걸로 보아 uwsgi_params 파일을 만들어야겠네요. /etc/nginx/uwsgi_prams 에 아래 내용을 채워넣습니다
+`include uwsgi_params`란 내용이 있는 것으로 보아 `uwsgi_params` 파일을 만들어야겠네요.
+`/etc/nginx/uwsgi_prams`에 아래 내용을 채워넣습니다
 
-	#!vim
-	uwsgi_param     QUERY_STRING            $query_string;
-	uwsgi_param     REQUEST_METHOD          $request_method;
-	uwsgi_param     CONTENT_TYPE            $content_type;
-	uwsgi_param     CONTENT_LENGTH          $content_length;
-	
-	uwsgi_param     REQUEST_URI             $request_uri;
-	uwsgi_param     PATH_INFO               $document_uri;
-	uwsgi_param     DOCUMENT_ROOT           $document_root;
-	uwsgi_param     SERVER_PROTOCOL         $server_protocol;
-	uwsgi_param     UWSGI_SCHEME            $scheme;
-	
-	uwsgi_param     REMOTE_ADDR             $remote_addr;
-	uwsgi_param     REMOTE_PORT             $remote_port;
-	uwsgi_param     SERVER_PORT             $server_port;
-	uwsgi_param     SERVER_NAME             $server_name;
+    #!plain
+    uwsgi_param     QUERY_STRING            $query_string;
+    uwsgi_param     REQUEST_METHOD          $request_method;
+    uwsgi_param     CONTENT_TYPE            $content_type;
+    uwsgi_param     CONTENT_LENGTH          $content_length;
+    
+    uwsgi_param     REQUEST_URI             $request_uri;
+    uwsgi_param     PATH_INFO               $document_uri;
+    uwsgi_param     DOCUMENT_ROOT           $document_root;
+    uwsgi_param     SERVER_PROTOCOL         $server_protocol;
+    uwsgi_param     UWSGI_SCHEME            $scheme;
+    
+    uwsgi_param     REMOTE_ADDR             $remote_addr;
+    uwsgi_param     REMOTE_PORT             $remote_port;
+    uwsgi_param     SERVER_PORT             $server_port;
+    uwsgi_param     SERVER_NAME             $server_name;
 
+Nginx를 재기동합니다.
 
-nginx reload
-
+    #!bash
     test@ubuntu:~$ sudo /etc/init.d/nginx reload
      * Reloading nginx configuration nginx                                   [ OK ]
     test@ubuntu:~$
 
+이제 웹브라우저로 접속해보시면 잘 되는것을 확인하실 수 있습니다.
+아마 2012년 기사의 웹 앱을 작성하는 것이 번거로워 Dancer 기본 App을
+만드셨던 분들은 `Error 404 ... Powered by Dancer`라는 오류 메시지를
+볼텐데 그렇다면 성공한 것입니다!
 
-이제 웹브라우저로 접속해보시면 잘 되는것을 확인하실 수 있습니다. 아마 2012년으로 돌아가는게 귀찮아서 그냥 Dancer 기본 App만 만드셨던 분들은 Error 404 ... Powered by Dancer 라는 Dancer가 내보내는 에러메시지를 보시게 될텐데요. 그렇다면 성공한것 맞습니다!
 
 웹 앱에서 경로 설정은 어떻게 하나?
 ----------------------------------
-위의 설정대로 하게 되면 http://myhost/jjal 로 접속하게 되면 웹 앱이 응답을 하게 됩니다.
 
-그럼 웹 앱에서 경로 처리시 /jjal 경로는 / 가 되는걸까요?
+위의 설정대로 하게 되면 `http://myhost/jjal`로 접속하게 되면 웹 앱이 응답을 하게 됩니다.
+그럼 웹 앱에서 경로 처리시 `/jjal` 경로는 `/`가 되는걸까요?
+결론적으로 아닙니다. 웹 앱 내부에서 경로 처리도 `/jjal`로 해야 합니다.
 
-결론적으로 아닙니다. 웹 앱 내부에서 경로 처리도 /jjal 로 해야 합니다.
+제가 만든 이미지 뷰어는 `http://myhost/` 로 접속할 수 있도록 만들었지만,
+`jjal`로 경로를 바꾼 뒤 이미지 뷰어 소스에서 `/` 로 시작하던 경로를
+전부 `/jjal`로 시작하도록 수정해야 했습니다.
 
-제가 만든 짤방 뷰어는 처음에 http://myhost/ 로 접속하면 볼 수 있도록 만들었는데, jjal로 경로를 바꾼 뒤 짤방 뷰어 소스에서 / 로 시작하던 경로를 전부 /jjal 로 시작하도록 수정해야 했습니다.
+    #!perl
+    get '/jjal/' => sub {
+        template 'index';
+    };
+    
+    get '/jjal/:site/?' => require_login sub {
+        ...
+    };
 
-	#!perl
-	get '/jjal/' => sub {
-	#get '/' => require_login sub {
-	    template 'index';
-	};
-	
-	get '/jjal/:site/?' => require_login sub {
-	...
-	};
+또한 [로그인 처리를 위한 환경 설정][jellypoo-auth-extensible]도 바꿨었네요.
+Nginx 설정파일에서 `/jjal` 경로를 다른 곳으로 바꾸면,
+웹 앱 소스는 물론 웹 앱 환경설정까지 수정해야 함에 주의하세요.
 
-또한 [perl Auth::Extensible 기본 경로 변경 시 로그인 경로 설정][ref02] 로그인 처리를 위한 환경 설정도 바꿨었네요.
-
-Nginx 설정파일에서 /jjal 경로를 다른 곳으로 바꾸게 되면 웹 앱 소스는 물론 웹 앱 환경설정까지 수정해야 함에 주의하세요.
 
 정리하며
 ---------
-여기까지 읽어보셨다면 아시겠지만, 이 글을 쓴 JellyPooo는 '좋다'는 성능을 찾아 헤매지만 그 검증 과정(벤치마크)은 제대로 거치지 않고 그저 좋다던 뭔가의 신기술을 적용했다는 것에 만족을 느끼고 마는 사람입니다. 그래서 이 기사가 얼마나 도움이 될지 좀 의문이 있네요...
 
-뱀발 - crontab 실행 시 bash 환경설정 적용
-----------------------------------------
-이대로 기사를 송고하려니 내용이 너무 적은 것 같아 다른 팁을 추가합니다.
-
-[매일매일 네이버 카페 출석 체크하기!][ref03] 스크립트를 crontab -e 에 추가해 실행하려 했더니, 직접 실행 할 때는 잘 동작하던 스크립트가 cron에서 실행할 때는 정상 동작 하지 않는 것을 확인했습니다.
-
-네이버 아이디와 패스워드를 .bash_passwd 란 파일을 따로 만들어 넣어두고, 거기서 읽어들이도록 수정한 이후부터 안 되더군요. 이전까지는 실행 파일에 아이디와 패스워드가 적혀 있었습니다.
-
-	#!perl
-	$res = $mech->submit_form(
-	    form_name => 'frmNIDLogin',
-	    fields    => {
-	        id => "$ENV{NAVER_ID}",
-	        pw => "$ENV{NAVER_PW}",
-	    },
-	);
-	
-위 소스에서 id와 pw를 $ENV에서 불러들이는 것을 확인하실 수 있습니다.
-
-안되는 이유는, cron에서 실행 시 사용자 환경을 완전히 무시하고 없는 것으로 한다고 합니다([참조][ref04]). 전 그걸 모르고 아래와 같은 방법들을 썼거든요
-
-	#!bash
-	* */2 * * * source /home/user/.bash_profile; <command>
-
-	#!bash
-	* */2 * * * bash -c "<command>"
-
-	#!bash
-	* */2 * * * sudo -i jellypo "<command>"
-
-전 그냥 쉘 스크립트([perlbrew-cron][ref04])로 실행하고, 그 쉘 스크립트에서 .bash_passwd 파일을 읽어들이(source .bash_passwd)는 방법으로 해결했습니다.
-
-	#!bash
-	01 */2 * * * /home/jellypo/bin/cron-perlbrew.sh --with perl-5.20 /home/jellypo/web/strip/naver_cafe.pl
-
-여기서 설명한 환경설정 무시는 Ubuntu 만의 cron 동작일 수 있습니다.
-
-_EOT_
+여기까지 읽어보셨다면 아시겠지만, 글쓴이는 '좋다'는 성능을 찾아 헤매지만
+그 검증 과정(벤치마크)은 제대로 거치지 않고 그저 좋다던 뭔가의 신기술을
+적용했다는 것에 만족을 느끼고 마는 사람입니다.
+그래서 벤치마크는 여러분의 몫으로 남겨두도록 하죠. :)
 
 
-[twitter-JellyPooo]:                  http://twitter.com/#!/JellyPooo
-[twitter-yuni_kim]:                  http://twitter.com/#!/yuni_kim
-[kpw2012_uwsgi]:	https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p
-[ubuntu]:		http://www.ubuntu.com/
-[ref01]:		https://github.com/kraih/mojo/wiki/nginx-&-uwsgi%28psgi%29-&-perlbrew-&-mojolicious
-[ref02]:		http://mini.jellypo.pe.kr/wp/?p=613
-[ref03]:		http://advent.perl.kr/2010/2010-12-07.html
-[ref04]:		http://stackoverflow.com/questions/415403/whats-the-difference-between-bashrc-bash-profile-and-environment
-[ref05]:		https://github.com/agorman/perlbrew-cron
-[perl-advent-kr-20121204]:  http://advent.perl.kr/2012/2012-12-04.html
+[advent-2010-12-07]:              http://advent.perl.kr/2010/2010-12-07.html
+[advent-2012-12-04]:              http://advent.perl.kr/2012/2012-12-04.html
+[kpw2012_uwsgi]:                  https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p
+[mojo-nginx-uwsgi-perlbrew-mojo]: https://github.com/kraih/mojo/wiki/nginx-&-uwsgi%28psgi%29-&-perlbrew-&-mojolicious
+[jellypoo-auth-extensible]:       http://mini.jellypo.pe.kr/wp/?p=613
+[ref05]:                          https://github.com/agorman/perlbrew-cron
+[twitter-jellypooo]:              http://twitter.com/#!/JellyPooo
+[twitter-yuni_kim]:               http://twitter.com/#!/yuni_kim
+[ubuntu]:                         http://www.ubuntu.com/
