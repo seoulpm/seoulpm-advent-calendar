@@ -15,7 +15,7 @@ Author:   JellyPo
 ---------
 
 2012년 펄 워크샵 때 [@yuni_kim][twitter-yuni_kim]님이 발표한
-[Perl을 위한 Web App 실행 환경 꾸미기][kpw2012_uwsgi]를 [Ubuntu][ubuntu]
+[Perl을 위한 Web App 실행 환경 꾸미기][kpw-2012-uwsgi]를 [Ubuntu][ubuntu]
 14.04에 직접 적용한 내용입니다.
 
 
@@ -24,10 +24,10 @@ Author:   JellyPo
 
 필요한 준비물은 다음과 같습니다.
 
- - Ubuntu 14.04
- - perlbrew 환경
+ - [Ubuntu][ubuntu] 14.04
+ - [perlbrew][home-perlbrew] 환경
  - Nginx 패키지 설치
- - uWSGI 컴파일 설치
+ - [uWSGI][home-uwsgi] 컴파일 설치
 
 
 HTTP 서버랑 웹 앱 서버랑 왜 분리하죠?
@@ -43,7 +43,7 @@ HTTP 서버랑 웹 앱 서버랑 왜 분리하죠?
 단순 파일 전송을 하는데 웹 앱 서버를 쓰는 것은 좀 아깝다싶어 따로 분리하는게 아닐까 싶습니다.
 Nginx가 단순 파일 전송에 강점이 있다고도 하구요.
 따로 벤치마크 등을 하진 않았습니다.
-좋다고 하니까 그냥 uwsgi랑 Nginx를 써본거라...
+좋다고 하니까 그냥 [uWSGI][home-uwsgi]랑 Nginx를 써본거라...
 저는 이 설정을 잘못 해서 웹 데몬과 웹 앱 양쪽에서 파일 전송을 하고 있었습니다. 아...
 
 
@@ -56,7 +56,7 @@ Nginx가 단순 파일 전송에 강점이 있다고도 하구요.
     $ sudo apt-get install zip
     $ sudo apt-get install build-essential
 
-일단 perlbrew를 설치합니다.
+일단 [perlbrew][home-perlbrew]를 설치합니다.
 
     #!bash
     $ curl -kL http://install.perlbrew.pl | bash
@@ -176,7 +176,7 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다.
     10258 ?        S      0:00  \_ /home/test/uwsgi-perl --psgi /home/test/src/MyD
     10259 ?        S      0:00  \_ /home/test/uwsgi-perl --psgi /home/test/src/MyD
 
-설정의 uwsgi 실행 파일 위치를 보면 알겠지만,
+설정의 [uWSGI][home-uwsgi] 실행 파일 위치를 보면 알겠지만,
 위에서 직접 컴파일한 바이너리로 실행하는 중입니다.
 Ubuntu 패키지로도 있지만, 패키지 설치시 perlbrew 환경도 지원하는지는 확인해보지 않아서 모르겠습니다.
 아마도 시스템 기본 펄에만 연동되겠지요.
@@ -295,10 +295,11 @@ Nginx 설정파일에서 `/jjal` 경로를 다른 곳으로 바꾸면,
 
 [advent-2010-12-07]:              http://advent.perl.kr/2010/2010-12-07.html
 [advent-2012-12-04]:              http://advent.perl.kr/2012/2012-12-04.html
-[kpw2012_uwsgi]:                  https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p
-[mojo-nginx-uwsgi-perlbrew-mojo]: https://github.com/kraih/mojo/wiki/nginx-&-uwsgi%28psgi%29-&-perlbrew-&-mojolicious
+[home-perlbrew]:                  http://perlbrew.pl/
+[home-uwsgi]:                     https://uwsgi-docs.readthedocs.org/en/latest/
 [jellypoo-auth-extensible]:       http://mini.jellypo.pe.kr/wp/?p=613
-[ref05]:                          https://github.com/agorman/perlbrew-cron
+[kpw-2012-uwsgi]:                 https://docs.google.com/presentation/pub?id=116VQT--oCOLDKaGktjVJLhoejBv3_5cVvsIjjVCSkR0&start=false&loop=false&delayms=3000#slide=id.p
+[mojo-nginx-uwsgi-perlbrew-mojo]: https://github.com/kraih/mojo/wiki/nginx-&-uwsgi%28psgi%29-&-perlbrew-&-mojolicious
 [twitter-jellypooo]:              http://twitter.com/#!/JellyPooo
 [twitter-yuni_kim]:               http://twitter.com/#!/yuni_kim
 [ubuntu]:                         http://www.ubuntu.com/
