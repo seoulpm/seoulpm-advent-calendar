@@ -50,15 +50,15 @@ perl 설치
     test@ubuntu:~$ curl -kL http://install.perlbrew.pl | bash
     ...
     Happy brewing!
-     
+    
     ## Installing patchperl
-     
+    
     ## Done.
 
 일단 설치는 잘 끝났습니다. bash 환경설정을 하고..
 
     test@ubuntu:~$ echo 'source ~/perl5/perlbrew/etc/bashrc' >> .bash_profile
-    test@ubuntu:~$ source .bash_profile 
+    test@ubuntu:~$ source .bash_profile
 
 이제 최신 stable버전의 perl을 설치합니다.
 
@@ -116,7 +116,7 @@ uWSGI 실행
 Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성능이 좀 더 낫다고 합니다. 물론 이 경우는 웹 데몬과 웹 앱 서버가 같은 곳에 있을 때이고, TCP 소켓을 써야할 수도 있습니다.
 
 
-    test@ubuntu:~/src/MyDancer$ cat app.start 
+    test@ubuntu:~/src/MyDancer$ cat app.start
     #!/bin/bash
     # $ mojo generate app Service1
     SERVICE_ROOT=/home/test/src/MyDancer
@@ -137,7 +137,7 @@ Nginx와 uWSGI간 통신은 UNIX Socket 으로 하게 합니다. 이 편이 성�
 
 그리고 실행을 해보겠습니다.
 
-    bilbo@ubuntu:~/src$ ./app.start 
+    bilbo@ubuntu:~/src$ ./app.start
 
 뭐 아무것도 떨어지는게 없습니다만.. ps로 확인해보시면 잘 실행된것을 보실 수 있습니다.
 
@@ -181,7 +181,7 @@ nginx 설치
 
 설정 수정
 
-    bilbo@ubuntu:~$ sudo vi /etc/nginx/sites-enabled/default 
+    bilbo@ubuntu:~$ sudo vi /etc/nginx/sites-enabled/default
 
 
 	#!vim
@@ -222,8 +222,8 @@ include uwsgi_params 란 내용이 있는걸로 보아 uwsgi_params 파일을 �
 nginx reload
 
     test@ubuntu:~$ sudo /etc/init.d/nginx reload
-     * Reloading nginx configuration nginx                                   [ OK ] 
-    test@ubuntu:~$ 
+     * Reloading nginx configuration nginx                                   [ OK ]
+    test@ubuntu:~$
 
 
 이제 웹브라우저로 접속해보시면 잘 되는것을 확인하실 수 있습니다. 아마 2012년으로 돌아가는게 귀찮아서 그냥 Dancer 기본 App만 만드셨던 분들은 Error 404 ... Powered by Dancer 라는 Dancer가 내보내는 에러메시지를 보시게 될텐데요. 그렇다면 성공한것 맞습니다!
