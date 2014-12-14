@@ -28,7 +28,9 @@ aero라는 닉을 사용하기도 한다.
  tail -f access.log | sed 's/^\(.*Opera.*\)$/\x1b[31m\1\x1b[0m/'
  tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/'
 ```
-1.png
+
+![XXX][img-1-resize]
+*그림 1.* XXX ([원본][img-1])
 
 sed를 먼저 설명하자면 s/매칭할정규식/교체할문자열/ 패턴으로 Opera가 들어간 줄의 처음부터 끝까지 정규식으로 그룹 캡쳐해서 교체할문자열 부분에서 캡쳐한 것을 나타내는 \1 앞과 뒤에 ANSI칼라코드를 나타내는 문자를 넣어 색깔을 넣고 있습니다. \x1b는 ANSI칼라코드를 적용하기 위한 이스케이프문자이고 [31m, [0m 이 어떤 동작을 할지 나타내는 코드입니다(각 칼라코드는 http://misc.flogisoft.com/bash/tip_colors_and_formatting 를 참고). [31m은 빨간색으로 바꾸라는 것이고 [0m은 다시 원상태로 돌리라는 뜻입니다. 그리고 perl도 \x1b가 \e로 바뀌고 정규식을 매칭한 부분이 $&특수변수로 바뀐것 빼고는 비슷합니다. 물론 Perl은 sed보다 정규식에서 더 강력해서 복잡한 패턴을 찾아야 할 경우에 더 유용합니다.
 
@@ -39,7 +41,8 @@ tail -f access.log | sed 's/\(Opera\)/\x1b[31m\1\x1b[0m/'
 tail -f access.log | perl -pe 's/Opera/\e[31m$&\e[0m/'
 ````
 
-2.png
+![XXX][img-2-resize]
+*그림 2.* XXX ([원본][img-2])
 
 만약에 다른 패턴은 어떤 색 이런 식으로 계속 추가하고자 하면 아래와 같이 ;으로 구분하여 추가하면 됩니다.
 
@@ -48,7 +51,8 @@ tail -f access.log | perl -pe 's/Opera/\e[31m$&\e[0m/'
  tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/.*Mozilla.*/\e[32m$&\e[0m/'
 ``` 
 
-3.png
+![XXX][img-3-resize]
+*그림 3.* XXX ([원본][img-3])
 
 하지만 위의 방법에서는 여러패턴을 쓰더라도 특정 패턴이 들어간 줄은 빨간색을 표시하되 로그의 URL부분은 녹색으로 표시하고싶다. 그런식으로 하면 앞의 패턴에서 바꿔놓은 결과에 다음 패턴이 중간에서 원상복구 시켜버리는 식으로 동작하게 되어 원하는대로 표시하기 어렵게 됩니다.
 
@@ -57,7 +61,8 @@ tail -f access.log | perl -pe 's/Opera/\e[31m$&\e[0m/'
 tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/(http:[^"]+)/\e[32m$&\e[0m/'
 ```
 
-4.png
+![XXX][img-4-resize]
+*그림 4.* XXX ([원본][img-4])
 
 그러면 칼라코드 찾아서 복잡하게 교체(substitute)정규식을 쓰기도 싫고 원하는 작업을 깔끔하게 하고싶다. 이럴땐 어떻게 해야 할까요? 뭐 찾아보면 그러한 작업을 해주는 유틸리티가 제법 있지만 Perl이 깔려있다면 CPAN에 올라와 있는 cet( https://metacpan.org/pod/cet ) 라는 유틸리티를 쓰면 아주 편합니다. cpan cet 명령으로 모듈을 설치한 후. 다음과 같이 명령내립니다.
   
@@ -65,7 +70,8 @@ tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/(http:[^"]+)/\e[32m$
 tail -f access.log | cet .*Opera.* red  "http:[^\"]+" green
 ```
 
-5.png
+![XXX][img-5-resize]
+*그림 5.* XXX ([원본][img-5])
 
 cet 명령의 사용법은 아래와 같습니다.
 ```
@@ -78,6 +84,28 @@ cet REGEX1 [COLOR1] [REGEX2 [COLOR2]] ... [REGEXn [COLORn]]
 tail -f access.log | cet .*Opera.* "reverse bright_red"  "http:[^\"]+" "underline green"
 ```
 
-6.png
+![XXX][img-6-resize]
+*그림 6.* XXX ([원본][img-6])
 
 이제 예쁜 색이 마치 크리스마스트리 조명같이 박혀 들어가는 화면을 띄워놓고 연말연시 크리스마스 기분을 느껴보세요~ :)
+
+
+[img-1]:          2014-12-15-1.png
+[img-2]:          2014-12-15-2.png
+[img-3]:          2014-12-15-3.png
+[img-4]:          2014-12-15-4.png
+[img-5]:          2014-12-15-5.png
+[img-6]:          2014-12-15-6.png
+
+[img-1-resize]:   2014-12-15-1_r.png
+[img-2-resize]:   2014-12-15-2_r.png
+[img-3-resize]:   2014-12-15-3_r.png
+[img-4-resize]:   2014-12-15-4_r.png
+[img-5-resize]:   2014-12-15-5_r.png
+[img-6-resize]:   2014-12-15-6_r.png
+
+[cpan-www-adventcalendar]:        https://metacpan.org/module/WWW::AdventCalendar
+[cpan]:                           http://www.cpan.org/
+[home-aer0]:                      http://aero.sarang.net/
+[home-perlbrew]:                  http://perlbrew.pl/
+[twitter-aer0]:                   http://twitter.com/#!/aer0
