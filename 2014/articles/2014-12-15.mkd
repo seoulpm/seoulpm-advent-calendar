@@ -97,50 +97,73 @@ ANSI 칼라 코드를 나타내는 문자를 넣어 색깔을 넣고 있습니�
 한계
 -----
 
-하지만 위의 방법에서는 여러패턴을 쓰더라도 특정 패턴이 들어간 줄은 빨간색을 표시하되 로그의 URL부분은 녹색으로 표시하고싶다. 그런식으로 하면 앞의 패턴에서 바꿔놓은 결과에 다음 패턴이 중간에서 원상복구 시켜버리는 식으로 동작하게 되어 원하는대로 표시하기 어렵게 됩니다.
+여러 패턴을 쓰더라도 특정 패턴이 들어간 줄은 빨간색을 표시하되,
+로그의 URL부분은 녹색으로 표시하고 싶다고 가정해보죠.
+하지만 앞의 방법을 사용할 경우, 앞쪽의 패턴에서 바꿔놓은 결과에
+다음 패턴이 중간에서 원상복구 시켜버리는 식으로 동작하기 때문에
+원하는대로 표시하기가 어렵습니다.
 
-예)
-```
-tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/(http:[^"]+)/\e[32m$&\e[0m/'
-```
+    #!bash
+    $ tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/(http:[^"]+)/\e[32m$&\e[0m/'
 
-![XXX][img-4-resize]
-*그림 4.* XXX ([원본][img-4])
+*그림 4*를 살펴보면 의도했던 것과는 다르게 출력됨을 알 수 있습니다.
 
-그러면 칼라코드 찾아서 복잡하게 교체(substitute)정규식을 쓰기도 싫고 원하는 작업을 깔끔하게 하고싶다. 이럴땐 어떻게 해야 할까요? 뭐 찾아보면 그러한 작업을 해주는 유틸리티가 제법 있지만 Perl이 깔려있다면 CPAN에 올라와 있는 cet( https://metacpan.org/pod/cet ) 라는 유틸리티를 쓰면 아주 편합니다.
+![원하는대로 표시하지 못하는 복합 패턴][img-4-resize]
+*그림 4.* 원하는대로 표시하지 못하는 복합 패턴 ([원본][img-4])
+
+그러면 색상 코드를 찾아 복잡하게 치환하는 정규식을 쓰기늘 싫지만
+원하는 패턴에 대해 원하는 색상을 쉽게 표시하고 싶다면 어떻게 해야할까요?
+찾아보면 이런 류의 작업을 해주는 유틸리티가 제법 있지만,
+[CPAN의 cet 모듈][cpan-cet]을 사용하면 무척 간편합니다.
 
 
 cet
 ----
 
-cpan cet 명령으로 모듈을 설치한 후. 다음과 같이 명령내립니다.
-  
-```
-tail -f access.log | cet .*Opera.* red  "http:[^\"]+" green
-```
+[cet 모듈][cpan-cet]은 동일한 이름의 `cet` 명령을 제공합니다.
+명령줄에서 다음 명령을 실행해보세요.
 
-![XXX][img-5-resize]
-*그림 5.* XXX ([원본][img-5])
+    #!bash
+    $ tail -f access.log | cet .*Opera.* red  "http:[^\"]+" green
 
-cet 명령의 사용법은 아래와 같습니다.
-```
-cet REGEX1 [COLOR1] [REGEX2 [COLOR2]] ... [REGEXn [COLORn]]
-```
+*그림 5*는 `cet` 명령을 사용한 결과입니다.
 
-여기서 color는 https://metacpan.org/source/RRA/Term-ANSIColor-4.03/lib/Term/ANSIColor.pm#L111 에 있는 red니 bright_red등을 쓸 수 있습니다. 만약 밑줄친 빨간색같이 여러 속성,색을 조합할 경우는 "underline red" 이렇게 ""로 묶어서 공백을 띄워 나열해주면 됩니다. 만약 Opera가 들어간 줄은 반전된 밝은 빨간색으로 하고 URL부분은 밑줄들어간 녹색으로 하고 싶다고 하면 아래처럼 하면 되겠죠.
+![cet 예제][img-5-resize]
+*그림 5.* cet 예제 ([원본][img-5])
 
-```
-tail -f access.log | cet .*Opera.* "reverse bright_red"  "http:[^\"]+" "underline green"
-```
+`cet` 명령의 사용법은 무척 간단합니다.
 
-![XXX][img-6-resize]
-*그림 6.* XXX ([원본][img-6])
+    #!plain
+    cet REGEX1 [COLOR1] [REGEX2 [COLOR2]] ... [REGEXn [COLORn]]
+
+색상을 의미하는 `COLORn`는 [CPAN의 Term::ANSIColor 모듈][cpan-term-ansicolor]에
+정의되어있는 `red`나 `bright_red` 등의 값을 사용할 수 있습니다.
+*밑줄친 빨간색*과 같은 여러가지 속성과 색을 조합할 경우는
+`"underline red"`처럼 `"..."`로 묶어 사용하면 됩니다.
+
+`Opera`가 들어간 줄은 반전된 밝은 빨간색으로 표시하고,
+URL은 밑줄이 들어간 녹색으로 표시하고 싶다면 실행할 명령은 다음과 같습니다.
+
+    #!bash
+    $ tail -f access.log | cet .*Opera.* "reverse bright_red"  "http:[^\"]+" "underline green"
+
+*그림 6*은 `cet`를 사용해서 복잡한 요구사항을 모두 만족하는
+결과물을 출력한 화면입니다.
+
+![최종 결과][img-6-resize]
+*그림 6.* 최종 결과 ([원본][img-6])
+
+참 쉽죠? :)
 
 
 정리하며
 ---------
 
-이제 예쁜 색이 마치 크리스마스트리 조명같이 박혀 들어가는 화면을 띄워놓고 연말연시 크리스마스 기분을 느껴보세요~ :)
+[cet][cpan-cet]를 사용하면, 복잡한 로그에 다양한 일치 요구 사항이
+있더라도 손쉽게 원하는 패턴과 색상을 추가할 수 있습니다.
+필요한 것은 오직 펄과 [cet 모듈][cpan-cet]과 정규표현식에 대한 약간의 이해 뿐입니다.
+이제 로그에 크리스마스트리 조명처럼 예쁜 색을 칠해서
+연말연시 크리스마스 기분을 느껴보세요~ :)
 
 
 [img-1]:          2014-12-15-1.png
@@ -158,7 +181,8 @@ tail -f access.log | cet .*Opera.* "reverse bright_red"  "http:[^\"]+" "underlin
 [img-6-resize]:   2014-12-15-6_r.png
 
 [bash-tips]:                http://misc.flogisoft.com/bash/tip_colors_and_formatting
-[cpan-www-adventcalendar]:  https://metacpan.org/module/WWW::AdventCalendar
+[cpan-cet]:                 https://metacpan.org/module/cet
+[cpan-term-ansicolor]:      https://metacpan.org/source/RRA/Term-ANSIColor-4.03/lib/Term/ANSIColor.pm#L111
 [cpan]:                     http://www.cpan.org/
 [home-aer0]:                http://aero.sarang.net/
 [home-perlbrew]:            http://perlbrew.pl/
