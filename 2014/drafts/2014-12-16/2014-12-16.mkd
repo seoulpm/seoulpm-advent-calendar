@@ -1,5 +1,18 @@
+Title:    Boolean in Perl
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   JEEN_LEE
 
-## Boolean for Perl/JSON
+저자
+-----
+
+[@JEEN_LEE][twitter-jeen-lee] -
+Homo Guichanius, Phaeburrism, `tr/Something_/Something/`
+
+
+시작하며
+---------
 
 펄로 몇 가지 제품을 개발하는 중 __다른 언어/환경과 데이터를 주고받고 하는 와중__에 회사 동료로부터
 
@@ -36,6 +49,9 @@ typedef enum {false, true} bool
 ```
 
 이런 식으로 `is_*` 같은 Boolean 데이터 형의 필드들에 `0`/`1`로 주는 <del>만행을 벌여왔었습니다</del> 으레 펄에서 사용하던 식으로 데이터를 넘겨줬었죠. 하지만 그때마다 Boolean 형을 지원하는 쪽에서는 이런 데이터들의 형을 일일이 변환해줘야 하는 수고가 있었습니다. 미안하고 또 미안했습니다.
+
+그러면 어떻게?
+-----------
 
 나중에서야 이런 부분에 대한 배려가 부족했던 것을 반성하며 소잃고 외양간 고치기 격으로 알아본 바로는, `JSON::*` 류의 `JSON` 인코딩/디코딩에서 `true`/`false`를 넘기려면 아래처럼 `\1`, `\0`을 사용할 수 있습니다.
 
@@ -84,6 +100,9 @@ sub is_drunken { JSON->true }
 
 다른 대체제는 뭐가 있을까요?
 
+use boolean
+-----------
+
 아시다시피 펄은 <del>그저 CPAN을 사용하기 위한 도구</del> CPAN을 사용해서 여러 위기상황을 해쳐나가고 있습니다.
 
 아래처럼 [boolean][metacpan-boolean] 모듈을 사용해서 `true`, `false`를 사용할 수 있습니다.
@@ -111,6 +130,9 @@ print ref(true);   # boolean
 ```
 
 위의 `JSON->true` 같은 형태보다는 훨씬 더 깔끔합니다. 하지만 JSON 출력시에는 `boolean`도 좀 까탈스러운 과정을 거쳐야 합니다. 일반적인 `JSON`, `JSON::XS`의 `convert_blessed` 옵션이 이 `boolean`에는 먹히지 않습니다(`null`을 반환합니다). 문서에서는 `JSON::MaybeXS`를 사용하는 것을 권장합니다(분명 `convert_blessed` 옵션으로는 `TO_JSON`을 호출할 텐데 왜 안될까에 대해서는 나중에 따로 알아보겠습니다).
+
+use Types::Serialiser
+---------------------
 
 다른 방법도 있습니다. 바로 `Types::Serialiser`를 사용하는 것이죠.
 
@@ -147,17 +169,22 @@ print $json;         # {"bbb":false,"aaa":true}
 print length($json); # 24
 ```
 
+정리하며
+------
+
 웹 개발에서야 JSON 위주로 데이터를 주고 받는 게 이제는 거의 상식처럼 받아들여지고 있습니다만, 사실 1바이트로 표현될 Boolean에 4~5바이트의 문자열이 오가는 상황이고... <del>Javascript만 좋은 일 시키고 있습니다.</del>
 
-이거 시작은 Boolean으로 했는데, 마지막은 데이터 직렬화 이야기가 되어버렸네요. 앞에서도 언급한 대로 이 모든 것은 소 잃고 외양간 고치기 격입니다. 현재 진행중인 프로젝트에서 무턱대고 API의 응답결과를 저렇게 바꿔버리면 제품은 무너지고 저는 깨질테니까요.
+이거 시작은 Boolean으로 했는데, 마지막은 데이터 직렬화 이야기가 되어버렸네요. 앞에서도 언급한 대로 이 모든 것은 _소 잃고 외양간 고치기_로 시작한 것입니다. 현재 진행중인 프로젝트에서 무턱대고 API의 응답결과를 저렇게 바꿔버리면 제품은 무너지고 저는 깨질테니까요.
 
-지금까지는 `Boolean불가론`을 깨기위한 방법소개에 지나지 않았습니다만, 다음 기사(언제가 될 지 모르지만)에서는 이런 것들을 사용해서 펄의 객체지향 프로그래밍에서 어떻게 적용할 수 있을 지를 알아보고자 합니다.
+지금까지는 `Boolean불가론`을 깨기 위한 방법소개에 지나지 않았습니다. 다음 기사(언제가 될 지 모르지만)에서는 이런 것들을 사용해서 펄의 객체지향 프로그래밍에서는 어떻게 적용할 수 있을 지를 알아보고자 합니다.
 
-[metacpan-enum]:https://metacpan.org/pod/enum
-[metacpan-overload]:https://metacpan.org/pod/overload
-[metacpan-boolean]:https://metacpan.org/pod/boolean
-[metacpan-types-serialiser]:https://metacpan.org/pod/Types::Serialiser
-[metacpan-json-xs]:https://metacpan.org/pod/JSON::XS
-[metacpan-json-maybexs]:https://metacpan.org/pod/JSON::MaybeXS
-[metacpan-data-messagepack]:https://metacpan.org/pod/Data::MessagePack
+
+[twitter-jeen-lee]:           http://twitter.com/JEEN_LEE
+[metacpan-enum]:              https://metacpan.org/pod/enum
+[metacpan-overload]:          https://metacpan.org/pod/overload
+[metacpan-boolean]:           https://metacpan.org/pod/boolean
+[metacpan-types-serialiser]:  https://metacpan.org/pod/Types::Serialiser
+[metacpan-json-xs]:           https://metacpan.org/pod/JSON::XS
+[metacpan-json-maybexs]:      https://metacpan.org/pod/JSON::MaybeXS
+[metacpan-data-messagepack]:  https://metacpan.org/pod/Data::MessagePack
 
