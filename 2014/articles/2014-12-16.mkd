@@ -14,25 +14,25 @@ Homo Guichanius, Phaeburrism, `tr/Something_/Something/`
 시작하며
 ---------
 
-펄로 몇 가지 제품을 개발하는 중 __다른 언어/환경과 데이터를 주고받고 하는 와중__에 회사 동료로부터
+펄로 몇 가지 제품을 개발하는 중 __다른 언어/환경과 데이터를 주고받고 하는 와중__에
+회사 동료로부터 다음과 같은 이야기를 들었습니다.
 
-> 펄은 Boolean 표기가 없냐? 왜 데이터가 전부 0 아니면 1이야? C냐?
+> 펄은 Boolean 표기가 없냐?
+> 왜 데이터가 전부 0 아니면 1이야? C냐?
 
-라는 이야기를 들었습니다.
+그러고보니 그냥 익숙하게 `true`면 `1`, `false`면 `0`으로 사용하고 있었습니다.
+아시다시피 펄의 기본 데이터 형에는 불리언(boolean)형이 없습니다.
+C도 마찬가지로 불리언이 없지요.
 
-그러고보면 그냥 익숙하게 `true`면 `1`, `false`면 `0`으로 사용하고 있었습니다.
+    #!cpp
+    ...
+    typedef enum {false, true} bool
+    ...
 
-아시다시피 펄의 기본 데이터 형에는 `Boolean`형이 없습니다. C도 마찬가지로 `Boolean`이 없지요. 하지만...
-
-``` c
-...
-typedef enum {false, true} bool
-...
-```
-
-위처럼 `typedef`로 얼추 그런 모양으로 내고 있는 장면을 몇 번 보기는 했습니다만...(아니, 그럼 펄에서도 [enum][metacpan-enum] 써서 하면 되는데)
-
-어찌되었든 그러다보니 서두에서 말했던 것처럼 JSON 같은 형식으로 데이터를 주고받을 때는(예를 들어),
+하지만 앞의 예제처럼 C에서는 `typedef`와 `enum`을 사용해 불리언을 표현하기도 하죠.
+(아니, 그렇다면 펄에서도 [enum][metacpan-enum]쓰면 되는데!)
+어찌되었든 이러한 연유로 JSON 같은 형식으로 데이터를 주고받을 때 `is_*`같은
+불리언 데이터 형의 필드에 `0` 또는 `1`을 전달하는 <del>만행을 벌여왔었습니다.</del>
 
 ``` json
 {
@@ -48,10 +48,13 @@ typedef enum {false, true} bool
 }
 ```
 
-이런 식으로 `is_*` 같은 Boolean 데이터 형의 필드들에 `0`/`1`로 주는 <del>만행을 벌여왔었습니다</del> 으레 펄에서 사용하던 식으로 데이터를 넘겨줬었죠. 하지만 그때마다 Boolean 형을 지원하는 쪽에서는 이런 데이터들의 형을 일일이 변환해줘야 하는 수고가 있었습니다. 미안하고 또 미안했습니다.
+늘 하듯이 펄에서 사용하던 식으로 데이터를 넘겨줬었죠.
+하지만 그때마다 불리언 형을 지원하는 쪽에서는 이런 데이터들의 형을 일일이 변환해줘야 하는 수고가 있었습니다.
+미안하고 또 미안했습니다.
+
 
 그러면 어떻게?
------------
+---------------
 
 나중에서야 이런 부분에 대한 배려가 부족했던 것을 반성하며 소잃고 외양간 고치기 격으로 알아본 바로는, `JSON::*` 류의 `JSON` 인코딩/디코딩에서 `true`/`false`를 넘기려면 아래처럼 `\1`, `\0`을 사용할 수 있습니다.
 
@@ -179,12 +182,11 @@ print length($json); # 24
 지금까지는 `Boolean불가론`을 깨기 위한 방법소개에 지나지 않았습니다. 다음 기사(언제가 될 지 모르지만)에서는 이런 것들을 사용해서 펄의 객체지향 프로그래밍에서는 어떻게 적용할 수 있을 지를 알아보고자 합니다.
 
 
-[twitter-jeen-lee]:           http://twitter.com/JEEN_LEE
-[metacpan-enum]:              https://metacpan.org/pod/enum
-[metacpan-overload]:          https://metacpan.org/pod/overload
 [metacpan-boolean]:           https://metacpan.org/pod/boolean
-[metacpan-types-serialiser]:  https://metacpan.org/pod/Types::Serialiser
-[metacpan-json-xs]:           https://metacpan.org/pod/JSON::XS
-[metacpan-json-maybexs]:      https://metacpan.org/pod/JSON::MaybeXS
 [metacpan-data-messagepack]:  https://metacpan.org/pod/Data::MessagePack
-
+[metacpan-enum]:              https://metacpan.org/pod/enum
+[metacpan-json-maybexs]:      https://metacpan.org/pod/JSON::MaybeXS
+[metacpan-json-xs]:           https://metacpan.org/pod/JSON::XS
+[metacpan-overload]:          https://metacpan.org/pod/overload
+[metacpan-types-serialiser]:  https://metacpan.org/pod/Types::Serialiser
+[twitter-jeen-lee]:           http://twitter.com/JEEN_LEE
