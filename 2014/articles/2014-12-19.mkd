@@ -1,4 +1,4 @@
-Title:    Perl 내부 구조 #3 : 배열과 해시
+Title:    Perl 내부 구조 #3 : 배열 변수와 해시 변수
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -15,9 +15,11 @@ Author:   luzluna
 시작하며
 --------
 
-지난번까지는 펄의 기본타입인 스칼라변수가 어떻게 내부적으로
+[첫 번째 기사][advent-2014-12-08]에서는 펄이 어떻게 스칼라 변수를 내부적으로 처리하는지를,
+[두 번째 기사][advent-2014-12-09]에서는 펄의 기본타입인 스칼라변수가 어떻게 내부적으로
 표현되는지 문맥에 따라 어떻게 변화되는지를 살펴보았습니다.
-오늘은 펄의 또다른 기본 타입인 LIST와 HASH에 대해 살펴보겠습니다. 
+오늘은 펄의 또다른 기본 타입인 배열 변수와 해시 변수에 대해 살펴봅니다.
+
 
 array
 -----
@@ -216,5 +218,7 @@ FLAGS를 보면 ANON 익명함수, WEAKOUTSIDE 약한 바인딩? 네임스페이
 벌써 대림 셋째주입니다, 기사를 읽으시러 오시는 모든 분들께 평화를 기원하겠습니다..
 
 
+[advent-2014-12-08]:    http://advent.perl.kr/2014/2014-12-08.html
+[advent-2014-12-09]:    http://advent.perl.kr/2014/2014-12-09.html
 [twitter-luzluna]:      https://twitter.com/luzluna
 [yes24-14061821]:       http://www.yes24.com/24/goods/14061821
