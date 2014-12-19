@@ -1,3 +1,10 @@
+Title:    Perl 내부 구조 #3 : 배열과 해시
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   luzluna
+
+
 시작하며
 --------
 
