@@ -182,45 +182,48 @@ Author:   luzluna
 보안을 향상시키는 기능이 추가되어 발생하는 현상입니다.
 
 
-subroutine
------------
+익명 함수
+----------
 
-이번에는 익명함수를 저장하는 변수가 어떻게 표현되는지 살펴보도록 하겠습니다.
+마지막으로 익명 함수를 저장하면 어떻게 되는지 알아볼까요?
 
-	use Devel::Peek;
-         
-	$sub_a = sub { print "aa"; };
-	Dump( $sub_a );
+    #!perl
+    use Devel::Peek;
+      
+    $sub_a = sub { print "aa"; };
+    Dump( $sub_a );
 
-출력 결과를 보도록 하겠습니다.
+결과를 살펴보죠.
 
-	SV = IV(0x7fee4a029680) at 0x7fee4a029690
-	  REFCNT = 1
-	  FLAGS = (ROK)
-	  RV = 0x7fee4a029738
-	  SV = PVCV(0x7fee4a0280e8) at 0x7fee4a029738
-	    REFCNT = 2
-	    FLAGS = (PADMY,ANON,WEAKOUTSIDE,CVGV_RC)
-	    COMP_STASH = 0x7fee4a004320	"main"
-	    START = 0x7fee49c0e428 ===> 1
-	    ROOT = 0x7fee49c0e370
-	    GVGV::GV = 0x7fee4a0296c0	"main" :: "__ANON__"
-	    FILE = "array.pl"
-	    DEPTH = 0
-	    FLAGS = 0x490
-	    OUTSIDE_SEQ = 95
-	    PADLIST = 0x7fee49c0db80
-	    PADNAME = 0x7fee4a0296d8(0x7fee49c0e930) PAD = 0x7fee4a0296f0(0x7fee49c0c7d0)
-	    OUTSIDE = 0x7fee4a004680 (MAIN)
+    #!plain
+    SV = IV(0x7fee4a029680) at 0x7fee4a029690
+      REFCNT = 1
+      FLAGS = (ROK)
+      RV = 0x7fee4a029738
+      SV = PVCV(0x7fee4a0280e8) at 0x7fee4a029738
+        REFCNT = 2
+        FLAGS = (PADMY,ANON,WEAKOUTSIDE,CVGV_RC)
+        COMP_STASH = 0x7fee4a004320	"main"
+        START = 0x7fee49c0e428 ===> 1
+        ROOT = 0x7fee49c0e370
+        GVGV::GV = 0x7fee4a0296c0	"main" :: "__ANON__"
+        FILE = "array.pl"
+        DEPTH = 0
+        FLAGS = 0x490
+        OUTSIDE_SEQ = 95
+        PADLIST = 0x7fee49c0db80
+        PADNAME = 0x7fee4a0296d8(0x7fee49c0e930) PAD = 0x7fee4a0296f0(0x7fee49c0c7d0)
+        OUTSIDE = 0x7fee4a004680 (MAIN)
 
-IV타입아래에 FLAGS는 똑같이 ROK 그리고 RV를 따라가면 PVCV타입이 저장되어 있는것을 보실 수 있습니다.
-PVCV가 Code Value 를 저장하는 형식입니다.
-컴파일된 Op Code들의 Tree를 저장하게 됩니다.
-아마도 이 구조 덕분에 first-class function이라든지 심볼테이블을
-dynamic access하는 등 lisp에서만 사용가능한 테크닉들을 Perl에서도
-사용할 수 있는게 아닌가 싶습니다.(정확히는 저도 잘 모릅니다만 ㅜ.ㅠ)
-FLAGS를 보면 ANON 익명함수, WEAKOUTSIDE 약한 바인딩? 네임스페이스가
-"main::__ANON__" 아래에 정의되어있다는게 눈에 띕니다.
+`IV` 타입 아래의 `FLAGS`는 똑같이 `ROK`, 그리고 `RV`를 따라가면 `PVCV` 타입이 저장되어 있습니다.
+`PVCV`가 *Code Value*를 저장하는 형식입니다.
+즉, 컴파일된 *op 코드*의 Tree를 저장하는 것입니다.
+아마도 이 구조 덕분에 first-class function이라든지,
+심볼 테이블을 동적으로 접근하는 등 lisp에서만 사용가능한 테크닉을
+펄에서도 사용할 수 있는게 아닌가 싶습니다(정확히는 저도 잘 모릅니다만 :).
+`FLAGS`를 보면 `ANON` 익명함수, `WEAKOUTSIDE` 약한 바인딩 네임스페이스가
+`main::__ANON__` 아래에 정의되어 있다는 점도 눈여겨 봐두세요.
+
 
 정리하며
 --------
