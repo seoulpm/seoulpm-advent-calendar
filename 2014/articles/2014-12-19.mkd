@@ -5,6 +5,13 @@ Category: Seoul.pm
 Author:   luzluna
 
 
+저자
+-----
+
+[@luzluna][twitter-luzluna] - C,Perl 엔지니어. 근래엔 Ops에 더 가까운 DevOps.
+[PostgreSQL 성능 최적화][yes24-14061821]의 공동 역자, luzluna _at_ gmail.com
+
+
 시작하며
 --------
 
@@ -207,3 +214,7 @@ FLAGS를 보면 ANON 익명함수, WEAKOUTSIDE 약한 바인딩? 네임스페이
 앞에서 언급하지 못했던 기타 나머지들을 모아놓았더니
 별 도움이 안되는 기사가 만들어진 것 같아서 죄송한 마음이 살짝 드네요.
 벌써 대림 셋째주입니다, 기사를 읽으시러 오시는 모든 분들께 평화를 기원하겠습니다..
+
+
+[twitter-luzluna]:      https://twitter.com/luzluna
+[yes24-14061821]:       http://www.yes24.com/24/goods/14061821
