@@ -226,15 +226,30 @@ Author:   luzluna
 
 
 정리하며
+---------
+
+지난 기사에 이어 펄이 그 외의 다른 타입을 어떻게 저장하는지를 간략히 살펴보았습니다.
+앞에서 언급하지 못했던 기타 나머지들을 모아놓았더니,
+별 도움이 안되는 기사가 만들어진 것 같아서 죄송한 마음이 살짝 드네요.
+벌써 대림 셋째주입니다.
+기사를 읽으시러 오시는 모든 분들께 평화를 기원하겠습니다. :-)
+
+
+참고문헌
 --------
 
-지난 기사에 이어 기타 기타 다른 타입들을 어떻게 저장하는지를 간략히 살펴보았습니다.
-앞에서 언급하지 못했던 기타 나머지들을 모아놓았더니
-별 도움이 안되는 기사가 만들어진 것 같아서 죄송한 마음이 살짝 드네요.
-벌써 대림 셋째주입니다, 기사를 읽으시러 오시는 모든 분들께 평화를 기원하겠습니다..
+더 자세한 내용을 알고 싶다면 다음 문서를 참고하세요.
+
+- [PerlGuts Illustrated][perlguts-illustrated]: 링크걸린 과거 문서들을 보시면 5.8버전부터 지금까지 어떤 고민들을 했고 어떻게 변화해왔는지를 알 수 있습니다.
+- [Introduction to the Perl API][perldoc-perlguts]: 코드레벨에서 어떻게 접근하는지를 알 수 있습니다.
+
+
+_EOT_
 
 
 [advent-2014-12-08]:    http://advent.perl.kr/2014/2014-12-08.html
 [advent-2014-12-09]:    http://advent.perl.kr/2014/2014-12-09.html
 [twitter-luzluna]:      https://twitter.com/luzluna
 [yes24-14061821]:       http://www.yes24.com/24/goods/14061821
+[perldoc-perlguts]:     http://perldoc.perl.org/perlguts.html
+[perlguts-illustrated]: http://cpansearch.perl.org/src/RURBAN/illguts-0.49/index.html
