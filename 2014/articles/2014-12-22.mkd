@@ -1,0 +1,265 @@
+dcgrep: 갤러리를 넘나드는 패턴검색
+
+
+
+저자
+        dsm - 공군 병사
+
+
+
+시작하며
+---------
+
+grep은 *nix의 커맨드라인 유틸리티로써 텍스트 속의 패턴을 찾아내는 도구 중 하나입니다.
+이 글에서는 텍스트의 범위를 web으로 넓혀 여러 웹페이지를 수집하여
+그 속에서 원하는 패턴을 찾아내는 방법에 대해 알아보겠습니다.
+
+
+
+준비물
+-------
+
+필요한 모듈은 Mojolicious 프레임워크에 포함된 Mojo::UserAgent 하나 뿐입니다.
+오, 하나만 설치하면 되겠구나 하시겠지만 Mojolicious는
+하나의 거대한 프레임워크이기 때문에 각각의 모듈 별로 따로 설치하는 것은 불가능합니다.[1]
+따라서 Mojolicious를 설치하시던 Mojo::UserAgent를 설치하시던
+상관없이 Mojolicious는 의존성에 따라 통째로 설치됩니다.
+
+
+CPAN을 이용해서 설치하신다면 다음 명령을 이용합니다.
+
+sudo cpan install Mojo::UserAgent
+
+또는
+
+sudo cpan install Mojolicious
+
+또는
+
+cpanm Mojo::DOM
+
+을 이용해도 Mojolicious가 설치됩니다.
+
+
+
+준비생각
+---------
+
+웹페이지를 검색하려면 먼저 어떤 웹페이지를 검색 해야 할지 정해야 합니다.
+이 글에선 디씨인사이드를 선택했습니다.
+갤러리의 주제 구분이 명확하고 갤러리마다 올라오는 글들의 특성도 다르기 때문에
+패턴 검색에 적당하다 생각했지만 좋은 선택인지는 잘 모르겠습니다.
+큰 의미는 없으니 불편 없이 봐주시면 감사하겠습니다.
+
+
+
+얼개
+-----
+
+우리의 dcgrep은 아래와 같은 input과 output을 가져야 합니다.
+
+$ dcgrep “입대” airforce
+airforce 작년 12월30일입대한 애비기수로서 한마디하자면 - ㅁ | 35
+airforce 입대휴학 성적 반영 관련해서 질문하나만 쌀게요 - 눈팅족 | 14
+airforce 나 전공만 있고 자격증 하나도 없는 예비 통전입대자인데 헬보직 확정임? - ddfs | 67
+$
+
+모티브인 grep과 같이 패턴과 대상을 input으로 주면
+대상 속에서 패턴을 찾아 적당한 모양을 갖춰 output으로 내놓습니다.
+하지만 grep의 검색 대상은 로컬 시스템의 파일이거나 일반 문자열이지만
+dcgrep의 검색 대상은 웹페이지입니다. 그렇다면 먼저 웹페이지를 가져와야겠죠.
+
+
+Mojo::UserAgent
+----------------
+
+현대의 컴퓨터 사용자가 하나의 웹페이지를 얻기 위해서 만들어진 Layer의 수는 대단히 깊고도 넓습니다.
+제 식견이 부족하여 간단한 요약조차 어렵기에 코드로 밀어 붙이겠습니다.
+
+#!/usr/bin/env perl
+
+use v5.18;
+use Mojo::UserAgent;
+
+
+my $ua = Mojo::UserAgent->new;
+say $ua->get(‘http://gall.dcinside.com/board/lists/?id=airforce’)->res->body;
+
+네, 디씨인사이드 공군 갤러리의 웹페이지를 얻었습니다.
+이제 웹페이지를 굽어살펴 패턴을 찾으면 됩니다.
+
+
+
+Mojo::DOM
+----------
+
+Document Object Model은 HTML같은 구조화된 문서를 표현하기 위해 만들어진, 허술하게 정의된 형식입니다.
+얼마나 허술한지 브라우저마다 달리 해석하여 보여지는 방식이 달라지기도 하죠.
+하지만 Mojo::DOM은 그런 허술함에도 불구하고 DOM Tree를 꾸역꾸역 만들어 HTML문서를 돌아다닐 수 있게 해줍니다!
+
+위의 $ua->get(~~)에서 get함수는 Mojo::Transaction::HTTP 객체를 반환하고
+이 객체의 res 메소드는 Mojo::Message::Response 객체를 반환합니다.
+복잡하죠.
+위쪽 코드에선 raw 데이터를 얻기 위해 response 객체의 body 메소드를 사용했지만
+우리는 웹페이지에서 게시글의 제목도 찾아야 하고 작성자도 확인해야 되고 조회수도 얻어야 됩니다.
+이때 dom이 필요하게 되죠.
+
+
+말은 복잡하지만 res대신 dom 메소드를 사용해서 HTML문서의 Mojo::DOM 객체를 얻어오면 됩니다.
+
+my $dom = $ua->get(‘http://gall.dcinside.com/board/lists/?id=airforce’)->res->dom;
+
+이제 우리는 dom을 이용해서 필요한 정보를 뽑아낼 수 있습니다.
+하지만 그 전에 정보가 어떻게 담겨있는지 파악해야 합니다.
+일반 grep의 경우 정보를 추출하는데 따로 필요한 절차가 없습니다.
+왜냐면 그냥 문자열 더미 속에서 패턴을 찾기만 하면 되기 때문이죠.
+하지만 우리는 웹페이지 속에서 패턴을 찾아야 합니다.
+웹페이지는 HTML라는 언어로 구조화되어있고 HTML을 대상으로
+패턴 검색을 수행하면 슬프게도 찾는 정보보다 딸려오는 태그들이 더 많을 겁니다.
+
+
+
+정보 추출
+----------
+
+디씨인사이드 갤러리의 게시판은 하나의 테이블 태그로 이루어져 있습니다.
+테이블은 여러 행으로 구성되어 있고 각 행은 하나의 글에 대한 정보를 담고 있습니다.
+우리가 수집할 정보는 글의 제목, 작성자, 조회수로 총 3개입니다.
+수집을 시작하려면 먼저 테이블의 행들을 찾아야 하고 행을 찾았다면
+행 속에서 세 가지 정보를 얻은 뒤 사용자가 원하는 패턴을 가지고 있는지
+검사하여 올바른 결과만 취해야 합니다.
+
+
+Mojo::DOM의 DOM Travel기능과 Mojo::Collection의 grep 메소드를 사용하면 매우 쉽게 이 목표를 달성할 수 있습니다.
+
+my $articles = $dom->find(
+    ‘tr[class=”tb”]'
+)->grep(
+    qr/$pattern/
+);
+
+dom객체의 find 메소드는 CSS selector를 입력으로 받아
+dom에서 검색을 수행한 후 매칭된 결과들이 담긴 Mojo::Collection 객체를 반환합니다.
+여기서 사용된 ‘tr[class=”tb”]' 는 tr 태그 중에서 class 속성의 값이
+정확히 tb와 일치하는 CSS selector입니다. 자세한 문서는 위키피디아를 참고하세요.
+
+
+$articles에 담긴 각 요소(행이겠죠?)는 하나의 글(내용을 제외한)을 의미하기에
+각 글에 대해 다시 dom traveling을 수행하여 제목, 작성자, 조회수를 뽑아와야 합니다.
+
+        push @result, {
+                    gall        => $gall,
+                    subject => $_->at('td[class="t_subject"]')->at('a')->all_text,
+                    author  => $_->at('td[class*="writer"]')->at('span')->all_text,
+                    hit         => $_->at('td[class="t_hits"]')->all_text,
+        } for (@$articles);
+
+컬렉션을 순회하면서 글에 대한 정보를 익명 해시로 포장한 뒤
+결과 배열에 차곡차곡 집어넣고 있습니다.
+여기서 쓰인 at 메소드는 find와 비슷하게 CSS selector로
+검색을 수행하는데 컬렉션을 반환 하는 것이 아니라 첫 번째 매칭된 하나의 dom만을 반환합니다.
+마지막으로 모두 all_text 메소드를 사용해서 dom에서
+태그들을 다 날리고 텍스트만을 취함으로써 원하는 정보를 전부 얻었습니다.
+
+
+전체 코드는 아래와 같습니다.
+
+use v5.10;
+use Mojo::UserAgent;
+
+if (@ARGV < 2) {
+        say STDERR "Usage: $0 <pattern> <galleries...>";
+        exit;
+}
+
+my $pattern = shift @ARGV;
+my @gallery = @ARGV;
+
+my $prefix = 'http://gall.dcinside.com/board/lists/?id=';
+my $ua = Mojo::UserAgent->new;
+
+my @result;
+for my $gall (@gallery) {
+        my $url = $prefix . $gall;
+        my $dom = $ua->get($url)->res->dom;
+
+        my $articles = $dom->find(
+                    'tr[class="tb"]'
+        )->grep(
+                    qr/$pattern/
+        );
+
+        push @result, {
+            gall        => $gall,
+            subject => $_->at('td[class="t_subject"]')->at('a')->all_text,
+            author  => $_->at('td[class*="writer"]')->at('span')->all_text,
+            hit         => $_->at('td[class="t_hits"]')->all_text,
+        } for (@$articles);
+}
+
+for (@result) {
+        printf("%s %s - %s | %d\n",
+            $_->{gall},
+            $_->{subject},
+            $_->{author},
+            $_->{hit},
+        );
+}
+
+
+활용
+-----
+
+사용자로부터 입력 받은 pattern을 그대로 interpolate하기 때문에
+위험한 면도 있지만 사용자는 슈퍼초강력한 perl의 regex를 그대로
+사용할 수 있다는 장점이 있습니다. (사실 그냥 무책임한 겁니다.)
+
+입대와 전역을 전군 갤러리에서 검색하면 꽤 재밌는 결과를 얻을 수 있습니다.
+
+
+~ $ ./dcgrep.pl “입대|전역” airforce army navy
+airforce 작년 12월30일입대한 애비기수로서 한마디하자면 - ㅁ | 52
+airforce 입대휴학 성적 반영 관련해서 질문하나만 쌀게요 - 눈팅족 | 16
+airforce 나 전공만 있고 자격증 하나도 없는 예비 통전입대자인데 헬보직 확정임? - ddfs | 76
+army 15년 3월에 입대하고싶은데 - 9610월생 | 28
+army 몇월 입대인데 1~2달후에 후임생기는 군번이 어쩌고.. 없다 그런거 - ㅇㅇ | 42
+army 다음달 전역인데 심심해서 한번 와봄 - d30 | 28
+army 2015년 1월에 입대하기 빡셔요 ? - ㅇㅇ | 72
+army 1월13일 입대인데, 1월 군번이 젤좋아요? 이유가 ?.. - ㅇㅇ | 76
+army 3사단 입대예정인데, 저 어디로빠질까요? - ㅇㅇ | 17
+army 크리스마스에 전역하는 친구들있니? - 미리메리크리스. | 24
+navy 해군입대하기전에 이거 필독하고 들어가라 개꿀팁 - 진기사상병 | 170
+~ $
+
+커맨드라인 도구이기 때문에 원조 grep과의 결합도 가능합니다.
+
+$ ./dcgrep.pl "입대|전역" airforce army navy|grep ㅇㅇ
+army 몇월 입대인데 1~2달후에 후임생기는 군번이 어쩌고.. 없다 그런거 - ㅇㅇ | 43
+army 2015년 1월에 입대하기 빡셔요 ? - ㅇㅇ | 72
+army 1월13일 입대인데, 1월 군번이 젤좋아요? 이유가 ?.. - ㅇㅇ | 76
+army 3사단 입대예정인데, 저 어디로빠질까요? - ㅇㅇ | 17
+$
+
+
+마치며
+-------
+
+우리가 이룬 것은 사실 Web scraping이라는 기술입니다.
+여기서 더 나간다면 게시글의 내용까지 포함하여 검색하거나,
+갤러리의 1페이지만이 아닌 여러 페이지에 걸친 검색을 할 수도 있고
+웹페이지에 built-in된 검색기능을 이용해서 패턴을 검색하고,
+그 검색 결과를 검색하는 방법도 있을 겁니다.
+
+하지만 글을 읽으면서 예상하셨겠지만 데이터 추출 기법 치고는 안정성이 떨어지는 방법입니다.
+정보를 얻기 위해 웹사이트의 특성들을 많이 사용하는데
+이 특성은 웹페이지 관리자의 마음에 의존하기 때문이죠.
+예를 들어서 관리자가 t_subject라는 클래스 이름을 h_subject로
+바꾸기만 해도 이 프로그램은 동작하지 않을 겁니다.
+
+그럼에도 불구하고 인터넷 트래픽의 23%가 Web scraping과 관련된 트래픽이라고하며[2],
+실제로 웹페이지의 구조가 그렇게 자주 바뀌지 않기 때문에 웹페이지의 일반적 특성만
+이용하면 오래오래 잘 써먹는 프로그램을 만들 수 있을 것입니다.
+
+
+[1] http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
+[2] www.scrapesentry.com/scrapesentry-scraping-threat-report-2014/
