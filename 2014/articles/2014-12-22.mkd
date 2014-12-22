@@ -75,21 +75,22 @@ Mojolicious 웹 프레임워크가 통째로 설치됩니다.
 Mojo::UserAgent
 ----------------
 
-현대의 컴퓨터 사용자가 하나의 웹페이지를 얻기 위해서 만들어진 Layer의 수는 대단히 깊고도 넓습니다.
-제 식견이 부족하여 간단한 요약조차 어렵기에 코드로 밀어 붙이겠습니다.
+[Mojo::UserAgent 모듈][cpan-mojo-useragent]을 이용하면
+매우 간단하게 웹 페이지를 다운로드 받을 수 있습니다.
 
-#!/usr/bin/env perl
+    #!perl
+    #!/usr/bin/env perl
+    
+    use v5.18;
+    use strict;
+    use warnings;
+    use Mojo::UserAgent;
+    
+    my $ua = Mojo::UserAgent->new;
+    say $ua->get("http://gall.dcinside.com/board/lists/?id=airforce")->res->body;
 
-use v5.18;
-use Mojo::UserAgent;
-
-
-my $ua = Mojo::UserAgent->new;
-say $ua->get(‘http://gall.dcinside.com/board/lists/?id=airforce’)->res->body;
-
-네, 디씨인사이드 공군 갤러리의 웹페이지를 얻었습니다.
-이제 웹페이지를 굽어살펴 패턴을 찾으면 됩니다.
-
+네! [디씨인사이드 공군 갤러리][dcinside-airforce]의 웹 페이지를 얻었습니다.
+이제 원하는 패턴만 찾으면 됩니다.
 
 
 Mojo::DOM
@@ -268,6 +269,7 @@ $
 [cpan-mojo-useragent]:    https://metacpan.org/pod/Mojo::UserAgent
 [cpan-mojolicious]:       https://metacpan.org/module/Mojolicious
 [cpan]:                   http://www.cpan.org/
+[dcinside-airforce]:      http://gall.dcinside.com/board/lists/?id=airforce
 [home-dcinside]:          http://www.dcinside.com/
 [home-mojolicious]:       http://mojolicio.us/
 [home-perlbrew]:          http://perlbrew.pl/
