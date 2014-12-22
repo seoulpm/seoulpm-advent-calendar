@@ -4,9 +4,11 @@ Category: perl
 Category: Seoul.pm
 Author:   dsm
 
-저자
-        dsm - 공군 병사
 
+저자
+-----
+
+dsm - 공군 병사, foollbar _at_ gmail.com
 
 
 시작하며
