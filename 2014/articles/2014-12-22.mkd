@@ -1,6 +1,8 @@
-dcgrep: 갤러리를 넘나드는 패턴검색
-
-
+Title:    dcgrep: 갤러리를 넘나드는 패턴검색
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   dsm
 
 저자
         dsm - 공군 병사
