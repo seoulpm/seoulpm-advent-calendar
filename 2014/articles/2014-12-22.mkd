@@ -22,27 +22,30 @@ dsm - 공군 병사, foollbar _at_ gmail.com
 준비물
 -------
 
-필요한 모듈은 Mojolicious 프레임워크에 포함된 Mojo::UserAgent 하나 뿐입니다.
-오, 하나만 설치하면 되겠구나 하시겠지만 Mojolicious는
-하나의 거대한 프레임워크이기 때문에 각각의 모듈 별로 따로 설치하는 것은 불가능합니다.[1]
-따라서 Mojolicious를 설치하시던 Mojo::UserAgent를 설치하시던
-상관없이 Mojolicious는 의존성에 따라 통째로 설치됩니다.
+필요한 모듈은 다음과 같습니다.
 
+- [CPAN의 Mojo::UserAgent 모듈][cpan-mojo-useragent]
 
-CPAN을 이용해서 설치하신다면 다음 명령을 이용합니다.
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
-sudo cpan install Mojo::UserAgent
+    #!bash
+    $ sudo cpan Mojo::UserAgent
 
-또는
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
 
-sudo cpan install Mojolicious
+    #!bash
+    $ cpan Mojo::UserAgent
 
-또는
-
-cpanm Mojo::DOM
-
-을 이용해도 Mojolicious가 설치됩니다.
-
+필요한 모듈은 Mojolicious 프레임워크에 포함된 [Mojo::UserAgent][cpan-mojo-useragent] 하나 뿐입니다.
+*"오, 하나만 설치하면 되겠구나!"*할 수도 있지만 [Mojolicious][home-mojolicious]는
+[외부 모듈 의존성은 없지만 여러 개의 내부 모듈 파일로 이루어진 웹 프레임워크][mojolicious-why]이기 때문에
+수동으로 설치하지 않는 이상 각각의 모듈 별로 따로 설치하기는 어렵습니다.
+따라서 [Mojolicious 모듈][cpan-mojolicious]을 설치하든,
+[Mojo::UserAgent 모듈][cpan-mojo-useragent]를 설치하든 상관없이
+Mojolicious 웹 프레임워크가 통째로 설치됩니다.
+하지만 Mojolicious는 매우 가벼운 웹프레임워크니 걱정하지 마세요. :)
 
 
 준비생각
@@ -264,5 +267,11 @@ $
 이용하면 오래오래 잘 써먹는 프로그램을 만들 수 있을 것입니다.
 
 
-[1] http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
 [2] www.scrapesentry.com/scrapesentry-scraping-threat-report-2014/
+
+[cpan-mojo-useragent]:    https://metacpan.org/pod/Mojo::UserAgent
+[cpan-mojolicious]:       https://metacpan.org/module/Mojolicious
+[cpan]:                   http://www.cpan.org/
+[home-mojolicious]:       http://mojolicio.us/
+[home-perlbrew]:          http://perlbrew.pl/
+[mojolicious-why]:        http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
