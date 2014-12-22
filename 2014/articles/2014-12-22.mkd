@@ -15,8 +15,13 @@ dsm - 공군 병사, foollbar _at_ gmail.com
 ---------
 
 `grep`은 유닉스의 명령줄 유틸리티로써 패턴으로 문자열 속의 일치하는 부분을 찾아내는 도구입니다.
-기사에서는 문자열의 범위를 웹으로 넓혀, 여러 웹페이지를 수집한 후
+기사에서는 문자열의 범위를 웹으로 넓혀, 여러 웹 페이지를 수집한 후
 그 속에서 원하는 패턴을 찾아내는 방법에 대해 알아보겠습니다.
+웹 페이지를 검색하려면 먼저 어떤 웹페이지를 검색할지 정해야 합니다.
+[디씨인사이드][home-dcinside]는 갤러리 별 게시판이 존재하며,
+각 갤러리 별로 주제 구분이 명확하고, 올라오는 글들의 특성도 다르기 때문에
+패턴 검색에 적절하다고 판단해 선택했습니다.
+큰 의미는 없으니 편하게 읽어주세요. :)
 
 
 준비물
@@ -46,17 +51,6 @@ dsm - 공군 병사, foollbar _at_ gmail.com
 [Mojo::UserAgent 모듈][cpan-mojo-useragent]를 설치하든 상관없이
 Mojolicious 웹 프레임워크가 통째로 설치됩니다.
 하지만 Mojolicious는 매우 가벼운 웹프레임워크니 걱정하지 마세요. :)
-
-
-준비생각
----------
-
-웹페이지를 검색하려면 먼저 어떤 웹페이지를 검색 해야 할지 정해야 합니다.
-이 글에선 디씨인사이드를 선택했습니다.
-갤러리의 주제 구분이 명확하고 갤러리마다 올라오는 글들의 특성도 다르기 때문에
-패턴 검색에 적당하다 생각했지만 좋은 선택인지는 잘 모르겠습니다.
-큰 의미는 없으니 불편 없이 봐주시면 감사하겠습니다.
-
 
 
 얼개
@@ -272,6 +266,7 @@ $
 [cpan-mojo-useragent]:    https://metacpan.org/pod/Mojo::UserAgent
 [cpan-mojolicious]:       https://metacpan.org/module/Mojolicious
 [cpan]:                   http://www.cpan.org/
+[home-dcinside]:          http://www.dcinside.com/
 [home-mojolicious]:       http://mojolicio.us/
 [home-perlbrew]:          http://perlbrew.pl/
 [mojolicious-why]:        http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
