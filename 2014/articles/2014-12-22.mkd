@@ -154,7 +154,7 @@ DOM에서 검색을 수행한 후 일치한 결과가 담긴 [Mojo::Collection][
     push(
         @result,
         {
-            gall    => $gall,
+            gallery => $gallery,
             subject => $_->at('td[class="t_subject"]')->at('a')->all_text,
             author  => $_->at('td[class*="writer"]')->at('span')->all_text,
             hit     => $_->at('td[class="t_hits"]')->all_text,
@@ -171,49 +171,47 @@ DOM에서 검색을 수행한 후 일치한 결과가 담긴 [Mojo::Collection][
 전체 코드
 ----------
 
-전체 코드는 아래와 같습니다.
+전체 코드는 다음과 같습니다.
 
-use v5.10;
-use Mojo::UserAgent;
-
-if (@ARGV < 2) {
-        say STDERR "Usage: $0 <pattern> <galleries...>";
-        exit;
-}
-
-my $pattern = shift @ARGV;
-my @gallery = @ARGV;
-
-my $prefix = 'http://gall.dcinside.com/board/lists/?id=';
-my $ua = Mojo::UserAgent->new;
-
-my @result;
-for my $gall (@gallery) {
-        my $url = $prefix . $gall;
-        my $dom = $ua->get($url)->res->dom;
-
-        my $articles = $dom->find(
-                    'tr[class="tb"]'
-        )->grep(
-                    qr/$pattern/
-        );
-
-        push @result, {
-            gall        => $gall,
-            subject => $_->at('td[class="t_subject"]')->at('a')->all_text,
-            author  => $_->at('td[class*="writer"]')->at('span')->all_text,
-            hit         => $_->at('td[class="t_hits"]')->all_text,
-        } for (@$articles);
-}
-
-for (@result) {
-        printf("%s %s - %s | %d\n",
-            $_->{gall},
+    #!perl
+    #!/usr/bin/env perl
+    
+    use v5.18;
+    use strict;
+    use warnings;
+    use Mojo::UserAgent;
+    
+    my $url_prefix = 'http://gall.dcinside.com/board/lists/?id=';
+    
+    die "Usage: $0 <pattern> <gallery> [ <gallery> ... ]\n" unless @ARGV >= 2;
+    my ( $pattern, @galleries ) = @ARGV;
+    
+    my @result;
+    for my $gallery (@galleries) {
+            my $ua       = Mojo::UserAgent->new;
+            my $dom      = $ua->get("$url_prefix$gallery")->res->dom;
+            my $articles = $dom->find( 'tr[class="tb"]' )->grep( qr/$pattern/ );
+    
+            push(
+                @result,
+                {
+                    gallery => $gallery,
+                    subject => $_->at('td[class="t_subject"]')->at('a')->all_text,
+                    author  => $_->at('td[class*="writer"]')->at('span')->all_text,
+                    hit         => $_->at('td[class="t_hits"]')->all_text,
+                },
+            ) for @$articles;
+    }
+    
+    for (@result) {
+        printf(
+            "%s %s - %s | %d\n",
+            $_->{gallery},
             $_->{subject},
             $_->{author},
             $_->{hit},
         );
-}
+    }
 
 
 활용
