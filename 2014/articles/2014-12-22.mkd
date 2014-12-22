@@ -86,8 +86,10 @@ Mojo::UserAgent
     use warnings;
     use Mojo::UserAgent;
     
+    my $url = "http://gall.dcinside.com/board/lists/?id=airforce";
+    
     my $ua = Mojo::UserAgent->new;
-    say $ua->get("http://gall.dcinside.com/board/lists/?id=airforce")->res->body;
+    say $ua->get($url)->res->body;
 
 네! [디씨인사이드 공군 갤러리][dcinside-airforce]의 웹 페이지를 얻었습니다.
 이제 원하는 패턴만 찾으면 됩니다.
@@ -96,30 +98,33 @@ Mojo::UserAgent
 Mojo::DOM
 ----------
 
-Document Object Model은 HTML같은 구조화된 문서를 표현하기 위해 만들어진, 허술하게 정의된 형식입니다.
-얼마나 허술한지 브라우저마다 달리 해석하여 보여지는 방식이 달라지기도 하죠.
-하지만 Mojo::DOM은 그런 허술함에도 불구하고 DOM Tree를 꾸역꾸역 만들어 HTML문서를 돌아다닐 수 있게 해줍니다!
+DOM은 문서 객체 모델(Document Object Model)로 HTML이나
+XML 같은 구조화된 문서를 표현하기 위해 만들어진 형식입니다.
+[Mojo::DOM 모듈][cpan-mojo-dom]은 HTML이나 XML 문서를 파싱해서
+DOM 트리를 순회할 수 있는 편리한 방법을 제공합니다.
 
-위의 $ua->get(~~)에서 get함수는 Mojo::Transaction::HTTP 객체를 반환하고
-이 객체의 res 메소드는 Mojo::Message::Response 객체를 반환합니다.
-복잡하죠.
-위쪽 코드에선 raw 데이터를 얻기 위해 response 객체의 body 메소드를 사용했지만
-우리는 웹페이지에서 게시글의 제목도 찾아야 하고 작성자도 확인해야 되고 조회수도 얻어야 됩니다.
-이때 dom이 필요하게 되죠.
+앞에서 살펴 본 예제의 `$ua->get(...)`에서 `get()` 메소드는
+[Mojo::Transaction::HTTP][cpan-mojo-transaction-http] 객체를 반환하고,
+이 객체의 `res()` 메소드는 [Mojo::Message::Response][cpan-mojo-message-response]
+객체를 반환합니다.
+raw 데이터를 얻기 위해 `Mojo::Message::Response` 객체의 `body()` 메소드를 사용했지만,
+이제는 웹 페이지에서 게시글의 제목도 찾아야 하고, 작성자도 확인해야 되고, 조회수도 얻어야 합니다.
+이때 필요한 것이 바로 DOM입니다.
 
+말은 복잡하지만 `res()` 메소드 대신, `dom()` 메소드를 사용해
+HTML문서의 `Mojo::DOM` 객체를 얻어오는 것은 무척 간단합니다.
 
-말은 복잡하지만 res대신 dom 메소드를 사용해서 HTML문서의 Mojo::DOM 객체를 얻어오면 됩니다.
+    #!perl
+    my $dom = $ua->get($url)->res->dom;
 
-my $dom = $ua->get(‘http://gall.dcinside.com/board/lists/?id=airforce’)->res->dom;
-
-이제 우리는 dom을 이용해서 필요한 정보를 뽑아낼 수 있습니다.
+이제 DOM을 이용해서 필요한 정보를 뽑아낼 모든 준비를 마쳤습니다.
 하지만 그 전에 정보가 어떻게 담겨있는지 파악해야 합니다.
-일반 grep의 경우 정보를 추출하는데 따로 필요한 절차가 없습니다.
-왜냐면 그냥 문자열 더미 속에서 패턴을 찾기만 하면 되기 때문이죠.
-하지만 우리는 웹페이지 속에서 패턴을 찾아야 합니다.
-웹페이지는 HTML라는 언어로 구조화되어있고 HTML을 대상으로
-패턴 검색을 수행하면 슬프게도 찾는 정보보다 딸려오는 태그들이 더 많을 겁니다.
-
+일반 `grep`의 경우 문자열 속에서 패턴을 찾기만 하면되기 때문에
+정보를 추출하는데 따로 필요한 절차가 없습니다.
+하지만 이제는 웹 페이지 속에서 패턴을 찾아야 합니다.
+웹 페이지는 HTML라는 언어로 구조화되어있고 HTML을 대상으로
+패턴 검색을 수행하면 안타깝게도 찾으려는 정보보다
+딸려오는 HTML 태그가 더 많을 겁니다.
 
 
 정보 추출
@@ -266,11 +271,14 @@ $
 
 [2] www.scrapesentry.com/scrapesentry-scraping-threat-report-2014/
 
-[cpan-mojo-useragent]:    https://metacpan.org/pod/Mojo::UserAgent
-[cpan-mojolicious]:       https://metacpan.org/module/Mojolicious
-[cpan]:                   http://www.cpan.org/
-[dcinside-airforce]:      http://gall.dcinside.com/board/lists/?id=airforce
-[home-dcinside]:          http://www.dcinside.com/
-[home-mojolicious]:       http://mojolicio.us/
-[home-perlbrew]:          http://perlbrew.pl/
-[mojolicious-why]:        http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
+[cpan-mojo-dom]:              https://metacpan.org/module/Mojo::DOM
+[cpan-mojo-message-response]: https://metacpan.org/module/Mojo::Message::Response
+[cpan-mojo-transaction-http]: https://metacpan.org/module/Mojo::Transaction::HTTP
+[cpan-mojo-useragent]:        https://metacpan.org/module/Mojo::UserAgent
+[cpan-mojolicious]:           https://metacpan.org/module/Mojolicious
+[cpan]:                       http://www.cpan.org/
+[dcinside-airforce]:          http://gall.dcinside.com/board/lists/?id=airforce
+[home-dcinside]:              http://www.dcinside.com/
+[home-mojolicious]:           http://mojolicio.us/
+[home-perlbrew]:              http://perlbrew.pl/
+[mojolicious-why]:            http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#Why-not-split-up-Mojolicious-into-many-smaller-distributions
