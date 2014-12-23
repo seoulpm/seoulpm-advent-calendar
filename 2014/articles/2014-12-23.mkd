@@ -57,23 +57,23 @@ aqua - 두마리 고양이의  집사. 직관 잘 안 가는 FC서울 서포터,
 
 
 smartctl 옵션
------
+--------------
 
 디스크 검사에 사용할 옵션입니다.
 
-    -H health 상태 값을 확인 합니다.
-    -A attributes 상태 값을 확인 합니다.
+- `-H health`: 상태 값을 확인 합니다.
+- `-A attributes`: 상태 값을 확인 합니다.
 
-모니터링에 사용하는 attributes 항목입니다.
+모니터링에 사용하는 속성 항목은 다음과 같습니다.
 
-    UDMA_CRC_Error_Count
-    Reallocated_Event_Count
-    Reallocated_Sector_Ct
-    Offline_Uncorrectable
-    Spin_Retry_Count
-    Current_Pending_Sector
+- `UDMA_CRC_Error_Count`
+- `Reallocated_Event_Count`
+- `Reallocated_Sector_Ct`
+- `Offline_Uncorrectable`
+- `Spin_Retry_Count`
+- `Current_Pending_Sector`
 
-참고로 attributes 항목은 [이곳][attributes]을 참고했습니다.
+속성 항목은 [Smartctl - Thomas-Krenn-Wiki 문서][thomaskrenn-smartctl]를 참고하세요.
 
 
 명령 만들기
@@ -490,7 +490,7 @@ smartctl을 실제로 실행한 결과입니다.
 
 __EOT__
 [smartmontools]:        http://www.smartmontools.org
-[attributes]:           http://www.thomas-krenn.com/en/wiki/Smartctl
+[thomaskrenn-smartctl]: http://www.thomas-krenn.com/en/wiki/Smartctl
 [cpan-nagios-plugin]:   https://metacpan.org/pod/Nagios::Plugin
 [cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
 [cpan]:                 http://www.cpan.org/
