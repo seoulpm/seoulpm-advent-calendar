@@ -443,13 +443,15 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 
 
 테스트
------
+-------
 
-실행할 장비에는 디스크가 `sda`, `sdb` 2개가 있습니다.
-smartctl을 실제로 실행한 결과입니다.
+테스트할 장비에는 디스크가 `sda`, `sdb` 2개가 있습니다.
+`smartctl`을 실제로 실행한 결과는 다음과 같습니다.
 
-`sda`에 대한 health 검사
-
+    #!bash
+    #
+    # `sda`에 대한 health 검사
+    #
     root@hubble:~# smartctl -H /dev/sda
     smartctl 6.2 2013-07-26 r3841 [x86_64-linux-3.13.0-27-generic] (local build)
     Copyright (C) 2002-13, Bruce Allen, Christian Franke, www.smartmontools.org
@@ -457,8 +459,9 @@ smartctl을 실제로 실행한 결과입니다.
     === START OF READ SMART DATA SECTION ===
     SMART overall-health self-assessment test result: PASSED
 
-`sda`에 대한 attributes 검사
-
+    #
+    # `sdb`에 대한 health 검사
+    #
     root@hubble:~# smartctl -A /dev/sda
     smartctl 6.2 2013-07-26 r3841 [x86_64-linux-3.13.0-27-generic] (local build)
     Copyright (C) 2002-13, Bruce Allen, Christian Franke, www.smartmontools.org
@@ -485,12 +488,13 @@ smartctl을 실제로 실행한 결과입니다.
     198 Offline_Uncorrectable   0x0008   100   100   000    Old_age   Offline      -       0
     199 UDMA_CRC_Error_Count    0x000a   200   200   000    Old_age   Always       -       0
 
-그리고 펄 프로그램으로 실행한 health 검사 결과 입니다.
+그리고 펄 프로그램으로 실행한 health 검사 결과는 다음과 같습니다.
 
+    #!bash
     root@hubble:~# perl check_smart.pl
     SMART OK - /dev/sda: [PASSED] /dev/sdb: [PASSED]
 
-그리고 펄 프로그램으로 실행한 attributes 검사 결과 입니다.
+그리고 펄 프로그램으로 실행한 속성 검사 결과는 다음과 같습니다.
 
     root@hubble:~# perl check_smart.pl attributes
     SMART OK - /dev/sda: UDMA_CRC_Error_Count [OK]
@@ -506,10 +510,11 @@ smartctl을 실제로 실행한 결과입니다.
      /dev/sdb: Spin_Retry_Count [OK]
      /dev/sdb: Current_Pending_Sector [OK]
 
+어떤가요? 눈에 훨씬 잘 들어오죠? :-)
 
 
 
-__EOT__
+
 [smartmontools]:        http://www.smartmontools.org
 [thomaskrenn-smartctl]: http://www.thomas-krenn.com/en/wiki/Smartctl
 [cpan-nagios-plugin]:   https://metacpan.org/pod/Nagios::Plugin
