@@ -1,0 +1,545 @@
+Title:    SMART 체크 - 디스크 검사
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aqua
+
+저자
+-----
+
+aqua - 두마리 고양이의  집사. 직관 잘 안 가는 FC서울 서포터, aquative _at_ gmail.com
+
+
+시작하며
+---------
+
+서버에 발생하는 문제 중에서 빈번하지는 않지만(서비스 종류에 따라 다릅니다)
+디스크 문제가 생긴 경우는 매우 치명적입니다.
+그러므로 평소에 모니터링을 통해 디스크 교체와 같은 조치를 미리 취하는 것은 중요합니다.
+보통 [smartmontools][smartmontools]를 이용한 검사를 많이 쓰는데,
+이번 기사에서는 *smartmontools* 패키지의 `smartctl`을 실행하고
+결과를 간단히 분석한 후 판단한 결과를 알려주는 방법을 살펴봅니다.
+`smartctl`을 실행하고 결과를 분석하기 위해서 [CPAN의 Capture::Tiny 모듈][cpan-capture-tiny]과
+모니터링 시스템(Opsview)과 같이 사용하기 위해서 [CPAN의 Nagios::Plugin 모듈][cpan-nagios-plugin]도 사용합니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+* [CPAN의 Nagios::Plugin 모듈][cpan-nagios-plugin]
+* [CPAN의 Capture::Tiny 모듈][cpan-capture-tiny]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Nagios::Plugin Capture::Tiny
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Nagios::Plugin Capture::Tiny
+
+그리고 [smartmontools][smartmontools] 패키지를 설치합니다.
+
+    #!plain
+    #
+    # RHEL/CentOS
+    #
+    $ yum -y install smartmontools
+    
+    #
+    # Debian/Ubuntu
+    #
+    $ aptitude -y install smartmontools
+
+
+smartctl 옵션
+--------------
+
+디스크 검사에 사용할 옵션입니다.
+
+- `-H health`: 상태 값을 확인 합니다.
+- `-A attributes`: 상태 값을 확인 합니다.
+
+모니터링에 사용하는 속성 항목은 다음과 같습니다.
+
+- `UDMA_CRC_Error_Count`
+- `Reallocated_Event_Count`
+- `Reallocated_Sector_Ct`
+- `Offline_Uncorrectable`
+- `Spin_Retry_Count`
+- `Current_Pending_Sector`
+
+속성 항목은 [Smartctl - Thomas-Krenn-Wiki 문서][thomaskrenn-smartctl]를 참고하세요.
+
+
+명령 만들기
+------------
+
+`smartctl` 명령을 실행할 코드를 살펴보죠.
+사용자가 실행 할 때 입력한 옵션과 `@disk` 배열에 있는 디스크 정보를 이용해서 명령문을 생성합니다.
+디스크가 1개이면 한 개의 명령문이 생성됩니다.
+하지만 디스크가 여러개가 있을 수 있기 때문에 배열을 사용합니다.
+
+    #!perl
+    my $opt  = shift;
+    my @disk = @_;
+    my @cmd;
+
+    $opt = '-H' if $opt eq 'health';
+    $opt = '-A' if $opt eq 'attributes';
+
+디스크는 한 개 이상이므로 반복문을 사용해야겠죠?
+
+    #!perl
+    for my $i ( @disk ) {
+        push @cmd, sprintf "/usr/sbin/smartctl $opt /dev/%s", $i;
+    }
+
+    return @cmd;
+
+
+실행
+-----
+
+명령을 실행하고 결과를 반환할 코드를 살펴보겠습니다.
+명령을 실행한 후에는 종료 값을 확인합니다.
+종료값이 `0`이면 성공으로 판단하고, `0`이 아니면 실패한 것으로 판단합니다.
+종료값이 `0`이 아니면 사용자가 직접 명령을 실행하고 상태확인을 해야합니다.
+
+    #!perl
+    for my $i ( @cmd ) {
+        my ($stdout, $stderr, $exit) = capture {
+            system $i
+        };
+
+        if ( $exit != 0 ) {
+            #
+            # 0이 아니므로 정상 종료가 아닙니다.
+            #
+            $res{execute} = 0;
+            return %res;
+        }
+        else {
+            #
+            # 정상 종료!
+            #
+            $res{execute} = 1;
+        }
+
+        #
+        # 사용자가 입력한 옵션에 따라 다른 동작 수행
+        #
+        if ( $opt eq 'health' ) {
+            ($res{$dev}{health}) = $stdout =~ m{SMART overall-health self-assessment test result: (\w+)}g;
+        }
+        else {
+             my @output = split q{[\r\n]+}, $stdout;
+
+            for my $res ( @output ) {
+                my @d = split q{ }, $res;
+
+                #
+                # 지정한 attributes 정보 값만 변수에 저장합니다.
+                #
+                for my $i ( @{ $attr } ) {
+                    $res{$dev}{ $i } = $d[-1] if $d[1] eq $i;
+                }
+            }
+        }
+    }
+
+
+main 함수와 결과 분석, 모니터링(Opsview) 알림
+----------------------------------------------
+
+`main` 함수는 3가지 기능을 합니다.
+
+- 사용자로부터 옵션을 입력 받습니다.
+- 생성한 명령을 실행하는 함수를 호출 합니다.
+- 실행 결과를 분석합니다.
+
+사용자가 프로그램을 실행할 때 입력할 옵션을 정의하고
+결과에 문제가 있는 경우, 기록하기 위한 `$do_notify`를 초기화합니다.
+더불어 속성 항목에서 모니터링 대상과 임계값(threshold value)을 설정합니다.
+
+    #!perl
+    my $check_target = $ARGV[0] || 'health'; # 기본값: 'health'
+    my @mode = qw( health attributes );
+
+    my $do_notify = 0;
+
+    my %cond_attr = qw(
+        Spin_Retry_Count         1
+        Reallocated_Sector_Ct    0
+        Reallocated_Event_Count  0
+        Current_Pending_Sector   0
+        Offline_Uncorrectable    0
+        UDMA_CRC_Error_Count     0
+    );
+
+프로그램을 실행 할 때 입력한 옵션이 올바른지 확인하고,
+틀리면 안내문을 출력하고 프로그램을 종료합니다.
+
+    #!perl
+    unless ( grep { m{^$check_target$} } @mode ) {
+        print "Usage: check_smart.pl { health | attributes }\n";
+        exit 1;
+    }
+
+알람을 하기 위해서 `Nagios::Plugin` 객체를 생성한 후
+디스크 정보를 획득하고 명령을 생성한 뒤 이를 실행합니다.
+
+    #!perl
+    my $np = Nagios::Plugin->new();
+
+    my @disk = get_disk_info();
+    my @cmd  = make_cmd($check_target, @disk);
+
+    my %res;
+    {
+    	# attributes 정보를 얻기 위해서 키 값을 추출한다.
+        my @attr = map {
+            $_
+        } keys %cond_attr;
+
+        %res = exe_check($check_target, \@attr, @cmd);
+    }
+
+명령 실행에 실패하면 [Opsview][opsview]의 `UNKNOWN` 경고를 알리고 프로그램을 종료합니다.
+
+    #!perl
+    $np->nagios_exit(UNKNOWN, "check to smartctl path or permission") unless $res{execute};
+
+health 검사 결과를 분석하는 구문은 다음과 같습니다.
+검사 결과가 `PASSED`가 아니면 디스크에 문제가 있습니다.
+그러므로 [Nagios][nagios] 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
+
+    #!perl
+     if ( $check_target eq 'health' ) {
+        for my $i ( keys %res ) {
+            next if $i eq 'execute';
+            next unless defined $res{$i}{health};
+
+            $do_notify++ if $res{$i}{health} ne 'PASSED';
+
+            $msg .= "$i: [$res{$i}{health}]";
+            $msg .= " ";
+        }
+
+        $msg =~ s{[[:space:]]$}{} if $msg;
+    }
+
+속성 검사 결과를 분석하는 구문은 다음과 같습니다.
+모니터링 대상 속성 항목이면 임계값을 비교합니다.
+지정한 임계값보다 크면 모니터링 알람을 하기 위해 `$do_notify`의 값을 증가합니다.
+
+    #!perl
+    if ( $check_target eq 'attributes' ) {
+        for my $i ( keys %res ) {
+            next if $i eq 'execute';
+            for my $a ( keys %cond_attr ) {
+                if ( exists $res{$i}{$a} and defined $res{$i}{$a} ) {
+                    if ( $res{$i}{$a} > $cond_attr{$a} ) {
+                        $do_notify++;
+                        $msg .= "$i: $a [$res{$i}{$a}]\n";
+                    }
+                    else {
+                        $msg .= "$i: $a [OK]\n";
+                    }
+                }
+            }
+        }
+    }
+
+모니터링 알람을 수행하는 코드는 다음과 같습니다.
+
+    #!perl
+    if ( $do_notify ) {
+        $np->nagios_exit(CRITICAL, $msg);
+    }
+    else {
+        $np->nagios_exit(OK, $msg);
+    }
+
+
+전체코드
+---------
+
+코드 구문을 하나 하나 설명하다보니 전체 코드가 눈에 들어오지 않겠군요.
+작성한 전체 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # requirement package: smartmontools
+    #
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use Capture::Tiny qw( capture );
+    use Nagios::Plugin;
+
+    sub get_disk_info {
+        my $disk_info = '/proc/partitions';
+        my @disk;
+
+        open my $fh, '<', $disk_info or die "$!\n";
+        while ( <$fh> ) {
+            push @disk, ( split q{ }, $_ )[-1] if $_ =~ m{sd[a-z]$}g;
+        }
+        close $fh;
+
+        return @disk;
+    }
+
+    sub make_cmd {
+        my ( $opt, @disk ) = @_;
+
+        $opt = '-H' if $opt eq 'health';
+        $opt = '-A' if $opt eq 'attributes';
+
+        my @cmd;
+        for my $i ( @disk ) {
+            push @cmd, sprintf "/usr/sbin/smartctl $opt /dev/%s", $i;
+        }
+
+        return @cmd;
+    }
+
+    sub exe_check {
+        my ( $opt, $attr, @cmd ) = @_;
+
+        my %res;
+        for my $i ( @cmd ) {
+            my ($stdout, $stderr, $exit) = capture { system $i };
+
+            if ( $exit != 0 ) {
+                $res{execute} = 0;
+                return %res;
+            }
+            else {
+                $res{execute} = 1;
+            }
+
+            my $dev = ( split q{ }, $i )[-1];
+
+            if ( $opt eq 'health' ) {
+                ($res{$dev}{health}) = $stdout =~ m{SMART overall-health self-assessment test result: (\w+)}g;
+            }
+            else {
+                my @output = split q{[\r\n]+}, $stdout;
+
+                for my $res ( @output ) {
+                    my @d = split q{ }, $res;
+
+                    for my $i ( @{ $attr } ) {
+                        $res{$dev}{ $i } = $d[-1] if $d[1] eq $i;
+                    }
+                }
+            }
+        }
+
+        return %res;
+    }
+
+    sub main {
+        my $check_target = $ARGV[0] || 'health';
+        my @mode = qw( health attributes );
+        my $msg;
+        my $do_notify = 0;
+        my %cond_attr = qw(
+            Spin_Retry_Count         1
+            Reallocated_Sector_Ct    0
+            Reallocated_Event_Count  0
+            Current_Pending_Sector   0
+            Offline_Uncorrectable    0
+            UDMA_CRC_Error_Count     0
+        );
+
+        unless ( grep { m{^$check_target$} } @mode ) {
+            print "Usage: check_smart.pl { health | attributes }\n";
+            exit 1;
+        }
+
+        my $np = Nagios::Plugin->new();
+
+        #
+        # get disk info
+        # 
+        my @disk = get_disk_info();
+
+        #
+        # command
+        # 
+        my @cmd = make_cmd($check_target, @disk);
+
+        #
+        # execute
+        # 
+        my %res;
+        {
+            my @attr = map {
+                $_
+            } keys %cond_attr;
+
+            %res = exe_check($check_target, \@attr, @cmd);
+        }
+
+        #
+        # parsing execute results
+        # 
+        $np->nagios_exit(
+            UNKNOWN,
+            "smartctl return value is false, check to smartctl path or permission",
+        ) unless $res{execute};
+
+        if ( $check_target eq 'health' ) {
+            for my $i ( keys %res ) {
+                next if $i eq 'execute';
+                next unless defined $res{$i}{health};
+
+                $do_notify++ if $res{$i}{health} ne 'PASSED';
+
+                $msg .= "$i: [$res{$i}{health}]";
+                $msg .= q{ };
+            }
+
+            $msg =~ s{[[:space:]]$}{} if $msg;
+        }
+        elsif ( $check_target eq 'attributes' ) {
+            for my $i ( keys %res ) {
+                next if $i eq 'execute';
+                for my $a ( keys %cond_attr ) {
+                    if ( exists $res{$i}{$a} and defined $res{$i}{$a} ) {
+                        if ( $res{$i}{$a} > $cond_attr{$a} ) {
+                            $do_notify++;
+                            $msg .= "$i: $a [$res{$i}{$a}]\n";
+                        }
+                        else {
+                            $msg .= "$i: $a [OK]\n";
+                        }
+
+                        $msg .= " ";
+                    }
+                }
+            }
+            $msg =~ s{[[:space:]]$}{} if $msg;
+        }
+
+        # do notify
+        if ( $do_notify ) {
+            $np->nagios_exit(CRITICAL, $msg);
+        }
+        else {
+            $np->nagios_exit(OK, $msg);
+        }
+    }
+
+    main;
+
+
+테스트
+-------
+
+테스트할 장비에는 디스크가 `sda`, `sdb` 2개가 있습니다.
+`smartctl`을 실제로 실행한 결과는 다음과 같습니다.
+
+    #!bash
+    #
+    # `sda`에 대한 health 검사
+    #
+    root@hubble:~# smartctl -H /dev/sda
+    smartctl 6.2 2013-07-26 r3841 [x86_64-linux-3.13.0-27-generic] (local build)
+    Copyright (C) 2002-13, Bruce Allen, Christian Franke, www.smartmontools.org
+
+    === START OF READ SMART DATA SECTION ===
+    SMART overall-health self-assessment test result: PASSED
+
+    #
+    # `sdb`에 대한 health 검사
+    #
+    root@hubble:~# smartctl -A /dev/sda
+    smartctl 6.2 2013-07-26 r3841 [x86_64-linux-3.13.0-27-generic] (local build)
+    Copyright (C) 2002-13, Bruce Allen, Christian Franke, www.smartmontools.org
+
+    === START OF READ SMART DATA SECTION ===
+    SMART Attributes Data Structure revision number: 16
+    Vendor Specific SMART Attributes with Thresholds:
+    ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+      1 Raw_Read_Error_Rate     0x000b   100   100   016    Pre-fail  Always       -       65536
+      2 Throughput_Performance  0x0005   139   139   054    Pre-fail  Offline      -       73
+      3 Spin_Up_Time            0x0007   144   144   024    Pre-fail  Always       -       404 (Average 393)
+      4 Start_Stop_Count        0x0012   100   100   000    Old_age   Always       -       27
+      5 Reallocated_Sector_Ct   0x0033   100   100   005    Pre-fail  Always       -       0
+      7 Seek_Error_Rate         0x000b   100   100   067    Pre-fail  Always       -       0
+      8 Seek_Time_Performance   0x0005   124   124   020    Pre-fail  Offline      -       33
+      9 Power_On_Hours          0x0012   099   099   000    Old_age   Always       -       11327
+     10 Spin_Retry_Count        0x0013   100   100   060    Pre-fail  Always       -       0
+     12 Power_Cycle_Count       0x0032   100   100   000    Old_age   Always       -       27
+    192 Power-Off_Retract_Count 0x0032   100   100   000    Old_age   Always       -       28
+    193 Load_Cycle_Count        0x0012   100   100   000    Old_age   Always       -       28
+    194 Temperature_Celsius     0x0002   200   200   000    Old_age   Always       -       30 (Min/Max 18/42)
+    196 Reallocated_Event_Count 0x0032   100   100   000    Old_age   Always       -       0
+    197 Current_Pending_Sector  0x0022   100   100   000    Old_age   Always       -       0
+    198 Offline_Uncorrectable   0x0008   100   100   000    Old_age   Offline      -       0
+    199 UDMA_CRC_Error_Count    0x000a   200   200   000    Old_age   Always       -       0
+
+그리고 펄 프로그램으로 실행한 health 검사 결과는 다음과 같습니다.
+
+    #!bash
+    root@hubble:~# perl check_smart.pl
+    SMART OK - /dev/sda: [PASSED] /dev/sdb: [PASSED]
+
+그리고 펄 프로그램으로 실행한 속성 검사 결과는 다음과 같습니다.
+
+    #!bash
+    root@hubble:~# perl check_smart.pl attributes
+    SMART OK - /dev/sda: UDMA_CRC_Error_Count [OK]
+     /dev/sda: Reallocated_Event_Count [OK]
+     /dev/sda: Reallocated_Sector_Ct [OK]
+     /dev/sda: Offline_Uncorrectable [OK]
+     /dev/sda: Spin_Retry_Count [OK]
+     /dev/sda: Current_Pending_Sector [OK]
+     /dev/sdb: UDMA_CRC_Error_Count [OK]
+     /dev/sdb: Reallocated_Event_Count [OK]
+     /dev/sdb: Reallocated_Sector_Ct [OK]
+     /dev/sdb: Offline_Uncorrectable [OK]
+     /dev/sdb: Spin_Retry_Count [OK]
+     /dev/sdb: Current_Pending_Sector [OK]
+
+어떤가요? 눈에 훨씬 잘 들어오죠? :-)
+
+
+정리하며
+---------
+
+기사에서는 디스크를 효율적이고 안전하게 감시하기 위해 만들어진
+[smartmontools][smartmontools]와 펄과 몇가지 [CPAN][cpan] 모듈을 사용해
+간단하게 디스크를 감시하며 남은 수명 또는 상태를 관리할 수 있는 방법을 알아보았습니다.
+자세히 설명하지는 않았지만 [Nagios][nagios]/[OpsView][opsview]와도 연동했는데
+더 자세한 부분은 CPAN 및 공식 홈페이지에서 관련 플러그인 문서를 참고하세요.
+
+시스템을 운영하다보면 피치못하게 발생하는 장애가 많습니다.
+하지만 이런 장애들 중 꽤 많은 부분은 미리 예견하고 어느정도 대처가 가능하며,
+디스크 오류 역시 충분히 사전에 예방할 수 있는 경우입니다.
+꼭 서버가 아니더라도 여러분이 사용하는 시스템의 하드 디스크 상태를
+이번 기회에 확인해보는 것은 어떨까요? :)
+
+
+
+[cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
+[cpan-nagios-plugin]:   https://metacpan.org/pod/Nagios::Plugin
+[cpan]:                 http://www.cpan.org/
+[home-perlbrew]:        http://perlbrew.pl/
+[nagios]:               http://www.nagios.org/
+[opsview]:              http://www.opsview.com/
+[smartmontools]:        http://www.smartmontools.org
+[thomaskrenn-smartctl]: http://www.thomas-krenn.com/en/wiki/Smartctl
