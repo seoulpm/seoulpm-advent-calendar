@@ -72,21 +72,20 @@ John_Kang - 시스템엔지니어
 Bash 자동 완성
 ---------------
 
-`bash`는 다양한 방법으로 자동 완성을 시켜주는 `complete` 내장함수를 사용할 수 있도록 합니다.
-somecmd명령어에 대해서 `Wordlist`를 작성해 두고 사용할 수 있으며,
+Bash는 다양한 방법으로 자동 완성을 도와주는 `complete` 내장 함수를 지원합니다.
+`somecmd` 명령어에 대해서 `Wordlist`를 작성해 두고 사용하려면 방법은 다음과 같습니다.
 
     #!bash
     $ complete -W "one two three four" somecmd
     $ somecmd t<TAB><TAB>
     two  three
 
-아래와 같이 함수(-F)를 사용할수 도 있으며,
-해당 함수는 2개의 input인자를 전달 받게 됩니다.
+함수(`-F`)를 사용할 수도 있는데, 이 때 해당 함수는 두 개의 입력 인자를 전달받습니다.
 
-- `COMP_WORDS` : 인자 리스트
-- `COMP_CWORD` : 배열 인덱스(현재 커서의 위치)
+- `COMP_WORDS`: 인자 리스트
+- `COMP_CWORD`: 배열 인덱스(현재 커서의 위치)
 
-그리고 반드시 `COMPREPLY`에 사용 가능한 자동 완성 요소 리스트를 담아야 합니다.
+그리고 반드시 `COMPREPLY`에 사용 가능한 자동 완성 요소 목록을 담아야 합니다.
 
     #!bash
     $ _foo()
