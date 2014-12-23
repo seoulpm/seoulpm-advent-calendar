@@ -215,7 +215,7 @@ main 함수와 결과 분석, 모니터링(Opsview) 알림
 
 health 검사 결과를 분석하는 구문은 다음과 같습니다.
 검사 결과가 `PASSED`가 아니면 디스크에 문제가 있습니다.
-그러므로 nagios 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
+그러므로 [Nagios][nagios] 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
 
     #!perl
      if ( $check_target eq 'health' ) {
@@ -513,11 +513,28 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 어떤가요? 눈에 훨씬 잘 들어오죠? :-)
 
 
+정리하며
+---------
+
+기사에서는 디스크를 효율적이고 안전하게 감시하기 위해 만들어진
+[smartmontools][smartmontools]와 펄과 몇가지 [CPAN][cpan] 모듈을 사용해
+간단하게 디스크를 감시하며 남은 수명 또는 상태를 관리할 수 있는 방법을 알아보았습니다.
+자세히 설명하지는 않았지만 [Nagios][nagios]/[OpsView][opsview]와도 연동했는데
+더 자세한 부분은 CPAN 및 공식 홈페이지에서 관련 플러그인 문서를 참고하세요.
+
+시스템을 운영하다보면 피치못하게 발생하는 장애가 많습니다.
+하지만 이런 장애들 중 꽤 많은 부분은 미리 예견하고 어느정도 대처가 가능하며,
+디스크 오류 역시 충분히 사전에 예방할 수 있는 경우입니다.
+꼭 서버가 아니더라도 여러분이 사용하는 시스템의 하드 디스크 상태를
+이번 기회에 확인해보는 것은 어떨까요? :)
 
 
-[smartmontools]:        http://www.smartmontools.org
-[thomaskrenn-smartctl]: http://www.thomas-krenn.com/en/wiki/Smartctl
-[cpan-nagios-plugin]:   https://metacpan.org/pod/Nagios::Plugin
+
 [cpan-capture-tiny]:    https://metacpan.org/pod/Capture::Tiny
+[cpan-nagios-plugin]:   https://metacpan.org/pod/Nagios::Plugin
 [cpan]:                 http://www.cpan.org/
 [home-perlbrew]:        http://perlbrew.pl/
+[nagios]:               http://www.nagios.org/
+[opsview]:              http://www.opsview.com/
+[smartmontools]:        http://www.smartmontools.org
+[thomaskrenn-smartctl]: http://www.thomas-krenn.com/en/wiki/Smartctl
