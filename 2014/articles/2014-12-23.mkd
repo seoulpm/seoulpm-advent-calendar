@@ -104,40 +104,47 @@ smartctl 옵션
 
 실행
 -----
-명령을 실행하고 결과를 리턴하는 함수입니다.
-명령을 실행하고 exit 값을 확인 합니다. exit 값이 0이면 성공으로 판단하고, 0이 아니면 성공하지 못 한걸로 판단합니다.
-exit 값이 0이 아니면 사용자가 직접 명령을 실행하고 상태 확인을 해야 합니다.
 
+명령을 실행하고 결과를 반환할 코드를 살펴보겠습니다.
+명령을 실행한 후에는 종료 값을 확인합니다.
+종료값이 `0`이면 성공으로 판단하고, `0`이 아니면 실패한 것으로 판단합니다.
+종료값이 `0`이 아니면 사용자가 직접 명령을 실행하고 상태확인을 해야합니다.
+
+    #!perl
     for my $i ( @cmd ) {
         my ($stdout, $stderr, $exit) = capture {
             system $i
         };
 
-0이 아니므로 정상 종료가 아닙니다.
-
         if ( $exit != 0 ) {
+            #
+            # 0이 아니므로 정상 종료가 아닙니다.
+            #
             $res{execute} = 0;
             return %res;
         }
-
-정상 종료!
-
         else {
+            #
+            # 정상 종료!
+            #
             $res{execute} = 1;
         }
 
-사용자가 입력한 옵션에 따라서 실행이 다릅니다.
-
+        #
+        # 사용자가 입력한 옵션에 따라 다른 동작 수행
+        #
         if ( $opt eq 'health' ) {
             ($res{$dev}{health}) = $stdout =~ m{SMART overall-health self-assessment test result: (\w+)}g;
-        } else {
+        }
+        else {
              my @output = split q{[\r\n]+}, $stdout;
 
             for my $res ( @output ) {
                 my @d = split q{ }, $res;
 
-지정한 attributes 정보 값만 변수에 저장합니다.
-
+                #
+                # 지정한 attributes 정보 값만 변수에 저장합니다.
+                #
                 for my $i ( @{ $attr } ) {
                     $res{$dev}{ $i } = $d[-1] if $d[1] eq $i;
                 }
@@ -146,56 +153,50 @@ exit 값이 0이 아니면 사용자가 직접 명령을 실행하고 상태 확
     }
 
 
-main 함수 및 결과 분석 그리고 모니터링(Opsview) 알림
------
+main 함수와 결과 분석, 모니터링(Opsview) 알림
+----------------------------------------------
 
-main 함수는 3가지 기능을 합니다.
+`main` 함수는 3가지 기능을 합니다.
 
-* 사용자로부터 옵션을 입력 받습니다.
-* 생성한 명령을 실행하는 함수를 호출 합니다.
-* 실행 결과를 분석합니다.
+- 사용자로부터 옵션을 입력 받습니다.
+- 생성한 명령을 실행하는 함수를 호출 합니다.
+- 실행 결과를 분석합니다.
 
-사용자가 프로그램을 실행 할 때 입력한 옵션입니다.
+사용자가 프로그램을 실행할 때 입력할 옵션을 정의하고
+결과에 문제가 있는 경우, 기록하기 위한 `$do_notify`를 초기화합니다.
+더불어 속성 항목에서 모니터링 대상과 임계값(threshold value)을 설정합니다.
 
-    my $check_target = $ARGV[0] || 'health'; # 입력이 없으면 기본값을 'health'로 셋팅한다.
+    #!perl
+    my $check_target = $ARGV[0] || 'health'; # 기본값: 'health'
     my @mode = qw( health attributes );
-
-smart 결과에 문제가 있는 경우, $do_notify의 값을 증가 시켜셔 알람 행동을 판단합니다.
 
     my $do_notify = 0;
 
-attributes 항목에서 모니터링 대상과 threshold값입니다.
-
     my %cond_attr = qw(
-      Spin_Retry_Count         1
-      Reallocated_Sector_Ct    0
-      Reallocated_Event_Count  0
-      Current_Pending_Sector   0
-      Offline_Uncorrectable    0
-      UDMA_CRC_Error_Count     0
+        Spin_Retry_Count         1
+        Reallocated_Sector_Ct    0
+        Reallocated_Event_Count  0
+        Current_Pending_Sector   0
+        Offline_Uncorrectable    0
+        UDMA_CRC_Error_Count     0
     );
 
 프로그램을 실행 할 때 입력한 옵션이 올바른지 확인하고,
 틀리면 안내문을 출력하고 프로그램을 종료합니다.
 
+    #!perl
     unless ( grep { m{^$check_target$} } @mode ) {
         print "Usage: check_smart.pl { health | attributes }\n";
         exit 1;
     }
 
-알람을 하기 위해서 `Nagios::Plugin` 객체를 생성합니다.
+알람을 하기 위해서 `Nagios::Plugin` 객체를 생성한 후
+디스크 정보를 획득하고 명령을 생성한 뒤 이를 실행합니다.
 
     my $np = Nagios::Plugin->new();
 
-디스크 정보를 받습니다.
-
     my @disk = get_disk_info();
-
-디스크 정보를 이용해서 명령을 생성합니다.
-
-    my @cmd = make_cmd($check_target, @disk);
-
-생성한 명령 실행
+    my @cmd  = make_cmd($check_target, @disk);
 
     my %res;
     {
@@ -207,19 +208,20 @@ attributes 항목에서 모니터링 대상과 threshold값입니다.
         %res = exe_check($check_target, \@attr, @cmd);
     }
 
-명령 실행에 실패 하면 Opsview의 unknown 경고 알람을 하고 프로그램을 종료 합니다.
+명령 실행에 실패하면 Opsview의 unknown 경고를 알리고 프로그램을 종료합니다.
 
+    #!perl
     $np->nagios_exit(UNKNOWN, "check to smartctl path or permission") unless $res{execute};
 
-health 검사 결과를 분석하는 구문입니다.
+health 검사 결과를 분석하는 구문은 다음과 같습니다.
+검사 결과가 `PASSED`가 아니면 디스크에 문제가 있습니다.
+그러므로 nagios 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
 
+    #!perl
      if ( $check_target eq 'health' ) {
         for my $i ( keys %res ) {
             next if $i eq 'execute';
             next unless defined $res{$i}{health};
-
-검사 결과가 PASSED 가 아니면 디스크에 문제가 있습니다.
-그러므로 nagios 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
 
             $do_notify++ if $res{$i}{health} ne 'PASSED';
 
@@ -230,21 +232,21 @@ health 검사 결과를 분석하는 구문입니다.
         $msg =~ s{[[:space:]]$}{} if $msg;
     }
 
-attributes 검사 결과를 분석하는 구문입니다.
+속성 검사 결과를 분석하는 구문은 다음과 같습니다.
+모니터링 대상 속성 항목이면 임계값을 비교합니다.
+지정한 임계값보다 크면 모니터링 알람을 하기 위해 `$do_notify`의 값을 증가합니다.
 
+    #!perl
     if ( $check_target eq 'attributes' ) {
         for my $i ( keys %res ) {
             next if $i eq 'execute';
             for my $a ( keys %cond_attr ) {
                 if ( exists $res{$i}{$a} and defined $res{$i}{$a} ) {
-
-모니터링 대상 attributes 항목이면 threshold 값을 비교합니다.
-지정한 threshold 값보다 크면 모니터링 알람을 하기 위해서 `$do_notify`의 값을 증가합니다.
-
                     if ( $res{$i}{$a} > $cond_attr{$a} ) {
                         $do_notify++;
                         $msg .= "$i: $a [$res{$i}{$a}]\n";
-                    } else {
+                    }
+                    else {
                         $msg .= "$i: $a [OK]\n";
                     }
                 }
@@ -252,14 +254,192 @@ attributes 검사 결과를 분석하는 구문입니다.
         }
     }
 
-모니터링 알람을 합니다.
+모니터링 알람을 수행하는 코드는 다음과 같습니다.
 
+    if ( $do_notify ) {
+        $np->nagios_exit(CRITICAL, $msg);
+    }
+    else {
+        $np->nagios_exit(OK, $msg);
+    }
+
+
+전체코드
+---------
+
+코드 구문을 하나 하나 설명하다보니 전체 코드가 눈에 들어오지 않겠군요.
+작성한 전체 코드는 다음과 같습니다.
+
+    #!/usr/bin/env perl
+
+    #
+    # requirement package: smartmontools
+    #
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use Capture::Tiny qw( capture );
+    use Nagios::Plugin;
+
+    sub get_disk_info {
+        my $disk_info = '/proc/partitions';
+        my @disk;
+
+        open my $fh, '<', $disk_info or die "$!\n";
+        while ( <$fh> ) {
+            push @disk, ( split q{ }, $_ )[-1] if $_ =~ m{sd[a-z]$}g;
+        }
+        close $fh;
+
+        return @disk;
+    }
+
+    sub make_cmd {
+        my ( $opt, @disk ) = @_;
+
+        $opt = '-H' if $opt eq 'health';
+        $opt = '-A' if $opt eq 'attributes';
+
+        my @cmd;
+        for my $i ( @disk ) {
+            push @cmd, sprintf "/usr/sbin/smartctl $opt /dev/%s", $i;
+        }
+
+        return @cmd;
+    }
+
+    sub exe_check {
+        my ( $opt, $attr, @cmd ) = @_;
+
+        my %res;
+        for my $i ( @cmd ) {
+            my ($stdout, $stderr, $exit) = capture { system $i };
+
+            if ( $exit != 0 ) {
+                $res{execute} = 0;
+                return %res;
+            }
+            else {
+                $res{execute} = 1;
+            }
+
+            my $dev = ( split q{ }, $i )[-1];
+
+            if ( $opt eq 'health' ) {
+                ($res{$dev}{health}) = $stdout =~ m{SMART overall-health self-assessment test result: (\w+)}g;
+            }
+            else {
+                my @output = split q{[\r\n]+}, $stdout;
+
+                for my $res ( @output ) {
+                    my @d = split q{ }, $res;
+
+                    for my $i ( @{ $attr } ) {
+                        $res{$dev}{ $i } = $d[-1] if $d[1] eq $i;
+                    }
+                }
+            }
+        }
+
+        return %res;
+    }
+
+    sub main {
+        my $check_target = $ARGV[0] || 'health';
+        my @mode = qw( health attributes );
+        my $msg;
+        my $do_notify = 0;
+        my %cond_attr = qw(
+            Spin_Retry_Count         1
+            Reallocated_Sector_Ct    0
+            Reallocated_Event_Count  0
+            Current_Pending_Sector   0
+            Offline_Uncorrectable    0
+            UDMA_CRC_Error_Count     0
+        );
+
+        unless ( grep { m{^$check_target$} } @mode ) {
+            print "Usage: check_smart.pl { health | attributes }\n";
+            exit 1;
+        }
+
+        my $np = Nagios::Plugin->new();
+
+        #
+        # get disk info
+        #
+        my @disk = get_disk_info();
+
+        #
+        # command
+        #
+        my @cmd = make_cmd($check_target, @disk);
+
+        #
+        # execute
+        #
+        my %res;
+        {
+            my @attr = map {
+                $_
+            } keys %cond_attr;
+
+            %res = exe_check($check_target, \@attr, @cmd);
+        }
+
+        #
+        # parsing execute results
+        #
+        $np->nagios_exit(
+            UNKNOWN,
+            "smartctl return value is false, check to smartctl path or permission",
+        ) unless $res{execute};
+
+        if ( $check_target eq 'health' ) {
+            for my $i ( keys %res ) {
+                next if $i eq 'execute';
+                next unless defined $res{$i}{health};
+
+                $do_notify++ if $res{$i}{health} ne 'PASSED';
+
+                $msg .= "$i: [$res{$i}{health}]";
+                $msg .= q{ };
+            }
+
+            $msg =~ s{[[:space:]]$}{} if $msg;
+        }
+        elsif ( $check_target eq 'attributes' ) {
+            for my $i ( keys %res ) {
+                next if $i eq 'execute';
+                for my $a ( keys %cond_attr ) {
+                    if ( exists $res{$i}{$a} and defined $res{$i}{$a} ) {
+                        if ( $res{$i}{$a} > $cond_attr{$a} ) {
+                            $do_notify++;
+                            $msg .= "$i: $a [$res{$i}{$a}]\n";
+                        }
+                        else {
+                            $msg .= "$i: $a [OK]\n";
+                        }
+
+                        $msg .= " ";
+                    }
+                }
+            }
+            $msg =~ s{[[:space:]]$}{} if $msg;
+        }
+
+        # do notify
         if ( $do_notify ) {
             $np->nagios_exit(CRITICAL, $msg);
-        } else {
+        }
+        else {
             $np->nagios_exit(OK, $msg);
         }
     }
+
+    main;
 
 
 테스트
@@ -327,167 +507,6 @@ smartctl을 실제로 실행한 결과입니다.
      /dev/sdb: Current_Pending_Sector [OK]
 
 
-전체코드
------
-
-
-    #!/usr/bin/env perl
-    # requirement package: smartmontools
-    use utf8;
-    use strict;
-    use warnings;
-
-    use Capture::Tiny qw( capture );
-    use Nagios::Plugin;
-    use Data::Dumper;
-
-    sub get_disk_info {
-        my $disk_info = '/proc/partitions';
-        my @disk;
-
-        open my $fh, '<', $disk_info or die "$!\n";
-        while ( <$fh> ) {
-            push @disk, ( split q{ }, $_ )[-1] if $_ =~ m{sd[a-z]$}g;
-        }
-        close $fh;
-
-        return @disk;
-    }
-
-    sub make_cmd {
-        my $opt = shift;
-        my @disk = @_;
-        my @cmd;
-
-        $opt = '-H' if $opt eq 'health';
-        $opt = '-A' if $opt eq 'attributes';
-
-        for my $i ( @disk ) {
-            push @cmd, sprintf "/usr/sbin/smartctl $opt /dev/%s", $i;
-        }
-
-        return @cmd;
-    }
-
-    sub exe_check {
-        my $opt = shift;
-        my $attr = shift;
-        my @cmd = @_;
-        my %res;
-
-        for my $i ( @cmd ) {
-            my ($stdout, $stderr, $exit) = capture {
-                system $i
-            };
-
-            if ( $exit != 0 ) {
-                $res{execute} = 0;
-                return %res;
-            } else {
-                $res{execute} = 1;
-            }
-
-            my $dev = ( split q{ }, $i )[-1];
-
-            if ( $opt eq 'health' ) {
-                ($res{$dev}{health}) = $stdout =~ m{SMART overall-health self-assessment test result: (\w+)}g;
-            } else {
-                 my @output = split q{[\r\n]+}, $stdout;
-
-                for my $res ( @output ) {
-                    my @d = split q{ }, $res;
-
-                    for my $i ( @{ $attr } ) {
-                        $res{$dev}{ $i } = $d[-1] if $d[1] eq $i;
-                    }
-                }
-            }
-        }
-
-        return %res;
-    }
-
-    sub main {
-        my $check_target = $ARGV[0] || 'health';
-        my @mode = qw( health attributes );
-        my $msg;
-        my $do_notify = 0;
-        my %cond_attr = qw(
-          Spin_Retry_Count         1
-          Reallocated_Sector_Ct    0
-          Reallocated_Event_Count  0
-          Current_Pending_Sector   0
-          Offline_Uncorrectable    0
-          UDMA_CRC_Error_Count     0
-        );
-
-        unless ( grep { m{^$check_target$} } @mode ) {
-            print "Usage: check_smart.pl { health | attributes }\n";
-            exit 1;
-        }
-
-        my $np = Nagios::Plugin->new();
-
-        # get disk info
-        my @disk = get_disk_info();
-
-        # command
-        my @cmd = make_cmd($check_target, @disk);
-
-        # execute
-        my %res;
-        {
-            my @attr = map {
-                $_
-            } keys %cond_attr;
-
-            %res = exe_check($check_target, \@attr, @cmd);
-        }
-
-        # parsing execute results
-        $np->nagios_exit(UNKNOWN, "smartctl return value is false, check to smartctl path or permission") unless $res{execute};
-
-        if ( $check_target eq 'health' ) {
-            for my $i ( keys %res ) {
-                next if $i eq 'execute';
-                next unless defined $res{$i}{health};
-                $do_notify++ if $res{$i}{health} ne 'PASSED';
-
-                $msg .= "$i: [$res{$i}{health}]";
-                $msg .= " ";
-            }
-
-            $msg =~ s{[[:space:]]$}{} if $msg;
-        }
-
-        if ( $check_target eq 'attributes' ) {
-            for my $i ( keys %res ) {
-                next if $i eq 'execute';
-                for my $a ( keys %cond_attr ) {
-                    if ( exists $res{$i}{$a} and defined $res{$i}{$a} ) {
-                        if ( $res{$i}{$a} > $cond_attr{$a} ) {
-                            $do_notify++;
-                            $msg .= "$i: $a [$res{$i}{$a}]\n";
-                        } else {
-                            $msg .= "$i: $a [OK]\n";
-                        }
-
-                        $msg .= " ";
-                    }
-                }
-            }
-            $msg =~ s{[[:space:]]$}{} if $msg;
-        }
-
-        # do notify
-        if ( $do_notify ) {
-            $np->nagios_exit(CRITICAL, $msg);
-        } else {
-            $np->nagios_exit(OK, $msg);
-        }
-    }
-
-    main;
 
 
 __EOT__
