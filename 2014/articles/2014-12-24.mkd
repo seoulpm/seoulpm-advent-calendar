@@ -13,18 +13,18 @@ John_Kang - 시스템엔지니어
 시작하며
 ---------
 
-펄을 접할때 '게으름은 미학이다!' 라는 말이 저에게는 가장 흥미로운 문장이지 않을수 없었습니다.
-게으름 그 자체를 어떻게 바라보는지 본인은 사실 크게 관심 없습니다만 게을러 지기 위한 노력들은 삶을 윤택(?) 하게 만들어 주기 때문입니다.
+펄을 접할 때 단연코 가장 흥미로운 것은 "*게으름은 미학이다!*"라는 [철학][three-virtues]입니다.
+게으름(laziness) 그 자체를 어떻게 바라보는지는 크게 관심 없습니다만,
+게을러지기 위한 노력들은 삶을 윤택(?)하게 만들어 주기 때문이 아닐까합니다.
 이번에 다룰 주제를 통해서 다시 한번 게을러 보고자 합니다 :)
 
-우리가 좋아라 하는 유용한 유틸리티들을 보면 다양한 기능을 제공하기 위해 사용자에게 서브커멘드와 옵션을 제공합니다.
-사용자는 해당 서브커멘드와 옵션을 통해 유연하게 해당 유틸리티를 사용/활용 할 수 있습니다.
-하지만 애석하게도 저의 brain은 이를 오랫동안 기억하도록 허락하지 않습니다 :(
-심지어는 오타를 발생시키기도 합니다.
+인기있는 유용한 유틸리티들은 항상 다양한 기능을 제공하기 위해
+명령줄 옵션을 제공할 뿐만 아니라 때때로 부명령(subcommand)까지도 지원합니다.
+하지만 이런 다양한 명령과 옵션을 오랫동안 기억하는 것은 쉬운 일이 아닙니다.
+심지어 입력하다보면 오타가 발생하기도 하죠.
+`--help` 옵션을 이용해 도움말을 확인하면 될 일이지만, 번거롭긴 합니다.
 
---help 한번 치는게 그리 번거로운 작업은 아니지만...
-
-좀 더 게을러 보죠!!!
+자! 좀 더 게을러보죠!!! :-)
 
 
 준비물
@@ -419,8 +419,9 @@ perlbrew의 필수 인자인 <command> 부분의 자동완성을 완성했습니
 _EOT_
 
 
-[cpan]:                 http://www.cpan.org/
-[wikipedia-completion]: http://en.wikipedia.org/wiki/Command-line_completion
 [cpan-complete-bash]:   https://metacpan.org/pod/Complete::Bash
 [cpan-complete-util]:   https://metacpan.org/pod/Complete::Util
+[cpan]:                 http://www.cpan.org/
 [home-perlbrew]:        http://perlbrew.pl/
+[three-virtues]:        http://c2.com/cgi/wiki?LazinessImpatienceHubris
+[wikipedia-completion]: http://en.wikipedia.org/wiki/Command-line_completion
