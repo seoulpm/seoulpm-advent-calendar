@@ -45,6 +45,7 @@ aqua - 두마리 고양이의  집사. 직관 잘 안 가는 FC서울 서포터,
 
 그리고 [smartmontools][smartmontools] 패키지를 설치합니다.
 
+    #!plain
     #
     # RHEL/CentOS
     #
@@ -193,6 +194,7 @@ main 함수와 결과 분석, 모니터링(Opsview) 알림
 알람을 하기 위해서 `Nagios::Plugin` 객체를 생성한 후
 디스크 정보를 획득하고 명령을 생성한 뒤 이를 실행합니다.
 
+    #!perl
     my $np = Nagios::Plugin->new();
 
     my @disk = get_disk_info();
@@ -208,7 +210,7 @@ main 함수와 결과 분석, 모니터링(Opsview) 알림
         %res = exe_check($check_target, \@attr, @cmd);
     }
 
-명령 실행에 실패하면 Opsview의 unknown 경고를 알리고 프로그램을 종료합니다.
+명령 실행에 실패하면 [Opsview][opsview]의 `UNKNOWN` 경고를 알리고 프로그램을 종료합니다.
 
     #!perl
     $np->nagios_exit(UNKNOWN, "check to smartctl path or permission") unless $res{execute};
@@ -256,6 +258,7 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 
 모니터링 알람을 수행하는 코드는 다음과 같습니다.
 
+    #!perl
     if ( $do_notify ) {
         $np->nagios_exit(CRITICAL, $msg);
     }
@@ -270,6 +273,7 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 코드 구문을 하나 하나 설명하다보니 전체 코드가 눈에 들어오지 않겠군요.
 작성한 전체 코드는 다음과 같습니다.
 
+    #!perl
     #!/usr/bin/env perl
 
     #
@@ -369,17 +373,17 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 
         #
         # get disk info
-        #
+        # 
         my @disk = get_disk_info();
 
         #
         # command
-        #
+        # 
         my @cmd = make_cmd($check_target, @disk);
 
         #
         # execute
-        #
+        # 
         my %res;
         {
             my @attr = map {
@@ -391,7 +395,7 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 
         #
         # parsing execute results
-        #
+        # 
         $np->nagios_exit(
             UNKNOWN,
             "smartctl return value is false, check to smartctl path or permission",
@@ -496,6 +500,7 @@ health 검사 결과를 분석하는 구문은 다음과 같습니다.
 
 그리고 펄 프로그램으로 실행한 속성 검사 결과는 다음과 같습니다.
 
+    #!bash
     root@hubble:~# perl check_smart.pl attributes
     SMART OK - /dev/sda: UDMA_CRC_Error_Count [OK]
      /dev/sda: Reallocated_Event_Count [OK]
