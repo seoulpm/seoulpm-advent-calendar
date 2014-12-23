@@ -7,7 +7,7 @@ Author:   aqua
 저자
 -----
 
-aqua - 두마리 고양이의  집사. 직관 잘 안 가는 fc서울 서포터, aquative _at_ gmail.com
+aqua - 두마리 고양이의  집사. 직관 잘 안 가는 FC서울 서포터, aquative _at_ gmail.com
 
 
 시작하며
@@ -24,7 +24,7 @@ aqua - 두마리 고양이의  집사. 직관 잘 안 가는 fc서울 서포터,
 
 
 준비물
------
+-------
 
 필요한 모듈은 다음과 같습니다.
 
@@ -33,22 +33,26 @@ aqua - 두마리 고양이의  집사. 직관 잘 안 가는 fc서울 서포터,
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
-    $ sudo cpan Nagios::Plugin
-    $ sudo cpan Capture::Tiny
+    #!bash
+    $ sudo cpan Nagios::Plugin Capture::Tiny
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
-    $ cpan Nagios::Plugin
-    $ cpan Capture::Tiny
+    #!bash
+    $ cpan Nagios::Plugin Capture::Tiny
 
-그리고 smartmontools 패키지를 설치합니다.
+그리고 [smartmontools][smartmontools] 패키지를 설치합니다.
 
+    #
     # RHEL/CentOS
+    #
     $ yum -y install smartmontools
     
-    # Debian
+    #
+    # Debian/Ubuntu
+    #
     $ aptitude -y install smartmontools
 
 
