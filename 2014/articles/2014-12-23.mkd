@@ -217,7 +217,7 @@ main 함수와 결과 분석, 모니터링(Opsview) 알림
 
 health 검사 결과를 분석하는 구문은 다음과 같습니다.
 검사 결과가 `PASSED`가 아니면 디스크에 문제가 있습니다.
-그러므로 [Nagios][nagios] 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
+그러므로 [Opsview][opsview] 알림을 하기 위해서 `$do_notify`의 값을 증가합니다.
 
     #!perl
      if ( $check_target eq 'health' ) {
