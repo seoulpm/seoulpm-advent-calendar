@@ -9,9 +9,19 @@ Author:   aanoaa
 
 [@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
-# 시작하며 #
 
-Mojolicious 에서 Websocket 을 사용하는 방법을 소개합니다.
+시작하며
+---------
+
+[Mojolicious][home-mojolicious]은 인기있는 펄의 경량 웹 프레임워크입니다.
+경량의 MVC 프레임워크임에도 불구하고 HTTP 클라이언트 및 서버의
+거의 풀 스택을 구현한 웹 프레임워크로 지원하지 못하는 기능을
+찾기가 더 어려울 정도인 잘 만들어진 모듈입니다.
+웹소켓 역시 대표적인 예로 *Mojolicious*는 이 웹소켓을 아주 잘 지원합니다.
+실시간으로 상태를 갱신한다던가 등의 동작을 단순 HTTP만으로 구현하려면
+자바스크립트 및 웹응용의 컨트롤러에서 처리해야 할 내용이 꽤 많죠.
+이번 기사에서는 *Mojolicious*에서 손쉽게 웹소켓을 다루는 방법을 소개합니다.
+
 
 # echo server/client #
 
@@ -192,7 +202,11 @@ Mojolicious 에서 Websocket 을 사용하는 방법을 소개합니다.
 묵묵히 perl 을 사용해서 web 프로그래밍을 하시는 분들에게 도움이
 되었으면 합니다.
 
-[github-aanoaa]:  https://github.com/aanoaa
-[twitter-aanoaa]: https://twitter.com/aanoaa
-[redis-pubsub]:   http://redis.io/topics/pubsub
-[mojo-wiki]:      https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
+
+[cpan]:             http://www.cpan.org/
+[github-aanoaa]:    https://github.com/aanoaa
+[home-perlbrew]:    http://perlbrew.pl/
+[mojo-wiki]:        https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
+[redis-pubsub]:     http://redis.io/topics/pubsub
+[twitter-aanoaa]:   https://twitter.com/aanoaa
+[home-mojolicious]: http://mojolicio.us/
