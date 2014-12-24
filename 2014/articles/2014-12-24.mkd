@@ -24,7 +24,7 @@ John_Kang - 시스템엔지니어
 심지어 입력하다보면 오타가 발생하기도 하죠.
 `--help` 옵션을 이용해 도움말을 확인하면 될 일이지만, 번거롭긴 합니다.
 
-자! 좀 더 게을러보죠!!! :-)
+자! [명령줄 자동 완성][wiki-cli-completion] 기능을 이용해 좀 더 게을러져 보죠!!! :-)
 
 
 준비물
@@ -131,7 +131,7 @@ Complete::Bash
     use Complete::Bash qw( parse_cmdline format_completion );
     use Complete::Util qw( complete_array_elem );
 
-    my ( $words, $cur_idx ) = @{ parse_cmdline() };                                             
+    my ( $words, $cur_idx ) = @{ parse_cmdline() };
     my $given = $words->[$cur_idx];
 
     ## from bash : perlbrew <TAB><TAB>
@@ -203,7 +203,7 @@ Complete::Bash
 `format_completion()` 함수를 이용해 출력합니다.
 
     #!perl
-    if ( $cur_idx == 1 ) { 
+    if ( $cur_idx == 1 ) {
         my $complete = complete_array_elem(
             #
             # 자동 완성 목록
@@ -238,7 +238,7 @@ Complete::Bash
             # 검색할 문자열
             # 
             word  => $given,
-        );  
+        );
 
         print format_completion $complete;
     }
@@ -288,19 +288,19 @@ Complete::Bash
         generic_options($given);
     }
 
-    sub generic_options {                                                                       
+    sub generic_options {
         my $given = shift;
 
         completion( [qw( --quite --verbose )], $given );
     }
 
     sub completion {
-        my ( $available_opts, $given ) = @_; 
+        my ( $available_opts, $given ) = @_;
 
         my $res = complete_array_elem(
-            array => $available_opts,    
+            array => $available_opts,
             word  => $given,
-        );  
+        );
 
         print format_completion $res;
         exit 0;
@@ -331,20 +331,8 @@ Complete::Bash
 
     sub list_modules {
         my @modules = qx( perlbrew list-modules );
-                                                                                                
+
         return [ map { chomp; $_ } @modules ];
-    }
-
-    sub completion {
-        my ( $available_opts, $given ) = @_; 
-
-        my $res = complete_array_elem(
-            array => $available_opts,    
-            word  => $given,
-        );  
-
-        print format_completion $res;
-        exit 0;
     }
 
 
@@ -366,18 +354,6 @@ Complete::Bash
     sub installed_perl {
         my @installed_perl = qx( perlbrew list );
         return [ map { /(perl-\d\.\d\d\.\d)/ } @installed_perl ];
-    }
-
-    sub completion {
-        my ( $available_opts, $given ) = @_; 
-
-        my $res = complete_array_elem(
-            array => $available_opts,    
-            word  => $given,
-        );  
-
-        print format_completion $res;
-        exit 0;
     }
 
 
@@ -559,12 +535,6 @@ Complete::Bash
 
 Enjoy Your Perl & Merry Christmas! ;-)
 
-
-참고문헌
---------
-[위키피디아][wikipedia-completion]
-
-
 _EOT_
 
 
@@ -573,4 +543,5 @@ _EOT_
 [cpan]:                 http://www.cpan.org/
 [home-perlbrew]:        http://perlbrew.pl/
 [three-virtues]:        http://c2.com/cgi/wiki?LazinessImpatienceHubris
-[wikipedia-completion]: http://en.wikipedia.org/wiki/Command-line_completion
+[wiki-cli-completion]:  http://en.wikipedia.org/wiki/Command-line_completion
+[wiki-larry]:           http://en.wikipedia.org/wiki/Larry_Wall
