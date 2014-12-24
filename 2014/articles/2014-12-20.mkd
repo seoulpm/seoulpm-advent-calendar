@@ -21,7 +21,7 @@ Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Kor
 이런 연유로 정보 검색(Information Retrieval)이나 언어 처리(NLP)에서
 은근히 자주 다루는 자료 구조입니다.
 트라이의 창시자는 [Edward Fredkin 교수][wiki-fredkin]로
-*reTRIEval*에 유용하다고 trie라 명명했다고 합니다.
+*reTRIEval*에 유용하다고 *trie*라 명명했다고 합니다.
 펄에서 트라이를 손쉽게 사용할 수 있도록 도와주는
 [Tree::Trie라는 멋진 모듈][cpan-tree-trie]을 살펴보죠. :)
 
