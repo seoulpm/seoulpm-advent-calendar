@@ -2,7 +2,7 @@ Title:    Twitter streaming API 사용하기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   aqua
+Author:   gypark
 
 저자
 -----
