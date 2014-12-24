@@ -134,5 +134,6 @@ Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Kor
 [cpan]:                 http://www.cpan.org/
 [home-corpus007]:       http://corpus.egloos.com/
 [home-perlbrew]:        http://perlbrew.pl/
+[twitter-corpus007]:    https://twitter.com/corpus007
 [wiki-fredkin]:         http://en.wikipedia.org/wiki/Edward_Fredkin
 [wiki-trie]:            http://en.wikipedia.org/wiki/Trie
