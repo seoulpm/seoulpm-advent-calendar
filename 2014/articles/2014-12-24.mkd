@@ -103,22 +103,24 @@ Bash는 다양한 방법으로 자동 완성을 도와주는 `complete` 내장 �
 Complete::Bash
 ---------------
 
-또다른 방법으로 펄등의 외부명령어 실행을 통하여 자동 완성 리스트를 만들수 있습니다.
+다른 방법으로 펄 등의 외부 명령을 실행해서 자동 완성 목록을 만들 수도 있습니다.
 
-[perlbrew][home-perlbrew] 명령어에 `complete`를 작성 해보겠습니다.
+지금부터 [perlbrew][home-perlbrew]를 자동 완성을 지원할 대상으로 정하고 하나씩 살펴보겠습니다.
 
 
 ### 쉘로 전달된 인자 파싱
 
-가장먼저 쉘에서 `<TAB><TAB>`키가 눌렸을때 전달된 인자가 무엇인지를 확인해야 합니다.
-[Complete::Bash][cpan-complete-bash]모듈이 제공하는 `parse_cmdline()` 함수를 통해 쉘의 인자들을 파싱할 수 있습니다.
-실제로는 인자를 그대로 파싱하는것이 아니라 `bash`로 부터 전달된 `COMP_LINE`, `COMP_POINT` 환경변수를 파싱합니다.
-`parse_cmdline()`는 아래와 같은 구조로 파싱된 결과를 리턴합니다.
+가장 먼저 쉘에서 `<TAB><TAB>`키가 눌렸을 때 전달된 인자가 무엇인지를 확인해야 합니다.
+[Complete::Bash 모듈][cpan-complete-bash]이 제공하는 `parse_cmdline()`
+함수를 통해 쉘의 인자들을 파싱할 수 있습니다.
+실제로는 인자를 그대로 파싱하는 것이 아니라 Bash 쉘로부터 전달된
+`COMP_LINE`, `COMP_POINT` 환경 변수를 파싱하는 것입니다.
+`parse_cmdline()` 함수는 다음과 같은 구조로 파싱한 결과를 반환합니다.
 
-- Return : [ [], $cur_idx ]
-- 명령줄에 전달된 모든 인자와, 현재 커서의 인덱스를 배열 레퍼런스로 리턴합니다.
+- 반환: `[ [], $cur_idx ]`
+- 명령줄에 전달된 모든 인자와, 현재 커서의 인덱스를 배열 레퍼런스로 반환
 
-`$cur_idx`는 `<TAB><TAB>`을 사용한 시점의 cursor의 인덱스 값입니다.
+`$cur_idx`는 `<TAB><TAB>`을 사용한 시점의 커서 인덱스 값입니다.
 
     #!perl
     #!/usr/bin/env perl
@@ -140,72 +142,156 @@ Complete::Bash
     ## 현재 커서는 2번째 배열인덱스에 있으므로 커서의 값은 배열 인덱스인 1입니다.
 
 
-### 자동 완성 리스트 작성/출력
+### 자동 완성 리스트 작성 및 출력
 
-`perlbrew` 명령어는 주동작을 결정짓는 command를 필수 인자로 취하고 부가적인 옵션들을 취합니다.
+`perlbrew` 명령어는 주동작을 결정짓는 부명령(subcommand)을
+필수 인자로 취하고 부가적인 옵션들을 취합니다.
 
-    #!plain
-    Usage : perlbrew <command> [options] [arguments]
+    #!bash
+    $ perlbrew
+    Usage:
+        perlbrew command syntax:
 
-먼저 command에 해당하는 부분에 대해서 자동 완성을 작성합니다.
+            perlbrew <command> [options] [arguments]
 
-[Complete::Util][cpan-complete-util]모듈이 제공하는 `complete_array_elem()` 함수는 미리 작성된 자동 완성 리스트와
-검색에 사용할 문자열을 취하여 사용가능한 자동 완성 리스트를 반환 합니다.
-그리고 우리는 [Complete::Bash][cpan-complete-bash] 모듈이 제공하는 `format_completion()`함수를 통해서 출력하면 됩니다.
+        Commands:
+
+            init           Initialize perlbrew environment.
+            info           Show useful information about the perlbrew installation
+
+            install        Install perl
+            uninstall      Uninstall the given installation
+            available      List perls available to install
+            lib            Manage local::lib directories.
+            alias          Give perl installations a new name
+            upgrade-perl   Upgrade the current perl
+
+            list           List perl installations
+            use            Use the specified perl in current shell
+            off            Turn off perlbrew in current shell
+            switch         Permanently use the specified perl as default
+            switch-off     Permanently turn off perlbrew (revert to system perl)
+            exec           exec programs with specified perl enviroments.
+
+            self-install       Install perlbrew itself under PERLBREW_ROOT/bin
+            self-upgrade       Upgrade perlbrew itself.
+
+            install-patchperl  Install patchperl
+            install-cpanm      Install cpanm, a friendly companion.
+            install-multiple   Install multiple versions and flavors of perl
+
+            download       Download the specified perl distribution tarball.
+            mirror         Pick a preferred mirror site
+            clean          Purge tarballs and build directories
+            version        Display version
+            help           Read more detailed instructions
+
+        Generic command options:
+
+            -q --quiet     Be quiet on informative output message.
+            -v --verbose   Tell me more about it.
+
+        See `perlbrew help` for the full documentation of perlbrew, or
+
+        See `perlbrew help <command>` for detail description of the command.
+
+먼저 `command`에 해당하는 부명령에 대해 자동 완성을 작성합니다.
+[Complete::Util 모듈][cpan-complete-util]이 제공하는
+`complete_array_elem()` 함수는 미리 작성된 자동 완성 목록과
+검색에 사용할 문자열을 취해 사용가능한 자동 완성 목록을 반환합니다.
+그리고 우리는 [Complete::Bash 모듈][cpan-complete-bash]이 제공하는
+`format_completion()` 함수를 이용해 출력합니다.
 
     #!perl
     if ( $cur_idx == 1 ) { 
         my $complete = complete_array_elem(
-            array => [qw/
-                init info install uninstall available lib alias
-                upgrade-perl list use off switch switch-off exec
-                self-install self-upgrade install-patchperl install-cpanm
-                install-multiple download mirror clean version help
-            /],               ## 자동 완성 리스트
-        
-            word  => $given,  ## 검색할 문자열
+            #
+            # 자동 완성 목록
+            # 
+            array => [qw(
+                init
+                info
+                install
+                uninstall
+                available
+                lib
+                alias
+                upgrade-perl
+                list
+                use
+                off
+                switch
+                switch-off
+                exec
+                self-install
+                self-upgrade
+                install-patchperl
+                install-cpanm
+                install-multiple
+                download
+                mirror
+                clean
+                version
+                help
+            )],
+            #
+            # 검색할 문자열
+            # 
+            word  => $given,
         );  
 
         print format_completion $complete;
     }
 
-
-perlbrew의 필수 인자인 <command> 부분의 자동 완성을 완성했습니다.
-이제 해당 커멘드에 필요한 option 및 argument를 작성 해보겠습니다.
-
-### 옵션이 필요 없는 command
-
-`init`, `list`, `off`, `switch-off`, `install-cpanm`, `install-patchperl`, `self-upgrade`, `version` 등등의 명령어는
-옵션을 필요로 하지 않기 때문에 더 이상의 자동 완성을 필요로 하지 않습니다.
-
-헐... `man page` 자세히 보니 Genric command option이 있군요...
-
-    #!plain
-    Generic command options:
-        -q --quiet     Be quiet on informative output message.
-        -v --verbose   Tell me more about it.
+`perlbrew` 명령의 필수 인자인 부명령의 자동 완성 목록을 완성했습니다.
+이제 해당 부명령에 필요한 옵션 및 인자를 처리해야겠죠.
 
 
-명령줄에서 전달된 리스트에서 마지막 2번째 요소를 확인하면(`$words[-2]`) perlbrew 커맨드를 확인할 수 있습니다.
+### 옵션이 필요 없는 부명령
+
+옵션이 필요없는 명령어의 경우 더 이상의 자동 완성 기능이 필요없습니다.
+다음은 옵션이 필요없는 부명령의 목록입니다.
+
+- `init`
+- `list`
+- `off `
+- `switch-off`
+- `install-cpanm`
+- `install-patchperl`
+- `self-upgrade`
+- `version`
+- `upgrade-perl`
+- `list-modules`
+
+추가로 모든 명령에 대응하는 일반 옵션 항목은 다음과 같습니다.
+
+- `-q` `--quiet`
+- `-v` `--verbose`
+
+명령줄에서 전달한 목록중 마지막 두 번째 요소(`$words[-2]`)를 이용하면
+`perlbrew`를 실행할 때 사용한 부명령을 확인할 수 있습니다.
 
     #!perl
-    if ( $words->[-2] eq 'init'              ||
-         $words->[-2] eq 'list'              ||
-         $words->[-2] eq 'off '              ||
-         $words->[-2] eq 'switch-off'        ||
-         $words->[-2] eq 'install-cpanm'     ||
-         $words->[-2] eq 'install-patchperl' ||
-         $words->[-2] eq 'self-upgrade'      ||
-         $words->[-2] eq 'version'           ||
-         $words->[-2] eq 'upgrade-perl'      ||
-         $words->[-2] eq 'list-modules' ) {
-
+    if (
+           $words->[-2] eq 'init'
+        || $words->[-2] eq 'list'
+        || $words->[-2] eq 'off '
+        || $words->[-2] eq 'switch-off'
+        || $words->[-2] eq 'install-cpanm'
+        || $words->[-2] eq 'install-patchperl'
+        || $words->[-2] eq 'self-upgrade'
+        || $words->[-2] eq 'version'
+        || $words->[-2] eq 'upgrade-perl'
+        || $words->[-2] eq 'list-modules'
+    )
+    {
         generic_options($given);
     }
 
     sub generic_options {                                                                       
-        my ($given) = @_;
-        completion( [qw/ --quite --verbose /], $given );
+        my $given = shift;
+
+        completion( [qw( --quite --verbose )], $given );
     }
 
     sub completion {
@@ -221,10 +307,22 @@ perlbrew의 필수 인자인 <command> 부분의 자동 완성을 완성했습�
     }
 
 
-### 옵션이 필요한 info
+### info
 
-`info` 명령어는 모듈을 인자로 취하여 해당 모듈의 정보를 출력해 줍니다.
-`perlbrew list-module` 명령어 통해서 획득한 리스트를 사용하여 이를 자동 완성 시켜 줍니다.
+`perlbrew`의 `info` 부명령은 모듈을 인자로 받은 후 해당 모듈의 정보를 화면에 출력합니다.
+
+    #!plain
+    COMMAND: INFO
+        info [module]
+            Usage: perlbrew info [ <module> ]
+
+            Display useful information about the perlbrew installation.
+
+            If a module is given the version and location of the module is
+            displayed.
+
+설치한 모듈의 목록을 후보로 보여줄 수 있으면 편리하겠죠?
+`perlbrew list-modules` 명령으로 획득한 목록을 사용해 자동 완성 시켜보죠.
 
     #!perl
     if ( $words->[-2] eq 'info' ) {
@@ -232,7 +330,7 @@ perlbrew의 필수 인자인 <command> 부분의 자동 완성을 완성했습�
     }
 
     sub list_modules {
-        my @modules = qx(perlbrew list-modules);
+        my @modules = qx( perlbrew list-modules );
                                                                                                 
         return [ map { chomp; $_ } @modules ];
     }
@@ -250,20 +348,23 @@ perlbrew의 필수 인자인 <command> 부분의 자동 완성을 완성했습�
     }
 
 
-### switch uninstall use
+### switch / uninstall / use
 
-`switch`, `uninstall`, `use` 명령어들은 현재 perlbrew에 설치된 Perl 버전정보를 인자로 취합니다.
+`switch`와 `uninstall`, `use` 부명령은 현재 `perlbrew`로 설치한 펄의 버전 정보를 인자로 취합니다.
+이번에는 `perlbrew list` 명령으로 획득한 펄 버전 정보 목록을 사용해 자동 완성 시켜보죠.
 
     #!perl
-    if ( $words->[-2] eq 'uninstall' ||
-         $words->[-2] eq 'use'       ||
-         $words->[-2] eq 'switch' ) {
-
+    if (
+           $words->[-2] eq 'uninstall'
+        || $words->[-2] eq 'use'
+        || $words->[-2] eq 'switch'
+    )
+    {
         completion( installed_perl(), $given );
     }
 
     sub installed_perl {
-        my @installed_perl = qx(perlbrew list);
+        my @installed_perl = qx( perlbrew list );
         return [ map { /(perl-\d\.\d\d\.\d)/ } @installed_perl ];
     }
 
@@ -278,8 +379,6 @@ perlbrew의 필수 인자인 <command> 부분의 자동 완성을 완성했습�
         print format_completion $res;
         exit 0;
     }
-
-`perlbrew list` 커맨드로 획득한 펄 버전정보들을 자동 완성 리스트로 활용합니다.
 
 
 적용하기
