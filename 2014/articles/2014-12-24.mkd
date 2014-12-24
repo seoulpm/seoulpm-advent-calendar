@@ -381,6 +381,137 @@ Complete::Bash
     }
 
 
+전체 코드
+----------
+
+코드 구문을 하나 하나 설명하다보니 전체 코드가 눈에 들어오지 않겠군요.
+작성한 전체 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use Complete::Bash qw( parse_cmdline format_completion );
+    use Complete::Util qw( complete_array_elem );
+
+    my ( $words, $cur_idx ) = @{ parse_cmdline() };
+    my $given = $words->[$cur_idx];
+
+    if ( $cur_idx == 1 ) {
+        my $complete = complete_array_elem(
+            #
+            # 자동 완성 목록
+            # 
+            array => [qw(
+                init
+                info
+                install
+                uninstall
+                available
+                lib
+                alias
+                upgrade-perl
+                list
+                use
+                off
+                switch
+                switch-off
+                exec
+                self-install
+                self-upgrade
+                install-patchperl
+                install-cpanm
+                install-multiple
+                download
+                mirror
+                clean
+                version
+                help
+            )],
+            #
+            # 검색할 문자열
+            # 
+            word  => $given,
+        );
+
+        print format_completion $complete;
+    }
+
+    if (
+           $words->[-2] eq 'init'
+        || $words->[-2] eq 'list'
+        || $words->[-2] eq 'off '
+        || $words->[-2] eq 'switch-off'
+        || $words->[-2] eq 'install-cpanm'
+        || $words->[-2] eq 'install-patchperl'
+        || $words->[-2] eq 'self-upgrade'
+        || $words->[-2] eq 'version'
+        || $words->[-2] eq 'upgrade-perl'
+        || $words->[-2] eq 'list-modules'
+    )
+    {
+        generic_options($given);
+    }
+
+    if ( $words->[-2] eq 'info' ) {
+        completion( list_modules(), $given );
+    }
+
+    if ( $words->[-2] eq 'install' ) {
+        my $install_opt = [qw/
+            -f --force -j -n --notest --switch --as --noman --thread
+            --multi --64int --64all --ld --debug --clang -D -U -A
+            --sitecustomize
+        /];
+        completion( $install_opt, $given );
+    }
+
+    if ( $words->[-2] eq 'available' ) {
+        completion( [qw / --all /], $given );
+    }
+
+    if (
+           $words->[-2] eq 'uninstall'
+        || $words->[-2] eq 'use'
+        || $words->[-2] eq 'switch'
+    )
+    {
+        completion( installed_perl(), $given );
+    }
+
+    sub completion {
+        my ( $available_opts, $given ) = @_;
+
+        my $res = complete_array_elem(
+            array => $available_opts,
+            word  => $given,
+        );
+
+        print format_completion $res;
+        exit 0;
+    }
+
+    sub generic_options {
+        my $given = shift;
+
+        completion( [qw( --quite --verbose )], $given );
+    }
+
+    sub list_modules {
+        my @modules = qx( perlbrew list-modules );
+
+        return [ map { chomp; $_ } @modules ];
+    }
+
+    sub installed_perl {
+        my @installed_perl = qx(perlbrew list);
+
+        return [ map { /(perl-\d\.\d\d\.\d)/ } @installed_perl ];
+    }
+
+
 적용하기
 ---------
 
@@ -412,107 +543,6 @@ Complete::Bash
 참고하시면 조금더 정교한 방법으로 사용할 수 있습니다.
 사용자 프로그램을 배포할때도 completion script를 같이 배포하여
 프로그램의 질을 한번 높여 보는것도 좋은 방법인것 같습니다.
-
-
-완성본
--------
-
-지금까지 살표본것들을 종합한 스크립트 입니다.
-
-    #!perl
-    #!/usr/bin/env perl
-
-    use strict;
-    use warnings;
-
-    use Complete::Bash qw( parse_cmdline format_completion );
-    use Complete::Util qw( complete_array_elem );
-
-    my ( $words, $cur_idx ) = @{ parse_cmdline() };
-    my $given = $words->[$cur_idx];
-
-    if ( $cur_idx == 1 ) {
-        my $complete = complete_array_elem(
-            array => [qw/
-                init info install uninstall available lib alias
-                upgrade-perl list use off switch switch-off exec
-                self-install self-upgrade install-patchperl install-cpanm
-                install-multiple download mirror clean version help
-            /],
-                        
-            word  => $given,
-        );
-
-        print format_completion $complete;
-    }
-
-    if ( $words->[-2] eq 'init'              ||
-         $words->[-2] eq 'list'              ||
-         $words->[-2] eq 'off '              ||
-         $words->[-2] eq 'switch-off'        ||
-         $words->[-2] eq 'install-cpanm'     ||
-         $words->[-2] eq 'install-patchperl' ||
-         $words->[-2] eq 'self-upgrade'      ||
-         $words->[-2] eq 'version'           ||
-         $words->[-2] eq 'upgrade-perl'      ||
-         $words->[-2] eq 'list-modules' ) {
-
-        generic_options($given);
-    }
-
-    if ( $words->[-2] eq 'info' ) {
-        completion( list_modules(), $given );
-    }
-
-    if ( $words->[-2] eq 'install' ) {
-        my $install_opt = [qw/
-            -f --force -j -n --notest --switch --as --noman --thread
-            --multi --64int --64all --ld --debug --clang -D -U -A
-            --sitecustomize
-        /];
-        completion( $install_opt, $given );
-    }
-
-    if ( $words->[-2] eq 'available' ) {
-        completion( [qw / --all /], $given );
-    }
-
-    if ( $words->[-2] eq 'uninstall' ||
-         $words->[-2] eq 'use'       ||
-         $words->[-2] eq 'switch' ) {
-
-        completion( installed_perl(), $given );
-    }
-
-
-    ## subroutine
-    sub completion {
-        my ($available_opts, $given) = @_;
-        my $res = complete_array_elem(
-            array => $available_opts,                    
-            word  => $given,
-        );
-
-        print format_completion $res;
-        exit 0;
-    }
-
-    sub installed_perl {
-        my @installed_perl = qx(perlbrew list);
-
-        return [ map { /(perl-\d\.\d\d\.\d)/ } @installed_perl ];
-    }
-
-    sub list_modules {
-        my @modules = qx(perlbrew list-modules);
-
-        return [ map { chomp; $_ } @modules ];
-    }
-
-    sub generic_options {
-        my ($given) = @_;
-        completion([qw/ --quite --verbose /], $given);
-    }
 
 
 참고문헌
