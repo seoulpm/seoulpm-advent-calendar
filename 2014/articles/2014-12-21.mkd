@@ -17,7 +17,7 @@ Author:   aanoaa
 경량의 MVC 프레임워크임에도 불구하고 HTTP 클라이언트 및 서버의
 거의 풀 스택을 구현한 웹 프레임워크로 지원하지 못하는 기능을
 찾기가 더 어려울 정도인 잘 만들어진 모듈입니다.
-웹소켓 역시 대표적인 예로 *Mojolicious*는 이 웹소켓을 아주 잘 지원합니다.
+[웹소켓][wiki-websocket] 역시 대표적인 예로 *Mojolicious*는 이 웹소켓을 아주 잘 지원합니다.
 실시간으로 상태를 갱신한다던가 등의 동작을 단순 HTTP만으로 구현하려면
 자바스크립트 및 웹응용의 컨트롤러에서 처리해야 할 내용이 꽤 많죠.
 이번 기사에서는 *Mojolicious*에서 손쉽게 웹소켓을 다루는 방법을 소개합니다.
@@ -249,10 +249,14 @@ Author:   aanoaa
     $ hypnotoad -f echo-redis
 
 
-# 정리하며 #
+정리하며
+---------
 
-묵묵히 perl 을 사용해서 web 프로그래밍을 하시는 분들에게 도움이
-되었으면 합니다.
+[웹소켓][wiki-websocket]과 [Redis][home-redis]에 대한 자세한 부분을
+설명한 것은 아닙니다만, 펄을 사용하면 이런 느낌으로, 이 정도의 코드로
+웹에서 비동기 프로그램이 가능하고, 골치아픈 자원 공유의 문제를 손쉽게
+해결할 수 있다는 것을 이해하기만 해도 큰 수확이라고 생각합니다.
+묵묵히 펄을 사용해서 웹 프로그래밍을 하는 몽거스 분들에게 조금이나마 도움이 되었으면 합니다. :)
 
 
 [cpan-hypnotoad]:       https://metacpan.org/pod/distribution/Mojolicious/script/hypnotoad
@@ -271,3 +275,4 @@ Author:   aanoaa
 [mojo-wiki-websocket]:  https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
 [redis-pubsub]:         http://redis.io/topics/pubsub
 [twitter-aanoaa]:       https://twitter.com/aanoaa
+[wiki-websocket]:       http://en.wikipedia.org/wiki/WebSocket
