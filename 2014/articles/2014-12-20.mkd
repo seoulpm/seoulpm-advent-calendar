@@ -1,0 +1,139 @@
+Title:    언어 처리와 트라이
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   corpus007
+
+저자
+-----
+
+[@corpus007][twitter-corpus007] - I like:
+Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Korea Girl Group ^__^,
+[홈페이지][home-corpus007]
+
+
+시작하며
+---------
+
+[트라이(trie)][wiki-trie]는 트리와 유사한 자료 구조로
+주로 문자열 등에 대한 동적 집합 혹은 연관 배열을 저장합니다.
+키 값의 전체가 아닌 일부만 비교하는데 사용되므로 매우 빠르게 비교를 수행합니다.
+이런 연유로 정보 검색(Information Retrieval)이나 언어 처리(NLP)에서
+은근히 자주 다루는 자료 구조입니다.
+트라이의 창시자는 [Edward Fredkin 교수][wiki-fredkin]로
+*reTRIEval*에 유용하다고 *trie*라 명명했다고 합니다.
+펄에서 트라이를 손쉽게 사용할 수 있도록 도와주는
+[Tree::Trie라는 멋진 모듈][cpan-tree-trie]을 살펴보죠. :)
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Tree::Trie 모듈][cpan-tree-trie]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Tree::Trie
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Tree::Trie
+
+
+트라이 맛보기
+--------------
+
+다행히 [Tree::Trie 모듈][cpan-tree-trie]은 다국어를 지원하기 때문에
+한글을 사용하는 데에도 문제가 없습니다.
+우선 모듈을 사용하기 위해 `Tree::Trie` 모듈을 적재하고 객체를 생성합니다.
+`new()` 메소드는 다양한 옵션을 지원하니 자세한 내용은 [공식 문서][cpan-tree-trie]를 살펴보세요.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use Tree::Trie;
+
+    my $trie = Tree::Trie->new;
+
+`add()` 메소드를 이용해서 트라이 모듈에 자료를 추가합니다.
+`add()` 메소드를 반복해서 사용하거나,
+`add_all()` 메소드를 사용해 기존에 만든 트라이 객체를 추가할 수도 있습니다.
+편의를 위해 예제 자료는 코드 안에 기술합니다.
+
+    #!perl
+    $trie->add(qw[
+        사람
+        사냥꾼
+        사슴
+        가자미
+        가재
+        가마
+        사재기
+        사계절
+        가마
+        가솔린
+        나무
+        나비
+        다다미
+        다슬기
+        사루만
+        가마꾼
+        나방
+    ]);
+
+`Tree::Trie` 모듈의 핵심은 바로 `lookup()` 메소드입니다.
+`lookup()` 메소드는 주어진 문자열으로 시작하는 모든 문자열을
+트라이 구조 내에서 검색한 다음, 그 결과를 목록으로 만들어 돌려줍니다.
+
+    #!perl
+    my @all       = $trie->lookup(q{});
+    my @ga_list   = $trie->lookup("가");
+    my @gama_list = $trie->lookup("가마");
+
+    printf( "모든 데이터셋: %s\n", join( '--', @all ) );
+    printf( "가           : %s\n", join( '--', @ga_list ) );
+    printf( "가마         : %s\n", join( '--', @gama_list ) );
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./trie.pl 
+    모든 데이터셋: 가재--가자미--가솔린--가마꾼--가마--사냥꾼--사루만--사람--사슴--사재기--사계절--다슬기--다다미--나방--나비--나무
+    가           : 가재--가자미--가솔린--가마꾼--가마
+    가마         : 가마꾼--가마
+    $
+
+결과가 꽤 깔끔하게 나오죠? :D
+
+
+정리하며
+---------
+
+정보 검색(IR)이나 언어 처리(NLP) 분야에서는 트라이를 이용한 응용 및 연구가 많습니다.
+대표적으로 트라이를 이용해 특정한 기능을 위한 사전(dictionary)를 구축해 사용하죠.
+일례로, 웹 검색 시스템의 query bar나, 휴대폰의 가상 키보드에서 흔히 볼 수 있는
+입력 문자열에 따른 단어 자동 완성이나, 추천 검색어 제시에 사용되거나,
+기타 단어 교정, 전문가 사전 시스템 구축 등 다양하게 사용하고 있습니다.
+[CPAN의 Tree::Trie 모듈][cpan-tree-trie]은 좀 더 전문적인 활용이나,
+진지한 학습(research), 시험 등에 사용하기 위한 부가적인 메소드도 제공하고 있으므로
+기본적으로 트라이에 대해 이해를 하고 공식 문서를 살펴본다면 도움이 될 것입니다.
+분명한 건, 언어 처리를 위해 트라이 구조를 고려하거나, 학습하려 하는 이들에게
+이 [Tree::Trie 모듈][cpan-tree-trie]은 매우 좋은 시작점이자 길잡이가 될 것입니다. :-)
+ 
+
+[cpan-tree-trie]:       https://metacpan.org/module/Tree::Trie
+[cpan]:                 http://www.cpan.org/
+[home-corpus007]:       http://corpus.egloos.com/
+[home-perlbrew]:        http://perlbrew.pl/
+[twitter-corpus007]:    https://twitter.com/corpus007
+[wiki-fredkin]:         http://en.wikipedia.org/wiki/Edward_Fredkin
+[wiki-trie]:            http://en.wikipedia.org/wiki/Trie
