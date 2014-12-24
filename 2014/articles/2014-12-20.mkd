@@ -12,14 +12,19 @@ Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Kor
 [홈페이지][home-corpus007]
 
 
-* 트라이(Trie) 모듈 소개
-* 트라이란?
-트라이(Trie)란 Tree와 유사한 데이터 구조이지만 주로 스트링(String) 등에 대한 다이나한 집합 혹은 연관 배열을 저장하는 데이터 구조로써
-Key 값의 전체가 아닌 일부만 비교하는데 사용되어 매우 빠른 비교속도를 가집니다. 이에 검색(Information Retrieval)이나 언어처리(NLP)에서
-은근히 자주 다뤄지는 데이터 구조입니다.
-Fredkin이란 분이 reTRIEval에 유용하다고 하여 trie라 명명했다는 합니다.
-(CPAN 사이트의 헤드라인은 A data structure optimized for prefix lookup 입니다)
-여기에서는 Trie 자료구조에 대해 길게 얘기하지는 않습니다. 대신에 CPAN에서 제공되는 trie라는 멋진 모듈에 대한 소개를 하려 합니다.
+시작하며
+---------
+
+[트라이(trie)][wiki-trie]는 트리와 유사한 자료 구조로
+주로 문자열 등에 대한 동적 집합 혹은 연관 배열을 저장합니다.
+키 값의 전체가 아닌 일부만 비교하는데 사용되므로 매우 빠르게 비교를 수행합니다.
+이런 연유로 정보 검색(Information Retrieval)이나 언어처리(NLP)에서
+은근히 자주 다루는 자료 구조입니다.
+트라이의 창시자는 [Edward Fredkin 교수][wiki-fredkin]로
+*reTRIEval*에 유용하다고 trie라 명명했다고 합니다.
+펄에서 트라이를 손쉽게 사용할 수 있도록 도와주는
+[Tree::Trie라는 멋진 모듈][cpan-tree-trie]을 살펴보죠. :)
+
 
 * 모듈 인스톨
 늘 그렇듯이 cpan이나 cpanm으로 가볍게 인스톨해 줍니다.
@@ -88,3 +93,7 @@ $"는 결과 값 들 사이의 구분자를 정의하는데 쓰입니다.
 분명한 건, 언어처리로 트라이 구조를 고려하거나 학습하려 하는 이들에게 이 Tree::Trie 모듈은 매우 좋은 시작점이자 길잡이가 될 수 있다는 것입니다.
  
 
+[cpan-tree-trie]:       https://metacpan.org/module/Tree::Trie
+[home-corpus007]:       http://corpus.egloos.com/
+[wiki-fredkin]:         http://en.wikipedia.org/wiki/Edward_Fredkin
+[wiki-trie]:            http://en.wikipedia.org/wiki/Trie
