@@ -1,3 +1,9 @@
+Title:    언어 처리와 트라이
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   corpus007
+
 * 트라이(Trie) 모듈 소개
 * 트라이란?
 트라이(Trie)란 Tree와 유사한 데이터 구조이지만 주로 스트링(String) 등에 대한 다이나한 집합 혹은 연관 배열을 저장하는 데이터 구조로써
