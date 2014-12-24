@@ -319,22 +319,6 @@ Author:   gypark
 재미있는 응용법이 많이 나오길 기대해봅니다. :)
 
 
-[twitter]:                      https://twitter.com/
-[twitter-gypark]:               http://twitter.com/gypark
-[twitter-jeen]:                 http://twitter.com/JEEN_LEE
-[twitter-streaming-api]:        https://dev.twitter.com/streaming/overview
-[twitter-api-limit]:            https://dev.twitter.com/rest/public/rate-limiting
-[twitter-apps]:                 https://apps.twitter.com/
-[cpan]:                         http://www.cpan.org/
-[cpan-anyevent-twitter-stream]: https://metacpan.org/pod/AnyEvent::Twitter::Stream
-[cpan-net-twitter-lite]:        https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1 
-[cpan-try-tiny]:                https://metacpan.org/pod/Try::Tiny
-[wiki-oauth]:                   http://en.wikipedia.org/wiki/OAuth
-[advent-2010-12-04]:            http://advent.perl.kr/2010/2010-12-04.html  
-[home-perlbrew]:                http://perlbrew.pl/
-[gypark-home]:                  http://gypark.pe.kr
-[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
-
 [img-1]:          2014-12-07-1.png
 [img-2]:          2014-12-07-2.png
 [img-3]:          2014-12-07-3.png
@@ -346,3 +330,18 @@ Author:   gypark
 [img-4-resize]:   2014-12-07-4_r.png
 
 
+[advent-2010-12-04]:            http://advent.perl.kr/2010/2010-12-04.html  
+[cpan-anyevent-twitter-stream]: https://metacpan.org/pod/AnyEvent::Twitter::Stream
+[cpan-net-twitter-lite]:        https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1 
+[cpan-try-tiny]:                https://metacpan.org/pod/Try::Tiny
+[cpan]:                         http://www.cpan.org/
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-api-limit]:            https://dev.twitter.com/rest/public/rate-limiting
+[twitter-apps]:                 https://apps.twitter.com/
+[twitter-gypark]:               http://twitter.com/gypark
+[twitter-jeen]:                 http://twitter.com/JEEN_LEE
+[twitter-streaming-api]:        https://dev.twitter.com/streaming/overview
+[twitter]:                      https://twitter.com/
+[wiki-oauth]:                   http://en.wikipedia.org/wiki/OAuth
