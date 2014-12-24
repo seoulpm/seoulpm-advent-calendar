@@ -14,11 +14,12 @@ rumidier - Silex *말썽꾸러기*, [@keedi][twitter-keedi] 옆에서 3년 넘�
 ---------
 
 간단한 단일 동작만을 실행고자 한다면 코드 내부에서 인자를 직접 선언해 사용해도 됩니다.
-처리해야할 일이 많아지고 여러가지 데이터를 유동적으로 받아 들여야 한다면 
-코드내부에서 수정하기란 매우 어렵고 자유롭지도 않기 때문에 기능을 손쉽게 나누고
-인자를 유동적으로 받아 들여 사용가능한 프로그램을 만들어 보기 위해
-[MooX::Cmd::Role][cpan-moox-cmd-role]과 [MooX::Options][cpan-moox-options] 를 사용해
-기본적인 계산 기능을 구현해 보겠습니다.
+이 방법은 간편하지만 처리해야할 일이 많아지고 여러가지 자료를 유동적으로 받아들여야 한다면
+코드 내부에서 수정하기란 매우 어렵고 자유롭지도 않기 때문에 시간이 지날 수록 힘들어집니다.
+[MooX::Cmd::Role 모듈][cpan-moox-cmd-role]과 [MooX::Options 모듈][cpan-moox-options]을
+사용해 기능을 손쉽게 나누고 인자를 유동적으로 받아들여 유지 보수가 손쉬운 프로그램을
+만드는 방법을 알아보겠습니다.
+
 
 준비물
 ------
@@ -33,7 +34,7 @@ rumidier - Silex *말썽꾸러기*, [@keedi][twitter-keedi] 옆에서 3년 넘�
     #!bash
     $ sudo cpan \
       MooX::Options \
-      MooX::Cmd::Role 
+      MooX::Cmd::Role
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
