@@ -7,7 +7,7 @@ Author:   John_Kang
 저자
 -----
 
-John_Kang - 시스템엔지니어
+John_Kang - 시스템 엔지니어
 
 
 시작하며
