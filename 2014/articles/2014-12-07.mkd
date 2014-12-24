@@ -47,7 +47,7 @@ Author:   gypark
 [CPAN의 AnyEvent::Twitter::Stream 모듈][cpan-anyevent-twitter-stream]을 이용해
 펄에서 스트리밍 API를 활용하는 간단한 예제를 소개합니다.
 
-- 내 트위터 아이디로 로그인한 후, 내 타임라인에 올라오는 트윗을 감시하다가 
+- 내 트위터 아이디로 로그인한 후, 내 타임라인에 올라오는 트윗을 감시하다가
 - "perl" 또는 "펄"이라는 문자열이 들어 있으면
    - 관심글(favorite) 체크를 하여 나중에 찾아 볼 수 있게 함
    - 내 자신에게 쪽지(direct message)로 그 트윗의 내용을 보냄
@@ -330,9 +330,9 @@ Author:   gypark
 [img-4-resize]:   2014-12-07-4_r.png
 
 
-[advent-2010-12-04]:            http://advent.perl.kr/2010/2010-12-04.html  
+[advent-2010-12-04]:            http://advent.perl.kr/2010/2010-12-04.html
 [cpan-anyevent-twitter-stream]: https://metacpan.org/pod/AnyEvent::Twitter::Stream
-[cpan-net-twitter-lite]:        https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1 
+[cpan-net-twitter-lite]:        https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1
 [cpan-try-tiny]:                https://metacpan.org/pod/Try::Tiny
 [cpan]:                         http://www.cpan.org/
 [gypark-home]:                  http://gypark.pe.kr
