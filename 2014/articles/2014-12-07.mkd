@@ -55,27 +55,29 @@ Author:   gypark
 
 
 준비물
------
+-------
 
 필요한 모듈은 다음과 같습니다.
 
 - [CPAN의 AnyEvent::Twitter::Stream 모듈][cpan-anyevent-twitter-stream] (필수)
 - [CPAN의 Net::Twitter::Lite 모듈][cpan-net-twitter-lite] (favorite, DM 등을 쓰기 위한 옵션)
-- [CPAN의 Try::Tiny 모듈][cpan-try-tiny] (에러 처리를 위한 옵션. eval로 대체 가능)
+- [CPAN의 Try::Tiny 모듈][cpan-try-tiny] (에러 처리를 위한 옵션. `eval`로 대체 가능)
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
-    $ sudo cpan AnyEvent::Twitter::Stream
-    $ sudo cpan Net::Twitter::Lite
-    $ sudo cpan Try::Tiny;
+    $ sudo cpan \
+      AnyEvent::Twitter::Stream \
+      Net::Twitter::Lite \
+      Try::Tiny;
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
-    $ cpan AnyEvent::Twitter::Stream
-    $ cpan Net::Twitter::Lite
-    $ cpan Try::Tiny;
+    $ cpan \
+      AnyEvent::Twitter::Stream \
+      Net::Twitter::Lite \
+      Try::Tiny;
 
 
 Twitter OAuth
