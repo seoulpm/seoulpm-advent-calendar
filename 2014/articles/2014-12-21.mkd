@@ -1,10 +1,11 @@
-Title:    Mojolicious 와 WebSocket
+Title:    Mojolicious와 웹소켓 그리고 Redis
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
 Author:   aanoaa
 
-# 저자 #
+저자
+-----
 
 [@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
 
