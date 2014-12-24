@@ -7,10 +7,8 @@ Author:   gypark
 저자
 -----
 
-[@gypark][twitter-gypark]
-- [gypark.pe.kr][gypark-home]의 주인장.
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
 홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
-
 
 
 시작하며
