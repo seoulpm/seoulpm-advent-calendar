@@ -95,109 +95,137 @@ Author:   gypark
 
 
 전체 코드
------
+----------
 
-다음 코드는 실제로 동작하는 스크립트입니다. 코드의 각 부분에 대한 설명은 주석문으로
-상세히 적어두었으니 참조하세요.
+다음 코드는 실제로 동작하는 스크립트입니다.
+코드의 각 부분에 대한 설명은 주석문으로 상세히 적어두었으니 참고하세요. :)
 
-
+    #!perl
     #!/usr/bin/env perl
+
+    use v5.20;
     use strict;
     use warnings;
+
     use AnyEvent::Twitter::Stream;
     use Net::Twitter::Lite::WithAPIv1_1;
     use Try::Tiny;
-    use 5.010;
-    
+
     binmode STDOUT, ':encoding(UTF-8)';
-    
+
     my $done = AE::cv;
-    
+
+    #
     # http://dev.twitter.com 에서 자신의 앱을 등록한 후 받아오는 키와 토큰
+    # 각 항목은 자신이 받은 값으로 채웁니다.
+    # 
     my $oauth = {
-        # 각 항목은 자신이 받은 값으로 채운다
         consumer_key        => '****',
         consumer_secret     => '****',
         access_token        => '****',
         access_token_secret => '****',
     };
+
+    #
     # 내 트위터 ID - 디엠을 보낼 때 수신자 아이디에 넣기 위해 필요
+    # 
     my $my_id = '****';
-    
+
+    #
     # 트위터 REST API 클라이언트
     # favorite, DM 등을 쓰기 위해 필요
+    # 
     my $api = Net::Twitter::Lite::WithAPIv1_1->new(
         %{$oauth},
         legacy_lists_api => 1,
-        ssl => 1
+        ssl              => 1
     );
-    
-    
+
+    #
     # 트위터 스트리밍 API 이벤트 처리기
+    # 
     my $streamer = AnyEvent::Twitter::Stream->new(
         # oAuth 정보
         consumer_key    => $oauth->{consumer_key},
         consumer_secret => $oauth->{consumer_secret},
         token           => $oauth->{access_token},
         token_secret    => $oauth->{access_token_secret},
-    
+
+        #
         # 스트림 타입
         # 세 가지 중 하나를 선택할 수 있는데,
         # 우리는 자신의 타임라인을 보고 싶은 것이므로 userstream 선택
         # https://dev.twitter.com/streaming/overview
+        # 
         method   => 'userstream',
-    
+
+        #
         # 1로 하면 종종 문제가 생김
+        # 
         use_compression => 0,
-    
+
         #
         # 여러 가지 이벤트에 대해 그 이벤트를 처리할 핸들러를 등록한다:
         #
         # 이벤트에 대한 설명은 다음 주소 참조:
         # https://dev.twitter.com/streaming/overview/messages-types
         #
-    
+
+        #
         # 새 트윗이 올라왔을 때 - 코드가 길어서 별도 함수로 분리
+        # 
         on_tweet => \&on_tweet,
-    
+
+        #
         # 에러가 발생하면 에러 내용을 출력한 후 종료
+        # 
         on_error => sub {
             my $error = shift;
             warn "ERROR: $error";
             $done->send;
         },
+
+        #
         # EOF는 정상적인 상태라면 발생하지 않을 것으로 생각됨
+        # 
         on_eof   => sub {
             $done->send;
         },
-    
+
+        #
         # 굳이 따로 처리하지 않아도 무방해 보이는 이벤트
-    #     on_connect        => sub {},
-    #     on_keepalive      => sub {},
-    
+        # 
+        #on_connect   => sub {},
+        #on_keepalive => sub {},
+
+        #
         # 다음 이벤트들은 따로 핸들러를 지정하지 않으면 on_tweet 핸들러가 불린다.
         # 따라서 명시적으로 빈 서브루틴을 지정하여 아무 일도 하지 않게 함
+        # 
         on_direct_message => sub {},
-        on_event    => sub {},
-        on_friends  => sub {},
-        on_delete   => sub {},
+        on_event          => sub {},
+        on_friends        => sub {},
+        on_delete         => sub {},
     );
-    
+
+    #
     # 스크립트는 이 지점에서 대기하면서 이벤트 발생을 기다리게 되고,
     # 이벤트가 발생하면 핸들러가 불리는 과정을 반복한다.
     # $done->send 가 호출되면 그 때 대기를 끝내고 종료
+    # 
     $done->recv;
-    
+
     exit 0;
-    
-    
+
+    #
     # 새 트윗이 올라왔을 때 불릴 핸들러
     # 인자로 트윗 객체가 익명 해시의 형태로 전달된다.
     # 그 해시의 키와 값은 다음 주소 참조
     # https://dev.twitter.com/overview/api/tweets
+    # 
     sub on_tweet {
         my $tweet = shift;
-    
+
         # 트윗 기본 정보 (트윗 아이디, 작성자 아이디 등) 추출
         my $tweet_id       = $tweet->{id};
         my $tweet_userid   = $tweet->{user}{screen_name};
@@ -208,14 +236,16 @@ Author:   gypark
         if ( $tweet->{entities}{urls} ) {
             @tweet_urls = map { $_->{expanded_url} } @{$tweet->{entities}{urls}};
         }
-    
+
         unless ($tweet_id and $tweet_userid) {
             return;
         }
-    
+
+        #
         # 디버그용 출력
+        # 
         print <<"EOF";
-    
+
     * id     : $tweet_id
     * author : $tweet_username (\@$tweet_userid)
     * text   : $tweet_text
@@ -223,20 +253,26 @@ Author:   gypark
         foreach my $url ( @tweet_urls ) {
             print "* url    : $url\n";
         }
-    
-    
+
+        #
         # 'perl' '펄'이 포함된 트윗에 대하여 특별 처리
+        # 
         if ( $tweet_text =~ /perl|펄/i ) {
-    
+            #
             # Net::Twitter::Lite의 여러 메쏘드들은 실행 도중 에러가 나면
             # 에러의 내용이 담긴 Net::Twitter::Lite::Error 객체를 던지며 die한다.
             # eval { ... } 로 감싸고 $@ 변수의 내용을 검사해도 되고,
             # 여기서는 Try::Tiny 를 사용하여 에러 핸들링을 함
+            # 
             try {
+                #
                 # favorite 체크를 하거나
+                # 
                 $api->create_favorite( { id => $tweet_id } );
-    
+
+                #
                 # DM으로 자기 자신에게 그 내용을 보내거나
+                # 
                 $api->new_direct_message( { screen_name => $my_id, text => $tweet_text } );
             }
             catch {
