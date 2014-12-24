@@ -23,6 +23,33 @@ Author:   aanoaa
 이번 기사에서는 *Mojolicious*에서 손쉽게 웹소켓을 다루는 방법을 소개합니다.
 
 
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+- [CPAN의 Mojo::Redis2 모듈][cpan-mojo-redis2]
+
+[Mojo::Redis2][cpan-mojo-redis2] 모듈을 사용하려면 [Redis][home-redis] 서버를 설치해야 합니다.
+데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 패키지를 설치합니다.
+
+    #!bash
+    $ sudo apt-get install redis-server
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Mojolicious Mojo::Redis2
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Mojolicious Mojo::Redis2
+
+
 # echo server/client #
 
 [Writing websocket chat using Mojolicious Lite][mojo-wiki] 를 조금 변경했습니다.
@@ -205,8 +232,9 @@ Author:   aanoaa
 
 [cpan]:             http://www.cpan.org/
 [github-aanoaa]:    https://github.com/aanoaa
+[home-mojolicious]: http://mojolicio.us/
 [home-perlbrew]:    http://perlbrew.pl/
+[home-redis]:       http://redis.io/
 [mojo-wiki]:        https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
 [redis-pubsub]:     http://redis.io/topics/pubsub
 [twitter-aanoaa]:   https://twitter.com/aanoaa
-[home-mojolicious]: http://mojolicio.us/
