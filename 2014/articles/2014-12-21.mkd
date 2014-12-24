@@ -271,7 +271,7 @@ Author:   aanoaa
 [home-mojolicious]:     http://mojolicio.us/
 [home-perlbrew]:        http://perlbrew.pl/
 [home-redis]:           http://redis.io/
-[mojo-wiki-websocket]:  https://github.com/kraih/mojo/wiki
+[mojo-wiki]:            https://github.com/kraih/mojo/wiki
 [mojo-wiki-websocket]:  https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
 [redis-pubsub]:         http://redis.io/topics/pubsub
 [twitter-aanoaa]:       https://twitter.com/aanoaa
