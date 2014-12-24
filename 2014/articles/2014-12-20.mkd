@@ -26,12 +26,25 @@ Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Kor
 [Tree::Trie라는 멋진 모듈][cpan-tree-trie]을 살펴보죠. :)
 
 
-* 모듈 인스톨
-늘 그렇듯이 cpan이나 cpanm으로 가볍게 인스톨해 줍니다.
-관리자(admin) 권한이 있다면 아래처럼
-$sudo cpanm Tree::Trie
-만일, 관리자 권한이 없다면 개인 계정에 인스톨하면 됩니다.
-$cpanm Tree:Trie
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Tree::Trie 모듈][cpan-tree-trie]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Tree::Trie
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Tree::Trie
+
 
 * 예제를 통한 모듈 맛보기
 다행히 멀티 랭귀지를 지원하는 덕분에 한글단어들을 이용한 간단한 예제를 만들어 봤습니다.
@@ -94,6 +107,8 @@ $"는 결과 값 들 사이의 구분자를 정의하는데 쓰입니다.
  
 
 [cpan-tree-trie]:       https://metacpan.org/module/Tree::Trie
+[cpan]:                 http://www.cpan.org/
 [home-corpus007]:       http://corpus.egloos.com/
+[home-perlbrew]:        http://perlbrew.pl/
 [wiki-fredkin]:         http://en.wikipedia.org/wiki/Edward_Fredkin
 [wiki-trie]:            http://en.wikipedia.org/wiki/Trie
