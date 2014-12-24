@@ -50,13 +50,18 @@ Author:   aanoaa
     $ cpan Mojolicious Mojo::Redis2
 
 
-# echo server/client #
+웹소켓 채팅 서버
+-----------------
 
-[Writing websocket chat using Mojolicious Lite][mojo-wiki] 를 조금 변경했습니다.
+[Mojolicious 저장소][github-mojo]의 [위키][mojo-wiki]에는 유용한 정보가 많은데,
+그 중 [Writing websocket chat using Mojolicious Lite 문서][mojo-wiki-websocket]를
+조금 변경해 보았습니다.
 
-    # echo
+    #!perl
     #!/usr/bin/env perl
+
     use Mojolicious::Lite;
+
     use Time::HiRes 'time';
     
     get '/' => 'index';
@@ -132,12 +137,18 @@ Author:   aanoaa
       </body>
     </html>
 
-`Mojolicious` 의 모든 기능을 지원하는 http server 인 `morbo` 혹은
-`hypnotoad` 로 실행 시켜야합니다.
-`Starman` 이나 `Starlet` 으로는 Mojolicious 의 websocket 이 동작하지
-않습니다.
+정말 간단한 예제죠?
+놀랍지만 이 짧은 코드가 웹소켓 채팅 서버로써의 최소한의 코드인 셈입니다.
+*Mojolicious*의 모든 기능을 지원하려면 [morbo][cpan-morbo]나
+[hypnotoad][cpan-hypnotoad]로 작성한 웹 응용을 실행해야 한다는 점에 유의하세요.
+[Starman][cpan-starman]이나 [Starlet][cpan-starlet]으로는
+*Mojolicious*의 웹소켓 기능이 제대로 동작하지 않습니다.
 
+웹소켓 서버를 구동하기 위해 명령줄에서 다음 명령을 실행하세요.
+
+    #!bash
     $ morbo echo
+
 
 # 문제 #
 
@@ -230,11 +241,19 @@ Author:   aanoaa
 되었으면 합니다.
 
 
-[cpan]:             http://www.cpan.org/
-[github-aanoaa]:    https://github.com/aanoaa
-[home-mojolicious]: http://mojolicio.us/
-[home-perlbrew]:    http://perlbrew.pl/
-[home-redis]:       http://redis.io/
-[mojo-wiki]:        https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
-[redis-pubsub]:     http://redis.io/topics/pubsub
-[twitter-aanoaa]:   https://twitter.com/aanoaa
+[cpan-hypnotoad]:       https://metacpan.org/pod/distribution/Mojolicious/script/hypnotoad
+[cpan-mojo-redis2]:     https://metacpan.org/module/Mojo::Redis2
+[cpan-mojolicious]:     https://metacpan.org/module/Mojolicious
+[cpan-morbo]:           https://metacpan.org/pod/distribution/Mojolicious/script/morbo
+[cpan-starlet]:         https://metacpan.org/module/Starlet
+[cpan-starman]:         https://metacpan.org/module/Starman
+[cpan]:                 http://www.cpan.org/
+[github-aanoaa]:        https://github.com/aanoaa
+[github-mojo]:          https://github.com/kraih/mojo
+[home-mojolicious]:     http://mojolicio.us/
+[home-perlbrew]:        http://perlbrew.pl/
+[home-redis]:           http://redis.io/
+[mojo-wiki-websocket]:  https://github.com/kraih/mojo/wiki
+[mojo-wiki-websocket]:  https://github.com/kraih/mojo/wiki/Writing-websocket-chat-using-Mojolicious-Lite
+[redis-pubsub]:         http://redis.io/topics/pubsub
+[twitter-aanoaa]:       https://twitter.com/aanoaa
