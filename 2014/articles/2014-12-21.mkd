@@ -150,30 +150,42 @@ Author:   aanoaa
     $ morbo echo
 
 
-# 문제 #
+자원의 공유
+------------
 
-위 예제는 http server 의 worker 가 한개 이상일때는 정상적으로 동작하지 않습니다.
-메세지를 받은 worker 에 연결된 client 에만 전달되기 때문입니다.
+앞서 살펴본 예제는 마치 잘 동작하는 것처럼 보이지만 사실 서버로 띄운
+웹 응용이 하나일 때, 즉 워커 프로세스가 하나 일 때만 정상적으로 동작합니다.
+[morbo][cpan-morbo]는 하나의 워커로 동작하는 비동기 서버이기 때문에 문제가 없지만
+[hypnotoad][cpan-hypnotoad]처럼 여러개의 워커를 띄울 수 있는 비동기 서버일 경우
+메세지를 받은 워커에 연결된 클라이언트에게만 전달하기 때문입니다.
 
-# redis 의 활용 #
+이런 자원 공유 문제를 해결하는 여러가지 방법이 있겠지만,
+그 중 [Redis의 Pub/Sub 모델][redis-pubsub]을 활용하면
+너무나도 간단하게 문제를 해결할 수 있습니다.
+메세지를 받은 워커가 출판(publish)하고 이를 구독(subscribe)하는
+워커가 메세지를 받아서 연결되어있는 클라이언트에게 전달하면 되겠죠!
 
-[redis-pubsub][redis-pubsub] 모델을 활용하면 위 문제가 너무나도
-간단하게 해결됩니다.
+[Redis][home-redis]를 사용한 예제는 다음과 같습니다.
+여러 개의 사용하기 위해 `hypnotoad` 관련 설정에서 띄울 워커 개수를 5개를 설정합니다.
+`__DATA__` 섹션은 앞선 예제와 동일하므로 생략합니다.
 
-메세지를 받은 worker 가 publish 하고 이를 subscribe 하고 있는 worker
-들이 메세지를 받아서 연결되어있는 client 에 전달합니다.
-
-# echo server/client using redis #
-
-`__DATA__` 섹션은 위 `echo` 예제와 같습니다.
-
-    # echo-redis
+    #!perl
     #!/usr/bin/env perl
+
     use Mojolicious::Lite;
+
     use Mojo::Redis2;
+    use Scalar::Util;
     use Time::HiRes 'time';
 
-    my $config = plugin 'Config';
+    my $config = plugin 'Config' => {
+        default => {
+            hypnotoad => {
+                listen  => [ "http://*:5000" ],
+                workers => 5,
+            },
+        },
+    };
 
     my $REDIS_CHANNEL = 'echo';
     
@@ -183,6 +195,7 @@ Author:   aanoaa
     
     websocket '/echo' => sub {
         my $self = shift;
+
         my $log  = $self->app->log;
         my $name = time;
     
@@ -193,6 +206,7 @@ Author:   aanoaa
         $self->on(
             message => sub {
                 my ( $self, $msg ) = @_;
+
                 $log->debug("[ws] < $msg");
                 $self->redis->publish( $REDIS_CHANNEL => $msg );
             }
@@ -201,6 +215,7 @@ Author:   aanoaa
         $self->on(
             finish => sub {
                 my ( $self, $code, $reason ) = @_;
+
                 $log->debug("[ws] client disconnected with status $code");
                 delete $self->stash->{redis};
             }
@@ -209,6 +224,7 @@ Author:   aanoaa
         $self->redis->on(
             message => sub {
                 my ( $redis, $message, $ch ) = @_;
+
                 return if $ch ne $REDIS_CHANNEL;
                 return unless $self;
                 $log->debug("[ws] > ($name) $message");
@@ -219,6 +235,7 @@ Author:   aanoaa
         $self->redis->subscribe(
             $REDIS_CHANNEL => sub {
                 my ( $redis, $err ) = @_;
+
                 $log->error("[REDIS ERROR] subscribe error: $err") if $err;
             }
         );
@@ -226,14 +243,11 @@ Author:   aanoaa
     
     app->start;
 
-여러개의 worker 를 띄우기 위해서 `hypnotoad` 설정을 해야합니다.
+웹소켓 서버를 구동하기 위해 명령줄에서 다음 명령을 실행하세요.
 
-    # echo-redis.conf
-    { hypnotoad => { listen => ["http://*:5000"], workers => 5 } };
-
-실행은
-
+    #!bash
     $ hypnotoad -f echo-redis
+
 
 # 정리하며 #
 
