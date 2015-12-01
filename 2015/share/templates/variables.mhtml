@@ -138,6 +138,14 @@ return {
             title => 'Sysadmin Advent Calendar',
             url   => 'http://sysadvent.blogspot.kr/',
         },
+        {
+            title => '한국 루비 크리스마스 달력 #2015',
+            url   => 'http://ruby-korea.github.io/advent-calendar/',
+        },
+        {
+            title => '이상한 모임 크리스마스 달력 #2015',
+            url   => 'http://1225.weirdx.io/',
+        },
     ],
     links => [
         {
