@@ -7,7 +7,7 @@
     <div class="indent">
       <& link.mhtml, global => $global &>
       <ul class="icon">
-        <li><a href="/2014/atom.xml"><img src="feed.png"></a></li>
+        <li><a href="/2015/atom.xml"><img src="feed.png"></a></li>
         <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
         <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
       </ul>
