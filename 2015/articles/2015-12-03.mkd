@@ -44,7 +44,8 @@ IT 강<strike>박</strike>국에서 컨텐츠 강국으로 발돋움하는 헬�
 어봐도 뭐 거기도 제대로 응해줄 기분이 아닌 것 같습니다. 거대한 분노가 휘몰아 칩니다만 이런
 짤을 보고 마음을 가라앉힙니다.
 
-![불평하지마][img-do-not-blame]
+![불평하지마][img-1-resize]
+*그림 1.* 불평하지마 ([원본][img-1])
 
 뭐가 문제겠어요. 그냥 뭐 `sort()` 한 번 돌려서 DB 때려넣으면 되는 그런 일 아니겠어요?
 그래서 단조롭게 코드를 만들어 넣습니다.
@@ -177,7 +178,8 @@ IT 강<strike>박</strike>국에서 컨텐츠 강국으로 발돋움하는 헬�
 
 아무튼 `Sort::Naturally`와는 좋은 만남이 계속되고 있습니다.
 
-[img-do-not-blame]:          do-not-blame.png
+[img-1]:                 2015-12-03-1.png
+[img-1-resize]:          2015-12-03-1_r.png
 
 [cpan-sort-naturally]:                   https://metacpan.org/module/Sort::Naturally
 [twitter-jeenlee]:                    http://twitter.com/#!/JEEN_LEE
