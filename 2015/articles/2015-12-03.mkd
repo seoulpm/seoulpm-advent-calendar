@@ -2,7 +2,7 @@ Title:    CPAN에서 만남을 추구하면 안되는 걸까 Vol. 1
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   Jeen Lee
+Author:   JEEN_LEE
 
 저자
 -----
