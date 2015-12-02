@@ -55,7 +55,7 @@ sub description {
   my @desc;
   my $dom = Mojo::DOM->new( '<div id="root">' . $self->body_html . '</div>' );
   for ( my $e = $dom->find('h2')->[1]->next; $e; $e = $e->next ) {
-    last if $e->type eq 'h2';
+    last if $e->tag eq 'h2';
     push @desc, $e->all_text;
   }
 
