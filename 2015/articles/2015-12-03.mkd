@@ -192,9 +192,11 @@ IT 강<strike>박</strike>국에서 컨텐츠 강국으로 발돋움하는 헬�
 아무튼 `Sort::Naturally`와는 좋은 만남이 계속되고 있습니다.
 
 
-[img-1]:                 2015-12-03-1.png
+[img-1]:                2015-12-03-1.png
 
-[img-1-resize]:          2015-12-03-1_r.png
+[img-1-resize]:         2015-12-03-1_r.png
 
-[cpan-sort-naturally]:                   https://metacpan.org/module/Sort::Naturally
-[twitter-jeenlee]:                    http://twitter.com/#!/JEEN_LEE
+[cpan-sort-naturally]:  https://metacpan.org/module/Sort::Naturally
+[cpan]:                 http://www.cpan.org/
+[home-perlbrew]:                                http://perlbrew.pl/
+[twitter-jeenlee]:      http://twitter.com/#!/JEEN_LEE
