@@ -55,6 +55,10 @@
     });
   </script>
 % }
+
+  <!-- Twitter Widgets -->
+  <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
   <!-- Google Analytics -->
   <script type="text/javascript">
     var _gaq = _gaq || [];
