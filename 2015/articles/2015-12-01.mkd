@@ -110,7 +110,7 @@ CPAN에는 157,981개의 펄 모듈과 32,708개의 배포판과 12,469명의 �
             1 [http://httpupdate23.cpanel.net/CPAN/]
             2 [http://mirrors.servercentral.net/CPAN/]
             3 [ftp://cpan.cse.msu.edu/]
-    cpan[2]> o conf urllist shift http://cpan.mysite.com
+    cpan[2]> o conf urllist unshift http://cpan.mysite.com
     cpan[3]> o conf commit
     cpan[4]> q
     $ cpan
