@@ -476,21 +476,21 @@ Enjoy Your Perl! ;-)
 _EOT_
 
 
-[img-1]:          2015-12-04-1.png
-[img-2]:          2015-12-04-2.png
-[img-3]:          2015-12-04-3.png
-[img-4]:          2015-12-04-4.png
-[img-5]:          2015-12-04-5.png
-[img-6]:          2015-12-04-6.png
-[img-7]:          2015-12-04-7.png
+[img-1]:          2015-12-07-1.png
+[img-2]:          2015-12-07-2.png
+[img-3]:          2015-12-07-3.png
+[img-4]:          2015-12-07-4.png
+[img-5]:          2015-12-07-5.png
+[img-6]:          2015-12-07-6.png
+[img-7]:          2015-12-07-7.png
 
-[img-1-resize]:   2015-12-04-1_r.png
-[img-2-resize]:   2015-12-04-2_r.png
-[img-3-resize]:   2015-12-04-3_r.png
-[img-4-resize]:   2015-12-04-4_r.png
-[img-5-resize]:   2015-12-04-5_r.png
-[img-6-resize]:   2015-12-04-6_r.png
-[img-7-resize]:   2015-12-04-7_r.png
+[img-1-resize]:   2015-12-07-1_r.png
+[img-2-resize]:   2015-12-07-2_r.png
+[img-3-resize]:   2015-12-07-3_r.png
+[img-4-resize]:   2015-12-07-4_r.png
+[img-5-resize]:   2015-12-07-5_r.png
+[img-6-resize]:   2015-12-07-6_r.png
+[img-7-resize]:   2015-12-07-7_r.png
 
 [bootstrap-in-practice-a-landing-page]:         https://www.williamghelfi.com/blog/2013/08/04/bootstrap-in-practice-a-landing-page/
 [cpan-app-cpanminus]:                           https://metacpan.org/pod/App::cpanminus
