@@ -459,6 +459,106 @@ FontAwesome 관련 정적 파일을 HTML에 적재할 수 있습니다.
 어떤가요? ;-)
 
 
+전체 코드
+----------
+
+전체 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use Mojolicious::Lite;
+
+    plugin "bootstrap3";
+    plugin 'FontAwesome4';
+
+    get "/" => "index";
+
+    app->start;
+    
+    __DATA__
+    @@ index.html.ep
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Landing Page Example</title>
+      <!-- Bootstrap -->
+      %= asset "bootstrap.css"
+      %= asset "bootstrap.js"
+      <!-- FontAwesome -->
+      %= asset "font-awesome4.css"
+      <!-- Google Font -->
+      <link href='http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600' rel='stylesheet'>
+
+      <style>
+        /* http://css-tricks.com/perfect-full-page-background-image/ */
+        html {
+          background: url(img/6133364748_89f2365922_o.jpg) no-repeat center center fixed; 
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;
+          background-size: cover;
+        }
+
+        body {
+          padding-top: 20px;
+          font-size: 16px;
+          font-family: "Open Sans",serif;
+          background: transparent;
+        }
+
+        h1 {
+          font-family: "Abel", Arial, sans-serif;
+          font-weight: 400;
+          font-size: 40px;
+        }
+
+        /* Override B3 .panel adding a subtly transparent background */
+        .panel {
+          background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .margin-base-vertical {
+          margin: 40px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3 panel panel-default">
+
+            <h1 class="margin-base-vertical">Have you ever seen the rain?</h1>
+
+            <p>
+              Someone told me long ago there's a calm before the storm. I know, It's been comin for some time.
+            </p>
+            <p>
+              When it's over, so they say, it'll rain a sunny day. I know,    Shinin down like water.
+            </p>
+
+            <p>
+              I want to know, have you ever seen the rain?
+            </p>
+
+            <form action="/mailing-list" method="post" class="margin-base-vertical">
+              <p class="input-group">
+                <span class="input-group-addon"><span class="fa fa-envelope"></span></span>
+                <input type="text" class="form-control input-lg" name="email" placeholder="keedi.k@gmail.com" />
+              </p>
+              <p class="help-block text-center"><small>We won't send you spam. Unsubscribe at any time.</small></p>
+              <p class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">Keep me posted</button>
+              </p>
+              </span>
+            </form>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+
+
 정리하며
 ---------
 
