@@ -1,0 +1,506 @@
+Title:    Mojolicious + Bootstrap + FontAwesome 삼종셋트
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+현대의 웹 응용에 있어 디자인은 필수 불가결한 요소입니다.
+제 아무리 뛰어난 기능을 가지고 있거나, 좋은 내용을 담고 있는 웹 페이지나 웹 응용이라 할지라도
+속된 말로 때깔이 좋지 않으면 사용자들의 호감도는 급감합니다.
+반대로 때깔이라도 좋으면 그래도 사용자들의 호감도는 증가합니다.
+비록 이런 상황 자체가 바람직한 것은 아니나, 그럼에도 불구하고 최소 웹에서 금칠(?)이
+중요하다는 사실에는 개발자나 사용자나 모두가 고개를 끄덕일 것입니다.
+디자이너가 없는 개발자나 개발팀의 경우 아리따운 웹 화면을 구성하려면 많은 노력이 필요합니다.
+하지만 오픈소스 커뮤니티의 노력으로 탄생한 [Bootstrap][home-bootstrap]과
+[FontAwesome][home-fontawesome] 두 라이브러리만 있다면 최소한의 노력으로
+미려한 웹 페이지를 만드는데 부족함이 없습니다.
+펄(Perl)과 [CPAN][cpan]은 [Mojolicious][home-mojolicious] +  [Bootstrap][home-bootstrap] + [FontAwesome][home-fontawesome]
+이 삼종셋트를 손쉽게 사용할 수 있는 아주 획기적인 도구를 지원하고 있습니다.
+[William Ghelfi씨의 Bootstrap in practice: a landing page][bootstrap-in-practice-a-landing-page] 기사를
+참고해 과연 얼마나 간단하게 이 삼종셋트를 이용해 웹을 꾸밀 수 있는지 알아보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+- [CPAN의 Mojolicious::Plugin::FontAwesome4 모듈][cpan-mojolicious-plugin-fontawesome4]
+- [CPAN의 Mojolicious::Plugin::Bootstrap3 모듈][cpan-mojolicious-plugin-bootstrap3]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Mojolicious \
+        Mojolicious::Plugin::Bootstrap3 \
+        Mojolicious::Plugin::FontAwesome4 
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Mojolicious \
+        Mojolicious::Plugin::Bootstrap3 \
+        Mojolicious::Plugin::FontAwesome4 
+
+
+Mojolicious
+------------
+
+[Mojolicious][home-mojolicious]는 인기있는 펄의 경량 웹 프레임워크입니다.
+간단히 `Mojolicious`를 이용해서 당장 돌릴 수 있는 최소한의 페이지를 꾸며보죠.
+웹에서 해당 주소의 가장 첫 페이지를 의미하는 랜딩 페이지(landing page) 정도면 적당하겠죠?
+명령줄에서 다음 명령을 실행합니다.
+
+    #!bash
+    $ mkdir landing
+    $ cd letsrock
+    $ mojo generate lite_app letsrock.pl
+    [exist] /home/askdna/letsrock
+    [write] /home/askdna/letsrock/letsrock.pl
+    [chmod] /home/askdna/letsrock/letsrock.pl 744
+    $ 
+
+생성된 `letsrock.pl` 파일의 내용은 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use Mojolicious::Lite;
+
+    # Documentation browser under "/perldoc"
+    plugin 'PODRenderer';
+
+    get '/' => sub {
+    my $c = shift;
+    $c->render(template => 'index');
+    };
+
+    app->start;
+    __DATA__
+
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Welcome';
+    Welcome to the Mojolicious real-time web framework!
+
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+    <head><title><%= title %></title></head>
+    <body><%= content %></body>
+    </html>
+
+기존 파일의 내용에 연연하지 말고 `letsrock.pl` 파일을 다음처럼 바꿔 볼까요?
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use Mojolicious::Lite;
+
+    get "/" => "index";
+
+    app->start;
+    
+    __DATA__
+    @@ index.html.ep
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Landing Page Example</title>
+    </head>
+    <body>
+      <h1>Hello, world!</h1>
+    </body>
+    </html>
+
+자, 이제 화면에 `Hello, world!`가 잘 나타나는지 확인해보죠.
+명령줄에서 다음 명령을 실행해서 웹 응용을 구동시킵니다.
+
+    #!bash
+    $ morbo letsrock.pl
+    Server available at http://127.0.0.1:3000
+    [Fri Dec  4 08:51:39 2015] [debug] Your secret passphrase needs to be changed
+
+브라우저에서 `http://localhost:3000` 주소로 접속해서 화면을 살펴보세요.
+
+![landing-hello-world][img-1-resize]
+*그림 1.* 첫 번째 랜딩 페이지 - 안녕, 세상?! ([원본][img-1])
+
+일단 랜딩 페이지가 보이는 것을 확인했습니다.
+이제 필요한 것은 랜딩 페이지에서 보일 내용이겠죠?
+랜딩 페이지에서 보여줄 내용을 추가해보죠.
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역의 내용을 다음 내용으로 대체합니다.
+
+    #!html
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Landing Page Example</title>
+    </head>
+    <body>
+      <h1>Have you ever seen the rain?</h1>
+
+      <p>
+        Someone told me long ago there's a calm before the storm. I know, It's been comin for some time.
+      </p>
+      <p>
+        When it's over, so they say, it'll rain a sunny day. I know, Shinin down like water.
+      </p>
+
+      <p>
+        I want to know, have you ever seen the rain?
+      </p>
+
+      <form action="/mailing-list" method="post">
+        <p class="input-group">
+          <span class="input-group-addon">@</span>
+          <input type="text" class="form-control input-lg" name="email" placeholder="keedi.k@gmail.com" />
+        </p>
+        <p class="help-block"><small>We won't send you spam. Unsubscribe at any time.</small></p>
+        <p>
+          <button type="submit" class="btn btn-success btn-lg">Keep me posted</button>
+        </p>
+        </span>
+      </form>
+    </body>
+    </html>
+
+다시 브라우저에서 `http://localhost:3000` 주소로 접속해서 화면을 살펴보세요.
+내용이 들어가니 조금 낫죠?
+
+![landing-content][img-2-resize]
+*그림 2.* 두 번째 랜딩 페이지 - 알맹이 ([원본][img-2])
+
+
+Bootstrap
+----------
+
+`Mojolicious::Plugin::Bootstrap3` 모듈을 사용하려면 `Mojolicious` 웹 응용 코드에
+해당 플러그인을 적재하는 코드를 추가해야 합니다. 
+
+    #!perl
+    ...
+    use Mojolicious::Lite;
+
+    plugin "bootstrap3";
+    ...
+
+플러그인을 적재한 뒤에는 템플릿 영역에서 `asset` 키워드를 이용해
+Bootstrap 관련 정적 파일을 HTML에 적재할 수 있습니다.
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`head` 태그 영역을 다음 내용으로 대체합니다.
+
+    #!html
+    <head>
+      <title>Landing Page Example</title>
+      <!-- Bootstrap -->
+      %= asset "bootstrap.css"
+      %= asset "bootstrap.js"
+    </head>
+
+`M::P::Bootstrap3` 플러그인을 이용해서 Bootstrap 관련 파일을 간단하게 적재하면
+실제로 HTML 소스 코드에는 다음처럼 코드가 풀려서 보입니다.
+복잡한 파일명은 각 파일의 체크썸인데 그리 중요하지 않으니 너무 신경쓰지 마세요. :)
+
+    #!html
+    <!-- Bootstrap -->
+    <link href="/packed/bootstrap-73854046a072ca699c62a43861d3ac56.css" rel="stylesheet">
+    <script src="/packed/jquery-1.11.0.min-8fc25e27d42774aeae6edbc0a18b72aa.js"></script>
+    <script src="/packed/transition-94f8bbd34de5157ec8a86a30f0ffcf82.js"></script>
+    <script src="/packed/alert-8cbee2ee1f07de10728ba4cc283e0739.js"></script>
+    <script src="/packed/button-f9c1f74c13e3bb7ed1298ce516807966.js"></script>
+    <script src="/packed/carousel-00705d0a2de981bcd603e143e62b2001.js"></script>
+    <script src="/packed/collapse-4c0a626e3f4a62146f9a6bae17ac0639.js"></script>
+    <script src="/packed/dropdown-65051d98394d995212ff5b7030c4071e.js"></script>
+    <script src="/packed/modal-f057e38edc5fa444b138a317a8fa2cbc.js"></script>
+    <script src="/packed/tooltip-c4a6379c9f74d73e0e045be0fefdf95f.js"></script>
+    <script src="/packed/popover-5b32b736b04ef19f68614b82030b5f70.js"></script>
+    <script src="/packed/scrollspy-26d9ab6e4f1d34ef36e14943eb017d44.js"></script>
+    <script src="/packed/tab-451e9d742ed72f9bf5d19a18159130a2.js"></script>
+    <script src="/packed/affix-252d27257a5b7ed1bce8fd797ea20a3c.js"></script>
+
+브라우저로 접속해서 화면을 살펴보세요.
+부트스트랩이 적용되고 달라진 점이 느껴지나요?
+
+![landing-bootstrap][img-3-resize]
+*그림 3.* 세 번째 랜딩 페이지 - Bootstrap ([원본][img-3])
+
+설명하기 어렵지만 무언가 조금은 미려해졌죠?
+좋아지긴 했는데 조금 부족한 것 같습니다.
+이 때 필요한 것이 바로 정면! 그리고 한 가운데!라는 마법의 규칙입니다.
+혹자(William Ghelfi)는 이렇게 말하기도 합니다.
+
+> Front and center is always a win!
+
+자 Bootstrap이 적용되었으니 간단히 마법의 규칙을 적용해보죠.
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`head` 태그 영역에 `style` 태그를 추가해보죠.
+
+    #!html
+    <style>
+      body {
+        padding-top: 20px;
+      }
+
+      .margin-base-vertical {
+        margin: 40px 0;
+      }
+    </style>
+
+더불어 `__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`body` 태그 영역을 다음 내용으로 대체합니다.
+
+    #!html
+    <body>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+
+            <h1 class="margin-base-vertical">Have you ever seen the rain?</h1>
+
+            <p>
+              Someone told me long ago there's a calm before the storm. I know, It's been comin for some time.
+            </p>
+            <p>
+              When it's over, so they say, it'll rain a sunny day. I know,    Shinin down like water.
+            </p>
+
+            <p>
+              I want to know, have you ever seen the rain?
+            </p>
+
+            <form action="/mailing-list" method="post" class="margin-base-vertical">
+              <p class="input-group">
+                <span class="input-group-addon">@</span>
+                <input type="text" class="form-control input-lg" name="email" placeholder="keedi.k@gmail.com" />
+              </p>
+              <p class="help-block text-center"><small>We won't send you spam. Unsubscribe at any time.</small></p>
+              <p class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">Keep me posted</button>
+              </p>
+              </span>
+            </form>
+          </div>
+        </div>
+      </div>
+    </body>
+
+![landing-bootstrap-css][img-4-resize]
+*그림 4.* 네 번째 랜딩 페이지 - Bootstrap + CSS ([원본][img-4])
+
+호오라, 점점 그럴듯해지고 있는 것 같죠? :)
+
+
+FontAwesome
+------------
+
+`Mojolicious::Plugin::FontAwesome4` 모듈을 사용하려면 `Mojolicious` 웹 응용 코드에
+해당 플러그인을 적재하는 코드를 추가해야 합니다. 
+
+    #!perl
+    ...
+    use Mojolicious::Lite;
+
+    plugin "bootstrap3";
+    plugin "FontAwesome4";
+    ...
+
+플러그인을 적재한 뒤에는 템플릿 영역에서 `asset` 키워드를 이용해
+FontAwesome 관련 정적 파일을 HTML에 적재할 수 있습니다.
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`head` 태그 영역에 다음 내용을 추가합니다.
+
+    #!html
+    <!-- Bootstrap -->
+    %= asset "bootstrap.css"
+    %= asset "bootstrap.js"
+    <!-- FontAwesome -->
+    %= asset "font-awesome4.css"
+
+`M::P::FontAwesome4` 플러그인을 이용해서 FontAwesome 관련 파일을 간단하게 적재하면
+실제로 HTML 소스 코드에는 다음처럼 코드가 풀려서 보입니다.
+마찬가지로 복잡한 파일명은 각 파일의 체크썸인데 그리 중요하지 않으니 너무 신경쓰지 마세요. :)
+
+    #!html
+    <!-- FontAwesome -->
+    <link href="/packed/font-awesome-1f2277e4931dd7b4d944014ff3126037.css" rel="stylesheet">
+
+전자우편 주소를 기입하는 영역의 `@` 기호 대신 FontAwesome의 편지 모양 아이콘을 사용해보죠.
+
+    #!html
+    <p class="input-group">
+      <span class="input-group-addon"><span class="fa fa-envelope"></span></span>
+      <input type="text" class="form-control input-lg" name="email" placeholder="keedi.k@gmail.com" />
+    </p>
+
+![landing-fontawesome][img-5-resize]
+*그림 5.* 다섯 번째 랜딩 페이지 - FontAwesome ([원본][img-5])
+
+아이콘 넣겠다고 인터넷을 찾아 헤매거나 이미지 편집 프로그램을
+띄워 한참 작업하던 예전과 비교하면 정말 편해졌죠?
+
+
+기타 등등
+----------
+
+### 폰트
+
+구글 폰트를 이용해서 타이포그라피에 약간의 변화를 주면 어떨까요?
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`head` 태그 영역에 다음 내용을 추가합니다.
+
+    #!html
+    <!-- Bootstrap -->
+    %= asset "bootstrap.css"
+    %= asset "bootstrap.js"
+    <!-- FontAwesome -->
+    %= asset "font-awesome4.css"
+    <!-- Google Font -->
+    <link href='http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600' rel='stylesheet'>
+
+구글 폰트를 사용할 준비가 되었으니 CSS에 이를 적용합니다.
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`style` 태그 영역을 다음 내용으로 대체합니다.
+
+    #!html
+    <style>
+      body {
+        padding-top: 20px;
+        font-size: 16px;
+        font-family: "Open Sans",serif;
+      }
+
+      h1 {
+        font-family: "Abel", Arial, sans-serif;
+        font-weight: 400;
+        font-size: 40px;
+      }
+
+      .margin-base-vertical {
+        margin: 40px 0;
+      }
+    </style>
+
+![landing-googlefont][img-6-resize]
+*그림 6.* 여섯 번째 랜딩 페이지 - Google Font ([원본][img-6])
+
+
+### 배경
+
+대미를 장식하는 것은 역시 배경 화면입니다.
+[기사 원저자 'William Ghelfi'][bootstrap-in-practice-a-landing-page]씨의 이미지를 슬쩍(?) 가져오죠.
+
+    #!bash
+    $ mkdir -p public/img
+    $ wget https://www.williamghelfi.com/demos/img/6133364748_89f2365922_o.jpg
+
+전체 화면에 배경 화면을 녹아들게 하기 위해
+`__DATA__` 섹션 하부의 `index.html.ep` 템플릿 영역 중
+`style` 태그 영역을 다음 내용으로 대체합니다.
+
+    #!html
+    <style>
+      /* http://css-tricks.com/perfect-full-page-background-image/ */
+      html {
+        background: url(img/6133364748_89f2365922_o.jpg) no-repeat center center fixed; 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+      }
+
+      body {
+        padding-top: 20px;
+        font-size: 16px;
+        font-family: "Open Sans",serif;
+        background: transparent;
+      }
+
+      h1 {
+        font-family: "Abel", Arial, sans-serif;
+        font-weight: 400;
+        font-size: 40px;
+      }
+
+      /* Override B3 .panel adding a subtly transparent background */
+      .panel {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      .margin-base-vertical {
+        margin: 40px 0;
+      }
+    </style>
+
+마지막으로 `div.col-md-6` 영역에 `panel` 및 `panel-default` 클래스를 추가합니다.
+
+    #!html
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3 panel panel-default">
+
+![landing-background][img-7-resize]
+*그림 7.* 일곱 번째 랜딩 페이지 - 배경화면 ([원본][img-7])
+
+어떤가요? ;-)
+
+
+정리하며
+---------
+
+Mojolicious + Bootstrap + FontAwesome 삼종셋트는 어떠셨나요?
+펄과 Mojolicious면 정말 간단히 웹 응용을 만들 수 있을 뿐만 아니라
+대세인 Bootstrap과 FontAwesome을 적용시키는 것도 매우 쉽습니다.
+꼭 소개한 모듈을 사용하지 않더라도 그리 어려운 작업은 아니지만
+정적 파일을 디렉터리에 맞게 배치하고 관리하는 것은 번거로운 작업입니다.
+`Mojolicious::Plugin::Bootstrap` 모듈과 `Mojolicious::Plugin::FontAwesome4` 모듈을
+사용하면 무척 손쉽게 여러분의 미려한 웹 응용을 만들 준비가 끝납니다.
+자, 지금 당장 Perl과 항께 아름다운 웹 페이지를 만들어 볼까요?
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+
+[img-1]:          2015-12-04-1.png
+[img-2]:          2015-12-04-2.png
+[img-3]:          2015-12-04-3.png
+[img-4]:          2015-12-04-4.png
+[img-5]:          2015-12-04-5.png
+[img-6]:          2015-12-04-6.png
+[img-7]:          2015-12-04-7.png
+
+[img-1-resize]:   2015-12-04-1_r.png
+[img-2-resize]:   2015-12-04-2_r.png
+[img-3-resize]:   2015-12-04-3_r.png
+[img-4-resize]:   2015-12-04-4_r.png
+[img-5-resize]:   2015-12-04-5_r.png
+[img-6-resize]:   2015-12-04-6_r.png
+[img-7-resize]:   2015-12-04-7_r.png
+
+[bootstrap-in-practice-a-landing-page]:         https://www.williamghelfi.com/blog/2013/08/04/bootstrap-in-practice-a-landing-page/
+[cpan-app-cpanminus]:                           https://metacpan.org/pod/App::cpanminus
+[cpan-mojolicious-plugin-bootstrap3]:           https://metacpan.org/pod/Mojolicious::Plugin::Bootstrap3
+[cpan-mojolicious-plugin-fontawesome4]:         https://metacpan.org/pod/Mojolicious::Plugin::FontAwesome4
+[cpan-mojolicious]:                             https://metacpan.org/pod/Mojolicious
+[cpan]:                                         http://www.cpan.org/
+[home-bootstrap]:                               http://getbootstrap.com/
+[home-fontawesome]:                             http://fontawesome.io/
+[home-mojolicious]:                             http://mojolicio.us/
+[home-perlbrew]:                                http://perlbrew.pl/
+[twitter-keedi]:                                http://twitter.com/#!/keedi
+[yes24-4433208]:                                http://www.yes24.com/24/goods/4433208
