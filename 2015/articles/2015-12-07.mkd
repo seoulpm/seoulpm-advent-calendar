@@ -462,7 +462,7 @@ FontAwesome 관련 정적 파일을 HTML에 적재할 수 있습니다.
 정리하며
 ---------
 
-Mojolicious + Bootstrap + FontAwesome 삼종셋트는 어떠셨나요?
+[Mojolicious][home-mojolicious] +  [Bootstrap][home-bootstrap] + [FontAwesome][home-fontawesome] 삼종셋트는 어떠셨나요?
 펄과 Mojolicious면 정말 간단히 웹 응용을 만들 수 있을 뿐만 아니라
 대세인 Bootstrap과 FontAwesome을 적용시키는 것도 매우 쉽습니다.
 꼭 소개한 모듈을 사용하지 않더라도 그리 어려운 작업은 아니지만
