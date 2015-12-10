@@ -1,0 +1,170 @@
+Title:    time-ago 구하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+요즘은 트위터나 페이스북 같은 유명한 SNS 덕분에(때문에)
+time-ago 식 표현이 널리 사용된지 몇 년 되었죠.
+자바스크립트를 비롯해 대부분의 언어에는 이런 time-ago 형식으로
+시간을 표시할 수 있는 모듈이나 플러그인이 많습니다.
+그렇다면 펄에서는 어떻게 사용해야 할까요?
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 DateTimeX::Format::Ago 모듈][cpan-datetimex-format-ago]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan DateTimeX::Format::Ago
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan DateTimeX::Format::Ago
+
+
+Time-Ago?
+----------
+
+time-ago 표시 법이란 특정 시점의 날짜를 우리가 흔히 사용하는
+`YYYY-MM-DD hh:mm:ss` 등의 절대 시각으로 표시하는 것이 아니라
+현재 시점을 기준으로 얼마나 지났는지 상대적인 시각으로 표현하는 방법입니다.
+백마디 말 보다 한 줄의 코드가 더 명확겠죠?
+현재 시점을 기준으로 3일 전을 표현해보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use DateTime;
+    use DateTimeX::Format::Ago;
+
+    my $then = DateTime->now( time_zone => 'Asia/Seoul' )->subtract( days => 3 );
+    print DateTimeX::Format::Ago->format_datetime($then) . "\n";
+
+명령줄에서 실행해보죠.
+
+    #!bash
+    $ perl timeago.pl
+    Wide character in print at timeago.pl line 8.
+    3일 전
+    $ 
+
+우와!? time-ago 형식의 결과가 나오는 것은 둘째 치고도
+별 기대하지도 않았던 한글이 나오는데요?
+`DateTimeX::Format::Ago` 모듈은 [@JEEN_LEE][twitter-jeenlee]님의
+패치 덕에 0.003 버전 부터 한국어를 지원한답니다.
+
+결과물을 유심히 보면 `Wide character...` 경고가 나오죠?
+이는 인코딩과 관련된 이슈로 조금 더 정확하게 코드를 수정해서
+경고가 나오지 않도록 해보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use DateTime;
+    use DateTimeX::Format::Ago;
+
+    binmode STDOUT, 'encoding(UTF-8)';
+
+    my $then = DateTime->now( time_zone => 'Asia/Seoul' )->subtract( days => 3 );
+    print DateTimeX::Format::Ago->format_datetime($then) . "\n";
+
+인코딩 문제를 해결하는 방법은 여러가지가 있지만,
+현재 소스 코드를 `utf8`로 지정하고 출력 화면의 인코딩을 명시적으로
+`UTF-8`로 지정하는 것이 가장 명확하고 간결한 해결책입니다.
+
+    #!bash
+    $ perl timeago.pl
+    3일 전
+    $ 
+
+이제 괜찮죠?
+
+
+다국어 지원
+------------
+
+`DateTimeX::Format::Ago` 모듈은 이전의 한국어 출력 결과에서
+알 수 있듯이 이미 다국어를 지원하고 있습니다.
+내부적으로 `ENV` 환경 변수와 생성자 옵션을 이용해서 출력할
+time-ago 결과 문자열의 다국어 버전을 지정할 수 있습니다.
+
+환경 변수를 이용하는 방법은 다음과 같습니다.
+
+    #!bash
+    $ LANG=en perl timeago.pl
+    3 days ago
+    $ 
+
+생성자를 이용하려면 코드를 조금 수정해야 합니다.
+독일어로 출력해볼까요?
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use DateTime;
+    use DateTimeX::Format::Ago;
+
+    binmode STDOUT, 'encoding(UTF-8)';
+
+    my $then = DateTime->now( time_zone => 'Asia/Seoul' )->subtract( days => 3 );
+    print DateTimeX::Format::Ago->new( language => 'de' )->format_datetime($then) . "\n";
+
+독일어로도 잘 출력되는군요.
+
+    #!bash
+    $ perl timeago.pl
+    vor 3 Tagen
+    $ 
+
+
+정리하며
+---------
+
+처음에 트위터나 페이스북이 나왔던 시절만 해도 time-ago 형식은 꽤나 신기했죠.
+지금은 거의 대부분의 사이트나 모바일 응용에서 사용하고 있기 때문에
+일반인에게도 많이 익숙한 형식입니다.
+심지어 time-ago 형식을 더 편하게 느끼시는 분들도 제법 많구요.
+다국어도 지원하는 `DateTimeX::Format::Ago` 모듈을 사용하면 요즘 트렌드에
+맞게 시각 정보를 표현하는 것은 무척 간단하답니다.
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+
+[cpan-datetimex-format-ago]:    https://metacpan.org/pod/DateTimeX::Format::Ago
+[cpan]:                         http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-jeenlee]:              http://twitter.com/#!/JEEN_LEE
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
