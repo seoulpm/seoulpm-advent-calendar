@@ -28,7 +28,7 @@ Author:   JEEN_LEE
     20151211
     20151211130000
     2015년 12월 11일
-    …
+    ...
 
 그렇다면 우리는 어떤 자세로 이런 데이터들을 대해야 할까요?
 
@@ -41,19 +41,18 @@ Author:   JEEN_LEE
 
     #!perl
     my $date_str = "2015-12-11";
-    my ($y,$m,$d) = $str = ~ /^([\d]{4})-([\d]{2})-([\d]{2})$/;
-    …
+    my ( $y, $m, $d ) = $str = ~ /^([\d]{4})-([\d]{2})-([\d]{2})$/;
 
 하지만 위 코드의 약점을 아실 겁니다.
-그건 바로…
+그건 바로... 이런 거죠.
 
 ![Month knuckle trick][img-1-resize]
 *그림 1.* Month knuckle trick ([원본][img-1])
 
-이런 거죠.
-2월은 28일, 29일이 있고, 매달 올록볼록 엠보싱처럼 30일, 31일 왔다합니다.
-정규표현식으로 이런 거 짜맞추는 거 그렇게 어렵지 않습니다.
-그냥 그걸 생각해서 정규표현식을 만들면 되겠죠. 이렇게 말입니다.
+2월은 28일, 29일이 있고, 매달 올록볼록 엠보싱처럼 30일, 31일이 왔다합니다.
+정규표현식으로 이런 것을 짜맞추는 것이 그렇게 어렵지는 않습니다.
+그냥 그 규칙들을 생각하면서 차분히 정규표현식을 만들면 되겠죠.
+이렇게 말입니다. :)
 
     #!perl
     (?^:(?^:2015-(?:0(?:2-(?:0[123456789]|2[012345678]|1\d)|1-(?:0[123456789]|3[01]|1\d|2\d)|3-(?:0[123456789]|3[01]|1\d|2\d)|5-(?:0[123456789]|3[01]|1\d|2\d)|7-(?:0[123456789]|3[01]|1\d|2\d)|8-(?:0[123456789]|3[01]|1\d|2\d)|4-(?:0[123456789]|1\d|2\d|30)|6-(?:0[123456789]|1\d|2\d|30)|9-(?:0[123456789]|1\d|2\d|30))|1(?:0-(?:0[123456789]|3[01]|1\d|2\d)|2-(?:0[123456789]|3[01]|1\d|2\d)|1-(?:0[123456789]|1\d|2\d|30)))))
@@ -64,8 +63,8 @@ Author:   JEEN_LEE
 *그림 2.* 괜찮은데? ([원본][img-2])
 
 
-2. 날짜 형식에 맞는 파싱모듈을 사용
-------------------------------------
+2. 날짜 형식에 맞는 파싱 모듈을 사용
+-------------------------------------
 
 조금 덩치가 크긴 하지만 세상에는 [DateTime][cpan-datetime]이라는
 이름 그대로 날짜와 시간을 다루는 가장 유명한 모듈이 있습니다.
@@ -85,23 +84,24 @@ Author:   JEEN_LEE
 
     #!perl
     package DateTime::Format::Jeenlee;
+
     use DateTime::Format::Builder
     (
         parsers => {
             parse_datetime => [
                 {
-                    params => [qw(year month day hour minute second)],
-                    regex  => qr/^………………$/,
+                    params => [qw( year month day hour minute second )],
+                    regex  => qr/^...blahblah...$/,
                 },
-                { … },
-            ]
-        }
+                { ... },
+            ],
+        },
     );
 
-`parse_datetime`의 배열 레퍼런스 안에 위의 저 많은 케이스들을 우겨넣도록 하는 것입니다.
+`parse_datetime`의 배열 레퍼런스 안에 위의 저 많은 케이스를 우겨넣는거죠.
 
 
-정리하…
+정리하...
 ----------
 
 어떤가요? 이제 쉽게(!) 날짜를 다룰 수 있을 것 같죠?
@@ -140,6 +140,7 @@ Author:   JEEN_LEE
 
     #!perl
     use v5.22;
+
     use DateTime::Format::Flexible;
 
     my @dates = (
@@ -162,7 +163,7 @@ Author:   JEEN_LEE
     #!plain
     now/tomorrow/yesterday
     2 months ago/2 days ago/ 2 minutes ago
-    …
+    ...
 
 `parse_datetime` 인자로 앞의 예제 값을 넣으면 그에 맞는 `DateTime` 객체가 반환됩니다.
 
@@ -172,17 +173,148 @@ Author:   JEEN_LEE
 그리고 이 모듈은 `DateTime::Format::Flexible::lang::*`로 각 언어별 확장의 여지를 남겨두고 있습니다.
 `DateTime::Format::Flexible::lang::ko` 같은 걸 만들어서 올려놔도 되겠죠?
 
-<script src="https://gist.github.com/JEEN/3d05660a0fee0305a911.js"></script>
+    #!perl
+    package DateTime::Format::Flexible::lang::ko;
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    sub new {
+        my ( $class, %params ) = @_;
+        my $self = bless \%params, $class;
+        return $self;
+    }
+
+    sub months {
+        return (
+            qr{1월}  => 1,
+            qr{2월}  => 2,
+            qr{3월}  => 3,
+            qr{4월}  => 4,
+            qr{5월}  => 5,
+            qr{6월}  => 6,
+            qr{7월}  => 7,
+            qr{8월}  => 8,
+            qr{9월}  => 9,
+            qr{10월} => 10,
+            qr{11월} => 11,
+            qr{12월} => 12,
+        );
+    }
+
+    sub days {
+        return (
+            qr{\b월요일\b} => 1,    # Monday
+            qr{\b화요일\b} => 2,    # Tuesday
+            qr{\b수요일\b} => 3,    # Wednesday
+            qr{\b목요일\b} => 4,    # Thursday
+            qr{\b금요일\b} => 5,    # Friday
+            qr{\b토요일\b} => 6,    # Saturday
+            qr{\b일요일\b} => 7,    # Sunday
+        );
+    }
+
+    sub day_numbers {
+        return (
+            qr{1일}  => 1,
+            qr{2일}  => 2,
+            qr{3일}  => 3,
+            qr{4일}  => 4,
+            qr{5일}  => 5,
+            qr{6일}  => 6,
+            qr{7일}  => 7,
+            qr{8일}  => 8,
+            qr{9일}  => 9,
+            qr{10일} => 10,
+            qr{11일} => 11,
+            qr{12일} => 12,
+            qr{13일} => 13,
+            qr{14일} => 14,
+            qr{15일} => 15,
+            qr{16일} => 16,
+            qr{17일} => 17,
+            qr{18일} => 18,
+            qr{19일} => 19,
+            qr{20일} => 20,
+            qr{21일} => 21,
+            qr{22일} => 22,
+            qr{23일} => 23,
+            qr{24일} => 24,
+            qr{25일} => 25,
+            qr{26일} => 26,
+            qr{27일} => 27,
+            qr{28일} => 28,
+            qr{29일} => 29,
+            qr{30일} => 30,
+            qr{31일} => 31,
+        );
+    }
+
+    sub hours {
+        return (
+            '정오' => '12:00:00',
+            '자정' => '00:00:00',
+        );
+    }
+
+    sub remove_strings {
+        return ();
+    }
+
+    sub parse_time {
+        my ( $self, $date ) = @_;
+        $date =~ s/(\d+)(?:년|월|일)/$1/g;
+        $date =~ s/[Xn ]//g;
+        return $date;
+    }
+
+    sub string_dates {
+        my $base_dt = DateTime::Format::Flexible->base;
+        return (
+            '지금'     => sub { return $base_dt->datetime },
+            '오늘'     => sub { return $base_dt->clone->truncate( to => 'day' )->ymd },
+            '내일'     => sub { return $base_dt->clone->truncate( to => 'day' )->add( days => 1 )->ymd; },
+            '어제'     => sub { return $base_dt->clone->truncate( to => 'day' ) ->subtract( days => 1 )->ymd; },
+            '모레'     => sub { return DateTime->today->add( days => 2 )->ymd },
+            '내일모레' => sub { return DateTime->today->add( days => 2 )->ymd },
+            '글피'     => sub { return DateTime->today->add( days => 3 )->ymd },
+        );
+    }
+
+    sub ago {
+        return qr{\b전\b}i;
+    }
+
+    sub math_strings {
+        return (
+            '년'   => 'years',
+            '월'   => 'months',
+            '개월' => 'months',
+            '일'   => 'days',
+            '시'   => 'hours',
+            '시간' => 'hours',
+            '분'   => 'minutes',
+        );
+    }
+
+    sub timezone_map {
+        return ( KST => 'Asia/Seoul', );
+    }
 
 네, 그래서 한번 끄적거려 봤습니다.
 이걸 사용해서 한글 날짜 데이터를 받아서, 아래와 같이 사용할 수 있습니다.
 
     #!perl
-    DateTime::Format::Flexible->parse_datetime('2 개월 전', lang => ['ko']); # 2016년 12월 11일/지금/내일/…
+    DateTime::Format::Flexible->parse_datetime(
+        '2 개월 전',
+        lang => ['ko'],
+    ); # 2016년 12월 11일/지금/내일/...
 
 `보름 전`이나 `이틀 후` 같은 다양한 표현도 받아들일 수 있게끔
 하는 것도 괜찮겠다 싶습니다만, 아직은 그런 것들은 아니됩니다.
-좀 더 확장의 여지가 남아있네요. 도전과제로 삼아보는 것도 좋을 듯 합니다.
+좀 더 확장의 여지가 남아있네요.
+도전과제로 삼아보는 것도 좋을 듯 합니다.
 
 
 정리하며
