@@ -2,7 +2,7 @@ Title:    CPAN에서 만남을 추구하면 안되는 걸까 Vol.2
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   Jeen Lee
+Author:   JEEN_LEE
 
 
 ## 저자
@@ -36,7 +36,8 @@ Author:   Jeen Lee
 
 하지만 위 코드의 약점을 아실 겁니다. 그건 바로…
 
-![Month knuckle trick][img-month-knuckle]
+![Month knuckle trick][img-1-resize]
+*그림 1.* Month knuckle trick ([원본][img-1])
 
 이런 거죠. 2월은 28일, 29일이 있고, 매달 올록볼록 엠보싱처럼 30일, 31일 왔다합니다. 정규표현식으로 이런 거 짜맞추는 거 그렇게 어렵지 않습니다. 그냥 그걸 생각해서 정규표현식을 만들면 되겠죠. 이렇게 말입니다.
 
@@ -44,7 +45,9 @@ Author:   Jeen Lee
 
 자, 위의 2015년 전용 날짜 정규표현식을 넣고 유효성까지 확인하면 깔끔하게 데이터를 얻을 수 있겠죠?
 
-![괜찮은데?][img-this-is-fine]
+![괜찮은데?][img-2-resize]
+*그림 2.* 괜찮은데? ([원본][img-2])
+
 
 ## 2. 날짜 형식에 맞는 파싱모듈을 사용한다
 
@@ -145,9 +148,14 @@ Author:   Jeen Lee
 사실 위의 `DateTime::Format::Flexible::lang::ko`는 그냥 대충 기사 써내기 위해서 대충 형식만 맞춘 것입니다. 좀 더 다듬어서 모듈저자에게 패치를 보내는 것도 좋겠다 싶습니다.
 
 
-[img-month-knuckle]: month-knuckle-tricks.jpg
-[img-this-is-fine]: this-is-fine.png
+[img-1]:          2015-12-14-1.jpg
+[img-2]:          2015-12-14-2.png
 
-[cpan-time-moment]: https://metacpan.org/modules/Time::Moment
-[twitter-jeen_lee]: http://twitter.com/#!/JEEN_LEE
+[img-1-resize]:   2015-12-14-1_r.jpg
+[img-2-resize]:   2015-12-14-2_r.png
 
+
+[cpan-time-moment]:     https://metacpan.org/pod/Time::Moment
+[cpan]:                 http://www.cpan.org/
+[home-perlbrew]:        http://perlbrew.pl/
+[twitter-jeen_lee]:     http://twitter.com/#!/JEEN_LEE
