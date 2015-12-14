@@ -1,0 +1,367 @@
+Title:    Mojolicious - 폼 파라메터와 파일 업로드 처리
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
+홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+[Mojolicious][home-mojolicious]를 사용하여 웹 애플리케이션을 만들어보고 싶은데,
+웹 프로그래밍에 익숙하지 않은 상태에서 막상 시작하면 막막할 때가 많습니다.
+브라우저에서 폼에 입력한 값을 서버에서 받으려면 어떻게 해야 하는지, 한 번에 여러 개의
+파일을 업로드하고 싶으면 어떻게 해야 하는지 같은 것들이 발목을 잡습니다.
+어떤 때는 잘 되는 것 같은데 조금 수정하고 나니 제대로 값을 받지 못하곤 합니다.
+공식 문서는 첫 단락에서는 덧셈을 가르치더니 두 번째 단락부터는 갑자기 미적분을
+소개하는 느낌입니다.
+사실 제가 저런 문제들 때문에 애를 먹곤 했던 터라, 이 기회에 간단히 정리해보겠습니다.
+
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Mojolicious
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Mojolicious
+
+
+
+시작
+-------------
+
+Mojolicious에 대한 소개는 그동안 크리스마스 달력에서도 여러 번 나왔기 때문에,
+모듈을 설치하고 라이트 앱을 만들어 띄우는 부분은 생략하겠습니다.
+
+![first-page][img-1-resize]
+*그림 1.* 많이 봤을 그 화면. 수학 자습서의 첫 챕터처럼... ([원본][img-1])
+
+여기에 간단한 폼을 만들어서, 이 폼을 통하여 넣은 데이터를 서버 쪽에서 어떻게 받아갈 수 있는지
+확인해보도록 하겠습니다.
+
+`myapp.pl`(또는 여러분이 앱을 생성할 때 사용한 이름) 파일의 `__DATA__` 섹션에 있는
+`index.html.ep` 템플릿을 수정하여 폼을 집어넣습니다.
+
+    #!xml
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Welcome';
+    
+    <h1>간단한 폼</h1>
+    
+      <form action="/formtest" method="POST" enctype="multipart/form-data">
+      <p>
+      field1 - 평범한 텍스트 필드: <br/>
+      <input type="text" name="field1" />
+      </p>
+    
+      <hr/>
+    
+      <p>
+      field2 - 동일한 이름의 필드가 두 개: <br/>
+      <input type="text" name="field2" />
+      </p>
+      <p>
+      field2: <br/>
+      <input type="text" name="field2" />
+      </p>
+    
+      <hr/>
+    
+      <p>
+      checkbox - 체크박스: <br/>
+      <input type="checkbox" name="checkbox" value="1">1
+      <input type="checkbox" name="checkbox" value="2">2
+      <input type="checkbox" name="checkbox" value="3">3
+      </p>
+    
+      <hr/>
+    
+      <p>
+      file1 - 동일한 이름의 파일 업로드 필드가 세 개: <br/>
+      <input type="file" name="file1" />
+      <input type="file" name="file1" />
+      <input type="file" name="file1" />
+      </p>
+    
+      <hr/>
+    
+      <p>
+      file2 - 여러 개의 파일을 보낼 수 있는 업로드 필드: <br/>
+      <input type="file" name="file2" multiple/>
+      </p>
+    
+      <p>
+      <input type="submit" />
+      </p>
+      </form>
+
+이제 브라우저에서 페이지를 띄우면 이렇게 나옵니다.
+
+![form-sample][img-2-resize]
+*그림 2.* 간단한 폼 샘플 ([원본][img-2])
+
+이 단순한 디자인을 예쁘고 멋있게 꾸미는 것은 다른 달력 기사를 참고하도록 합시다.
+
+이 폼에 사용자가 어떤 값을 채워넣고 제출 버튼을 누를 것입니다. 그 값을 서버에서 받는 여러 방법을 살펴봅시다.
+
+제출 버튼을 눌렀을 때 데이터는 `form` 태그의 `action` 필드에 적힌 `/formtest`라는 URL로 전달됩니다.
+그러니 그 URL에 응답할 수 있는 핸들러를 만듭니다.
+
+    #!perl
+    post '/formtest' => sub {
+        my $c = shift;  # $c 는 Mojolicious::Controller 객체
+    
+        # 여기서 작업을 하고
+    
+        return $c->redirect_to('/');        # 첫 페이지로 되돌아갈 수도 있고
+        # 또는
+        return $c->render( text => 'ok' );  # 간단한 텍스트를 응답으로 내보낼 수도 있고
+        # 또는
+        ...                                 # 기타 등등
+    };
+
+이 코드에서 "여기서 작업을 하고" 부분에서 사용자가 입력한 값을 읽어야 하겠죠.
+
+### 간단한 텍스트 필드
+
+폼의 첫 번째 필드는 `field1`이라는 이름의 텍스트 필드입니다. 여기 들어간 값은 다음과 같이 읽을 수 있습니다.
+
+    #!perl
+    # Mojolicious::Controller의 param() 메소드
+    my $value = $c->param('field1');
+
+    # 또는
+
+    # Mojo::Message::Request의 param() 메소드
+    my $value = $c->req->param('field1');
+
+문자열로 반환되며, 만일 값이 없는 경우는 빈 문자열 `""`이 반환됩니다.
+
+
+### 같은 이름의 필드가 여러 개일 때
+
+폼에 `field2`라는 텍스트 필드가 두 개입니다. 각각 `v1`, `v2`라고 값을 넣고 제출할 경우 `param()` 메소드는
+가장 마지막 필드의 값을 가져옵니다.
+
+    #!perl
+    my $value = $c->param('field2');    # "v2"
+
+같은 이름의 필드 여러 개의 값을 한 번에 가져오고 싶으면 `every_param()` 메소드를 사용합니다.
+이 메소드는 항상 익명 배열 레퍼런스를 반환합니다.
+
+    #!perl
+    my $value = $c->every_param('field2');
+    # 또는
+    my $value = $c->req->every_param('field2');
+
+    # $value = [ "v1", "v2" ]
+
+앞에서와 마찬가지로 비어있는 필드의 값은 빈 문자열로 들어옵니다.
+
+
+### 체크박스
+
+체크박스의 경우도 `field2`와 마찬가지로, `param()` 메소드는 체크된 값들 중 가장 마지막 값만 가져옵니다.
+(아무 값도 체크되어 있지 않은 경우 `undef`을 반환합니다.) 체크된 값 모두를 가져오고 싶으면
+`every_param()` 메소드를 사용합니다.
+
+    #!perl
+    my $value = $c->every_param('checkbox');
+    # 또는
+    my $value = $c->req->every_param('checkbox');
+
+    # $value = [ 2, 3 ]   (예를 들어)
+
+만일 체크된 항목이 하나도 없는 경우라면 `every_param()` 메소드는 원소가 하나도 없는
+빈 배열 레퍼런스를 반환합니다.
+
+
+### 파일 업로드
+
+그 다음은 파일을 업로드하는 경우입니다. 첫 줄 세 개의 필드는 동일하게 `file1`이라는 이름의 입력 필드인데
+실제로는 이런 식으로 같은 이름을 쓸 일은 별로 없을 것 같습니다. 두 번째 줄은 `file2`라는 이름의 `input` 태그에
+`multiple` 속성을 주어서 두 개 이상의 파일을 한꺼번에 업로드할 수 있게 하였습니다.
+
+필드가 하나 뿐이라면 다음과 같이 Mojolicious::Controller의 `param()` 메소드나 Mojo::Message::Request의
+`upload()` 메소드(`param()`이 아닙니다)를 사용해서 업로드된 파일의 정보와 내용을 가져올 수 있습니다.
+
+    #!perl
+    my $upload = $c->param('file1');
+    # 또는
+    my $upload = $c->req->upload('file1');
+
+이 때 반환되는 것은 Mojo::Upload 클래스의 객체입니다. 이 객체에는 업로드된 파일의 정보가 들어있어서,
+다음과 같이 사용할 수 있습니다.
+
+    #!perl
+    my $filename = $upload->filename;    # 업로드된 파일의 이름
+    my $size = $upload->size;            # 파일의 크기(바이트 단위)
+    my $bytes = $upload->slurp;          # 파일의 내용 전체
+    $upload->move_to( 'upload/'.$filename );    # 인자로 주어진 경로에 저장
+
+만일 업로드할 파일을 지정하지 않은 채로 제출 버튼을 눌렀다면? `undef`이나 빈 문자열이
+반환되는 것이 아니라, 이 때도 엄연한 Mojo::Upload 객체가 반환됩니다. 이 객체의 `filename` 속성은 빈 문자열,
+`size` 속성은 `0`이 됩니다.
+
+우리가 작성한 폼에서는 `file1`라는 이름의 필드가 세 개이므로 여기서도 `param()` 또는 `upload()`
+메소드는 마지막 세 번째 필드의 값만 반환합니다. 세 필드의 정보를 다 가져오기 위해서는 컨트롤러의
+`every_param()` 또는 리퀘스트의 `every_upload()` 메소드를 씁니다. 역시 익명 배열 레퍼런스를 반환하며,
+이 배열의 각 원소는 Mojo::Upload 클래스의 객체입니다.
+
+    #!perl
+    my $upload = $c->every_param('file1');
+    # 또는
+    my $upload = $c->req->every_upload('file1');
+
+    # $upload = [ Mojo::Upload 객체, 객체, 객체 ]
+
+
+`file2` 필드는 여러 개의 파일을 한꺼번에 선택할 수 있습니다. 이 경우 `param()` 또는 `upload()` 메소드는
+선택된 파일들 중 가장 마지막 파일을 나타내는 Mojo::Upload 객체를 반환하며, 모든 파일의 정보를 가져오려면
+역시 `every_param()`이나 `every_upload()` 메소드를 씁니다. 코드는 생략하겠습니다.
+
+
+### 모든 입력값을 한꺼번에 보기
+
+폼 안에 들어있는 입력 필드 각각에 대해 일일이 `param()`이나 `every_param()` 메소드를 호출하여 값을
+확인하자니 불편합니다. 모든 입력값을 한 번에 확인하려면, Mojo::Message::Request 클래스에 있는 `params()`
+메소드를 사용합니다.
+
+    #!perl
+    my $params = $c->req->params;
+
+이 메소드는 Mojo::Parameters 클래스의 객체를 반환하는데, 이 객체에는 모든 입력 필드의 이름과 그 필드에
+입력된 값들이 들어가 있습니다. 이 객체도 `param()`, `every_param()` 메소드를 제공할 뿐 아니라, 그 외에 모든 입력값을
+하나의 해시 또는 문자열로 구성해주는 메소드를 제공합니다.
+
+    #!perl
+    my $hash = $c->req->params->to_hash;
+    
+    # $hash = {
+    #           field1   => 'text',
+    #           field2   => [ 'v1', 'v2' ],
+    #           checkbox => [ 2, 3 ],
+    #         }
+
+    my $str = $c->req->params->to_string;
+
+    # $str = "field1=text&field2=v1&field2=v2&checkbox=2&checkbox=3"
+
+따라서 나중에 추가적인 메소드 호출 없이 `$hash->{field2}->[0]` 등과 같이 접근하여 값을 가져올 수 있습니다.
+
+다만 **체크박스의 경우는 주의할 점**이 있는데, 체크된 값이 두 개 이상일 경우는 위와
+같이 배열 레퍼런스로 저장이 되지만, 체크된 값이 하나 뿐일 때는 그 값만 스칼라 형태로 저장이
+된다는 것입니다.
+
+    #!perl
+    # $hash = {
+    #           field1   => 'text',
+    #           field2   => [ 'v1', '' ],    # 값이 없는 텍스트 필드의 경우는 빈 문자열
+    #           checkbox => 3,               # value가 3인 체크박스만 체크된 경우
+    #         } 
+
+만일 체크된 항목이 하나도 없다면, 이 때는 아예 해당 입력 필드를 나타내는 키(여기서는 `checkbox`)가
+저 익명 해시 안에 존재하지 않게 됩니다.
+따라서 배열 레퍼런스라고 가정하고 처리하다가는 런타임 에러가 발생할 수 있으니
+확인 후 처리하도록 구성해야 합니다.
+
+### 모든 파일 업로드 필드의 내용을 한꺼번에 보기
+
+Mojo::Message::Request 클래스에는 (정확히는 그 부모 클래스인 Mojo::Message 클래스에)
+`uploads()` 메소드가 있어서, 모든 파일 업로드 필드의 내용을 한꺼번에 가져올 수 있습니다.
+
+    #!perl
+    my $uploads = $c->req->uploads;
+
+    # $uploads = [ Mojo::Upload 객체, 객체, 객체, ... ]
+
+각 객체가 어느 업로드 필드를 통해 업로드되었는지는 객체의 `name` 속성값을 검사하면 알 수 있습니다.
+
+
+
+### Mojolicious::Controller의 param() 메소드
+
+Request 객체를 통해 입력값을 접근할 때는 파일 업로드는 `upload()` 메소드로,
+그 외 다른 입력 필드는 `param()` 메소드로 읽어와야 했는데, Controller 객체를
+통해 접근할 때는 모두 `param()` 메소드를 써서 접근하였습니다.
+
+추가로, Controller의 `param()` 메소드는 이 외에 라우트 핸들러에 쓰이는
+placeholder 값을 가져올 때도 쓰입니다. 아마 Mojolicious 튜토리얼 문서에서
+많이 보셨을 겁니다.
+
+    #!perl
+    get '/view/:name' => sub {                 # name은 placeholder 이름
+        my $c = shift;
+    
+        my $name_value = $c->param('name');    # name에 매치된 URL 값 읽기
+    }
+
+브라우저로 `서버주소/view/hello`라는 URL에 접근한다면 `$name_value`의 값은 `hello`가 됩니다.
+
+
+
+- | 컨트롤러의 `param` | 리퀘스트의 `param` | 리퀘스트의 `upload`
+--- | --- | --- | --- 
+placeholder | O |  | 
+파일업로드 | O | | O
+GET 파라메터 | O | O | 
+POST 파라메터 | O | O | 
+
+*표 1.* 어느 메소드로 어디에 접근할 수 있는가
+
+
+
+정리하며
+---------
+
+아마 익숙한 분들에게는 너무도 쉬운 내용이겠지만, 저처럼 문외한이던 분들이
+웹 애플리케이션을 자작할 때 참고가 되었으면 좋겠습니다.
+
+
+참고
+---------
+
+* [Mojolicious 튜토리얼](http://mojolicio.us/perldoc/Mojolicious/Guides/Tutorial)
+* [Mojolicious::Controller 문서](http://mojolicio.us/perldoc/Mojolicious/Controller)
+* [Mojo::Message 문서](http://mojolicio.us/perldoc/Mojo/Message)
+* [Mojo::Message::Request 문서](http://mojolicio.us/perldoc/Mojo/Message/Request)
+* [Mojo::Upload 문서](http://mojolicio.us/perldoc/Mojo/Upload)
+* [Mojo::Parameters 문서](http://mojolicio.us/perldoc/Mojo/Parameters)
+
+
+
+[img-1]:          2015-12-18-1.png
+[img-2]:          2015-12-18-2.png
+
+[img-1-resize]:   2015-12-18-1_r.png
+[img-2-resize]:   2015-12-18-2_r.png
+
+[cpan-mojolicious]:             https://metacpan.org/pod/Mojolicious
+[cpan]:                         http://www.cpan.org/
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[home-mojolicious]:             http://mojolicio.us/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-gypark]:               http://twitter.com/gypark
