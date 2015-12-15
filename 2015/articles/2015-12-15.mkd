@@ -36,7 +36,7 @@ Author:   gypark
 
 
 시작
--------------
+-----
 
 다음과 같이 사용합니다.
 
@@ -152,8 +152,6 @@ cwd와 getcwd의 차이?
 원래의 경로명을 반환합니다.
 
 
-
-
 정리하며
 ---------
 
@@ -164,9 +162,9 @@ cwd와 getcwd의 차이?
 * `abs_path`를 써서 어떤 경로명의 절대경로를 알 수 있다.
 
 
-
 참고
----------
+-----
+
 이 기사는 [Perl Maven](http://perlmaven.com)의
 [Current working directory in Perl](http://perlmaven.com/pro/current-working-directory)
 기사의 내용을 보강한 것입니다.
