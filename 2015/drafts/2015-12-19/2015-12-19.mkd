@@ -1,0 +1,540 @@
+Title:    Mojolicious - 폼의 필드를 자동으로 채워넣기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
+홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+웹 페이지에서 폼을 띄워서 사용자에게 입력을 받을 때,
+폼의 여러 입력 필드에 미리 어떤 값을 채워둔 상태로 두고 그 상태에서
+사용자가 제출 버튼을 누르면 그 값이 전송되도록 하고 싶을 때가 있습니다.
+일종의 디폴트 값인 셈입니다.
+
+예를 들자면, 사용자의 정보 수정 폼에서는 기존 정보(전화번호나 주소)를
+미리 채워넣고, 달라진 게 있는 항목만 사용자가 수정하도록 할 수 있을 겁니다.
+또는, 사용자가 입력한 내용 중에 잘못된 값이 있어서 폼을 다시 작성하도록 해야 하는데,
+제대로 넣은 값들까지도 전부 새로 넣으라면 사용자가 화를 낼 테니
+미리 채워넣어 주는 게 좋을 것입니다.
+
+[Mojolicious][home-mojolicious]를 이용하여 만드는 웹 페이지에서 이렇게 폼의
+필드를 채워넣는 작업을 자동으로 하는 방법에 대해 알아봅시다.
+
+
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+- [CPAN의 Mojolicious::Plugin::FillInFormLite 모듈][cpan-mojolicious-plugin-fillinformlite]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Mojolicious \
+        Mojolicious::Plugin::FillInFormLite
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Mojolicious \
+        Mojolicious::Plugin::FillInFormLite
+
+
+
+시작
+-------------
+
+Mojolicious에 대한 소개는 그동안 크리스마스 달력에서도 여러 번 나왔기 때문에,
+모듈을 설치하고 라이트 앱을 만들어 띄우는 부분은 생략하겠습니다.
+
+일단 간단한 폼을 만들어 봅시다.
+`myapp.pl`(또는 여러분이 앱을 생성할 때 사용한 이름) 파일의 `__DATA__` 섹션에 있는
+`index.html.ep` 템플릿을 수정하여 폼을 집어넣습니다.
+
+    #!xml
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Welcome';
+    <h1>간단한 폼</h1>
+    
+    <form action="/formtest" method="POST" enctype="multipart/form-data">
+    <p>
+        <label>이름:</label>
+        <input type="text" name="name" />
+    </p>
+    <p>
+        <label>전화번호:</label>
+        <input type="text" name="phone" />
+    </p>
+    <p>
+        <label>취미:</label>
+        <input type="checkbox" name="hobby" value="twiiter" />트위터
+        <input type="checkbox" name="hobby" value="comic" />만화
+        <input type="checkbox" name="hobby" value="ani" />애니메이션
+        <input type="checkbox" name="hobby" value="gundam" />건담
+    </p>
+    <p>
+        <label>사용 언어:</label>
+        <input type="radio" name="language" value="korean" />한국어
+        <input type="radio" name="language" value="latin" />라틴어
+        <input type="radio" name="language" value="esperanto" />에스페란토
+        <input type="radio" name="language" value="alien" />외계어
+    </p>
+    <p>
+        <input type="submit" />
+    </p>
+    
+    </form>    
+
+이제 브라우저에서 페이지를 띄우면 다음과 같은 폼이 나옵니다.
+
+![form-sample][img-1-resize]
+*그림 1.* 간단한 폼 샘플 ([원본][img-1])
+
+
+
+
+폼에 값을 채워넣기(1) - 수작업
+------------------------------
+
+저 폼을 띄우기 전에, 우리가 저 폼에 들어갈 데이터를 어떤 형식으로든
+입수했다고 가정합시다. 파일에서 읽어왔을 수도 있고, 데이터베이스에서 가져왔을
+수도 있습니다.
+
+    #!perl
+    get '/' => sub {
+        my $c = shift;
+      
+        # 다음과 같은 값을 얻었다
+        my $record = {
+            name     => '홍길동',
+            phone    => '010-1111-1111',
+            hobby    => [ 'twiiter', 'comic',  'gundam' ],
+            language => 'latin',
+        };
+      
+        # 저 값을 폼에 전달할 방법을 찾아야 한다
+
+        $c->render(template => 'index');
+    };
+
+`$record`에 들어있는 값을 폼에 미리 채워넣은 상태로 사용자에게 보여주고
+싶습니다.
+
+### stash 를 사용한 단순한 방법
+
+[Mojolicious 튜토리얼][mojo-tutorial]의 "Stash and templates" 절을 보니 컨트롤러에서
+템플릿으로 데이터를 보낼 수 있습니다. 이걸 사용해 봅시다.
+
+    #!perl
+    get '/' => sub {
+        my $c = shift;
+    
+        # 다음과 같은 값을 얻었다
+        my $record = {
+            name     => '홍길동',
+            phone    => '010-1111-1111',
+            hobby    => [ 'twiiter', 'comic',  'gundam' ],
+            language => 'latin',
+        };
+    
+        # stash에 저장하여 템플릿 쪽에서 사용할 수 있게 한다
+        $c->stash(
+            name     => $record->{name},
+            phone    => $record->{phone},
+            hobby    => $record->{hobby},
+            language => $record->{language},
+        );
+    
+        $c->render(template => 'index');
+    };
+
+`stash`를 써서 `name`이라는 키와 값을 저장하면,
+템플릿 쪽에서는 그 값을 `$name` 변수를 통하여 접근할 수 있습니다.
+
+    #!xml
+    <label>이름:</label>
+    <input type="text" name="name" value="<%= $name %>" />
+
+`input` 태그에 `value` 속성을 추가하여 기본값을 채워넣었습니다. 전화번호 필드에도
+마찬가지로 추가합니다.
+
+    #!xml
+    <label>전화번호:</label>
+    <input type="text" name="phone" value="<%= $phone %>" />
+
+사용 언어 필드의 경우는 라디오 버튼들로 구성되어 있습니다. 네 개의 버튼 중에 하나만
+체크할 수 있고, `$language` 변수의 값과 `value` 속성의 값이 일치하는 버튼이 체크되어
+있어야 할 것입니다.
+
+    #!xml
+    <label>사용 언어</label>
+    <input type="radio" name="language" value="korean"    <%= $language eq 'korean'    ? "checked" : "" %> />한국어
+    <input type="radio" name="language" value="latin"     <%= $language eq 'latin'     ? "checked" : "" %> />라틴어
+    <input type="radio" name="language" value="esperanto" <%= $language eq 'esperanto' ? "checked" : "" %> />에스페란토
+    <input type="radio" name="language" value="alien"     <%= $language eq 'alien'     ? "checked" : "" %> />외계어
+
+동일한 형식의 라인이 반복되니까 뭔가 낭비하는 것 같습니다. 템플릿 안에서 루프를 써서
+줄여볼 수도 있겠습니다.
+
+    #!xml
+    <label>사용 언어</label>
+    % for my $pair ( [ 'korean', '한국어' ], [ 'latin', '라틴어' ], [ 'esperanto', '에스페란토' ], [ 'alien', '외계어' ] ) {
+    <input type="radio" name="language" value="<%= $pair->[0] %>"   <%= $language eq $pair->[0] ? "checked" : "" %> /><%= $pair->[1] %>
+    % }
+
+취미 필드의 경우는 좀 더 복잡합니다. `$hobby`에 저장된 값이 문자열이 아니라 배열
+레퍼런스이기 때문입니다. 필드의 `value` 속성의 값이 그 배열 안에 들어있는 경우에만
+체크해주어야 합니다.
+
+    #!xml
+    <label>취미:</label>
+    <input type="checkbox" name="hobby" value="twiiter" <%= ( grep { $_ eq 'twiiter' } @{$hobby} ) ? "checked" : "" %> />트위터
+    <input type="checkbox" name="hobby" value="comic"   <%= ( grep { $_ eq 'comic'   } @{$hobby} ) ? "checked" : "" %> />만화
+    <input type="checkbox" name="hobby" value="ani"     <%= ( grep { $_ eq 'ani'     } @{$hobby} ) ? "checked" : "" %> />애니메이션
+    <input type="checkbox" name="hobby" value="gundam"  <%= ( grep { $_ eq 'gundam'  } @{$hobby} ) ? "checked" : "" %> />건담
+
+여기까지 수정이 되었으면 이제 브라우저에서 확인해봅시다.
+
+![fif-manual-1][img-2-resize]
+*그림 2.* 값이 채워진 채로 표시된 폼 ([원본][img-2])
+
+폼이 우리가 원하는 형태로 미리 채워져 있는 것을 확인할 수 있습니다.
+
+
+### stash에 저장해야 할 변수가 너무 많아요
+
+지금은 폼의 필드가 네 개밖에 없으니까 변수도 네 개만 있으면 되었습니다.
+하지만 필드가 십 수 가지라면? `$record`의 키가 매우 많다면?
+일일이 변수를 만들어 할당하는 것은 힘든 일입니다.
+
+`stash`를 통해 해시를 그냥 넘겨줄 수도 있습니다. 사실 스칼라, 배열, 해시,
+클래스 객체, 무엇이든 레퍼런스를 써서 넘겨줄 수 있습니다.
+
+    #!perl
+    $c->stash(
+        record => $record
+    );
+
+템플릿에서는 그 레퍼런스를 받아서 펄에서 하듯이 디레퍼런스하면 됩니다.
+
+    #!xml
+    <input type="text" name="name" value="<%= $record->{name} %>" />
+    ...
+    <input type="text" name="phone" value="<%= $record->{phone} %>" />
+    ...
+
+
+
+폼에 값을 채워넣기(2) - 자동으로
+--------------------------------
+
+### Let's Fill in Form!
+
+이렇게 폼에 넣을 값을 전달하기 위해 매번 stash에 값을 저장하고,
+템플릿에서 그 저장된 값을 읽도록 하는 것은 매우 귀찮은 일입니다.
+이것을 [Mojolicious::Plugin::FillInFormLite 모듈][cpan-mojolicious-plugin-fillinformlite]을
+사용하여 처리해봅시다.
+
+    #!perl
+    # 플러그인을 로드한다
+    plugin 'FillInFormLite';
+    
+    get '/' => sub {
+        my $c = shift;
+    
+        my $record = {
+            name     => '홍길동',
+            ...
+        };
+    
+        # 컨트롤러에 render_fillinform이라는 helper 메소드가 생겼다
+        $c->render_fillinform(
+            $record,              # 첫 번째 인자는 폼을 채울 해시 데이터
+            template => 'index'   # render()에 넘겨주던 인자는 그 뒤에 그대로 적는다
+        );
+    };
+
+템플릿 쪽은, 아무런 처리를 할 필요가 없습니다. 제일 처음 작성한 상태로
+두면 됩니다.
+
+    #!xml
+    <input type="text" name="name" />
+    ...
+    <input type="text" name="phone" />
+    ...
+
+브라우저에서 확인해보면, 수작업으로 값을 채워넣었을 때와 완전히 동일하게
+동작합니다. `$record` 익명 해시의 내용을 수정해가며 확인해보세요.
+
+
+### 사용자가 입력한 값을 보존하기
+
+"시작하기" 절에서 언급했던 상황을 구현해봅시다.
+먼저 사용자에게 입력을 받습니다. 
+입력한 내용이 특정한 조건을 만족시킨다면 다음 단계로 진행하고,
+그렇지 않다면 재입력을 요구합니다.
+그런데 재입력을 요구할 때 텅 빈 폼을 다시 채우라고 하면
+사용자는 짜증이 나겠지요. 그러니 사용자가 방금 입력했던 내용을
+일단 폼에 고스란히 채워넣은 상태로 보여주면 좋겠습니다.
+
+첫 화면은 원래대로 빈 폼을 보여주도록 합시다.
+
+    #!perl
+    get '/' => sub {
+        my $c = shift;
+    
+        $c->render( template => 'index' );
+    };
+
+사용자가 제출 버튼을 눌렀을 때 응답할 라우트 핸들러를 만들어줍니다.
+
+    #!perl
+    post '/formtest' => sub {
+        my $c = shift;
+    
+        # 이름 필드가 '오덕'이고
+        # 사용 언어가 '외계어'인 경우에만
+        # 다음 단계로 통과
+        if ( $c->param('name') eq '오덕' and $c->param('language') eq 'alien' ) {
+            return $c->render( text => 'May the Force be with you.' );
+        }
+    
+        # 그렇지 않다면 폼을 다시 보여줌
+        $c->render_fillinform(
+
+            # 첫 번째 인자는 폼을 채울 값들이 담긴 해시
+            $c->req->params->to_hash,
+
+            # 여기서부터는 render()에 전달될 인자들 
+            template => 'index',         # 첫 화면에 썼던 index.html.ep 템플릿을 재사용
+            msg      => "I don't know who you are."    # 추가로 stash에 저장
+
+        );
+    };
+
+사용자가 입력한 값을 컨트롤러에서 받는 법은
+[Mojolicious 튜토리얼][mojo-tutorial]의 "GET/POST parameters" 절에서
+볼 수도 있고. 몇 가지 방법에 대해서는
+[12월 18일 기사][advent-2015-12-18]에서도 다루고 있으니 참고하세요.
+
+위 코드의 컨트롤러는 입력받은 값 중 `name` 필드와 `language` 필드의 값을
+검사합니다. 이 값들이 조건에 맞으면, 짧은 텍스트를 브라우저로 출력해 주고
+끝이 납니다. 이보다 더 복잡한 동작을 할 수도 있을 것이고,
+`$c->redirect_to()`를 써서 미리 만들어둔 다른 URL로
+이동할 수도 있을 것입니다.
+
+값이 조건에 맞지 않는다면 첫 화면에서 보여주었던 폼을 다시 출력합니다.
+이 때 폼에 채울 내용은 브라우저에서 전송된 요청으로부터 뽑아냅니다.
+이에 대해서도 [12월 18일 기사][advent-2015-12-18]에서 같이 다루고 있습니다.
+
+그런데 사용자 입장에서는, 결과적으로 "제출" 버튼을 눌렀는데 제출하기 전에
+작성하던 폼 화면을 그대로 다시 보게 될 것입니다. 이러면 어리둥절하겠지요.
+따라서 간단한 메시지를 뿌려주면 좋을 것 같습니다. 이 메시지를 `msg`라는
+키를 써서 stash에 저장합니다(키 이름은 임의로 지어도 됩니다).
+
+이렇게 저장된 `msg`를 템플릿에서 읽어야 합니다.
+템플릿은 제일 처음 작성한 상태에서 다음 부분만 추가해 줍니다.
+
+    #!xml
+    ...
+    % title 'Welcome';
+    
+    % if ( stash('msg') ) {
+        <span style="color: red"><%= stash('msg') %></span>
+    % }
+    
+    <h1>간단한 폼</h1>
+    ...
+
+이 템플릿에서는 stash에 저장된 `msg` 값을 읽기 위해 `$msg`라는 변수를 사용하지
+않았습니다. 오히려 이 때는 **사용하면 안 됩니다**. 왜냐하면 첫 화면으로 들어와서
+`'/'` 주소에 연결된 핸들러를 거쳐 출력될 경우는 `msg` 키가 stash에 저장되지
+않기 때문에, 템플릿을 처리할 때 `$msg` 변수가 존재하지 않는다고 에러가 납니다.
+따라서 이렇게 특정한 키가 있을지 없을지 알 수 없는 경우라면 `stash()` 헬퍼를
+직접 써야 합니다.
+
+매번 `stash('msg')`라고 적어주는 게 귀찮다면 템플릿 안에서 변수를 선언해서 쓸
+수는 있습니다.
+
+    #!xml
+    % if ( my $m = stash('msg') ) {
+        <span style="color: red"><%= $m %></span>
+    % }
+
+이제 실행 결과를 살펴봅시다.
+
+첫 화면은 *그림 1*과 같은 비어있는 폼입니다.
+이 폼을 적당히 채워넣고 제출 버튼을 누르면 다음과 같이 메시지가 뜨면서
+재입력을 요구합니다. 만일 FillInForm을 쓰지 않았다면 이 시점에서
+폼의 모든 필드가 텅 빈 채로 나왔을 테고, 사용자는 한숨을 쉰 후
+창을 닫아버릴 것입니다.
+
+![fif-auto-1][img-3-resize]
+*그림 3.* 어디서 들은 말 같다면 기분 탓입니다. ([원본][img-3])
+
+만일 이름과 언어를 제대로 입력했다면, 다음과 같이 화면이 바뀝니다.
+
+![fif-auto-2][img-4-resize]
+*그림 4.* 축복받았습니다. ([원본][img-4])
+
+
+### 주의 사항
+
+여기서 사용하고 있는
+[Mojolicious::Plugin::FillInFormLite 모듈][cpan-mojolicious-plugin-fillinformlite]은
+내부적으로
+[HTML::FillInForm::Lite 모듈][cpan-html-fillinform-lite]을 사용하여 폼을 채워넣습니다.
+HTML::FillInForm::Lite 모듈은 폼을 채울 데이터를 전달받을 때 지금처럼 해시 레퍼런스를
+받거나, `param()` 메소드를 제공하는 객체를 받을 수 있습니다. 폼의 `name` 필드를
+채울 값을 얻기 위해 `$hash->{'name'}` 또는 `$obj->param('name')`을 호출하는 식입니다.
+
+따라서 `render_fillinform` 메소드를 호출할 때 굳이 해시가 아니라 브라우저의 요청 데이터에
+들어 있는
+[Mojo::Parameters 클래스](http://mojolicio.us/perldoc/Mojo/Parameters)의 객체를
+전달할 수도 있습니다.
+
+    #!perl
+    $c->render_fillinform( $c->req->params );   # 뒤에 ->to_hash 없이
+
+문제는, 체크박스의 경우는 `param()` 메소드로 값을 검사하면 체크된 값들 중
+가장 마지막 값만 반환한다는 점입니다. 앞에 있는 예제 소스를 위와 같이 고치고
+직접 해보시면 확인할 수 있습니다.
+
+그러니 여기서는 `to_hash()` 메소드까지 호출하여 폼에서 들어온 값들을
+해시 형태로 바꾼 후에 넘겨주는 것이 좋습니다. 이렇게 하면 여러 개의 체크박스가
+체크되었을 때도 제대로 폼에 반영이 됩니다.
+
+(여러 개의 값이 체크될 수 있는 상황이라면 `param()`이 아니라
+`every_param()` 메소드를 써서 검사해야 합니다.
+이에 관해서도 [12월 18일 기사][advent-2015-12-18]에서 다루고 있으니 참고하세요.)
+
+
+전체 코드
+---------
+
+    #!perl
+    #!/usr/bin/env perl
+    use Mojolicious::Lite;
+    
+    # Documentation browser under "/perldoc"
+    plugin 'PODRenderer';
+    plugin 'FillInFormLite';
+    
+    get '/' => sub {
+        my $c = shift;
+    
+        $c->render( template => 'index' );
+    };
+    
+    post '/formtest' => sub {
+        my $c = shift;
+    
+        if ( $c->param('name') eq '오덕' and $c->param('language') eq 'alien' ) {
+            return $c->render( text => 'May the Force be with you.' );
+        }
+    
+        $c->render_fillinform(
+            $c->req->params->to_hash,
+            template => 'index',
+            msg => "I don't know who you are."
+        );
+    };
+    
+    app->start;
+    __DATA__
+    
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Welcome';
+    
+    % if ( stash('msg') ) {
+        <span style="color: red"><%= stash('msg') %></span>
+    % }
+    
+    <h1>간단한 폼</h1>
+    
+    <form action="/formtest" method="POST" enctype="multipart/form-data">
+    <p>
+    <label>이름:</label>
+    <input type="text" name="name" />
+    </p>
+    <p>
+    <label>전화번호:</label>
+    <input type="text" name="phone" />
+    </p>
+    <p>
+    <label>취미:</label>
+    <input type="checkbox" name="hobby" value="twiiter" />트위터
+    <input type="checkbox" name="hobby" value="comic" />만화
+    <input type="checkbox" name="hobby" value="ani" />애니메이션
+    <input type="checkbox" name="hobby" value="gundam" />건담
+    </p>
+    <p>
+    <label>사용 언어:</label>
+    <input type="radio" name="language" value="korean" />한국어
+    <input type="radio" name="language" value="latin" />라틴어
+    <input type="radio" name="language" value="esperanto" />에스페란토
+    <input type="radio" name="language" value="alien" />외계어
+    </p>
+    <p>
+    <input type="submit" />
+    </p>
+    </form>
+    
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+    <head><title><%= title %></title></head>
+    <body><%= content %></body>
+    </html>
+
+
+
+참고
+---------
+
+* [Mojolicious::Plugin::FillInFormLite 모듈 문서][cpan-mojolicious-plugin-fillinformlite]
+* [HTML::FillInForm::Lite 모듈 문서][cpan-html-fillinform-lite]
+* [Mojolicious 튜토리얼](http://mojolicio.us/perldoc/Mojolicious/Guides/Tutorial)
+* [Mojo::Parameters 문서](http://mojolicio.us/perldoc/Mojo/Parameters)
+
+
+
+[img-1]:          2015-12-19-1.png
+[img-2]:          2015-12-19-2.png
+[img-3]:          2015-12-19-3.png
+[img-4]:          2015-12-19-4.png
+
+[img-1-resize]:   2015-12-19-1_r.png
+[img-2-resize]:   2015-12-19-2_r.png
+[img-3-resize]:   2015-12-19-3_r.png
+[img-4-resize]:   2015-12-19-4_r.png
+
+[advent-2015-12-18]:            http://advent.perl.kr/2015/2015-12-18.html
+[cpan-html-fillinform-lite]:    https://metacpan.org/pod/HTML::FillInForm::Lite
+[cpan-mojolicious]:             https://metacpan.org/pod/Mojolicious
+[cpan-mojolicious-plugin-fillinformlite]: https://metacpan.org/pod/Mojolicious::Plugin::FillInFormLite 
+[cpan]:                         http://www.cpan.org/
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[home-mojolicious]:             http://mojolicio.us/
+[home-perlbrew]:                http://perlbrew.pl/
+[mojo-tutorial]:                http://mojolicio.us/perldoc/Mojolicious/Guides/Tutorial
+[twitter-gypark]:               http://twitter.com/gypark
