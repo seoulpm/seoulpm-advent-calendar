@@ -1,4 +1,4 @@
-Title:    Perl과 보안: SQL Injection - Blind
+Title:    Perl과 보안: SQL Injection, Blind
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
