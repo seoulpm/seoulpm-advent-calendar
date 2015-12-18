@@ -38,6 +38,7 @@
 
         $(function() {
           $('#cont p img').parent().css('text-align', 'center');
+          $('#cont table + p').css('text-align', 'center');
         });
       }).call(this);
       </script>
