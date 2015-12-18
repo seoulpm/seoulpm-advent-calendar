@@ -2,7 +2,7 @@ Title:    펄에서 외부명령어 실행 시키기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   John Kang
+Author:   John_Kang
 
 ## 저자
 
