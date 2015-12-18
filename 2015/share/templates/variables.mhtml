@@ -127,8 +127,16 @@ return {
             url   => 'http://leonerds-code.blogspot.co.uk/search/label/advent',
         },
         {
-            title => '일본 Perl Advent Calendar',
-            url   => 'http://qiita.com/advent-calendar/2015/perl',
+            title => '일본 Perl 입학식 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2015/perl-entrance',
+        },
+        {
+            title => '일본 Perl 5 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2015/perl5',
+        },
+        {
+            title => '일본 Perl 6 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2015/perl6',
         },
         {
             title => '일본 Mojolicious Advent Calendar',
