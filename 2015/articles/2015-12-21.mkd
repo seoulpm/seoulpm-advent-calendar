@@ -1,0 +1,429 @@
+Title:    p5-hubot: 날씨봇 만들기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
+
+저자
+-----
+
+[@newbcode][twitter-newbcode] - 사랑스런 딸바보 도치파파
+
+
+시작하며
+---------
+
+[휴봇(HUBOT)][home-hubot]이라고 들어보셨나요?
+휴봇은 [GitHub][home-github]에서 만든 채팅 봇으로 처음에는 사내용으로 만들어졌지만,
+많은 발전을 거듭하며 현재는 오픈 소스로 공개되어 있습니다.
+GitHub에서는 그룹 채팅시 휴봇에게 "github xx부서의 핵심 업무를 알려줘."라고
+물어보면 휴봇이 그에 대해 상세한 답변을 하는 식입니다.
+더 나아가 구글 번역이라던가, 지도와의 통합, 프로젝트의 배포등의 일까지도 휴봇에게 지시할 수 있습니다.
+휴봇은 [Node.js][home-nodejs] 기반에 [CoffeeScript][home-coffeescript]로 개발되었지만
+[@aaonaa님께서 Perl로 포팅][cpan-hubot]하셨기 때문에 Perl로도 휴봇을 이리저리 만질 수 있답니다.
+[p5-hubot][cpan-hubot]의 자세한 설명은 [2012년도 크리스마스 캘린더][advent-2012-12-02]를 참고하세요.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Hubot 모듈][cpan-hubot]
+- [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Hubot \
+        LWP::UserAgent
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Hubot \
+        LWP::UserAgent
+
+
+날씨 알림 봇
+-------------
+
+[IRC][wiki-irc]에서 놀다보면 여러가지 정보를 확인하고 싶은 경우가 많은데요.
+제 경우 날씨가 제일 궁금하더군요. (저만 그런가요? :)
+IRC에서 날씨를 확인할 수 있는 봇을 만들어 보면서 휴봇에 대해서 좀 더 알아보죠.
+날씨 정보는 보통 [기상청][home-kma]이나 [Yahoo API][yahoo-api-weather]를 이용해서 가져올수도 있겠죠?
+백마디 말보다 코드를 보는 편이 이해가 빠르겠죠?
+우선 완성된 코드를 먼저 보면서 하나씩 맥을 짚어보죠.
+
+    #!perl
+    package Hubot::Scripts::weather;
+
+    # ABSTRACT: Weather Script for Hubot.
+
+    use utf8;
+    use strict;
+    use warnings;
+    use LWP::UserAgent;
+
+    sub load {
+        my ( $class, $robot ) = @_;
+
+        $robot->hear( qr/^week (.+)/i,        \&weather_week );
+        $robot->hear( qr/^(?:today |@)(.+)/i, \&weather_today );
+    }
+
+    sub weather_week {
+        my $msg          = shift;
+        my $user_country = $msg->match->[0];
+
+        my $woeid = get_woeid( $msg, $user_country );
+        unless ($woeid) {
+            $msg->send("The name of the country or the city name wrong.");
+            return;
+        }
+
+        my $ua = LWP::UserAgent->new;
+        my $res = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid&u=c");
+        unless ( $res->is_success ) {
+            $msg->send( "cannot get weather info: " . $res->status_line );
+        }
+
+        my @result;
+        my $content = $res->decoded_content;
+        @result = $content =~ m{<yweather:forecast day="(.*?)" date="(.*?)" low="(.*?)" high="(.*?)" text="(.*?)" code="\d+" />}gsm;
+        for ( my $i = 0; $i < 5; ++$i ) {
+            my $idx = i * 5;
+            $msg->send(
+                sprintf(
+                    '[%s %s] Low/High[%s℃ /%s℃ ] Condition[%s]',
+                    $result[$idx],
+                    $result[ $idx + 1 ],
+                    $result[ $idx + 2 ],
+                    $result[ $idx + 3 ],
+                    $result[ $idx + 4 ],
+                )
+            );
+        }
+    }
+
+    sub weather_today {
+        my $msg          = shift;
+        my $user_country = $msg->match->[0];
+
+        my $woeid = get_woeid( $msg, $user_country );
+        unless ($woeid) {
+            $msg->send("The name of the country or the city name wrong.");
+            return;
+        }
+
+        my $ua = LWP::UserAgent->new;
+        my $res = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid&u=c");
+        unless ( $res->is_success ) {
+            $msg->send( "cannot get weather info: " . $res->status_line );
+        }
+
+        my $content = $res->decoded_content;
+
+        my ( $condition, $temp, $date )
+            = ( $content
+                =~ m{<yweather:condition  text="(.*?)"  code="\d+"  temp="(.*?)"  date="(.*?)" />}gsm
+            );
+        my ( $city, $country )
+            = ( $content
+                =~ m{<yweather:location city="(.*?)" .*? country="(.*?)"/>}gsm
+            );
+        my ( $chill, $direction, $speed )
+            = ( $content
+                =~ m{<yweather:wind chill="(.+)"   direction="(.+)"   speed="(.*?)" />}gsm
+            );
+        my ( $humidty, $visibility, $pressure, $rising )
+            = ( $content
+                =~ m{<yweather:atmosphere humidity="(.+)"  visibility="(.*?)"  pressure="(.*?)"  rising="(.*?)" />}gsm
+            );
+        my ( $sunrise, $sunset )
+            = ( $content
+                =~ m{<yweather:astronomy sunrise="(.*?)"   sunset="(.*?)"/>}gsm
+            );
+
+        $msg->send(
+            sprintf(
+                '%s - %s[ LastTime:%s ]',
+                $country,
+                $city,
+                $date,
+            )
+        );
+        $msg->send(
+            sprintf(
+                '[%s] temp-[%s℃ ] humidity-[%s%%] direction-[%skm] speed-[%skm/h] sunrise/sunset-[%s/%s]',
+                $condition,
+                $temp,
+                $humidty,
+                $direction,
+                $speed,
+                $sunrise,
+                $sunset,
+            )
+        );
+    }
+
+    sub get_woeid {
+        my $country = shift;
+
+        my $ua  = LWP::UserAgent->new;
+        my $res = $ua->get("http://woeid.rosselliot.co.nz/lookup/$country");
+
+        die $res->status_line unless $res->is_success;
+
+        my $content   = $res->decoded_content;
+        my @woeid     = $content =~ m{data-woeid="(\d+)"}gsm;
+        my @countries = $content =~ m{data-woeid="\d+"><td>.*?</td><td>.*?</td><td>(.*?)</td>}gsm;
+
+        return if     !$countries[0] && !$countries[1] && !@woeid;
+        return unless $woeid =~ /^\d+/;
+
+        return $woeid[0];
+    }
+
+    1;
+
+
+사람들의 이야기를 듣기
+-----------------------
+
+휴봇을 동작시키려면 발동 조건을 지정해야 합니다.
+`load()` 함수 내에서 `hear()` 메소드를 이용해
+대화중 어떤 메시지가 나왔을때 어떤 함수를 호출할 지를 지정할 수 있습니다.
+
+    #!perl
+    sub load {
+        my ( $class, $robot ) = @_;
+
+        $robot->hear( qr/^week (.+)/i,        \&weather_week );
+        $robot->hear( qr/^(?:today |@)(.+)/i, \&weather_today );
+    }
+
+`forecast`라는 단어가 발생시 `weather_week()` 함수를,
+`weather`라는 단어가 발생시 `weather_today()` 함수를 실행하는 식입니다.
+
+
+주간 예보
+----------
+
+주간 예보는 `weather_week()` 함수가 처리합니다.
+매개변수 처리 부분을 먼저 살펴보죠.
+
+    #!perl
+    sub weather_week {
+        my $msg          = shift;
+        my $user_country = $msg->match->[0];
+
+사용자가 `week 분당`이라고 입력하면, `$msg` 변수는 다음과 같은 형식을 가집니다.
+
+    #!perl
+    Hubot::Response {
+        Parents Moose::Object
+        public methods (14) : DESTROY, exist, finish, http, match, message, meta, new, random, reply, robot, send, topic, whisper
+        private methods (0)
+        internals: {
+            match [
+                [0] "분당"
+            ],
+            message Hubot::TextMessage,
+            robot Hubot::Robot
+        }
+    }
+
+즉 사용자가 입력한 위치 정보는 `$msg->match->[0]` 코드로 얻을 수 있습니다.
+이 문자열을 그대로 이용해 날씨를 검색할 수는 없으므로
+[WOEID(Where On Earth Identifiers)][yahoo-woeid] 값으로 변환해야 합니다.
+
+    #!perl
+    my $woeid = get_woeid( $msg, $user_country );
+    unless ($woeid) {
+        $msg->send("The name of the country or the city name wrong.");
+        return;
+    }
+
+WOEID는 내부에 추가로 생성한 `get_woeid()` 함수를 이용합니다.
+WOEID 값을 성공적으로 확보했다면 야후 날씨 API를 이용해서
+기상 정보를 얻어와야겠죠.
+
+    #!perl
+    my $ua = LWP::UserAgent->new;
+    my $res = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid&u=c");
+    unless ( $res->is_success ) {
+        $msg->send( "cannot get weather info: " . $res->status_line );
+    }
+
+    my @result;
+    my $content = $res->decoded_content;
+    @result = $content =~ m{<yweather:forecast day="(.*?)" date="(.*?)" low="(.*?)" high="(.*?)" text="(.*?)" code="\d+" />}gsm;
+
+웹을 통해 HTTP 요청을 보내고, 그 결과를 정규표현식을 이용해서 적절하게
+값을 추출하는 것 말고는 특별할 것이 없는 코드입니다.
+이후 추출한 값을 가공해서 날씨 정보를 요청한 사용자에게 결과를 보여줘야겠죠.
+이때는 `$msg->send()` 메소드를 이용합니다.
+
+    #!perl
+    for ( my $i = 0; $i < 5; ++$i ) {
+        my $idx = i * 5;
+        $msg->send(
+            sprintf(
+                '[%s %s] Low/High[%s℃ /%s℃ ] Condition[%s]',
+                $result[$idx],
+                $result[ $idx + 1 ],
+                $result[ $idx + 2 ],
+                $result[ $idx + 3 ],
+                $result[ $idx + 4 ],
+            )
+        );
+    }
+
+
+WOEID 값 얻기
+--------------
+
+야후에서 사용할 수 있는 WOEID 값을 쉽게 얻을 수 있도록 웹 서비스를 제공하는
+[Yahoo WOEID Lookup][home-yahoo-woeid-lookup] 사이트가 있습니다.
+우리는 이 서비스를 이용해서 원하는 WOEID 값을 얻도록 하죠.
+
+    #!perl
+    sub get_woeid {
+        my $country = shift;
+
+        my $ua  = LWP::UserAgent->new;
+        my $res = $ua->get("http://woeid.rosselliot.co.nz/lookup/$country");
+
+        die $res->status_line unless $res->is_success;
+
+        my $content   = $res->decoded_content;
+        my @woeid     = $content =~ m{data-woeid="(\d+)"}gsm;
+        my @countries = $content =~ m{data-woeid="\d+"><td>.*?</td><td>.*?</td><td>(.*?)</td>}gsm;
+
+        return if     !$countries[0] && !$countries[1] && !@woeid;
+        return unless $woeid =~ /^\d+/;
+
+        return $woeid[0];
+    }
+
+
+당일 예보
+----------
+
+주간 예보와 비슷하게 당일 예보는 `weather_today()` 함수에서 처리합니다.
+상대적으로 조금 복잡해 보이지만 정규표현식으로 원하는 값을
+추출하는 부분을 제외하면 대동소이합니다. :)
+
+    #!perl
+    my ( $condition, $temp, $date )
+        = ( $content
+            =~ m{<yweather:condition  text="(.*?)"  code="\d+"  temp="(.*?)"  date="(.*?)" />}gsm
+        );
+    my ( $city, $country )
+        = ( $content
+            =~ m{<yweather:location city="(.*?)" .*? country="(.*?)"/>}gsm
+        );
+    my ( $chill, $direction, $speed )
+        = ( $content
+            =~ m{<yweather:wind chill="(.+)"   direction="(.+)"   speed="(.*?)" />}gsm
+        );
+    my ( $humidty, $visibility, $pressure, $rising )
+        = ( $content
+            =~ m{<yweather:atmosphere humidity="(.+)"  visibility="(.*?)"  pressure="(.*?)"  rising="(.*?)" />}gsm
+        );
+    my ( $sunrise, $sunset )
+        = ( $content
+            =~ m{<yweather:astronomy sunrise="(.*?)"   sunset="(.*?)"/>}gsm
+        );
+
+
+실행!
+------
+
+실제 만든 휴봇 동작은 다음과 같습니다.
+분당의 주간 예보를 살펴볼까요?
+
+    #!plain
+    hubot> week 분당
+    [Mon 14 Dec 2015] Low/High[4℃ /8℃ ] Condition[Light Rain]
+    [Tue 15 Dec 2015] Low/High[0℃ /8℃ ] Condition[Mostly Cloudy]
+    [Wed 16 Dec 2015] Low/High[-5℃ /2℃ ] Condition[AM Snow Showers]
+    [Thu 17 Dec 2015] Low/High[-4℃ /1℃ ] Condition[Sunny]
+    [Fri 18 Dec 2015] Low/High[-3℃ /5℃ ] Condition[Partly Cloudy]
+
+이번에는 서울의 당일 예보를 살펴보죠.
+
+    #!plain
+    hubot> today 서울
+    South Korea - Seoul[ LastTime:Mon, 14 Dec 2015 3:58 pm KST ]
+    The status of current weather-[Light Rain] temp-[5℃ ] humidity-[81%] direction- [350km] speed-[9.66km/h] sunrise/sunset-[7:39 am/5:15 pm]
+    hubot> @서울
+    South Korea - Seoul[ LastTime:Mon, 14 Dec 2015 3:58 pm KST ]
+    The status of current weather-[Light Rain] temp-[5℃ ] humidity-[81%] direction- [350km] speed-[9.66km/h] sunrise/sunset-[7:39 am/5:15 pm]
+
+정규표현식을 이용해 `@`를 이용한 단축 표현도 지원하고 있기 때문에
+`@서울`이라고 입력해도 결과가 출력됨을 확인할 수 있습니다.
+
+    #!perl
+    $robot->hear( qr/^(?:today |@)(.+)/i, \&weather_today );
+
+세계 각국의 날씨도 살펴볼까요?
+
+    #!plain
+    hubot> @델리
+    India - Delhi[ LastTime:Mon, 14 Dec 2015 11:29 am IST ]
+    The status of current weather-[Haze] temp-[18℃ ] humidity-[50%] direction- [290km] speed-[14.48km/h] sunrise/sunset-[7:05 am/5:26 pm]
+    hubot> @워싱턴
+    United States - Washington[ LastTime:Mon, 14 Dec 2015 1:51 am EST ]
+    The status of current weather-[Fair] temp-[14℃ ] humidity-[89%] direction- [210km] speed-[8.05km/h] sunrise/sunset-[7:18 am/4:45 pm]
+
+잘 동작하는군요!
+
+
+크리스마스 숙제
+----------------
+
+IRC에 입장하는 사람들이 접속한 동네의 날씨를 자동으로 보여주면 어떨까요?
+누군가가 IRC에 입장하면 보통 서버는 다음과 같은 메시지를 출력합니다.
+
+    #!plain
+    14:31:42 --> | John_Kang (~John_Kang@14.32.68.193) has joined #perl-kr
+
+조금 더 귀띔해드리자면 [IP2LOCATION][home-ip2location]처럼 아이피 주소를 이용해
+해당 사용자가 위치할 것으로 추정되는 지역(정확하진 않지만)을 구하는
+서비스를 이용해보세요.
+
+조금 감이 잡히나요? :)
+
+
+정리하며
+---------
+
+날씨라는 일반적인 주제로 시작했지만 여러분만의 봇을 만드는 것도 전혀 어렵지 않겠죠?
+이제 여러분만의 IRC 봇을 만들어서 재미있는 동작을 수행한다거나,
+또는 널리 세상을 이롭게 해보는 것은 어떨까요?
+기왕이면 오픈소스로 공개해서 많은 사람들에게 도움을 준다면 금상첨화겠죠.
+필요한 것은 상상력과 Perl, CPAN 뿐입니다. ;)
+
+
+[advent-2012-12-02]:        http://advent.perl.kr/2012/2012-12-02.html
+[cpan-hubot]:               https://metacpan.org/pod/Hubot
+[cpan-lwp-useragent]:       https://metacpan.org/pod/LWP::UserAgent
+[cpan]:                     http://www.cpan.org/
+[home-coffeescript]:        http://coffeescript.org/
+[home-github]:              https://github.com/
+[home-hubot]:               https://hubot.github.com/
+[home-ip2location]:         http://www.ip2location.com/
+[home-kma]:                 http://www.kma.go.kr/
+[home-nodejs]:              https://nodejs.org/en/
+[home-perlbrew]:            http://perlbrew.pl/
+[home-yahoo-woeid-lookup]:  http://woeid.rosselliot.co.nz/lookup
+[twitter-newbcode]:         http://twitter.com/#!/newbcode
+[wiki-irc]:                 https://en.wikipedia.org/wiki/Internet_Relay_Chat
+[yahoo-api-weather]:        https://developer.yahoo.com/weather/
+[yahoo-woeid]:              https://developer.yahoo.com/geo/geoplanet/guide/concepts.html
