@@ -1,5 +1,8 @@
-
-p5-hubot 실전기(-날씨봇 만들기)
+Title:    p5-hubot: 날씨봇 만들기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
 
 저자
 @newbcode - 사랑스런 딸바보 도치파파
