@@ -5,7 +5,10 @@ Category: Seoul.pm
 Author:   newbcode
 
 저자
-@newbcode - 사랑스런 딸바보 도치파파
+-----
+
+[@newbcode][twitter-newbcode] - 사랑스런 딸바보 도치파파
+
 
 시작하며
 혹시 휴봇(Hubot)이라고 들어보셨나요?
@@ -394,3 +397,6 @@ Hubot - https://hubot.github.com/
 HubotRepository - https://github.com/github/hubot-scripts
 YahooWoeid - http://woeid.rosselliot.co.nz/lookup
 YahooWeatherApis - http://weather.yahooapis.com/forecastrss
+
+
+[twitter-newbcode]:         http://twitter.com/#!/newbcode
