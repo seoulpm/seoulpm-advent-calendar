@@ -24,10 +24,30 @@ GitHub에서는 그룹 채팅시 휴봇에게 "github xx부서의 핵심 업무�
 [p5-hubot][cpan-hubot]의 자세한 설명은 [2012년도 크리스마스 캘린더][advent-2012-12-02]를 참고하세요.
 
 
-
 준비물
-직접 cpan을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
-$sudo cpan Hubot
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Hubot 모듈][cpan-hubot]
+- [CPAN의 LWP::UserAgent 모듈][cpan-lwp-useragent]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Hubot \
+        LWP::UserAgent
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Hubot \
+        LWP::UserAgent
+
 
 날씨 알림 봇 만들기
 irc에서 놀다보면 여러가지 정보를 확인하고 싶은경우가 많은데요 그중에 역시 날씨가 제일 궁금합니다(저만 그런가요???)
@@ -406,8 +426,11 @@ YahooWeatherApis - http://weather.yahooapis.com/forecastrss
 
 [advent-2012-12-02]:        http://advent.perl.kr/2012/2012-12-02.html
 [cpan-hubot]:               https://metacpan.org/pod/Hubot
+[cpan-lwp-useragent]:       https://metacpan.org/pod/LWP::UserAgent
+[cpan]:                     http://www.cpan.org/
 [home-coffeescript]:        http://coffeescript.org/
 [home-github]:              https://github.com/
 [home-hubot]:               https://hubot.github.com/
 [home-nodejs]:              https://nodejs.org/en/
+[home-perlbrew]:            http://perlbrew.pl/
 [twitter-newbcode]:         http://twitter.com/#!/newbcode
