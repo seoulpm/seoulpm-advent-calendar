@@ -517,15 +517,15 @@ HTML::FillInForm::Lite 모듈은 폼을 채울 데이터를 전달받을 때 지
 
 
 
-[img-1]:          2015-12-19-1.png
-[img-2]:          2015-12-19-2.png
-[img-3]:          2015-12-19-3.png
-[img-4]:          2015-12-19-4.png
+[img-1]:          2015-12-22-1.png
+[img-2]:          2015-12-22-2.png
+[img-3]:          2015-12-22-3.png
+[img-4]:          2015-12-22-4.png
 
-[img-1-resize]:   2015-12-19-1_r.png
-[img-2-resize]:   2015-12-19-2_r.png
-[img-3-resize]:   2015-12-19-3_r.png
-[img-4-resize]:   2015-12-19-4_r.png
+[img-1-resize]:   2015-12-22-1_r.png
+[img-2-resize]:   2015-12-22-2_r.png
+[img-3-resize]:   2015-12-22-3_r.png
+[img-4-resize]:   2015-12-22-4_r.png
 
 [advent-2015-12-18]:            http://advent.perl.kr/2015/2015-12-18.html
 [cpan-html-fillinform-lite]:    https://metacpan.org/pod/HTML::FillInForm::Lite
