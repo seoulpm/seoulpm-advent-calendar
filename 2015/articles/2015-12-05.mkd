@@ -1,4 +1,4 @@
-Title:    펄을 사용하여 Gmail로 메일 보내기
+Title:    Gmail로 메일 보내기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
