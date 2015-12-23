@@ -136,6 +136,7 @@ _EOT_
 
 
 [cpan-term-title]:              https://metacpan.org/pod/Term::Title
+[cpan-win32-console]:           https://metacpan.org/pod/Win32::Console
 [cpan]:                         http://www.cpan.org/
 [home-perlbrew]:                http://perlbrew.pl/
 [twitter-keedi]:                http://twitter.com/#!/keedi
