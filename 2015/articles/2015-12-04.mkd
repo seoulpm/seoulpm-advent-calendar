@@ -65,11 +65,11 @@ Author:   gypark
 입력을 외부에서 받는다면, 적절하게 디코드한 후에 작업할 수 있도록 신경을 써야 합니다.
 
     #!perl
-    use utf8;           # 문자열 리터럴을 자동으로 디코드하여 사용
-                        # 이 스크립트 자체도 인코딩을 UTF-8로 지정하여 저장해야 함
-    use 5.010;          # say를 쓰기 위해서
+    use utf8;   # 문자열 리터럴을 자동으로 디코드하여 사용
+                # 이 스크립트 자체도 인코딩을 UTF-8로 지정하여 저장해야 함
+    use 5.010;  # say를 쓰기 위해서
 
-    binmode STDOUT, ':encoding(UTF-8)';      # 윈도우 명령 프롬프트창이라면 UTF-8 대신 cp949
+    binmode STDOUT, ':encoding(UTF-8)'; # 윈도우 명령 프롬프트창이라면 UTF-8 대신 cp949
 
     my @targets = ( '고우영', '공지영' );
 
@@ -117,7 +117,7 @@ Author:   gypark
 
     #!perl
     # "가"(\x{AC00}) 를 "ㄱ"(\x{1100})과 "ㅏ"(\x{1161})의 조합으로 분리
-    my $decomposed = decomposeSyllable("\x{AC00}");          # "\x{1100}\x{1161}"
+    my $decomposed = decomposeSyllable("\x{AC00}"); # "\x{1100}\x{1161}"
 
     # 주의:
     # 분리된 문자열을 출력한다고 해서 "ㄱㅏ"가 출력되는 것은 아님.
