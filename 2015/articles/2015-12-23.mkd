@@ -1,0 +1,234 @@
+Title:    알록달록 터미널을 갈무리하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+흑백 모니터를 사용하고, [VT100][wiki-vt100]을 사용하거나,
+[ANSI 제어 문자][wiki-ansi-escape-code]를 제대로 쓰지도 못하던 먼 옛날과는 달리
+알록달록한 칼라 모니터와 칼라 터미널은 너무도 당연한 시대입니다.
+Full-HD를 넘어 U-HD까지 지원하는 모니터가 나오는 시대에 칼라 터미널이라니
+너무 시대에 동떨어진 이야기를 했나요? :-)
+터미널에서 우리가 보는 알록달록한 색깔은 대부분의 경우
+[ANSI 제어 문자를 이용한 색상 표현][wiki-ansi-escape-code-colors] 입니다.
+터미널이란 것 자체에 워낙 기대를 하지 않고 보아서 그런지는 몰라도
+이 터미널이란 화면 안에 알록달록하게 색상이 표시되면 그 아름다움(?)에
+가끔 넋이 나가기도 합니다. (저만 그런가요? :)
+이 터미널의 화면을 긁어서 누군가에게 보여주고 싶다는 생각을 해본적이 있나요?
+하지만 긁어서 복사하는 순간 그것은 단지 단순한 텍스트가 될 뿐입니다.
+터미널을 누군가에게 보여주어야 하는 순간이 온다면
+결국 화면 갈무리를해서 그림 파일로 저장해야했죠.
+이 알록달록한 화면을 갈무리하는 방법은 과연 없을까요?
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 App::Term2HTML 모듈][cpan-app-term2html]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan App::Term2HTML
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan App::Term2HTML
+
+
+term2html
+----------
+
+우선 `grep` 명령을 이용해 터미널에 ANSI 색상을 가진 문자열을 출력해보죠.
+
+    #!plain
+    $ grep --color -r color ~/.bashrc
+
+`~/.bashrc` 파일에서 `color`라는 문자열이 포함된 구문을 검색하고
+일치한 문자는 색상 강조를 이용해 화면에 표시하게 하는 것이죠.
+
+![grep][img-1-resize]
+*그림 1.* grep --color ([원본][img-1])
+
+`App::Term2HTML` 모듈은 명령줄에서 간단히 실행할 수 있는 `term2html` 명령을 제공합니다.
+이 모듈과 명령이 어떤 원리로 어떻게 동작하는지는 차치하고, 사용방법을 알아보죠.
+
+    #!plain
+    $ grep --color -r color ~/.bashrc | term2html
+
+으앗. 복잡한 문자열이 출력되는군요.
+
+![grep-term2html][img-2-resize]
+*그림 2.* grep --color | term2html ([원본][img-2])
+
+조금 유심히 결과물을 살펴보면 간단한 HTML임을 알 수 있습니다.
+아하! 그렇다면 결과물은 재지향을 통해 파일로 저장한 다음 브라우저에서 보면 되겠죠?
+
+    #!plain
+    $ grep --color -r color ~/.bashrc | term2html > grep-result.html
+    $ firefox grep-result.html
+
+![grep-term2html-firefox][img-3-resize]
+*그림 3.* grep --color | term2html > firefox ([원본][img-3])
+
+흐음. 뭔가 복잡한 HTML을 출력한 것 치고는 결과가 심심하네요.
+터미널로 볼때는 분명히 색상이 들어있었는데 막상 브라우저에서
+보니까 터미널을 긁어서 복사해 붙여넣은 것과 전혀 차이가 없는걸요.
+
+이것은 대부분의 유명한 리눅스 유틸리티를이 너무 똑똑하기 때문입니다.
+즉, 사용자가 색상 옵션을 사용해서 터미널로 출력할 경우
+결과물에 ANSI 색상 코드를 추가해 알록달록하게 표기하는 반면,
+재지향을 한다거나 파이프를 통해 다른 프로세스에게 넘겨줄 경우
+이를 감지해서 불필요한 ANSI 색상 코드를 추가하지 않기 때문입니다.
+사람에게 바로 보여줄 경우를 제외하고 ANSI 색상 코드 그 자체는
+매우 복잡한 제어 문자열이기 때문입니다.
+그렇다면 우리는 `grep`에게 강제로 색상을 출력하도록 명령해야겠죠?
+
+    #!plain
+    $ grep --color=always -r color ~/.bashrc | term2html > grep-result.html
+    $ firefox grep-result.html
+
+`--color=always` 옵션을 사용하면 `grep`으로 하여금 똑똑하게 표준 출력의
+상태를 확인하지 말고 그냥 강제로 색상을 출력하도록 지시합니다.
+
+![grep-color-term2html-firefox][img-4-resize]
+*그림 4.* grep --color=always | term2html > firefox ([원본][img-4])
+
+짜잔! 이제 원하는대로 색상이 잘 나타나는군요.
+`grep`의 명령 결과를 브라우저로 본 소감이 어떤가요?
+브라우저에서 추가로 검색을 한더가나, 가공을 한다거나, 등등
+여러가지 작업이 가능하겠죠?
+
+
+크리스마스 선물 #1: 한글
+-------------------------
+
+이번에는 `ls`의 결과물을 살펴볼까요?
+`ls` 역시 `grep`과 마찬가지로 `--color=always` 옵션을 사용하면
+강제로 ANSI 색상 코드를 출력할 수 있답니다.
+
+    #!plain
+    $ ls -l --color=always ~ | term2html > ls-result.html
+    $ firefox ls-result.html
+
+마찬가지로 브라우저로 결과를 살펴보죠.
+
+![ls-color-term2html-firefox][img-5-resize]
+*그림 5.* ls --color=always | term2html > firefox ([원본][img-5])
+
+아니! 한글이 죄다 깨지는군요.
+이는 `App::Term2HTML` 모듈이 아직까지는 인코딩을 고려하지 못해서 생기는 문제입니다.
+해결하는 방법은 간단하니 걱정하지 마세요.
+`my-term2html.pl` 파일을 만들어서 다음 내용을 저장합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use App::Term2HTML;
+
+    binmode STDIN, ':encoding(UTF-8)';
+    App::Term2HTML->run(@ARGV);
+
+이제는 `term2html` 대신 `my-term2html.pl`을 사용하면 됩니다.
+
+    #!plain
+    $ ls -l --color=always ~ | perl my-term2html.pl > ls-result.html
+    $ firefox ls-result.html
+
+실행 권한을 준다거나, 적절한 `PATH` 변수 환경 설정을 하는 것은
+여러분의 취향에 맞게 선택하면 됩니다.
+어때요? 간단하죠?
+
+![크리스마스 선물 #1 - 한글][img-6-resize]
+*그림 6.* 크리스마스 선물 #1: 한글 ([원본][img-6])
+
+이제 한글 출력도 문제 없죠? :)
+
+
+크리스마스 선물 #2: 터미널 배경과 전경
+---------------------------------------
+
+저는 보통 터미널 배경을 검게, 글꼴을 희게 설정해서 사용한답니다.
+어머님께서 사주셨던 생애 첫 컴퓨터였던 8088 XT 장비의 모니터 색상과 똑같아
+이 색상의 터미널을 쓸 때마다 절 설레게 했던 초등학교 때 시절이 생각나거든요. :)
+각설하고, 지금은 ANSI 색상 코드로 출력되는 결과물은 색상이 입혀져 있는데
+터미널 바탕화면과 기본 글씨에 대한 색상이 흰색과 검은색으로 고정되어 있네요.
+이를 원하는대로 바꾸면 좀 더 터미널 결과물 같겠죠?
+이전에 만든 `my-term2html.pl`을 조금만 수정해볼게요.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use App::Term2HTML;
+
+    print "<style>pre { background: black; color: white }</style>\n";
+
+    binmode STDIN, ':encoding(UTF-8)';
+    App::Term2HTML->run(@ARGV);
+
+간단한 CSS 코드를 추가했는데, 대신 명령줄 옵션으로 처리한다면 좀 더 확장성이 좋겠죠?
+실행 결과를 살펴볼까요?
+
+![크리스마스 선물 #2 - 터미널 배경과 전경][img-7-resize]
+*그림 7.* 크리스마스 선물 #2: 터미널 배경과 전경 ([원본][img-7])
+
+완벽하군요!
+
+
+정리하며
+---------
+
+터미널의 알록달록한 화면을 화면 갈무리로는 부족할 때, `App::Term2HTML`
+모듈을 사용하면 간단히 재사용 가능하며 미려한 결과물을 확보할 수 있습니다.
+터미널은 단순해서 불편하지만, 또 그렇기 때문에 묘한 매력이 있습니다.
+최첨단을 달리는 이 시대에도 여전히 프로그래머는 터미널을 쓴다는 것은
+많은 것을 반증하는 결과라고 생각합니다.
+여전히 이 세상에 산재해 있을 터미널 덕ㅎ.. 아니 해커들에게 유용하길 바래봅니다. :)
+
+_EOT_
+
+
+[img-1]:          2015-12-23-01.png
+[img-2]:          2015-12-23-02.png
+[img-3]:          2015-12-23-03.png
+[img-4]:          2015-12-23-04.png
+[img-5]:          2015-12-23-05.png
+[img-6]:          2015-12-23-06.png
+[img-7]:          2015-12-23-07.png
+
+[img-1-resize]:   2015-12-23-01_r.png
+[img-2-resize]:   2015-12-23-02_r.png
+[img-3-resize]:   2015-12-23-03_r.png
+[img-4-resize]:   2015-12-23-04_r.png
+[img-5-resize]:   2015-12-23-05_r.png
+[img-6-resize]:   2015-12-23-06_r.png
+[img-7-resize]:   2015-12-23-07_r.png
+
+
+[cpan-app-term2html]:           https://metacpan.org/pod/App::Term2HTML
+[cpan]:                         http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-ansi-escape-code-colors]: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+[wiki-ansi-escape-code]:        https://en.wikipedia.org/wiki/ANSI_escape_code
+[wiki-vt100]:                   https://en.wikipedia.org/wiki/VT100
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
