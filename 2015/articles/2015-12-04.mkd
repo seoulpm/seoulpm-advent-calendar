@@ -23,12 +23,11 @@ Author:   gypark
 *그림 1.* 검색 엔진의 검색어 예측 ([원본][img-1])
 
 *그림 1*을 보면 `정규표현식`을 입력하는 과정에서 일시적으로 `정귶`이라는 문자열이 만들어졌습니다
-(세벌식 자판을 사용한다면 이런 일이 없겠지만).
-만일 단순한 정규식 일치나 `index` 함수를 써서 검사한다면, `정귶`은 `정규표현식`에 일치되지 않는 것으로 판정되어 버립니다.
+(세벌식 자판을 사용한다면 이런 일이 없겠지만...).
+단순한 정규식 일치나 `index` 함수를 써서 검사한다면, `정귶`은 `정규표현식`에 일치되지 않는 것으로 판정되어 버립니다.
 직관적으로 생각해보면, 이 문제를 해결하기 위해서는 문자열을 일단 음소 단위로 분리하면 될 것 같습니다.
 그러면 이제 `ㅈㅓㅇㄱㅠㅍㅛㅎㅕㄴㅅㅣㄱ` 안에서 `ㅈㅓㅇㄱㅠㅍ`을 찾는 문제가 되고, 이 검사는 일치 판정을 받을 것입니다.
 이렇게 음소 단위로 분리하는 작업을 펄 모듈을 이용하여 해 봅시다.
-
 
 
 준비물
@@ -61,25 +60,24 @@ Author:   gypark
 
 일단 간단한 테스트 코드를 만들어봅시다.
 
-(지금부터 나오는 코드들은, **문자열을 특정 인코딩 규약에 의해 인코딩된 '바이트 스트림'이 아니라, 디코드되어 펄 내부에서 사용되는 '문자열'인 상태로 다루게 됩니다**.
+지금부터 나오는 코드들은, **문자열을 특정 인코딩 규약에 의해 인코딩된 '바이트 스트림'이 아니라, 디코드되어 펄 내부에서 사용되는 '문자열'인 상태로 다루게 됩니다**.
 이를 위해서, 따옴표 문자열 상수들을 바이트 스트림이 아닌 문자열로 취급하도록 `utf8` 프래그마를 사용하고 있습니다.
-만일 입력을 외부에서 받는다면, 적절하게 디코드한 후에 작업할 수 있도록 신경을 써야 합니다.)
-
+입력을 외부에서 받는다면, 적절하게 디코드한 후에 작업할 수 있도록 신경을 써야 합니다.
 
     #!perl
-    use utf8;           # 문자열 리터럴을 자동으로 디코드하여 사용
-                        # 이 스크립트 자체도 인코딩을 UTF-8로 지정하여 저장해야 함
-    use 5.010;          # say를 쓰기 위해서
-    
-    binmode STDOUT, ':encoding(UTF-8)';      # 윈도우 명령 프롬프트창이라면 UTF-8 대신 cp949
-    
+    use utf8;   # 문자열 리터럴을 자동으로 디코드하여 사용
+                # 이 스크립트 자체도 인코딩을 UTF-8로 지정하여 저장해야 함
+    use 5.010;  # say를 쓰기 위해서
+
+    binmode STDOUT, ':encoding(UTF-8)'; # 윈도우 명령 프롬프트창이라면 UTF-8 대신 cp949
+
     my @targets = ( '고우영', '공지영' );
-    
+
     my @search = ( 'ㄱ', '고', '공', '고우', '공ㅈ', '공지' );
-    
+
     say "---- regex ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 $t =~ $s ? "MATCH" : "NOT MATCH";
         }
@@ -88,7 +86,6 @@ Author:   gypark
 코드만 보아도 무엇을 하려는지 쉽게 알 수 있을 것입니다.
 우리가 `고우영`을 검색하든 `공지영`을 검색하든, 검색어를 입력할 때는 `ㄱ`, `고`, `공` 순으로 타이핑하게 됩니다.
 따라서 이 세 가지 검색어에 대해서는 `고우영`과 `공지영` 모두 일치하는 것으로 판정되어야 할 것입니다.
-
 그러나 막상 실행해보면 (당연하게도) 그렇게 되지 않습니다.
 
     #!plain
@@ -120,7 +117,7 @@ Author:   gypark
 
     #!perl
     # "가"(\x{AC00}) 를 "ㄱ"(\x{1100})과 "ㅏ"(\x{1161})의 조합으로 분리
-    my $decomposed = decomposeSyllable("\x{AC00}");          # "\x{1100}\x{1161}"
+    my $decomposed = decomposeSyllable("\x{AC00}"); # "\x{1100}\x{1161}"
 
     # 주의:
     # 분리된 문자열을 출력한다고 해서 "ㄱㅏ"가 출력되는 것은 아님.
@@ -138,18 +135,18 @@ Author:   gypark
     # 일치 검사하는 서브루틴
     sub jamo_match {
         my ( $target, $search ) = @_;
-    
+
         # $target, $search 를 각각 음소 단위로 분리
         my $target_jamo = decomposeSyllable($target);
         my $search_jamo = decomposeSyllable($search);
-    
+
         # 분리된 형태의 문자열을 사용하여 일치 검사
         return ( $target_jamo =~ $search_jamo );
     }
-    
+
     say "---- decompose ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 # 이제 정규식 대신 jamo_match()로 검사
                 jamo_match( $t, $s ) ? "MATCH" : "NOT MATCH";
@@ -176,12 +173,10 @@ Author:   gypark
 음... 결과가 만족스럽지 않습니다.
 `고`가 `공지영`에 일치한다는 판정을 받아내는 것에는 성공했으나,
 나머지 네 경우는 여전히 일치하지 않는군요.
-
 이런 문제가 생기는 이유는 다음과 같습니다.
 
 첫째로, `decomposeSyllable()` 함수에 의해 분리된 음소들은 유니코드의 '한글 자모 영역'에 있는 문자들입니다.
 이 한글 자모 영역에 있는 자음은 초성과 종성이 서로 별개의 문자로 구분되어 있습니다.
-
 위 코드에 출력문을 넣어서 눈으로 확인해 봅시다.
 
     #!perl
@@ -202,7 +197,6 @@ Author:   gypark
 
 즉, `공`을 분리했을 때 나오는 세 번째 음소는 `종성 이응`인데,
 `고우영`의 세 번째 음소는 `초성 이응`이기 때문에 일치하지 않는 것으로 판정됩니다.
-
 그러면 `공`은 그렇다치고, 어째서 `ㄱ`은 일치하지 않는 것일까요?
 코드값을 확인해봅시다.
 
@@ -211,7 +205,6 @@ Author:   gypark
 	ㄱ     : 0x3131
 
 `ㄱ`의 코드값이 `0x3131`입니다. 이것은 초성 기역도 종성 기역도 아닙니다.
-
 한글을 입력할 때 완성된 글자가 아니라 자음이나 모음 하나만 단독으로 입력하는 경우,
 그 음소는 유니코드의 '한글 호환 자모(Hangul Compatibility Jamo)' 영역에 있는 것을 사용하게 됩니다.
 지금처럼 제가 이 스크립트를 만들면서 에디터에 입력한 `ㄱ`도,
@@ -223,11 +216,10 @@ Author:   gypark
 자음의 경우 **초성과 종성의 구분이 따로 없이 음소 당 하나씩만 있습니다**.
 
 이제 원인을 파악했으니, 해결책도 알 수 있을 것 같습니다.
-문자열을 음소 단위로 분리한 다음, 이 음소들을 비교할 때 **자음의 초성과 종성을 구분하지 않도록** 하면 되겠습니다.
+문자열을 음소 단위로 분리한 다음, 이 음소들을 비교할 때 **자음의 초성과 종성을 구분하지 않도록** 하면 됩니다.
 하지만 종성이 나올 때마다 똑같은 음소의 초성으로 바꾸기는 불편하니,
 아예 '한글 자모' 영역에 있는 자음을 일괄적으로 '한글 호환 자모' 영역에 있는 자음으로 변환합시다.
 즉 `초성 기역(U+1100)`과 `종성 기역(U+11A8)`을 일괄적으로 `한글 문자 기역(U+3131)`으로 변환한 다음 비교하는 것입니다.
-
 
 
 한글 호환 자모로 변환
@@ -245,10 +237,10 @@ Author:   gypark
 
     #!perl
     use Lingua::KO::Hangul::JamoCompatMapping qw(jamo_to_compat);
-    
+
     sub jamo_compat_match {
         my ( $target, $search ) = @_;
-    
+
         # jamo_to_compat()은 입력을 음소 하나만 받기 때문에,
         # decomposeSyllable()의 결과로 나온 문자열을
         # 다시 개별 문자들로 나누기 위해 split 사용하고
@@ -264,16 +256,16 @@ Author:   gypark
 
         return ( $target_jamo_compat =~ $search_jamo_compat )
     }
-    
+
     say "---- decompose and convert ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 jamo_compat_match( $t, $s ) ? "MATCH" : "NOT MATCH";
         }
     }
 
- 결과는 다음과 같습니다.
+결과는 다음과 같습니다.
 
     #!plain
     ---- decompose and convert ----
@@ -299,32 +291,39 @@ Author:   gypark
 한글 단어를 음소 단위로 분리하고, 초성과 종성의 자음을 구분하지 않게 함으로써
 입력이 완료되지 않은 상태의 문자열을 대상으로 일치 검사를 수행하는 법을 살펴보았습니다.
 여기에다가 퍼지 검색 알고리즘을 적용하여, 입력에 오타가 있더라도
-적절한 검색 결과를 내어주도록 하는 식으로 응용할 수도 있겠습니다.
+적절한 검색 결과를 내어주도록 하는 식으로 응용할 수도 있습니다.
 
 
 참고
 -----
 
 솔직히 말씀드리면 다국어나 유니코드 처리에 관한 글을 쓰기에는 저도 아는 게 많이 부족합니다.
-제가 이 기사를 작성하면서 참고한 웹페이지들을 나열하니 자세한 것은 이곳에서 직접 살펴보시기를 권장합니다.
+제가 이 기사를 작성하면서 참고한 웹페이지들을 나열하니 자세한 것은 이곳에서 직접 살펴보세요.
 
-* [유니코드 8.0 문자 코드 차트 전체 링크](http://www.unicode.org/charts/)
- * [한글 음절 영역 코드표(Hangul Syllables, AC00-D7AF) - PDF](http://www.unicode.org/charts/PDF/UAC00.pdf)
- * [한글 자모 영역 코드표(Hangul Jamo, 1100-11FF) - PDF](http://www.unicode.org/charts/PDF/U1100.pdf)
- * [한글 호환 자모 영역 코드표(Hangul Compatibility Jamo, 3130-318F) - PDF](http://www.unicode.org/charts/PDF/U3130.pdf)
-* [Korean Hangul Syllabary in Unicode](http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html)
-* [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리](http://d2.naver.com/helloworld/76650)
-* [유니코드 한글 음절과 자모의 영역/주소 - Unicode Hangul Code Point Map](http://mwultong.blogspot.com/2006/09/unicode-hangul-code-point-map.html)
+* [유니코드 8.0 문자 코드 차트 전체 링크][home-unicode-charts]
+* [한글 음절 영역 코드표(Hangul Syllables, AC00-D7AF) - PDF][home-unicode-charts-uac00]
+* [한글 자모 영역 코드표(Hangul Jamo, 1100-11FF) - PDF][home-unicode-charts-u1100]
+* [한글 호환 자모 영역 코드표(Hangul Compatibility Jamo, 3130-318F) - PDF][home-unicode-charts-u3130]
+* [Korean Hangul Syllabary in Unicode][korean-hangul-unicode]
+* [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][helloworld-unicode-java]
+* [유니코드 한글 음절과 자모의 영역/주소 - Unicode Hangul Code Point Map][unicode-hangul-code-point-map]
 
 
 [img-1]:          2015-12-04-1.png
 
 [img-1-resize]:   2015-12-04-1_r.png
 
-[cpan-lingua-ko-hangul-util]:                   https://metacpan.org/pod/Lingua::KO::Hangul::Util
 [cpan-lingua-ko-hangul-jamocompatmapping]:      https://metacpan.org/pod/Lingua::KO::Hangul::JamoCompatMapping
+[cpan-lingua-ko-hangul-util]:                   https://metacpan.org/pod/Lingua::KO::Hangul::Util
 [cpan]:                                         http://www.cpan.org/
 [gypark-home]:                                  http://gypark.pe.kr
 [gypark-perl]:                                  http://gypark.pe.kr/wiki/Perl
+[helloworld-unicode-java]:                      http://d2.naver.com/helloworld/76650
 [home-perlbrew]:                                http://perlbrew.pl/
+[home-unicode-charts-u1100]:                    http://www.unicode.org/charts/PDF/U1100.pdf
+[home-unicode-charts-u3130]:                    http://www.unicode.org/charts/PDF/U3130.pdf
+[home-unicode-charts-uac00]:                    http://www.unicode.org/charts/PDF/UAC00.pdf
+[home-unicode-charts]:                          http://www.unicode.org/charts/
+[korean-hangul-unicode]:                        http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html
 [twitter-gypark]:                               http://twitter.com/gypark
+[unicode-hangul-code-point-map]:                http://mwultong.blogspot.com/2006/09/unicode-hangul-code-point-map.html
