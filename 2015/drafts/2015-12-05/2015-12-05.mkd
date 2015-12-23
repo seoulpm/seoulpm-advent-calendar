@@ -1,0 +1,126 @@
+Title:    펄을 사용하여 Gmail로 메일 보내기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
+홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+프로그램을 써서 자동으로 메일이 발송되게 하고 싶은데, 직접 메일 서버를 설치하자니 설치나 설정도 어렵고,
+최근에는 스팸 때문에 인증되지 않은 서버에서 발송된 메일은 아예 배달이 거부되는 경우도 있습니다.
+간편하게 내가 가입한 [Gmail][home-gmail] 계정을 사용하여 메일을 발송하는 법을 알아봅시다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Email::Send::SMTP::Gmail 모듈][cpan-email-send-smtp-gmail]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Email::Send::SMTP::Gmail
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Email::Send::SMTP::Gmail
+
+
+SMTP 세션 만들기
+-----------------
+
+먼저 Email::Send::SMTP::Gmail 클래스의 객체를 만들면서 인증 정보를 넣습니다.
+
+    #!perl
+    use Email::Send::SMTP::Gmail;
+    
+    my ( $mail, $error_msg ) = Email::Send::SMTP::Gmail->new(
+        -smtp  => 'smtp.gmail.com',
+        -login => '내gmail주소',
+        -pass  => '내gmail암호'
+    );
+    
+    if ( $mail == -1 ) {
+        print "error: $error_msg";
+        exit;
+    }
+
+`new()` 메소드는 인증에 성공하면 세션 정보가 담긴 객체를 반환합니다.
+실패할 경우는 `(-1, 에러메시지)` 형태의 리스트를 반환합니다.
+따라서 `$mail` 변수의 값이 `-1`인지 확인하면 에러가 발생했는지 알 수 있으며,
+에러가 발생했을 때 구체적인 에러메시지는 `$error_msg` 변수를 확인하면 됩니다.
+
+만일 구글 계정 설정에서 "2단계 인증"을 사용하도록 한 경우라면,
+그냥 아이디와 비밀번호를 넣어서 로그인할 수 없습니다.
+웹으로 로그인할 때라면 휴대폰으로 전송된 인증번호를 다시 넣도록 되어 있는데,
+우리가 만든 스크립트는 그런 기능이 없습니다.
+이런 경우는 "앱 비밀번호"란 것을 생성하여 사용합니다.
+앱 비밀번호를 사용하는 절차는 아래와 같습니다.
+
+* [구글의 내 계정 페이지][home-google-myaccount]에 갑니다.
+* "로그인 및 보안" 페이지에 들어갑니다.
+* "비밀번호 및 로그인 방식" 상자 안에 있는 "앱 비밀번호"를 클릭합니다.
+* "기기 선택"을 눌러 "기타(맞춤 이름)"을 선택한 후, 적당한 이름을 넣고 "생성" 버튼을 누릅니다.
+* 16자리의 임시 비밀번호가 출력됩니다. 이것을 코드에 `내gmail암호` 자리에 넣습니다.
+
+
+메일 보내기
+------------
+
+메일을 보내는 코드도 아주 간단합니다.
+
+    #!perl
+    my ( $result, $err_msg ) = $mail->send(
+        -to      => '수신자메일주소',
+        -subject => '메일 제목',
+        -body    => '메일 본문 텍스트',
+
+        # 첨부 파일이 있는 경우
+        -attachments=> '/home/gypark/doc.txt,/home/gypark/music.mp3'
+    );
+
+* 수신자가 여럿일 때는 메일주소들을 쉼표로 구분하여 적어줍니다.
+* 참조나 숨은 참조는 각각 `-cc`, `-bcc` 키로 지정할 수 있습니다만, 이 때도 `-to`는 필수라서 비워둘 수는 없습니다.
+* 제목과 본문 텍스트의 경우 디코드된 펄 문자열, UTF-8로 인코딩된 문자열 두 가지 다 사용 가능합니다.
+EUC-KR로 인코딩된 경우도 별 문제없이 발송되는 것까지는 확인했습니다만,
+메일 헤더에는 UTF-8이라고 표시되는 것으로 봐서 문제의 소지가 있을지 모릅니다.
+* 첨부 파일이 여러 개인 경우는 각 파일의 경로명을 쉼표로 구분해서 적어줍니다.
+만일 적어준 경로에 해당하는 파일이 없더라도 에러가 나지는 않으며, 그 파일을 제외하고 발송됩니다.
+* 모듈 문서에는 명시되지 않았지만, `send()`는 성공하면 `1`을 반환하며,
+실패할 경우는 `new()`와 마찬가지로 `(-1, 에러메시지)` 리스트를 반환합니다.
+* 첨부 파일에 `*.exe` 같은 실행 파일은 첨부할 수 없습니다. 심지어 압축을 해도 안 됩니다.
+보낼 수 없는 파일의 형식에 대해서는 [구글의 도움말][home-google-help-attachment]을 참조하세요.
+
+그리고 `new()`와 `send()` 모두 자체적으로 에러 처리를 하고는 있지만,
+실제 사용해보면 의존성이 걸린 모듈 쪽에서 에러가 날 때 그냥 `die`해 버리는 경우를 볼 수 있었습니다.
+따라서 이런 경우에 스크립트가 죽지 않게 하려면 `eval` 블록으로 둘러싸서 사용을 하는 게 안전합니다.
+
+
+정리하며
+---------
+
+펄 스크립트를 써서 gmail 계정을 통하여 메일을 전송하는 법을 살펴보았습니다.
+시스템을 모니터링하다가 문제가 생겼을 때 메일로 알려준다거나 하는 식으로 응용할 수 있겠습니다.
+
+[cpan-email-send-smtp-gmail]:                   https://metacpan.org/pod/Email::Send::SMTP::Gmail
+[cpan]:                                         http://www.cpan.org/
+[gypark-home]:                                  http://gypark.pe.kr
+[gypark-perl]:                                  http://gypark.pe.kr/wiki/Perl
+[home-gmail]:                                   https://mail.google.com/
+[home-google-help-attachment]:                  https://support.google.com/mail/answer/6590
+[home-google-myaccount]:                        https://myaccount.google.com/
+[home-perlbrew]:                                http://perlbrew.pl/
+[twitter-gypark]:                               http://twitter.com/gypark
