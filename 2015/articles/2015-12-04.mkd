@@ -30,7 +30,6 @@ Author:   gypark
 이렇게 음소 단위로 분리하는 작업을 펄 모듈을 이용하여 해 봅시다.
 
 
-
 준비물
 -------
 
@@ -70,16 +69,16 @@ Author:   gypark
     use utf8;           # 문자열 리터럴을 자동으로 디코드하여 사용
                         # 이 스크립트 자체도 인코딩을 UTF-8로 지정하여 저장해야 함
     use 5.010;          # say를 쓰기 위해서
-    
+
     binmode STDOUT, ':encoding(UTF-8)';      # 윈도우 명령 프롬프트창이라면 UTF-8 대신 cp949
-    
+
     my @targets = ( '고우영', '공지영' );
-    
+
     my @search = ( 'ㄱ', '고', '공', '고우', '공ㅈ', '공지' );
-    
+
     say "---- regex ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 $t =~ $s ? "MATCH" : "NOT MATCH";
         }
@@ -138,18 +137,18 @@ Author:   gypark
     # 일치 검사하는 서브루틴
     sub jamo_match {
         my ( $target, $search ) = @_;
-    
+
         # $target, $search 를 각각 음소 단위로 분리
         my $target_jamo = decomposeSyllable($target);
         my $search_jamo = decomposeSyllable($search);
-    
+
         # 분리된 형태의 문자열을 사용하여 일치 검사
         return ( $target_jamo =~ $search_jamo );
     }
-    
+
     say "---- decompose ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 # 이제 정규식 대신 jamo_match()로 검사
                 jamo_match( $t, $s ) ? "MATCH" : "NOT MATCH";
@@ -229,7 +228,6 @@ Author:   gypark
 즉 `초성 기역(U+1100)`과 `종성 기역(U+11A8)`을 일괄적으로 `한글 문자 기역(U+3131)`으로 변환한 다음 비교하는 것입니다.
 
 
-
 한글 호환 자모로 변환
 ----------------------
 
@@ -245,10 +243,10 @@ Author:   gypark
 
     #!perl
     use Lingua::KO::Hangul::JamoCompatMapping qw(jamo_to_compat);
-    
+
     sub jamo_compat_match {
         my ( $target, $search ) = @_;
-    
+
         # jamo_to_compat()은 입력을 음소 하나만 받기 때문에,
         # decomposeSyllable()의 결과로 나온 문자열을
         # 다시 개별 문자들로 나누기 위해 split 사용하고
@@ -264,16 +262,16 @@ Author:   gypark
 
         return ( $target_jamo_compat =~ $search_jamo_compat )
     }
-    
+
     say "---- decompose and convert ----";
-    foreach my $s ( @search ) {
-        foreach my $t ( @targets ) {
+    for my $s ( @search ) {
+        for my $t ( @targets ) {
             say "$s - $t : ",
                 jamo_compat_match( $t, $s ) ? "MATCH" : "NOT MATCH";
         }
     }
 
- 결과는 다음과 같습니다.
+결과는 다음과 같습니다.
 
     #!plain
     ---- decompose and convert ----
@@ -308,23 +306,30 @@ Author:   gypark
 솔직히 말씀드리면 다국어나 유니코드 처리에 관한 글을 쓰기에는 저도 아는 게 많이 부족합니다.
 제가 이 기사를 작성하면서 참고한 웹페이지들을 나열하니 자세한 것은 이곳에서 직접 살펴보시기를 권장합니다.
 
-* [유니코드 8.0 문자 코드 차트 전체 링크](http://www.unicode.org/charts/)
- * [한글 음절 영역 코드표(Hangul Syllables, AC00-D7AF) - PDF](http://www.unicode.org/charts/PDF/UAC00.pdf)
- * [한글 자모 영역 코드표(Hangul Jamo, 1100-11FF) - PDF](http://www.unicode.org/charts/PDF/U1100.pdf)
- * [한글 호환 자모 영역 코드표(Hangul Compatibility Jamo, 3130-318F) - PDF](http://www.unicode.org/charts/PDF/U3130.pdf)
-* [Korean Hangul Syllabary in Unicode](http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html)
-* [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리](http://d2.naver.com/helloworld/76650)
-* [유니코드 한글 음절과 자모의 영역/주소 - Unicode Hangul Code Point Map](http://mwultong.blogspot.com/2006/09/unicode-hangul-code-point-map.html)
+* [유니코드 8.0 문자 코드 차트 전체 링크][home-unicode-charts]
+* [한글 음절 영역 코드표(Hangul Syllables, AC00-D7AF) - PDF][home-unicode-charts-uac00]
+* [한글 자모 영역 코드표(Hangul Jamo, 1100-11FF) - PDF][home-unicode-charts-u1100]
+* [한글 호환 자모 영역 코드표(Hangul Compatibility Jamo, 3130-318F) - PDF][home-unicode-charts-u3130]
+* [Korean Hangul Syllabary in Unicode][korean-hangul-unicode]
+* [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][helloworld-unicode-java]
+* [유니코드 한글 음절과 자모의 영역/주소 - Unicode Hangul Code Point Map][unicode-hangul-code-point-map]
 
 
 [img-1]:          2015-12-04-1.png
 
 [img-1-resize]:   2015-12-04-1_r.png
 
-[cpan-lingua-ko-hangul-util]:                   https://metacpan.org/pod/Lingua::KO::Hangul::Util
 [cpan-lingua-ko-hangul-jamocompatmapping]:      https://metacpan.org/pod/Lingua::KO::Hangul::JamoCompatMapping
+[cpan-lingua-ko-hangul-util]:                   https://metacpan.org/pod/Lingua::KO::Hangul::Util
 [cpan]:                                         http://www.cpan.org/
 [gypark-home]:                                  http://gypark.pe.kr
 [gypark-perl]:                                  http://gypark.pe.kr/wiki/Perl
+[helloworld-unicode-java]:                      http://d2.naver.com/helloworld/76650
 [home-perlbrew]:                                http://perlbrew.pl/
+[home-unicode-charts-u1100]:                    http://www.unicode.org/charts/PDF/U1100.pdf
+[home-unicode-charts-u3130]:                    http://www.unicode.org/charts/PDF/U3130.pdf
+[home-unicode-charts-uac00]:                    http://www.unicode.org/charts/PDF/UAC00.pdf
+[home-unicode-charts]:                          http://www.unicode.org/charts/
+[korean-hangul-unicode]:                        http://gernot-katzers-spice-pages.com/var/korean_hangul_unicode.html
 [twitter-gypark]:                               http://twitter.com/gypark
+[unicode-hangul-code-point-map]:                http://mwultong.blogspot.com/2006/09/unicode-hangul-code-point-map.html
