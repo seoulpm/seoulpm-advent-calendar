@@ -39,78 +39,79 @@ Author:   gypark
     $ cpan Net::Google::Drive::Simple
 
 
-시작
--------------
+모듈 사용 준비하기
+-------------------
 
 이 모듈을 사용하는 것보다 이 모듈을 사용하기 위해 처음 준비하는 과정이 더 복잡합니다.
 구글에 접속하여 OAuth 인증을 해야 하는데, 이 과정이 모듈 문서에 간단히 나와 있긴
 합니다만 구글 웹페이지의 구성이 좀 바뀌었는지 중간중간에 문서의 내용과 실제 화면의
 내용이 일치하지 않는 경우가 있습니다.
 
-모듈 문서에서 알려주는 [Google Developers][google-developers-api] 페이지에
-들어갑니다. "Enable the Drive API" 아래에 있는 "Google Developers Console"
-링크를 클릭합니다.
+모듈 문서에서 알려주는 [Google Developers][google-developers-api] 페이지에 들어갑니다.
+**"Enable the Drive API"** 아래에 있는 **"Google Developers Console"** 링크를 클릭합니다.
 
 ![image 1][img-1-resize]
 *그림 1.* ([원본][img-1])
 
-그러면 콘솔 화면이 나옵니다. 여기에서 "빈 프로젝트 생성"을 클릭합니다.
+그러면 콘솔 화면이 나옵니다.
+여기에서 **"빈 프로젝트 생성"**을 클릭합니다.
 
 ![image 2][img-2-resize]
 *그림 2.* ([원본][img-2])
 
-"새 프로젝트" 창에서 프로젝트 이름을 적당히 지어주고 생성 버튼을 누릅니다.
+**"새 프로젝트"** 창에서 프로젝트 이름을 적당히 지어주고 생성 버튼을 누릅니다.
 
 ![image 3][img-3-resize]
 *그림 3.* ([원본][img-3])
 
-프로젝트 화면이 나옵니다. "Google API 사용" 박스를 클릭합니다.
+프로젝트 화면이 나옵니다.
+**"Google API 사용"** 박스를 클릭합니다.
 
 ![image 4][img-4-resize]
 *그림 4.* ([원본][img-4])
 
-API 목록에서 "Drive API"를 클릭합니다.
+API 목록에서 **"Drive API"**를 클릭합니다.
 
 ![image 5][img-5-resize]
 *그림 5.* ([원본][img-5])
 
-"API 사용 설정" 버튼을 클릭합니다.
+**"API 사용 설정"** 버튼을 클릭합니다.
 
 ![image 6][img-6-resize]
 *그림 6.* ([원본][img-6])
 
-"사용자 인증 정보로 이동" 버튼을 클릭합니다.
+**"사용자 인증 정보로 이동"** 버튼을 클릭합니다.
 
 ![image 7][img-7-resize]
 *그림 7.* ([원본][img-7])
 
-입력 필드가 두 개 나오고 첫 번째 필드는 이미 "Drive API"라고 정해져 있지만,
-그래도 다시 클릭해서 "Drive API"를 선택해 줍니다.
+입력 필드가 두 개 나오고 첫 번째 필드는 이미 **"Drive API"**라고 정해져 있지만,
+그래도 다시 클릭해서 **"Drive API"**를 선택해 줍니다.
 (그래야 다음 과정으로 제대로 넘어가더군요.)
 
 ![image 8][img-8-resize]
 *그림 8.* ([원본][img-8])
 
-API를 호출할 위치는 "기타 UI(예: Windows, CLI도구)",
-액세스할 데이터는 "사용자 데이터"를 선택한 후
-"어떤 사용자 인증 정보가 필요한가요?"를 클릭합니다.
+API를 호출할 위치는 **"기타 UI(예: Windows, CLI도구)"**,
+액세스할 데이터는 **"사용자 데이터"**를 선택한 후
+**"어떤 사용자 인증 정보가 필요한가요?"**를 클릭합니다.
 
 ![image 9][img-9-resize]
 *그림 9.* ([원본][img-9])
 
 OAuth 클라이언트 이름은 적당히 넣어주고
-"클라이언트 ID 만들기" 버튼을 클릭합니다.
+**"클라이언트 ID 만들기"** 버튼을 클릭합니다.
 
 ![image 10][img-10-resize]
 *그림 10.* ([원본][img-10])
 
-이메일 주소와 제품 이름을 넣고 "계속" 버튼을 클릭합니다.
+이메일 주소와 제품 이름을 넣고 **"계속"** 버튼을 클릭합니다.
 
 ![image 11][img-11-resize]
 *그림 11.* ([원본][img-11])
 
-제대로 Client ID가 생성되었으면 "완료" 버튼을 클릭합니다.
-또는 여기서 "다운로드"를 클릭하여 JSON 형식으로 되어 있는
+제대로 Client ID가 생성되었으면 **"완료"** 버튼을 클릭합니다.
+또는 여기서 **"다운로드"**를 클릭하여 JSON 형식으로 되어 있는
 파일을 다운로드받아서 그 파일을 가지고 나머지 과정에서
 이용할 수도 있습니다.
 
@@ -118,22 +119,22 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 *그림 12.* ([원본][img-12])
 
 이제 사용자 인증 정보 화면에서 우리가 생성한 클라이언트가 보입니다.
-클라이언트 이름(*그림 13*에서는 "기타 클라이언트 1")에 있는 링크를
+클라이언트 이름(*그림 13*에서는 **"기타 클라이언트 1"**)에 있는 링크를
 클릭해서 상세 정보 보기로 넘어갑니다.
 
 ![image 13][img-13-resize]
 *그림 13.* ([원본][img-13])
 
-상세 화면에서는 "클라이언트 ID"와, "클라이언트 보안 비밀"이라는 조금
-이상하게 들리는 항목이 있습니다. 여기에 나온 값을 잠시 후에 사용하도록
-하겠습니다.
+상세 화면에서는 **"클라이언트 ID"**와, **"클라이언트 보안 비밀"**이라는
+조금 이상하게 들리는 항목이 있습니다.
+여기에 나온 값을 잠시 후에 사용하도록 하겠습니다.
 
 ![image 14][img-14-resize]
 *그림 14.* ([원본][img-14])
 
 이제 
 [Net::Google::Drive::Simple 모듈 페이지][cpan-net-google-drive-simple]에
-가서 좌측의 "Download"를 눌러서 모듈 소스를 내려받고, 압축을 풉니다.
+가서 좌측의 **"Download"**를 눌러서 모듈 소스를 내려받고, 압축을 풉니다.
 모듈 소스 중에 `eg/google-drive-init` 파일을 편집합니다.
 
     #!bash
@@ -159,22 +160,21 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 여기에 `client_id`의 `"XXX..."`는 우리가 앞에서 봤던 "클라이언트 ID"의 값을,
 `client_secret`의 `"YYY..."`에는 "클라이언트 보안 비밀"의 값을
 덮어쓴 후, 저장하고 종료합니다.
-
 그 다음 이 스크립트를 실행합니다.
 
     #!bash
     $ perl eg/google-drive-init
     Server available at http://localhost:8082
 
-간이 웹서버가 실행되었습니다. 웹 브라우저에서 `localhost:8082`에 접속하면
-다음과 같은 화면이 나옵니다.
+간이 웹서버가 실행되었습니다.
+웹 브라우저에서 `localhost:8082`에 접속하면 다음과 같은 화면이 나옵니다.
 
 ![image 15][img-15-resize]
 *그림 15.* ([원본][img-15])
 
-"Login on google-drive" 링크를 클릭합니다.
+**"Login on google-drive"** 링크를 클릭합니다.
 구글 페이지가 뜨면서 우리가 등록한 클라이언트에게 권한을 줄 것인지 묻습니다.
-"허용"을 클릭합니다.
+**"허용"**을 클릭합니다.
 
 ![image 16][img-16-resize]
 *그림 16.* ([원본][img-16])
@@ -197,23 +197,20 @@ OAuth 클라이언트 이름은 적당히 넣어주고
     token_uri: https://accounts.google.com/o/oauth2/token
 
 구글 드라이브 API를 이용할 때는 이 파일의 정보를 사용하게 됩니다.
-
 여기서 불편한 점은 API 모듈을 이용할 때 이 인증 정보 파일의 이름을 따로 지정해줄
 수 없다는 점입니다. 따라서 여러 개의 아이디를 번갈아 쓴다거나 할 때는 설정 파일을
 바꿔치기하는 등의 번거로운 작업이 필요한 것으로 보입니다.
-
 어쨌거나 이렇게 해서 우리는 모듈을 사용할 준비를 마쳤습니다.
 
 
 모듈 사용 예
 -------------
 
-
 ### 사전 준비 - 디렉토리 구성
 
 제 구글 드라이브는 텅 비어있는 상태였기 때문에,
 먼저 웹 브라우저에서 적당히 폴더 계층 구조를 만들고 파일을 업로드하여
-다음과 같이 구성하였습니다.
+다음과 같이 구성했습니다.
 
     #!bash
     /
@@ -249,8 +246,8 @@ OAuth 클라이언트 이름은 적당히 넣어주고
     }
 
 `children()` 메소드는 인자로 받은 경로에 있는 파일과 폴더들의 목록을 반환합니다.
-좀 더 정확히는, 파일과 폴더를 나타내는 객체들로 구성된 배열의 레퍼런스를
-반환합니다. 위 코드의 출력은 다음과 같습니다.
+좀 더 정확히는, 파일과 폴더를 나타내는 객체들로 구성된 배열의 레퍼런스를 반환합니다.
+위 코드의 출력은 다음과 같습니다.
 
     #!bash
     $ perl ls.pl
@@ -267,34 +264,32 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 
 저도 구글 드라이브 API에서 제공하는 항목들에 대해 다 알고 있는 게 아니라서,
 여기서는 몇 가지 간단한 내용만 소개해드리도록 하겠습니다.
-
-- 모든 파일과 폴더는 고유한 `id` 속성이 있습니다. 루트 폴더의 경우는
-별개로 `root`라는 별칭을 ID로 쓸 수 있습니다.
-- 파일과 폴더의 이름은 `title` 속성값으로 담겨 있습니다.
-- `kind` 속성은 파일의 타입을 나타내는데... 현재는 언제나 `drive#file`로 고정되어 있습니다.
-- `mimeType` 속성값은 폴더의 경우 언제나 `application/vnd.google-apps.folder`입니다.
-파일의 경우는 `text/plain`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
-등 파일의 내용에 따라 달라집니다.
-
 그 외에, 파일 객체의 속성들의 이름과 그 의미에 대해서는
 [Google Developers의 Files 문서][google-developers-files]를 참고하세요.
 
-따라서, 폴더의 내용물들 중에 어떤 게 파일이고 어떤 게 폴더인지 구분하려면 `mimeType`
-속성의 값을 검사해야 합니다. 이것은 뭔가 불편해보이는군요.
+- 모든 파일과 폴더는 고유한 `id` 속성이 있습니다. 루트 폴더의 경우는
+  별개로 `root`라는 별칭을 ID로 쓸 수 있습니다.
+- 파일과 폴더의 이름은 `title` 속성값으로 담겨 있습니다.
+- `kind` 속성은 파일의 타입을 나타내는데... 현재는 언제나 `drive#file`로 고정되어 있습니다.
+- `mimeType` 속성값은 폴더의 경우 언제나 `application/vnd.google-apps.folder`입니다.
+  파일의 경우는 `text/plain`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+  등 파일의 내용에 따라 달라집니다.
 
-
+따라서, 폴더의 내용물들 중에 어떤 게 파일이고 어떤 게 폴더인지
+구분하려면 `mimeType` 속성의 값을 검사해야 합니다.
+이것은 뭔가 불편해보이는군요.
 
 
 ### 폴더를 제외한 전체 파일 목록 보기
 
 파일이 들어있는 폴더에 무관하게, 드라이브 내에 있는 모든 파일들의 목록을 살펴봅시다.
-
 방금 전 코드에서 `children()` 대신 `files()` 메소드를 씁니다.
 
     #!perl
     my $children = $gd->files();
 
-출력은 다음과 같습니다. 업로드했던 파일 네 개 모두가 보입니다.
+출력은 다음과 같습니다.
+업로드했던 파일 네 개 모두가 보입니다.
 
     #!bash
     $ perl filelist.pl
@@ -320,23 +315,20 @@ OAuth 클라이언트 이름은 적당히 넣어주고
     mimeType: text/plain
 
 
-
 ### 특정한 파일을 다운로드하기
 
 `myfolder/bbb.txt` 파일을 다운로드해 봅시다.
-
 그런데 별 거 아닌 것 같은데, 막상 하려면 방법이 없습니다.
 
     #!perl
     # 이렇게 경로를 지정하여 다운로드할 메소드가 없음
     $gd->download( '/myfolder/bbb.txt' );
 
-`download()` 메소드가 있긴 하지만, 이 메소드의 인자는 `children()`이나 `files()`로
-얻어낸 파일 객체 레퍼런스이거나, 그 객체에 대해 `downloadUrl()` 메소드를 호출하여
-얻은 URL이어야 합니다.
-
-따라서 일단 상위 폴더의 내용물 목록을 얻고, 거기에서 원하는 파일을 찾은 후
-다운로드해야 합니다.
+`download()` 메소드가 있긴 하지만, 이 메소드의 인자는
+`children()`이나 `files()`로 얻어낸 파일 객체 레퍼런스이거나,
+그 객체에 대해 `downloadUrl()` 메소드를 호출하여 얻은 URL이어야 합니다.
+따라서 일단 상위 폴더의 내용물 목록을 얻고,
+거기에서 원하는 파일을 찾은 후 다운로드해야 합니다.
 
     #!perl
     my $children = $gd->children( '/myfolder' );
@@ -349,23 +341,20 @@ OAuth 클라이언트 이름은 적당히 넣어주고
     
     $gd->download( $files[0], './bbb.txt' );
 
-이 코드를 실행하고 현재 작업 디렉토리를 보면 `bbb.txt` 파일이 짠 하고 생겨난
-것을 알 수 있습니다.
-
+이 코드를 실행하고 현재 작업 디렉토리를 보면
+`bbb.txt` 파일이 짠 하고 생겨난 것을 알 수 있습니다.
 
 
 ### 폴더를 생성하기
 
 `/myfolder` 아래에 `newfolder`를 만들어봅시다.
-
-다운로드와 마찬가지로, `mkdir( '/myfolder/newfolder' )`와 같은 메소드는
-없습니다. 폴더를 만들려면 `folder_create()` 메소드를 사용하는데, 이 때
-그 폴더가 위치할 상위 폴더의 먼저 ID를 알아낸 후 인자로 주어야 합니다.
-
+다운로드의 경우와 마찬가지로, `mkdir('/myfolder/newfolder')`와 같은 메소드는 없습니다.
+폴더를 만들려면 `folder_create()` 메소드를 사용하는데, 이 때
+그 폴더가 위치할 상위 폴더의 ID를 먼저 알아낸 후 인자로 주어야 합니다.
 그런데 상위 폴더의 ID를 알아내려면 다시 한 단계 더 위의 폴더에 대해서
-`children` 메소드를 호출한 후 반환된 목록에서 찾아봐야 하느냐...하면
-다행히 그건 아닙니다. `children` 메소드는 두 번째 반환값으로 인자로 받은
-경로의 ID를 반환해줍니다. 이 값을 사용하면 됩니다.
+`children` 메소드를 호출한 후 반환된 목록에서 찾아봐야 하느냐...하면 다행히 그건 아닙니다.
+`children` 메소드는 두 번째 반환값으로 인자로 받은 경로의 ID를 반환해줍니다.
+이 값을 사용하면 됩니다.
 
     #!perl
     my ($children, $parent_id) = $gd->children( '/myfolder' );
@@ -380,11 +369,11 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 *그림 19.* ([원본][img-19])
 
 
-
 ### 파일을 업로드하기
 
-폴더를 생성할 때와 비슷합니다. 파일이 위치할 폴더의 ID를 먼저 알아낸 후에,
-`file_upload()` 메소드에 업로드할 로컬 파일의 경로와 폴더ID를 인자로 줍니다.
+폴더를 생성할 때와 비슷합니다.
+파일이 위치할 폴더의 ID를 먼저 알아낸 후에, `file_upload()` 메소드에
+업로드할 로컬 파일의 경로와 폴더ID를 인자로 줍니다.
 
     #!perl
     my ($children, $parent_id) = $gd->children( '/myfolder' );
@@ -397,21 +386,22 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 *그림 20.* ([원본][img-20])
 
 
-
 정리하며
 ---------
 
-이 모듈에는 이 외에도 파일을 지우는 메소드와, 제목/내용/작성자 등의 여러 조건을
-가지고 파일을 검색하는 메소드가 있습니다.
+이 모듈에는 이 외에도 파일을 지우는 메소드와, 제목/내용/작성자 등의
+여러 조건을 가지고 파일을 검색하는 메소드가 있습니다.
 자세한 것은 [모듈 문서][cpan-net-google-drive-simple]와
 [검색에 대한 구글 API문서][google-developers-search]를 참고하세요.
+앞서 말했듯이 인증 정보가 들어있는 yml 파일을 실행 시점에
+지정해 줄 수 없다는 불편한 점이 있고, 디렉토리 구조를 탐색하거나
+파일, 폴더를 생성하는 절차가 조금 복잡하긴 합니다.
+그러나 파일을 업로드, 다운로드하는 간단한 스크립트를
+만들 때는 유용하게 쓸 수 있습니다.
+제 경우는 홈페이지의 데이터를 하루에 한 번씩 백업하여 저장하는
+스크립트를 만들어 쓰고 있는데 아주 잘 동작하고 있답니다. :)
 
-앞서 말했듯이 인증 정보가 들어있는 yml 파일을 실행 시점에 지정해 줄 수 없다는
-불편한 점이 있고, 디렉토리 구조를 탐색하거나 파일, 폴더를 생성하는 절차가 조금
-복잡하긴 합니다. 그러나 파일을 업로드, 다운로드하는 간단한 스크립트를
-만들 때는 유용하게 쓸 수 있습니다. 제 경우는 홈페이지의 데이터를 하루에 한 번씩
-백업하여 저장하는 스크립트를 만들어 쓰고 있는데 아주 잘 동작합니다.
-
+Merry Christmas~!! ;-)
 
 
 [img-1]:                2015-12-24-01.png
@@ -436,7 +426,6 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 [img-20]:               2015-12-24-20.png
 
 
-
 [img-1-resize]:         2015-12-24-01_r.png
 [img-2-resize]:         2015-12-24-02_r.png
 [img-3-resize]:         2015-12-24-03_r.png
@@ -459,16 +448,14 @@ OAuth 클라이언트 이름은 적당히 넣어주고
 [img-20-resize]:        2015-12-24-20_r.png
 
 
-
-
 [cpan-net-google-drive-simple]: https://metacpan.org/pod/Net::Google::Drive::Simple
 [cpan]:                         http://www.cpan.org/
-[gypark-home]:                  http://gypark.pe.kr
-[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
-[home-google]:                  http://google.com
-[home-google-drive]:            https://www.google.co.kr/intl/ko/drive/
-[home-perlbrew]:                http://perlbrew.pl/
 [google-developers-api]:        https://developers.google.com/drive/v2/web/enable-sdk
 [google-developers-files]:      https://developers.google.com/drive/v2/reference/files
 [google-developers-search]:     https://developers.google.com/drive/v2/web/search-parameters
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[home-google-drive]:            https://www.google.co.kr/intl/ko/drive/
+[home-google]:                  http://google.com
+[home-perlbrew]:                http://perlbrew.pl/
 [twitter-gypark]:               http://twitter.com/gypark
