@@ -1,0 +1,427 @@
+title:    명령줄 인자를 내 맘대로 사용하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   rumidier
+
+저자
+---
+
+rumidier - Silex *말썽꾸러기*, [@keedi][twitter-keedi] 옆에서 3년 넘게 풍월을 읊는 중.
+
+
+시작하며
+---------
+
+간단한 단일 동작만을 실행고자 한다면 코드 내부에서 인자를 직접 선언해 사용해도 됩니다.
+이 방법은 간편하지만 처리해야할 일이 많아지고 여러가지 자료를 유동적으로 받아들여야 한다면
+코드 내부에서 수정하기란 매우 어렵고 자유롭지도 않기 때문에 시간이 지날 수록 힘들어집니다.
+[MooX::Cmd::Role 모듈][cpan-moox-cmd-role]과 [MooX::Options 모듈][cpan-moox-options]을
+사용해 기능을 손쉽게 나누고 인자를 유동적으로 받아들여 유지 보수가 손쉬운 프로그램을
+만드는 방법을 알아보겠습니다.
+
+
+준비물
+------
+
+필요한 모듈은 다음과 같습니다.
+
+- [MooX::Options 모듈][cpan-moox-options]
+- [MooX::Cmd::Role 모듈][cpan-moox-cmd-role]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+      MooX::Options \
+      MooX::Cmd::Role
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+      MooX::Options \
+      MooX::Cmd::Role
+
+
+실행 파일 만들기
+-----------------
+
+여러가지 기능을 사용하기 위해서 기능에 따라 분리가 가능해야됩니다.
+기능 분리를 위해 [MooX::Cmd::Role][cpan-moox-cmd-role] 모듈을 사용합니다.
+실행 파일을 만들기 위해서 `mycal.pl`, `lib/My/Calculator.pm` 두개의 파일을 작성합니다.
+
+
+### mycal.pl
+
+실행 파일로 `lib/My/Calculator.pm` 에서 작성된 `execute()`를 실행합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use My::Calculator;
+
+    My::Calculator->new_with_cmd->execute;
+
+
+### lib/My/Calculator.pm
+
+`execute()` 메소드 실행시 인자에 따라 동작할 기능을 선택합니다.
+
+    #!perl
+    package My::Calculator;
+
+    use Moo;
+    with qw( MooX::Cmd::Role );
+
+    sub _build_command_base { __PACKAGE__ }
+
+    sub execute {
+        my $self = shift;
+
+        my ( $args ) = @_;
+        die "Need to specify a sub-command\n";
+    }
+
+    1;
+
+`execute()` 메소드가 실행되기 위해서는 `My/Calculator/plus.pm`, `My/Calculator/minus.pm`
+두 개의 파일이 필요합니다.
+
+
+### lib/My/Calculator/plus.pm
+
+기본적인 더하기 기능을 하는 `plus.pm`입니다.
+파일명과 지정할 기능명이 동일해야 됩니다.
+
+    #!perl
+    package My::Calculator::plus;
+
+    use Moo;
+    use MooX::Cmd;
+
+    sub execute {
+        my ( $self ) = @_;
+
+        print (1+1);
+
+        exit;
+    }
+
+    1;
+
+### lib/My/Calculator/minus.pm
+
+기본적인 뺄셈 기능을 하는 `minus.pm`입니다.
+파일명과 지정할 기능명이 동일해야 됩니다.
+
+    #!perl
+    package My::Calculator::minus;
+
+    use Moo;
+    use MooX::Cmd;
+
+    sub execute {
+        my ( $self ) = @_;
+
+        print (1 - 1);
+
+        exit;
+    }
+
+    1;
+
+실행 방법은 다음과 같습니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl plus
+    2
+
+    #!bash
+    $ perl -Ilib mycal.pl minus
+    0
+
+분리 할 부명령(subcommand) 값(plus, minus)이 없다면 다음과 같은 오류 메세지를 출력합니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl
+    Need to specify a sub-command
+
+기능명이 파일명과 다를 때도 동일한 메세지를 출력합니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl Add
+    Need to specify a sub-command
+
+[MooX::Cmd::Role][cpan-moox-cmd-role]을 이용해서 두 개의 조건을 분리할 수 있는 방법을 찾았습니다.
+현재는 두 개의 기능만 있지만 `Calculator/foo.pm`, `Calculator/bar.pm` 추가함으로써
+더 많은 기능을 만들어낼수 있습니다.
+
+하지만 아무리 기능을 늘려도 `plus`, `minus`를 실행하면 *2*와 *0*만을 출력할 뿐입니다.
+사용자의 입력에 따라 올바른 계산값을 출력하기 위해서는 인자를 입력받아야 합니다.
+펄에서는 `@ARGV`를 사용해 특정한 모듈을 사용하지 않고도 인자를 전달 받을수 있습니다.
+하지만 `@ARGV` 사용시 `--numbers`와 같이 옵션을 추가하려면 인자와 옵션 처리가 번거롭습니다.
+
+`lib/My/Calculator/plus.pm`를 사용해 `@ARGV` 값을 확인해보죠.
+
+    #!bash
+    $ perl -Ilib mycal.pl plus --numbers 2 arg1 arg2
+
+    #!perl
+    sub execute {
+        ...
+
+        use Data::Dumper;
+	say Dumper \@ARGV
+
+        ...
+	exit;
+    }
+
+`@ARGV` 인자는 다음과 같이 출력됩니다.
+
+    #!bash
+    $VAR1 = [
+                '--numbers',
+                '2',
+                'arg1',
+                'arg2'
+	    ];
+
+`--numbers` `2`가 추가 되어진다 하더라도 계산을 위해서 필요한 값은 `arg1`과 `arg2` 입니다.
+`@ARGV`를 사용하기에는 번거로워 보입니다.
+인자와 옵셥을 손쉽게 분리하기 위해 [MooX::Options 모듈][cpan-moox-options]을 사용하겠습니다.
+
+`use MooX::Options` 모듈을 추가하더라도 `@ARGV` 값이 바뀌지는 않습니다.
+모듈 추가시 `flavour`과 `protect_argv` 값을 정의합니다.
+모듈 추가시 다음과 같이 추가합니다.
+
+    #!perl
+    use MooX::Options flavour => [ qw( pass_through ) ], protect_argv => 0;
+
+`flaver`, `protect_argv` 추가시 `@ARGV`에 인자값은 다음과 같이 출력됩니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl plus --number 2 --number 3 arg1 arg2
+
+    $VAR1 = [
+	    'arg1',
+	    'arg2'
+	    ];
+
+`plus` 기능에서 `arg1`, `arg2` 값을 더하기 편해졌습니다.
+실제로 작성되어진다면 구조는 다음과 같습니다.
+
+    #!bash
+    .
+    ├── mycal.pl
+    └── lib
+	└── My
+	    ├── Calculator
+	    │   ├── minus.pm
+	    │   └── plus.pm
+	    └── Calculator.pm
+
+
+### lib/My/Calculator/plus.pm
+
+인자를 입력받아 계산이 가능하도록 수정합니다.
+
+    #!bash
+    package My::Calculator::plus;
+
+    use v5.14;
+    use Moo;
+    use MooX::Cmd;
+    use MooX::Options flavour => [ qw( pass_through ) ], protect_argv => 0;
+
+    sub execute {
+        my ( $self ) = @_;
+
+        my $number;
+        $number = @ARGV ? shift @ARGV : 0;
+
+        foreach my $num (@ARGV) {
+            $number += $num;
+        }
+
+        say "[ $number ]";
+
+        exit;
+    }
+
+    1;
+
+### lib/My/Calculator/minus.pm
+
+인자를 입력받아 계산이 가능하도록 수정합니다.
+
+    #!bash
+    package My::Calculator::minus;
+
+    use v5.14;
+    use Moo;
+    use MooX::Cmd;
+    use MooX::Options flavour => [ qw( pass_through ) ], protect_argv => 0;
+
+    sub execute {
+        my ( $self ) = @_;
+
+        my $number;
+        $number = @ARGV ? shift @ARGV : 0;
+
+        foreach my $num (@ARGV) {
+	    $number -= $num;
+        }
+
+        say "[ $number ]";
+
+        exit;
+    }
+
+    1;
+
+`plus` 와 `minus` 두개의 기능 사용을 위해 3개의 숫자 `3`, `2`, `1` 을 계산해 출력합니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl plus 3 2 1
+    [ 6 ]
+
+    #!bash
+    $ perl -Ilib mycal.pl minus 3 2 1
+    [ -6 ]
+
+
+기능 추가 방법
+---------------
+
+현재는 *더하기*와 *빼기* 기능만 존재합니다.
+여기에 *곱셈* 기능을 추가해보겠습니다.
+`lib/My/Calculator/` 하부에 추가하면 기능을 추가할 수 있습니다.
+`lib/My/Calculator/multiply.pm`을 추가합니다.
+
+    #!perl
+    package My::Calculator::multiply;
+
+    use v5.14;
+    use Moo;
+    use MooX::Cmd;
+    use MooX::Options flavour => [ qw( pass_through ) ], protect_argv => 0;
+
+    option 'options' => (
+	is     => 'ro',
+	format => 's',
+	doc    => 'Plese input options'
+    );
+
+    sub execute {
+        my ( $self ) = @_;
+
+        my $number;
+        $number = @ARGV ? shift @ARGV : 0;
+
+        foreach my $num (@ARGV) {
+            $number *= $num;
+        }
+
+        say "[ $number ]";
+
+        exit;
+    }
+
+    1;
+
+사용법은 다음과 같습니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl multiply 3 2 1
+    [ 6 ]
+
+
+option 사용 방법
+-----------------
+
+같은 기능안에서도 옵션에 따라 다른 행동을 하도록 만들수 있습니다.
+`option` 사용은 `@ARGV`와는 별도로 입력이 가능합니다.
+
+    #!perl
+    option 'options' => (
+        is     => 'ro',
+        format => 's',
+        doc    => 'Plese input options'
+    );
+
+`option`이 추가된 *곱셈* 기능 입니다.
+`options`으로 `exponent`를 사용합니다.
+`exponent` 값이면 *제곱* 을 계산합니다.
+
+    #!perl
+    package My::Calculator::multiply;
+
+    use v5.14;
+    use Moo;
+    use MooX::Cmd;
+    use MooX::Options flavour => [ qw( pass_through ) ], protect_argv => 0;
+
+    option 'options' => (
+        is     => 'ro',
+        format => 's',
+        doc    => 'Plese input options'
+    );
+
+    sub execute {
+        my ( $self ) = @_;
+
+        my $number;
+        $number = @ARGV ? shift @ARGV : 0;
+
+        my $exponent = $self->{options} || 'multiplication';
+
+        foreach my $num (@ARGV) {
+            if ($exponent eq 'exponent') {
+	        $number **= $num;
+            }
+            else {
+       	        $number *= $num;
+            }
+        }
+
+        say "[ $number ]";
+
+        exit;
+    }
+
+    1;
+
+사용법은 다음과 같습니다.
+
+    #!bash
+    $ perl -Ilib mycal.pl multiply --options exponent 3 2 1
+    [ 9 ]
+
+
+정리하며
+--------
+
+비슷한 일을 하지만 입력값에 따라 조금씩 다른 동작을 해야만 하는 프로그램을 작성할 때 동작별로
+스크립트를 작성하게 되면 파일을 관리하기도 어렵지만 중복되는 코드를 여러개 복사해놓고
+파일명만 바꾸어서 사용하게 되어 코드 중복이 필연적으로 발생했습니다.
+더군다나 업데이트가 필요한 시점에는 개별 파일을 열고, 동일한 부분을 모두 수정해야되는 비효율의
+극을 보여주는 행동을 반복하는 와중 [MooX::Options 모듈][cpan-moox-options]과
+[MooX::Cmd::Role 모듈][cpan-moox-cmd-role]의 사용은
+좀 더 효율적인 관리와 사용법의 간소화를 외치던 제게 큰 도움이 되었습니다.
+효율적인 스크립트 관리르 고민하는 다른 몽거스분들께도 조금이나마 도움이 되었으면 합니다. :)
+
+*use perl or die;*
+
+_EOT_
+
+[cpan-moox-cmd-role]: https://metacpan.org/pod/MooX::Cmd::Role
+[cpan-moox-options]:  https://metacpan.org/pod/MooX::Options
+[cpan]:               http://www.cpan.org/
+[home-perlbrew]:      http://perlbrew.pl/
+[twitter-keedi]:      http://twitter.com/#!/keedi

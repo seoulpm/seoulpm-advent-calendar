@@ -1,0 +1,525 @@
+Title:    동적 차트 그리기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+근래에 들어 HTML5와 CSS, 자바스크립트를 비롯 웹 관련 라이브러리들이 비약적으로 발전했습니다.
+그래프만 해도 예전에는 서버의 자료를 서버의 자원 및 라이브러리를 이용해서 그래프를 이미지로
+제작한 다음 이를 브라우저에서 보여주었다면 최근에는 미려하면서도 화려한 그래프 라이브러리를
+사용해 클라이언트의 자원을 이용해 보여주곤 합니다.
+유명한 대부분의 그래프 라이브러리는 Ajax 호출을 통해 자료를 얻어와
+거의 실시간에 가깝게 그래프를 갱신해주는 기능을 포함하고 있죠.
+[Flot 그래프 라이브러리][home-flot]와 [Mojolicious 웹프레임워크][home-mojolicious]를 조합해
+CPU 사용률을 그래프로 표현하는 간단한 웹앱을 통해 실시간 그래프 그리기에 대해 감을 잡아 볼까요?
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 JSON 모듈][cpan-json]
+- [CPAN의 List::MoreUtils 모듈][cpan-list-moreutils]
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+- [CPAN의 Path::Tiny 모듈][cpan-path-tiny]
+- [CPAN의 Sys::Info 모듈][cpan-sys-info]
+- [CPAN의 Sys::Info::Driver::* 모듈][search-cpan-sys-info-driver]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+      JSON \
+      List::MoreUtils \
+      Mojolicious \
+      Path::Tiny \
+      Sys::Info
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+      JSON \
+      List::MoreUtils \
+      Mojolicious \
+      Path::Tiny \
+      Sys::Info
+
+
+Flot 다운로드
+--------------
+
+[Flot 그래프 라이브러리][home-flot]를 [다운로드][download-flot]한 후 압축을 해제합니다.
+
+    #!bash
+    $ wget http://www.flotcharts.org/downloads/flot-0.8.2.tar.gz
+    $ tar xvzf flot-0.8.2.tar.gz
+
+테스트에 필요한 *jQuery*와 *flot* 그래프 자바스크립트를 `public/` 디렉터리 하부로 옮기고 필요 없는 디렉터리는 지웁니다.
+
+    #!bash
+    $ mkdir public
+    $ cp flot/jquery.min.js flot/jquery.flot.min.js public/
+    $ rm -rf flot
+
+
+Flot 그래프 생성
+-----------------
+
+Flot 그래프는 다음과 같은 방식으로 생성할 수 있습니다.
+
+    #!javascript
+    var plot = $.plot(container, series, {
+      grid: {
+        borderWidth:     1,
+        minBorderMargin: 20,
+        labelMargin:     10,
+        backgroundColor: { colors: ["#fff", "#e4f4f4"] },
+        margin:          { top: 8, bottom: 20, left: 20 },
+        markings: function(axes) {
+          var markings = [];
+          var xaxis = axes.xaxis;
+          for (var x = Math.floor(xaxis.min); x < xaxis.max; x += xaxis.tickSize * 2) {
+            markings.push({ xaxis: { from: x, to: x + xaxis.tickSize }, color: "rgba(232, 232, 255, 0.2)" });
+          }
+          return markings;
+        }
+      },
+      xaxis:  { tickFormatter: function() { return ""; } },
+      yaxis:  { min: 0, max: 110 },
+      legend: { show: true }
+    });
+
+`plot` 함수에 넘겨주는 첫 번째 인자인 `container` 변수는 그래프를 품게될 HTML 요소 아이디입니다.
+두 번째 인자인 `series` 변수는 다음과 같은 형식으로 구성합니다.
+
+    #!javascript
+    var series = [
+      [
+        [ x1, y1 ],
+        [ x2, y2 ],
+        ...
+        [ xn, yn ]
+      ]
+    ];
+
+생성할 그래프에 옵션을 설정하고 싶다면 `series` 변수를 다음처럼 구성할 수도 있습니다.
+
+    #!javascript
+    var series = [
+      {
+        data: [
+          [ x1, y1 ],
+          [ x2, y2 ],
+          ...
+          [ xn, yn ]
+        ],
+        lines: { 
+          fill: true
+        }
+      }
+    ];
+
+자세한 내용은 [Flot 문서][api-flot]를 참고하세요.
+
+
+CPU 사용률 확인
+----------------
+
+그래프로 표현할 CPU 사용률 자료를 제공할 간단한 스크립트를 만들어볼까요?
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: cpu.pl
+    #
+
+    use v5.16;
+    use utf8;
+    use strict;
+    use warnings;
+
+    use JSON;
+    use List::MoreUtils qw( pairwise );
+    use Path::Tiny;
+    use Sys::Info::Constants qw( :device_cpu );
+    use Sys::Info;
+
+    my $info = Sys::Info->new;
+    my $cpu  = $info->device('CPU');
+
+    my @y = ( 0 ) x 600;
+    while (1) {
+        shift @y if @y == 600;
+
+        push @y, $cpu->load(DCPU_LOAD_LAST_01) * 100;
+
+        my @x = 0 .. @y - 1;
+        my @data = pairwise { [ $a / 2, $b ] } @x, @y;
+
+        path('cpu.json')->spew_utf8( encode_json(\@data) );
+
+        sleep 1;
+    }
+
+[Sys::Info 모듈][cpan-sys-info]은 현재 스크립트를 실행하는 장비의 CPU 사용률을 얻기위해 사용한 모듈입니다.
+CPU 사용률을 구할 때는 직접 `/proc/*` 하부의 값을 파싱한다던가 또는 다른 라이브러리를 사용해도 무방합니다.
+`DCPU_LOAD_LAST_01` 값은 최근 1분 동안의 CPU 사용률을 얻어오라는 의미입니다.
+매 1초마다 CPU 사용률을 구한 다음 순환 큐처럼 밀어내는 방식으로 총 600개의 `x`, `y` 좌표를 구합니다.
+생성한 좌표 자료는 JSON 형식으로 `cpu.json` 파일에 저장합니다.
+자료는 다음과 같은 형태로 저장됩니다.
+
+    #!plain
+    [
+      [0,0], [0.5,0], [1,0], [1.5,0], [2,0],  [2.5,0],  [3,0],  [3.5,0],
+      [4,0], [4.5,0], [5,0], [5.5,0], [6,0],  [6.5,0],  [7,0],  [7.5,0],
+      [8,0], [8.5,0], [9,0], [9.5,0], [10,0], [10.5,0], [11,0], [11.5,0],
+      ...
+    ]
+
+
+Mojolicious::Lite 웹앱 준비
+----------------------------
+
+`Mojolicious` 웹앱은 무척 간단합니다.
+Ajax를 사용해 동적으로 그래프를 갱신하는 것이 목적이므로 다음 두 개의 컨트롤러가 필요합니다.
+
+- `GET /`
+- `GET /cpu`
+
+`/` 컨트롤러는 그래프를 화면에 보여주기 위한 것이며 `/cpu` 컨트롤러는 `/` 페이지에서
+Ajax를 이용해 계속해서 새로운 자료로 갱신하기 위해 필요합니다.
+
+`/` 컨트롤러와 템플릿은 다음처럼 구성합니다.
+
+    #!perl
+    get '/' => 'index';
+
+    ...
+
+    __DATA__
+
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Welcome';
+
+    <div id="content">
+      <div class="demo-container">
+        <div id="placeholder" class="demo-placeholder"></div>
+      </div>
+    </div>
+
+`/cpu` 컨트롤러 JSON 형태의 응답만 반환하면 되기 때문에 렌더링할 템플릿을 정할 필요가 없으므로 다음처럼 구성합니다.
+
+    #!perl
+    get '/cpu' => sub {
+        my $self = shift;
+
+        return $self->respond_to(
+            json => {
+                status => 200,
+                text   => path('cpu.json')->slurp_utf8,
+            },
+        );
+    };
+
+`/` 페이지를 렌더링할 때 Flot 그래프를 보여주기 위해 필요한 CSS와 자바스크립트를 적재합니다.
+
+    #!xml
+    <style type="text/css">
+      .demo-container {
+        box-sizing: border-box;
+        width: 850px;
+        height: 450px;
+        padding: 20px 15px 15px 15px;
+        margin: 15px auto 30px auto;
+        border: 1px solid #ddd;
+        background: #fff;
+        background: linear-gradient(#f6f6f6 0, #fff 50px);
+    <style type="text/css">
+      .demo-container {
+        box-sizing: border-box;
+        width: 850px;
+        height: 450px;
+        padding: 20px 15px 15px 15px;
+        margin: 15px auto 30px auto;
+        border: 1px solid #ddd;
+        background: #fff;
+        background: linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      }
+
+      .demo-placeholder {
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        line-height: 1.2em;
+      }
+    </style>
+    <script language="javascript" type="text/javascript" src="/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/jquery.flot.min.js"></script>
+        background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      }
+
+      .demo-placeholder {
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        line-height: 1.2em;
+      }
+    </style>
+    <script language="javascript" type="text/javascript" src="/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/jquery.flot.min.js"></script>
+
+
+1초 단위 갱신!
+---------------
+
+1초 단위로 갱신하는 핵심 코드입니다.
+`getCpuLoad()` 함수가 `/cpu` 컨트롤러로 접근해 가장 최신의 CPU 정보를 얻어온 다음
+`plot.setData()` 메소드로 그래프에 들어갈 자료를 갱신하고 `plot.draw()` 메소드를
+호출해서 갱신된 자료와 일치하도록 눈에 보이는 그래프를 갱신합니다.
+
+    #!javascript
+    <script type="text/javascript">
+      $(function() {
+        var plot = $.plot("#placeholder", [], {
+          series: {
+            shadowSize: 4
+          },
+          yaxis: {
+            show: true,
+            min: 0,
+            max: 100
+          },
+          xaxis: {
+            show: false,
+            min: 0,
+            max: 300
+          }
+        });
+
+        function getCpuLoad() {
+          $.ajax("/cpu.json", {
+            type: 'GET',
+            success: function(data, textStatus, jqXHR) {
+              plot.setData([{ data: data, lines: { fill: true } }]);
+              plot.draw();
+            },
+          });
+        }
+
+        function update() {
+          getCpuLoad();
+          setTimeout(update, 1000); // 1초마다 갱신
+        }
+
+        update();
+      });
+    </script>
+
+
+전체 코드
+----------
+
+전체 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: cpu-web.pl
+    #
+
+    use Mojolicious::Lite;
+
+    use Path::Tiny;
+
+    get '/' => 'index';
+    get '/cpu' => sub {
+        my $self = shift;
+
+        return $self->respond_to( json => { status => 200, text => path('cpu.json')->slurp_utf8 } );
+    };
+
+    app->start;
+
+    __DATA__
+
+    @@ index.html.ep
+    % layout 'default';
+    % title 'R.I.P. @am0c - Seoul.pm 펄 크리스마스 달력 #2013';
+
+    <div id="content">
+      <div class="demo-container">
+        <div id="placeholder" class="demo-placeholder"></div>
+      </div>
+    </div>
+
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title><%= title %></title>
+        <style type="text/css">
+          .demo-container {
+            box-sizing: border-box;
+            width: 850px;
+            height: 450px;
+            padding: 20px 15px 15px 15px;
+            margin: 15px auto 30px auto;
+            border: 1px solid #ddd;
+            background: #fff;
+            background: linear-gradient(#f6f6f6 0, #fff 50px);
+            background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+            background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+            background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+            background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+          }
+
+          .demo-placeholder {
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            line-height: 1.2em;
+          }
+        </style>
+        <script language="javascript" type="text/javascript" src="/jquery.min.js"></script>
+        <script language="javascript" type="text/javascript" src="/jquery.flot.min.js"></script>
+        <script type="text/javascript">
+          $(function() {
+            var plot = $.plot("#placeholder", [], {
+              series: {
+                shadowSize: 4
+              },
+              yaxis: {
+                show: true,
+                min: 0,
+                max: 100
+              },
+              xaxis: {
+                show: false,
+                min: 0,
+                max: 300
+              }
+            });
+
+            function getCpuLoad() {
+              $.ajax("/cpu.json", {
+                type: 'GET',
+                success: function(data, textStatus, jqXHR) {
+                  plot.setData([{ data: data, lines: { fill: true } }]);
+                  plot.draw();
+                },
+              });
+            }
+
+            function update() {
+              getCpuLoad();
+              setTimeout(update, 1000); // 1초마다 갱신
+            }
+
+            update();
+          });
+        </script>
+      </head>
+      <body>
+        <%= content %>
+      </body>
+    </html>
+
+결과를 보려면 `cpu.pl`과 `cpu-web.pl` 두 코드 모두를 실행해야 합니다.
+우선 CPU 사용률을 모으는 `cpu.pl` 스크립트를 먼저 실행합니다.
+
+    #!bash
+    $ chmod 755 cpu.pl
+    $ ./cpu.pl
+
+이후 `cpu-web.pl` 웹앱을 실행합니다.
+
+    #!bash
+    $ morbo cpu-web.pl
+
+*그림 1*은 브라우저로 `http://localhost:3000`에 접속한 결과를 갈무리한 것입니다.
+
+![실시간 CPU 사용률][img-1-resize]
+*그림 1.* 실시간 CPU 사용률 ([원본][img-1])
+
+생각보다 그럴듯하죠? :)
+
+
+정리하며
+---------
+
+사실 차트를 그리는 핵심적인 부분은 자바스크립트 그래프 라이브러리가 대부분을 처리해줍니다.
+[Flot 그래프 라이브러리][home-flot] 말고도 수많은 미려한 그래프 라이브러리가 많으니 한 번 조사해보세요.
+라이브러리는 서로 다르더라도 실시간으로 그래프를 갱신시켜주는 기법은 모두 대동소이합니다.
+최소 그래프를 보여주기 위한 페이지 하나와 Ajax로 그래프의 자료에 해당하는 부분을
+갱신시켜줄 수 있는 컨트롤러가 하나 필요한 것이 전부입니다.
+자바스크립트 그래프 라이브러리의 장점은 렌더링 자원을 서버 대신 접속하는 클라이언트에게 전가시킬 수 있으며
+최근 HTML과 CSS의 발전으로 이미지로는 한계가 있는 미려한 실시간 그래프를 그릴 수 있다는 점입니다.
+민감한 자료라면 세부적인 수치 자체가 개방된다는 점이 단점인데 이런 부분만 유의한다면 다양하게 활용할 수 있을 것입니다.
+
+Enjoy Your Perl! ;-)
+
+![EOT][img-2]
+
+_EOT_
+
+
+[img-1]:          2013-12-08-1.png
+[img-2]:          2013-12-08-2.png style="margin: 0"
+
+[img-1-resize]:   2013-12-08-1_r.png
+[img-2-resize]:   2013-12-08-2_r.png
+
+
+[cpan-json]:                        https://metacpan.org/module/JSON
+[cpan-list-moreutils]:              https://metacpan.org/module/List::MoreUtils
+[cpan-mojolicious]:                 https://metacpan.org/module/Mojolicious
+[cpan-path-tiny]:                   https://metacpan.org/module/Path::Tiny
+[cpan-sys-info]:                    https://metacpan.org/module/Sys::Info
+[cpan]:                             http://www.cpan.org/
+[download-flot]:                    http://www.flotcharts.org/downloads/
+[home-flot]:                        http://www.flotcharts.org/
+[home-mojolicious]:                 http://mojolicio.us/
+[home-perlbrew]:                    http://perlbrew.pl/
+[search-cpan-sys-info-driver]:      https://metacpan.org/search?q=Sys%3A%3AInfo%3A%3ADriver
+[twitter-keedi]:                    http://twitter.com/#!/keedi
+[yes24-4433208]:                    http://www.yes24.com/24/goods/4433208
+[api-flot]:                         https://github.com/flot/flot/blob/master/API.md

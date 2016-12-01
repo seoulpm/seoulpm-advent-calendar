@@ -1,0 +1,193 @@
+Title:    디스크 정보 - 디렉토리 사용량, 디스크 남은 용량 등을 확인하기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
+홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+어떤 디렉토리의 용량, 즉 그 디렉토리 안에 있는 파일들과 서브디렉토리들이
+차지하는 용량의 총합이 얼마나 될까 궁금하면 어떡해야 할까요?
+[File::Find 모듈][perldoc-file-find]을 사용해서 서브디렉토리를 재귀적으로
+탐색하며 모든 파일들을 찾으면서, 각 파일들의 크기를 구해서 더하면 되겠죠!
+아니면 [qx()][perldoc-qx]를 사용하여 유닉스/리눅스 명령어인 [du][man-du]를
+실행한 후 출력으로 나온 문자열을 정규식을 써서 해석하면 되겠지요.
+
+디스크 전체의 사용량과 남은 용량이 궁금하다면 어떡해야 할까요?
+이번에도 리눅스 명령어인 [df][man-df]를 실행해 나온 출력을 갈무리한 후
+정규식을 써서 원하는 부분을 추출하면 됩니다.
+
+흠...
+
+전부 맘에 들지 않는다는 까다로운 사람들을 위해, 다른 방법을 알아봅시다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Filesys::DiskUsage 모듈][cpan-filesys-diskusage]
+- [CPAN의 Filesys::DfPortable 모듈][cpan-filesys-dfportable]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Filesys::DiskUsage \
+        Filesys::DfPortable
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Filesys::DiskUsage \
+        Filesys::DfPortable
+
+
+파일 또는 디렉토리 사용량 알아내기
+-----------------------------------
+
+다음과 같이 사용합니다.
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+
+    use Filesys::DiskUsage qw/du/;
+
+    # 특정 파일이나 디렉토리의 용량
+    my $usage = du( '/Users/gypark/local/eclipse' );
+    
+    # 여러 파일과 디렉토리의 용량 합
+    my $total = du( qw(file1 dir1 dir2) );
+    
+    # 합 대신 각 용량들의 배열을 얻으려면
+    my @sizes = du( qw(file1 dir1 dir2) );
+
+    # 각 대상과 용량을 짝지은 해시를 얻으려면
+    my %sizes = du( { 'make-hash' => 1 }, qw(file1 dir1 dir2) );
+    
+    # %sizes = (
+    #    file1 => ...,
+    #    dir1  => ...,
+    #    dir2  => ...
+    #  )
+
+다만 이 모듈을 통해 얻어낸 값은, 셸에서 `du` 명령어를 써서 얻어낸 값과 정확히 일치하지는 않습니다.
+셸의 `du` 명령어는 파일이 실제로 차지하는 디스크 블록의 크기를 출력하는데,
+`Filesys::DiskUsage` 모듈이 파일의 크기를 계산할 때는 파일 자체의 바이트 크기를 가져오기 때문입니다.
+
+자신이 사용하는 디스크의 할당 블록 크기는 다음과 같이 알 수 있습니다.
+
+    #!bash
+    # 리눅스: blockdev --getbsz <검사하려는 장치>
+    # blockdev --getbsz /dev/mapper/VolGroup00-LogVol00
+    4096
+    
+    # MacOSX: diskutil info <장치>
+    $ diskutil info / | grep 'Block Size'
+    Device Block Size:        512 Bytes
+    Allocation Block Size:    4096 Bytes 
+
+위의 경우는 리눅스와 맥 다 4096바이트를 기본 할당 블록의 크기로 사용하고 있습니다.
+즉 우리가 1바이트짜리 파일을 만들어도, 그 파일은 디스크에서 4096바이트를 차지하게 됩니다.
+이 값을 반영하고 싶으면 `sector-size` 옵션을 명시합니다.
+
+    #!perl
+    my $alloc_size = du( { 'sector-size' => 4096 }, 'file1' );
+    
+이외에도 여러 옵션이 있습니다.
+자세한 것은 [모듈 문서][cpan-filesys-diskusage]를 참고하세요.       
+
+
+디스크의 남은 용량 확인하기
+----------------------------
+
+다음과 같이 파일시스템의 전체 정보를 얻을 수 있습니다.
+다음 코드는 모듈 문서에 있는 거의 그대로입니다.
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+
+    use Filesys::DfPortable;
+    
+    my $ref = dfportable('/');
+    
+    if ( defined($ref) ) {
+        print "전체 바이트    : $ref->{blocks}\n";
+        print "미사용 바이트  : $ref->{bfree}\n";
+        print "가용 바이트    : $ref->{bavail}\n";
+        print "사용 바이트    : $ref->{bused}\n";
+        print "사용 퍼센테이지: $ref->{per}\n"
+    }
+
+실행 결과는 다음과 같은 식입니다.
+
+    #!bash
+    $ perl df.pl
+    전체 바이트    : 19632164864
+    미사용 바이트  : 4333805568
+    가용 바이트    : 3320463360
+    사용 바이트    : 15298359296
+    사용 퍼센테이지: 82
+
+"미사용 바이트"와 "가용 바이트"가 따로 있고, 이 값은 서로 같지 않을 수 있습니다.
+사용자 별로 디스크 쿼터가 할당되어 있거나 하면 자신이 쓸 수 있는 가용 바이트는
+미사용 바이트보다 작아질 것입니다.
+
+`$ref` 해시 레퍼런스의 각 키에 해당하는 값들은(`{per}`를 제외하고) 기본 단위가 블록의 개수입니다.
+그런데 한 블록 당 1바이트라고 상정한 상태에서 계산이 되므로, 결과적으로는 단위가 바이트인 것과 같습니다.
+
+`dfportable()` 함수의 두 번째 인자로 블록 크기를 지정해줄 수 있습니다.
+
+    #!perl
+    use Filesys::DfPortable;
+    
+    my $ref = dfportable('/', 1024);   # 1KB
+    print "1KB 블록의 개수    : $ref->{blocks}\n";
+ 
+"1KB 블록의 개수"란 것은 결국 크기를 KB 단위로 쓴 것과 같겠죠?
+
+이 외에도 아이노드의 전체 개수, 사용 중인 아이노드의 개수 등을 알 수도 있습니다.
+단 파일시스템에서 지원하는 경우에만 그렇습니다.
+자세한 것은 [모듈 문서][cpan-filesys-dfportable]를 참고하세요.
+
+
+정리하며
+----------
+
+물론 외부 명령을 이용해서도 디렉터리나 디스크 사용량을 알아낼 수 있고,
+또 쉘 스크립트를 사용한다면 선택의 여지는 별로 없겠죠.
+하지만 때에 따라서는 외부 프로세스를 실행하는 것이 불가능한
+내부적 또는 외부적 이유가 있을 때도 있죠. 
+[CPAN의 Filesys::DiskUsage 모듈][cpan-filesys-diskusage]과
+[CPAN의 Filesys::DfPortable 모듈][cpan-filesys-dfportable]을 사용한다면
+더이상 외부 명령어를 실행하고 그 출력을 정규식을 써서 추출하지 않아도 됩니다.
+스크립트의 수행 속도가 빨라지는 것은 덤이랍니다. :-)
+
+
+[cpan-filesys-dfportable]:      https://metacpan.org/pod/Filesys::DfPortable
+[cpan-filesys-diskusage]:       https://metacpan.org/pod/Filesys::DiskUsage
+[cpan]:                         http://www.cpan.org/
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[home-perlbrew]:                http://perlbrew.pl/
+[man-df]:                       http://man7.org/linux/man-pages/man1/df.1.html
+[man-du]:                       http://man7.org/linux/man-pages/man1/du.1.html
+[perldoc-file-find]:            http://perldoc.perl.org/File/Find.html
+[perldoc-qx]:                   http://perldoc.perl.org/functions/qx.html
+[twitter-gypark]:               http://twitter.com/gypark

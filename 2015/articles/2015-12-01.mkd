@@ -1,0 +1,156 @@
+Title:    CPAN을 내 품에
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+펄 사용자에게 있어서 [CPAN][cpan](Comprehensive Perl Archive Network)은 정말 거대한 보물 창고입니다.
+홈페이지의 설명에 보다보면 심지어 "LWPs, POEs, and DBIs -- oh my!"와 같은 부제가 달려있기도 하죠.
+
+![CPAN][img-1-resize]
+*그림 1.* CPAN: LWPs, POEs, and DBIs -- oh my! ([원본][img-1])
+
+CPAN은 1995년에 시작해서 현재까지 규모가 꾸준히 증가해서 기사를 쓰는 현 시점 기준으로
+CPAN에는 157,981개의 펄 모듈과 32,708개의 배포판과 12,469명의 저자, 235개의 서버가 있습니다.
+사실 CPAN은 한국에도 미러서버가 많은지라 대부분의 경우 불편함을 느끼지는 못합니다.
+하지만 모듈을 개발한다던가, 다수의 장비에 다수의 모듈을 빈번하게 설치하고, 관리하고,
+배포하는 경우 지역의 미러 서버를 이용한다하더라도 속도 측면에서 불편함이 있긴합니다.
+이런 경우 단체 또는 사내, 심지어 개인 서버에 미러 서버를 구축하면 모듈 설치 및
+업데이트 속도를 획기적으로 개선할 수 있습니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 File::Rsync::Mirror::Recent 모듈][cpan-file-rsync-mirror-recent]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan File::Rsync::Mirror::Recent
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan File::Rsync::Mirror::Recent
+
+
+미러링
+-------
+
+`File::Rsync::Mirror::Recent` 모듈은 [rrr-client][cpan-file-rsync-mirror-recent-bin-rrr-client]라는
+명령줄 유틸리티를 제공합니다.  `rrr-client`는 원격 서버의 갱신 사항을 지속적으로
+지역쪽에 반영해서 미러 서버가 제 역할을 할 수 있도록 도와주는 도구입니다.
+이 외에도 미러링 서버를 지원하기 위한 다양한 도구가 있으니 [공식 문서][cpan-file-rsync-mirror-recent]를 확인하세요.
+
+거창하게 설명하지만 사용법 자체는 생각보다 간단합니다.
+
+    #!bash
+    $ rrr-client --source <source to mirror from> --target <destination directory>
+
+놀랍지만 이것이 전부입니다. 사실 `F:R:M:R` 모듈은 [rsync][home-rsync]에 기반해서 동작하면서
+더욱 효율적으로 미러링을 할 수 있도록 내부적으로 처리합니다.
+따라서 `rsync`와 `F:R:M:R`을 병행해서 사용할 때는 처리 방식에 따른 문제로 인해
+미러가 오염될 여지가 있으므로 공식 문서를 참조해서 정교하게 사용해야 합니다.
+
+준비한 서버의 사용자 계정이 `cpan`이고 `~/CPAN` 디렉터리에 미러링을 한다고 가정해보죠.
+
+    #!bash
+    $ rrr-client \
+        --source cpan-rsync.perl.org::CPAN/RECENT.recent \
+        --target /home/cpan/CPAN
+
+얼마간의 시간이 지나면 미러가 마무리 되고 `~/CPAN` 디렉터리 하부에는 CPAN 사이트가
+통째로 복제되어 있을 것입니다. 이제, 정적 페이지를 웹으로 제공하기 위해 웹서버 설정을
+해야 합니다. [nginx][home-nginx] 기준으로 설정 파일을 살펴보죠.
+
+    #!plain
+    server {
+        server_name                 cpan.mysite.com;
+        listen                      80;
+        root                        /home/cpan/public_html;
+        error_page                  404 /404.html;
+        location / {
+            index     index.html;
+        }
+        access_log                  /var/log/nginx/cpan.mysite.com/access.log;
+        error_log                   /var/log/nginx/cpan.mysite.com/error.log;
+        large_client_header_buffers 4 16k;
+    }
+
+제대로 설정했다면 nginx를 재구동한 뒤 설정한 도메인으로 접속하면 cpan과 동일한 화면을
+확인 할 수 있습니다.
+
+
+미러 사용
+----------
+
+구슬이 서말이라도 꿰어야 보배라죠? 미러를 설정했으면 해당 미러를 이용해서 설치해야죠.
+미러를 사용하는 방법 역시 간단합니다. `cpan`을 사용한다면 다음 명령을 이용하세요.
+
+    #!bash
+    $ cpan
+    cpan[1]> o conf urllist
+        urllist           
+            0 [http://httpupdate3.cpanel.net/CPAN/]
+            1 [http://httpupdate23.cpanel.net/CPAN/]
+            2 [http://mirrors.servercentral.net/CPAN/]
+            3 [ftp://cpan.cse.msu.edu/]
+    cpan[2]> o conf urllist unshift http://cpan.mysite.com
+    cpan[3]> o conf commit
+    cpan[4]> q
+    $ cpan
+    cpan[1]> install Foo::Bar
+
+[App::cpanminus][cpan-app-cpanminus]를 사용한다면 조금 더 간단하게 미러를 사용할 수 있습니다.
+
+    #!bash
+    $ cpanm --mirror http://cpan.mysite.com Foo::Bar
+
+
+정리하며
+---------
+
+CPAN은 항상 우리 곁에 있는 소중한 보물 창고입니다.
+가끔씩은 여러가지 이유로 CPAN에 접속하기가 힘들 때도 있죠.
+또는 CPAN을 공격적으로 사용하고 싶은데 속도 때문에 효율이 떨어지는 경우도 있고,
+또 이 모든 이유가 아니더라도 왠지 CPAN을 내 피씨 또는 내 서버에 복사본을 갖고
+싶다는 단순한 이유일 수도 있습니다.
+물론 여러분이 훌륭한 네트워크를 가지고 있어서 펄 커뮤니티에 공헌하고 싶어서 일수도 있구요.
+펄과 CPAN은 포함하는 라이브러리 뿐만 아니라 그 자체 역시도 모두 자유를 추구하고
+갈망하는 오픈소스 프로젝트입니다.
+CPAN의 수많은 미러 서버와 그 미러링을 하는 도구 조차 CPAN 안에 있다는 사실은 나름 오묘하죠?
+CPAN과 펄 둘 모두 여러분에게도 언제나 열려 있다는 점 잊지마세요!
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+
+[img-1]:          2015-12-01-1.png
+
+[img-1-resize]:   2015-12-01-1_r.png
+
+[cpan-app-cpanminus]:                           https://metacpan.org/pod/App::cpanminus
+[cpan-file-rsync-mirror-recent-bin-rrr-client]: https://metacpan.org/pod/distribution/File-Rsync-Mirror-Recent/bin/rrr-client
+[cpan-file-rsync-mirror-recent]:                https://metacpan.org/pod/File::Rsync::Mirror::Recent
+[cpan]:                                         http://www.cpan.org/
+[home-nginx]:                                   http://nginx.org/
+[home-perlbrew]:                                http://perlbrew.pl/
+[home-rsync]:                                   https://rsync.samba.org/
+[twitter-keedi]:                                http://twitter.com/#!/keedi
+[yes24-4433208]:                                http://www.yes24.com/24/goods/4433208

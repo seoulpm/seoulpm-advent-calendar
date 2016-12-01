@@ -1,0 +1,212 @@
+Title:    내 택배가 어디쯤 왔을까?
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+대부분의 직장인들에게 택배는 주문 및 결제를 완료한 순간부터 관심 그 자체입니다.
+'늦게 주문했는데 내일 올까? 아니 일괄 배송 시간이 지났으니 모레나 올거야.' 등
+사실 우리가 택배가 어디있는지 관심을 보이든 보이지 않든 택배가 대문 앞에 도착하는
+시간에는 하등 차이가 없음에도 관심을 놓을 수 없다는 것이 사실이긴 하지만요. :)
+대부분의 택배사는 물류 및 배송 조회 서비스를 홈페이지에 제공하고 있으므로
+이를 이용해도 되고, 각 쇼핑몰 홈페이지나, 택배 전용 모바일 전용 앱을 통해서도
+배송현황을 조회할 수 있으니 세상 참 많이 편해졌죠?
+하지만 역시 우리는 펄 해커! 해커에게 모든 것의 기본은 명령줄이죠?
+꼭 해커여서가 아니더라도 명령줄에서 택배를 열람할 수 있다면
+여러분이 상상해서 만들 수 있는 것이 더 많아질지도 모르겠네요.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Parcel::Track 모듈][cpan-parcel-track]
+- [CPAN의 Parcel::Track::KR::CJKorea 모듈][cpan-parcel-track-kr-cjkorea]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+      Parcel::Track \
+      Parcel::Track::KR::CJKorea
+
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+      Parcel::Track \
+      Parcel::Track::KR::CJKorea
+
+
+Parcel::Track
+--------------
+
+`Parcel::Track` 모듈은 택배 추적을 위해 API를 제공하는 드라이버 기반의 모듈입니다.
+말이 복잡한데 간단하게 말하면 `Parcel::Track` 모듈 자체는 API만 제공하며,
+하부의 별도 드라이버 모듈이 각 배송사 별 택배 추적 기능을 구현하는 것입니다.
+이렇게 구현함으로써 사용자는 API 모듈의 일관된 사용법을 이용해서 드라이버만
+변경하며 간단히 택배를 추적할 수 있습니다.
+
+현재 `Parcel::Track` 모듈을 지원하는 드라이버 모듈의 목록은 다음과 같습니다.
+
+- [CPAN의 Parcel::Track::KR::CJKorea 모듈][cpan-parcel-track-kr-cjkorea]
+- [CPAN의 Parcel::Track::KR::Dongbu 모듈][cpan-parcel-track-kr-dongbu]
+- [CPAN의 Parcel::Track::KR::Hanjin 모듈][cpan-parcel-track-kr-hanjin]
+- [CPAN의 Parcel::Track::KR::KGB 모듈][cpan-parcel-track-kr-kgb]
+- [CPAN의 Parcel::Track::KR::PostOffice 모듈][cpan-parcel-track-kr-postoffice]
+- [CPAN의 Parcel::Track::KR::Yellowcap 모듈][cpan-parcel-track-kr-yellowcap]
+
+[CJ대한통운][home-cj-korea-express] 택배사를 기준으로 설명하기 때문에
+`Parcel::Track::KR::CJKorea` 모듈을 설치했지만, 실제로 다른 배송사의 택배까지
+조회하려면 나머지 모듈도 설치해야 합니다.
+
+`Parcel::Track` 모듈의 API는 매우 간단합니다.
+네 개의 메소드를 제공하는데 각각의 메소드도 매우 직관적입니다.
+메소드의 목록은 다음과 같습니다.
+
+- `new`
+- `id`
+- `uri`
+- `track`
+
+대부분의 사용자는 `new` 메소드로 객체를 생성한 후 `track` 메소드로
+배송 정보를 조회하는 것으로 원하는 작업은 마무리 됩니다.
+
+    #!perl
+    # Create a tracker
+    my $tracker = Parcel::Track->new( 'KR::CJKorea', '690256848955' );
+
+다른 배송사의 택배를 조회한다면 `Pracel::Track` 모듈 객체 생성시
+첫 번째 인자인 드라이버 이름을 변경합니다.
+[우체국 택배][home-post-office]를 예로 든다면 코드를 다음과 같이 변경해야 합니다.
+
+    #!perl
+    # Create a tracker
+    my $tracker = Parcel::Track->new( 'KR::PostOffice', '1234567890' );
+
+물론 `Parcel::Track::KR::PostOffice` 모듈을 설치하는 것을 잊으시면 안되겠죠?
+
+    #!perl
+    # ID & URI
+    print $tracker->id . "\n";
+    print $tracker->uri . "\n";
+
+배송 조회와는 별개로 `id` 메소드를 이용하면 생성자에 운송장 번호를 열람할 수 있고,
+`uri` 메소드를 이용하면 웹브라우저를 통해 배송 조회 열람 페이지에 바로 접근할 수 있는
+웹 주소를 획득할 수 있습니다.
+
+    #!perl
+    # Track the information
+    my $result = $tracker->track;
+
+실제로 택배사 홈페이지를 통해 배송 조회 정보를 얻기 위해서는 `track` 메소드를 호출해야 합니다.
+호출한 결과는 해시 참조(reference)로 반환되며 이 해시에는 다음과 같은 해시 키 안에 정보가 들어있습니다.
+
+- `from`: 스칼라, 보낸 사람 정보
+- `to`: 스칼라, 받는 사람 정보
+- `result`: 스칼라, 호출한 시점 배송 최종 상태
+- `descs`: 배열 참조, 배송 출발 부터 시작해서 현 시점까지 배송 상태
+- `htmls`: 배열 참조, 실제 웹페이지의 HTML 조회 영역
+
+
+배송 조회
+----------
+
+CJ대한통운을 기준으로 운송장 조회를 하는 전체 코드를 살펴보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+    use Parcel::Track;
+    use Encode qw( decode_utf8 );
+
+    binmode STDOUT, ':encoding(UTF-8)';
+    
+    # Create a tracker
+    my $tracker = Parcel::Track->new( 'KR::CJKorea', '690256848955' );
+    
+    # ID & URI
+    print $tracker->id . "\n";
+    print $tracker->uri . "\n";
+    
+    # Track the information
+    my $result = $tracker->track;
+    
+    # Get the information what you want.
+    if ( $result ) {
+        print decode_utf8( "$result->{from}\n" );
+        print decode_utf8( "$result->{to}\n" );
+        print decode_utf8( "$result->{result}\n" );
+        print decode_utf8("$_\n") for @{ $result->{descs} };
+        print decode_utf8("$_\n") for @{ $result->{htmls} };
+    }
+    else {
+        print "Failed to track information\n";
+    }
+
+실행한 결과 화면은 다음과 같습니다.
+
+![result-parcel-track][img-1-resize]
+*그림 1.* 배송 조회 결과 ([원본][img-1])
+
+
+정리하며
+---------
+
+제 경우 [후원하는 단체][home-opencloset]의 내부 물류를 전산화하는 과정 중
+물품 반납시 손쉽게 배송 추적을 할 수 있도록 지원하면서 만들고, 사용한 모듈입니다.
+이미 택배사 홈페이지와 모바일 앱으로 조회가 가능하지만, 하루에도 백여건 이상의
+택배가 오고 가는 곳에서 이를 일일이 사람이 운송장 번호를 입력하고 눈으로 확인하는
+것은 무척 고된 일이죠. (물론 실제로 고되게 일했었습니다만...)
+
+택배 배송 조회는 기술적으로 어려운 작업이 아닙니다.
+다만 번거롭고 지저분한 작업일 뿐이죠.
+국내 배송사가 멋드러지게 REST API를 제공해주리라고 기대하는 것은 무리기도 하구요.
+(물론 계약을 맺고, 비용을 지불한 뒤 API를 제공받는 경우는 제외하죠. :)
+펄(Perl)과 [CPAN][cpan]은 여러분의 손을 조금이라도
+덜 더럽힐 수 있게 항상 준비되어 있다는 사실을 잊지마세요!
+
+Enjoy Your Perl! ;-)
+
+P.S.
+
+그나저나 금요일에 주문한 제 택배는 왜 아직도 배송중일까요? :,-(
+
+_EOT_
+
+
+[img-1]:          2015-12-02-1.png
+
+[img-1-resize]:   2015-12-02-1_r.png
+
+[cpan-parcel-track-kr-cjkorea]:     https://metacpan.org/pod/Parcel::Track::KR::CJKorea
+[cpan-parcel-track-kr-dongbu]:      https://metacpan.org/pod/Parcel::Track::KR::Dongbu
+[cpan-parcel-track-kr-hanjin]:      https://metacpan.org/pod/Parcel::Track::KR::Hanjin
+[cpan-parcel-track-kr-kgb]:         https://metacpan.org/pod/Parcel::Track::KR::KGB
+[cpan-parcel-track-kr-postoffice]:  https://metacpan.org/pod/Parcel::Track::KR::PostOffice
+[cpan-parcel-track-kr-yellowcap]:   https://metacpan.org/pod/Parcel::Track::KR::Yellowcap
+[cpan-parcel-track]:                https://metacpan.org/pod/Parcel::Track
+[cpan]:                             http://www.cpan.org/
+[home-cj-korea-express]:            https://www.doortodoor.co.kr/main/index.jsp
+[home-opencloset]:                  http://theopencloset.net/
+[home-perlbrew]:                    http://perlbrew.pl/
+[home-post-office]:                 http://www.epost.go.kr/main.retrieveMainPage.comm
+[twitter-keedi]:                    http://twitter.com/#!/keedi
+[yes24-4433208]:                    http://www.yes24.com/24/goods/4433208

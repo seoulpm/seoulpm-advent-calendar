@@ -1,5 +1,6 @@
 package WWW::AdventCalendar::MultiMarkdown;
-use 5.010;
+
+use v5.18;
 use strict;
 use warnings;
 use base qw(Text::MultiMarkdown);
@@ -37,6 +38,7 @@ sub _DoCodeBlocks {
         $codeblock =~ s/\n+\z//;  # trim trailing newlines
 
         my $brush;
+        no warnings qw( experimental );
         given ($codeblock) {
             when ( /^\s*#!bash$/ism       ) { $brush = 'bash'    }
             when ( /^\s*#!cpp$/ism        ) { $brush = 'cpp'     }
@@ -44,6 +46,7 @@ sub _DoCodeBlocks {
             when ( /^\s*#!ini$/ism        ) { $brush = 'ini'     }
             when ( /^\s*#!java$/ism       ) { $brush = 'java'    }
             when ( /^\s*#!javascript$/ism ) { $brush = 'jscript' }
+            when ( /^\s*#!lisp$/ism       ) { $brush = 'lisp'    }
             when ( /^\s*#!perl$/ism       ) { $brush = 'perl'    }
             when ( /^\s*#!plain$/ism      ) { $brush = 'plain'   }
             when ( /^\s*#!sql$/ism        ) { $brush = 'sql'     }

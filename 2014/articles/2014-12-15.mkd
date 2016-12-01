@@ -1,0 +1,189 @@
+Title:    로그에 색을 입혀보자
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aer0
+
+저자
+-----
+
+[@aer0][twitter-aer0] -
+Seoul.pm, #perl-kr의 정신적 지주,
+Perl에 대한 근원적이면서 깊은 부분까지 놓치지 않고 다루는 [홈페이지 및 블로그][home-aer0]를 운영하고 있다.
+aero라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+시스템을 다루다 보면 각종 로그를 `tail` 등의 명령어로 볼 일이 많습니다.
+이럴 때 특정 문자열이 포함되거나 패턴에 일치하는 줄은 더 눈에 잘 띄도록
+색을 넣어준다면 확연히 구분이 되어 더욱 가독성이 높아지겠죠?
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 cet 모듈][cpan-cet]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan cet
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan cet
+
+
+간단한 방법
+------------
+
+가장 간단하게 원하는 색을 넣는 방법은 `sed`나 펄 원라이너를 이용하는 것입니다.
+다음은 `Opera`라는 문자열이 들어간 줄을 빨간색으로 표시하는 예제입니다.
+테스트용 아파치 로그인 `access.log`는 구글에서 검색해서 가져온 샘플입니다.
+
+    #!bash
+    $ tail -f access.log | sed 's/^\(.*Opera.*\)$/\x1b[31m\1\x1b[0m/'
+    $ tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/'
+
+*그림 1*은 일치하는 줄에 색상을 넣어본 결과입니다.
+
+![일치하는 줄에 색상 넣기][img-1-resize]
+*그림 1.* 일치하는 줄에 색상 넣기 ([원본][img-1])
+
+`sed`의 경우 `s/매칭할정규식/교체할문자열/` 패턴으로 `Opera`가
+들어간 줄의 처음부터 끝까지 정규식으로 그룹 캡쳐를 수행합니다.
+교체할 문자열 부분에서 캡쳐한 것을 나타내는 `\1` 앞과 뒤에
+ANSI 칼라 코드를 나타내는 문자를 넣어 색깔을 넣고 있습니다.
+`\x1b`는 ANSI칼라코드를 적용하기 위한 회피 문자(escape character)이고,
+`[31m`, `[0m`이 어떤 동작을 수행할지 나타내는 코드입니다.
+`[31m`은 빨간색으로 바꾸라는 것이고, `[0m`은 다시 원상태로 돌리라는 뜻입니다.
+각 칼라코드는 [Bash tips: Colors and formatting][bash-tips] 문서를 참고하세요.
+
+펄의 경우 `\x1b`가 `\e`로 바뀌고, 정규식을 매칭한 부분이
+`$&` 특수변수로 바뀐것 빼고는 비슷합니다.
+물론 펄은 `sed`보다 정규식에서 더 강력하므로 복잡한 패턴을
+찾아야 할 경우 더 유용합니다.
+
+모든 줄이 아니라 특정 부분만 색을 넣으려면 다음과 같은 식으로 하면 되겠죠.
+
+    #!bash
+    $ tail -f access.log | sed 's/\(Opera\)/\x1b[31m\1\x1b[0m/'
+    $ tail -f access.log | perl -pe 's/Opera/\e[31m$&\e[0m/'
+
+*그림 2*는 일치하는 줄이 아닌 일치하는 부분에만 색상을 넣어본 결과입니다.
+
+![일치하는 부분에 색상 넣기][img-2-resize]
+*그림 2.* 일치하는 부분에 색상 넣기 ([원본][img-2])
+
+*또 다른 패턴은 어떤 색*과 같은 식으로 계속 추가하려면 `;`으로 구분해 추가합니다.
+
+    #!bash
+    $ tail -f access.log | sed 's/^\(.*Opera.*\)$/\x1b[31m\1\x1b[0m/;s/^\(.*Mozilla.*\)$/\x1b[32m\1\x1b[0m/'
+    $ tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/.*Mozilla.*/\e[32m$&\e[0m/'
+
+*그림 3*은 패턴과 색상을 추가한 결과입니다.
+
+![패턴과 색상 추가하기][img-3-resize]
+*그림 3.* 패턴과 색상 추가하기 ([원본][img-3])
+
+
+한계
+-----
+
+여러 패턴을 쓰더라도 특정 패턴이 들어간 줄은 빨간색을 표시하되,
+로그의 URL부분은 녹색으로 표시하고 싶다고 가정해보죠.
+하지만 앞의 방법을 사용할 경우, 앞쪽의 패턴에서 바꿔놓은 결과에
+다음 패턴이 중간에서 원상복구 시켜버리는 식으로 동작하기 때문에
+원하는대로 표시하기가 어렵습니다.
+
+    #!bash
+    $ tail -f access.log | perl -pe 's/.*Opera.*/\e[31m$&\e[0m/;s/(http:[^"]+)/\e[32m$&\e[0m/'
+
+*그림 4*를 살펴보면 의도했던 것과는 다르게 출력됨을 알 수 있습니다.
+
+![원하는대로 표시하지 못하는 복합 패턴][img-4-resize]
+*그림 4.* 원하는대로 표시하지 못하는 복합 패턴 ([원본][img-4])
+
+그러면 색상 코드를 찾아 복잡하게 치환하는 정규식을 쓰기는 싫지만
+원하는 패턴에 대해 원하는 색상을 쉽게 표시하고 싶다면 어떻게 해야할까요?
+찾아보면 이런 류의 작업을 해주는 유틸리티가 제법 있지만,
+[CPAN의 cet 모듈][cpan-cet]을 사용하면 무척 간편합니다.
+
+
+cet
+----
+
+[cet 모듈][cpan-cet]은 동일한 이름의 `cet` 명령을 제공합니다.
+명령줄에서 다음 명령을 실행해보세요.
+
+    #!bash
+    $ tail -f access.log | cet .*Opera.* red  "http:[^\"]+" green
+
+*그림 5*는 `cet` 명령을 사용한 결과입니다.
+
+![cet 예제][img-5-resize]
+*그림 5.* cet 예제 ([원본][img-5])
+
+`cet` 명령의 사용법은 무척 간단합니다.
+
+    #!plain
+    cet REGEX1 [COLOR1] [REGEX2 [COLOR2]] ... [REGEXn [COLORn]]
+
+색상을 의미하는 `COLORn`는 [CPAN의 Term::ANSIColor 모듈][cpan-term-ansicolor]에
+정의되어있는 `red`나 `bright_red` 등의 값을 사용할 수 있습니다.
+*밑줄친 빨간색*과 같은 여러가지 속성과 색을 조합할 경우는
+`"underline red"`처럼 `"..."`로 묶어 사용하면 됩니다.
+
+`Opera`가 들어간 줄은 반전된 밝은 빨간색으로 표시하고,
+URL은 밑줄이 들어간 녹색으로 표시하고 싶다면 실행할 명령은 다음과 같습니다.
+
+    #!bash
+    $ tail -f access.log | cet .*Opera.* "reverse bright_red"  "http:[^\"]+" "underline green"
+
+*그림 6*은 `cet`를 사용해서 복잡한 요구사항을 모두 만족하는
+결과물을 출력한 화면입니다.
+
+![최종 결과][img-6-resize]
+*그림 6.* 최종 결과 ([원본][img-6])
+
+참 쉽죠? :)
+
+
+정리하며
+---------
+
+[cet][cpan-cet]를 사용하면, 복잡한 로그에 다양한 일치 요구 사항이
+있더라도 손쉽게 원하는 패턴과 색상을 추가할 수 있습니다.
+필요한 것은 오직 펄과 [cet 모듈][cpan-cet]과 정규표현식에 대한 약간의 이해 뿐입니다.
+이제 로그에 크리스마스트리 조명처럼 예쁜 색을 칠해서
+연말연시 크리스마스 기분을 느껴보세요~ :)
+
+
+[img-1]:          2014-12-15-1.png
+[img-2]:          2014-12-15-2.png
+[img-3]:          2014-12-15-3.png
+[img-4]:          2014-12-15-4.png
+[img-5]:          2014-12-15-5.png
+[img-6]:          2014-12-15-6.png
+
+[img-1-resize]:   2014-12-15-1_r.png
+[img-2-resize]:   2014-12-15-2_r.png
+[img-3-resize]:   2014-12-15-3_r.png
+[img-4-resize]:   2014-12-15-4_r.png
+[img-5-resize]:   2014-12-15-5_r.png
+[img-6-resize]:   2014-12-15-6_r.png
+
+[bash-tips]:                http://misc.flogisoft.com/bash/tip_colors_and_formatting
+[cpan-cet]:                 https://metacpan.org/module/cet
+[cpan-term-ansicolor]:      https://metacpan.org/source/RRA/Term-ANSIColor-4.03/lib/Term/ANSIColor.pm#L111
+[cpan]:                     http://www.cpan.org/
+[home-aer0]:                http://aero.sarang.net/
+[home-perlbrew]:            http://perlbrew.pl/
+[twitter-aer0]:             http://twitter.com/#!/aer0

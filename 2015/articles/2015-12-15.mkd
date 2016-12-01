@@ -1,0 +1,176 @@
+Title:    디스크 정보 - 현재 작업 디렉토리 알기, cwd와 getcwd
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   gypark
+
+저자
+-----
+
+[@gypark][twitter-gypark] - [gypark.pe.kr][gypark-home]의 주인장.
+홈페이지에 [Perl에 대해 정리][gypark-perl]해두는 취미가 있고, Raymundo라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+어떤 프로그램을 실행할 때, 시스템의 디스크 드라이브에 대해 이런 저런 정보를
+얻어야 할 때가 있습니다. 그 중의 하나는 이 프로그램이 연결된
+"작업 디렉토리(working directory)"입니다. 프로그램 내에서 파일 관련 연산을 할 때
+상대 경로로 지정된 경로명은 모두 이 작업 디렉토리를 기준으로 동작하게 됩니다.
+펄 스크립트 내에서는 `chdir` 내장 함수를 사용하여 작업 디렉토리를 변경할 수 있지만,
+현재 작업 디렉토리가 어디인지를 알아내는 내장 함수(유닉스의 `pwd` 같은)는 따로 없습니다.
+그러나 이 기능을 제공하는 모듈이 있습니다.
+
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [Cwd 모듈][perldoc-cwd]
+
+이 모듈은 펄 배포본에 기본적으로 포함되어 있으니 별도로 설치할 필요는 없습니다.
+
+
+
+시작
+-----
+
+다음과 같이 사용합니다.
+
+    #!perl
+    use Cwd;
+
+    # 프로토타이핑이 되어 있어 굳이 getcwd()라고 괄호를 쓰지 않아도 됨
+    my $dir = getcwd;
+
+    # 또는
+    my $dir = cwd;
+
+`$dir` 변수에는 `/home/gypark/temp/perl/cwd` 등과 같은 값이 들어갈 것입니다.
+
+
+
+cwd와 getcwd의 차이?
+---------------------
+
+어째서 동일한 값을 반환하는 함수가 두 가지가 있는가? 사실은 동일한 값을 반환하지
+않을 때가 있습니다. 예를 들어 심볼릭 링크가 연관되어 있을 때입니다.
+
+다음과 같이 두 개의 디렉토리를 구성해봅시다.
+
+    #!bash
+    [gypark cwd]$ mkdir orig
+    [gypark cwd]$ ln -s orig symlink
+    [gypark cwd]$ ls -l
+
+    rwxr-xr-x   2 gypark staff  68 12 14 14:13 orig/
+    lrwxr-xr-x  1 gypark staff   4 12 14 14:13 symlink@ -> orig
+
+그리고 두 함수를 각각 출력하는 코드를 만듭니다.
+
+    #!perl
+    use Cwd;
+    use 5.010;
+
+    say "cwd:    ", cwd();
+    say "getcwd: ", getcwd();
+
+이 코드를 `orig` 디렉토리와 `symlink` 디렉토리 안에서 각각 실행해보겠습니다.
+
+    #!bash
+    [gypark cwd]$ cd orig
+    [gypark orig]$ perl ../cwd.pl
+
+    cwd:    /Users/gypark/temp/cwd/orig
+    getcwd: /Users/gypark/temp/cwd/orig
+
+    [gypark orig]$ cd ../symlink
+    [gypark symlink]$ perl ../cwd.pl
+
+    cwd:    /Users/gypark/temp/cwd/symlink
+    getcwd: /Users/gypark/temp/cwd/orig
+    
+`cwd`는 심볼릭 링크의 이름을 그대로 출력합니다. 반면에 `getcwd`는 심볼릭 링크가 가리키고
+있는 실제 디렉토리의 이름을 추적하여 출력합니다.
+
+디렉토리 이름의 마지막 부분이 아니라 중간에 심볼릭 링크가 있을 때도 마찬가지입니다.
+
+    
+    #!bash
+    [gypark cwd]$ mkdir orig/sub
+    [gypark cwd]$ tree
+    .
+    |-- cwd.pl
+    |-- orig
+    |   `-- sub
+    `-- symlink -> orig
+
+    [gypark cwd]$ cd orig/sub/
+    [gypark sub]$ perl ../../cwd.pl
+    
+    cwd:    /Users/gypark/temp/cwd/orig/sub
+    getcwd: /Users/gypark/temp/cwd/orig/sub
+    
+    [gypark sub]$ cd ../../
+    [gypark cwd]$ cd symlink/sub/
+    [gypark sub]$ perl ../../cwd.pl
+    
+    cwd:    /Users/gypark/temp/cwd/symlink/sub
+    getcwd: /Users/gypark/temp/cwd/orig/sub
+
+`sub` 디렉토리까지 들어오는 도중에 `orig`이라는 실제 디렉토리를 거쳐 들어왔는지,
+아니면 `symlink`라는 심볼릭 링크를 거쳐 왔는지에 따라서 `cwd`의 출력이 바뀌고 있습니다.
+
+
+절대 경로 알기
+---------------
+
+`Cwd` 모듈이 제공하는 함수 중에 `abs_path()`가 있습니다. 인자로 받은 경로명을
+절대 경로로 바꾸어서 반환합니다. 인자가 없다면 현재 작업 디렉토리를 절대 경로로
+반환합니다.
+
+    #!perl
+    use 5.010;
+    use Cwd qw(abs_path);   # abs_path는 명시적인 임포트 필요
+    
+    say "absolute path of cwd.pl: ", abs_path('cwd.pl');
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    [gypark cwd]$ perl cwd.pl
+    
+    absolute path of cwd.pl: /Users/gypark/temp/cwd/cwd.pl
+
+이 때 조심할 점이 있습니다.
+첫째, `abs_path`는 그저 인자로 받은 경로명을 절대 경로로 변환해 줄 뿐이고,
+실제로 그 대상이 존재하는지 여부는 상관하지 않습니다.
+둘째, `abs_path`는 `getcwd`와 마찬가지로 심볼릭 링크를 해석하여 링크가 가리키는
+원래의 경로명을 반환합니다.
+
+
+정리하며
+---------
+
+* 실행 중인 펄 스크립트의 "현재 작업 디렉토리"는 `Cwd` 모듈을 사용하여 알 수 있다.
+* `cwd`와 `getcwd`는 대부분의 경우 동일한 값을 반환한다.
+* 심볼릭 링크의 경우 `cwd`는 링크의 이름을 반환하고, `getcwd`는 그 링크가 가리키는
+실제 디렉토리 이름을 반환한다.
+* `abs_path`를 써서 어떤 경로명의 절대경로를 알 수 있다.
+
+
+참고
+-----
+
+이 기사는 [Perl Maven](http://perlmaven.com)의
+[Current working directory in Perl](http://perlmaven.com/pro/current-working-directory)
+기사의 내용을 보강한 것입니다.
+
+
+[gypark-home]:                  http://gypark.pe.kr
+[gypark-perl]:                  http://gypark.pe.kr/wiki/Perl
+[perldoc-cwd]:                  http://perldoc.perl.org/Cwd.html
+[twitter-gypark]:               http://twitter.com/gypark

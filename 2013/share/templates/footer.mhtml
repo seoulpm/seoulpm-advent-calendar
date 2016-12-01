@@ -1,0 +1,62 @@
+<%args>
+  $global
+  $article
+</%args>
+
+  <div id="foot">
+    <div class="indent">
+      <& link.mhtml, global => $global &>
+      <ul class="icon">
+        <li><a href="/2013/atom.xml"><img src="feed.png"></a></li>
+        <li><a href="http://twitter.com/seoulpm"><img src="twitter.png"></a></li>
+        <li><a href="http://webchat.freenode.net/?channels=perl-kr"><img src="chat.png"></a></li>
+      </ul>
+      <ul class="like">
+        <li class="twt"><a href="https://twitter.com/share" class="twitter-share-button" data-url="<% $global->{location} ? uri_escape($article->atom_id) : uri_escape($global->{base_uri}) %>" data-count="horizontal" data-via="seoulpm" data-lang="ko">트윗하기</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li>
+        <li class="fb">
+          <iframe src="//www.facebook.com/plugins/like.php?href=<% $global->{location} ? uri_escape($article->atom_id) : uri_escape($global->{base_uri}) %>&amp;width=280&amp;layout=standard&amp;action=like&amp;show_faces=true&amp;share=true&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:280px; height:80px;" allowTransparency="true"></iframe>
+        </li>
+      </ul>
+      <p class="copyright"><& copyright.mhtml &></p>
+      <!--
+        Adjust copyright vertical position due to facebook widget is variable
+      -->
+      <script type="text/javascript">
+      (function() {
+        $(function() {
+% if ($article) {
+	  var link_height = $('#link').height() - 450;
+	  var fb_height   = $('.fb').height() - 72;
+% }
+% else {
+	  var link_height = $('#link').height() - 380;
+	  var fb_height   = $('.fb').height() - 2;
+% }
+	  var pos = ( link_height > fb_height ? link_height : fb_height ) * -1;
+          $('#foot .copyright').css('bottom', pos );
+        });
+
+        $(function() {
+          $('#cont p img').parent().css('text-align', 'center');
+        });
+      }).call(this);
+      </script>
+    </div>
+    <pre class="hidden">
+     .-'''  __  __
+    /     \/  \/  \&nbsp;
+    =-_-           |
+        \. -____- / \&nbsp;
+         //    /||  ''
+        //|   //||
+       == =  == ==
+    </pre>
+  </div>
+</div>
+</body>
+</html>
+<%init>
+  use URI::Escape;
+  use HTML::Escape qw(escape_html);
+  sub uri_escape { URI::Escape::uri_escape(shift, q{\$\#\@\&\(\)\=\"\'\[\]\!\?}) }
+</%init>

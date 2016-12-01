@@ -1,0 +1,407 @@
+Title:    use Barcode;
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+[바코드(barcode)][wiki-barcode]는 광학 기기가 판독할 수 있도록 고안된 굵기가 다른 흑백 막대로 조합시켜 만든 코드입니다.
+전통적인 바코드는 서로 굵기가 다른 막대 모양의 이미지를 적절한 간격으로 배치해서 숫자나 문자를 표현합니다.
+최근에는 단순한 막대 모양이 아닌 사각형의 배열의 점으로 자료를 표현하는 2차원 코드도 개발되어 많은 양의 정보를 담기도 합니다.
+바코드 단순하면서도 판독율이 좋기 때문에 다양한 개체를 전산화하기 위한 용도로 널리 사용됩니다.
+더불어 바코드는 종이 뿐만 아니라 의류 등 인쇄할 수 있는 위치의 제약이 거의 없고, 표준화되어 있으며
+출력 비용을 제외하면 생성 비용이 거의 없어서 오래된 기술임에도 불구하고 여전히 많은 곳에서 사용하고 있습니다.
+
+지금부터 `HTML::Barcode`를 이용해 다양한 종류의 바코드를 만들어 보고
+`Mojolicious`와 연동해서 웹 기반의 바코드 생성기를 제작합니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 HTML::Barcode 모듈][cpan-html-barcode]
+- [CPAN의 HTML::Barcode::Code93 모듈][cpan-html-barcode-code93]
+- [CPAN의 HTML::Barcode::Code128 모듈][cpan-html-barcode-code128]
+- [CPAN의 HTML::Barcode::QRCode 모듈][cpan-html-barcode-qrcode]
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+      HTML::Barcode \
+      HTML::Barcode::Code93 \
+      HTML::Barcode::Code128 \
+      HTML::Barcode::QRCode \
+      Mojolicious
+
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+      HTML::Barcode \
+      HTML::Barcode::Code93 \
+      HTML::Barcode::Code128 \
+      HTML::Barcode::QRCode \
+      Mojolicious
+
+
+QRCode 모듈 설치
+-----------------
+
+준비물 중 `HTML::Barcode::QRCode` 모듈은 `Text::QRCode` 모듈을 사용합니다.
+`Text::QRCode` 모듈은 빌드시 `pkg-config` 명령줄 유틸리티를 사용하기 때문에
+`pkg-config`가 없을 경우 다음 오류를 내며 설치에 실패합니다.
+
+    #!plain
+    Cannot determine perl version info from lib/Text/QRCode.pm
+    Cannot find pkg-config command.
+    Specify it to PKG_CONFIG_PATH env variable if you have pkg-config cmd at Makefile.PL line 41.
+
+`pkg-config` 유틸리티는 데비안 계열 리눅스의 경우 다음 명령을 이용해 설치할 수 있습니다.
+
+    #!bash
+    $ sudo apt-get install pkg-config
+
+`Text::QRCode` 모듈은 [libqrencode 라이브러리][home-libqrencode]([저장소][github-libqrencode])를
+사용하기 때문에 `libqrencode` 개발 라이브러리가 없을 경우 모듈 설치에 실패합니다.
+
+    #!plain
+    Cannot determine perl version info from lib/Text/QRCode.pm
+    Package libqrencode was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `libqrencode.pc'
+    to the PKG_CONFIG_PATH environment variable
+    No package 'libqrencode' found
+    *** You must install libqrencode.
+    *** See http://megaui.net/fukuchi/works/qrencode/index.en.html at Makefile.PL line 73.
+
+데비안 계열 리눅스의 경우 다음 명령을 이용해 `libqrencode` 개발 라이브러리를 설치할 수 있습니다.
+
+    #!bash
+    $ sudo apt-get install libqrencode-dev
+
+필요한 의존 라이브러리와 유틸리티 설치가 완료되면 `HTML::Barcode::QRCode` 모듈 설치를 완료합니다.
+
+
+사용 방법
+----------
+
+`HTML::Barcode` 모듈의 사용법은 무척 간단합니다.
+`978-89-93827-28-6` 문자열을 *CODE_93* 규격 바코드로 변환하는 법은 다음과 같습니다.
+
+    #!perl
+    use 5.010;
+    use strict;
+    use warnings;
+    
+    use HTML::Barcode::Code93;
+    
+    my $code = HTML::Barcode::Code93->new( text => '978-89-93827-28-6' );
+    say $code->render;
+
+간단하죠? 실행하면 복잡한 문자열이 화면에 출력됩니다.
+복잡해보이지만 이 문자열은 유효한 HTML로 웹브라우저에서 바코드 형태로 확인할 수 있습니다.
+사람이 알아볼 수 있게 들여쓰기를 정리하면 대략 다음과 같은 내용을 가집니다.
+
+     #!xml
+     <style type="text/css">
+       table.hbc {border-width:0;border-spacing:0;}
+       table.hbc {border-width:0;border-spacing:0;}
+       table.hbc tr, table.hbc td{border:0;margin:0;padding:0;}
+       table.hbc td{text-align:center;}
+       table.hbc td.hbc_on,table.hbc td.hbc_off {width:2px;height:100px;}
+       table.hbc td.hbc_on {background-color:#000;color:inherit;}
+       table.hbc td.hbc_off {background-color:#fff;color:inherit;}
+     </style>
+     <table class="hbc">
+       <tr>
+         <td class="hbc_on"></td>
+         <td class="hbc_off"></td>
+         <td class="hbc_on"></td>
+         <td class="hbc_off"></td>
+         ...
+         <td class="hbc_on"></td>
+         <td class="hbc_on"></td>
+         <td class="hbc_off"></td>
+         <td class="hbc_on"></td>
+       </tr>
+       <tr>
+         <td colspan="190">978-89-93827-28-6</td>
+       </tr>
+     </table>
+
+즉 전혀 이미지를 사용하지 않고 HTML의 스타일을 재정의한 테이블 태그만 사용해서
+바코드를 표현합니다. 따라서 웹 기반의 프로그램을 작성한다면 매우 손쉽게
+바코드를 생성하고 화면에 보여줄 수 있습니다.
+`HTML::Barcode` 모듈은 다양한 바코드를 생성하기 위한 부모 클래스로
+`HTML::Barcode::Code93` 모듈에서 상속받고 있습니다.
+현재 지원하지 않는 바코드 형식이 있다면 `HTML::Barcode::FooBar` 모듈을 작성하면
+다른 모듈과 동일한 방식으로 바코드를 생성할 수 있습니다.
+자세한 내용은 [공식 문서][cpan-html-barcode]를 참조하세요.
+
+
+웹 기반 바코드 생성기
+----------------------
+
+그럴듯한 바코드 생성기를 만들기 위해 간단한 웹앱을
+만들어서 사용자의 요청을 받을 수 있도록 합니다.
+새로 만드는 웹앱은 다음 세 가지 요청을 처리하도록 합니다.
+
+- `/code93`:  CODE_93 바코드 생성기
+- `/code128`: CODE_128 바코드 생성기
+- `/qrcode`:  QR_CODE 바코드 생성기
+
+[Mojolicious][home-mojolicious]는 [Dancer][home-dancer]와 더불어 펄의 대표적인 경량 웹 프레임워크입니다.
+각각의 웹 프레임워크에 대한 자세한 설명은 공식 홈페이지 또는 CPAN의 공식 문서를 참조하세요.
+*Mojolicious*를 사용해서 간단히 웹앱을 구현해 보죠.
+우선 `Mojolicious::Lite` 모듈을 적재합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    #
+    # FILE: barcode-generator-web.pl
+    #
+    
+    use Mojolicious::Lite;
+
+이제 *CODE_93* 형식의 바코드를 생성하는 `/code93` 컨트롤러를 만듭니다.
+`code` 파라미터를 입력받아 *CODE_93*으로 변환한 HTML 결과를
+자료 공유 영역인 stash의 `code` 항목으로 전달합니다.
+
+    #!perl
+    get '/code93' => sub {
+        my $self = shift;
+
+        my $code = $self->param('code') || 'Enjoy Perl';
+
+        my $b = HTML::Barcode::Code93->new( text => $code );
+        $self->stash( code => $b->render($code) );
+    } => 'barcode';
+
+`/code93` 컨트롤러에 대한 템플릿 영역은 다음과 같습니다.
+
+    #!perl
+    __DATA__
+    @@ barcode.html.ep
+    % layout 'default';
+    % title 'Barcode Generator';
+    <div class="center">
+      <%== $code %>
+      %= form_for '' => begin
+        %= label_for code => 'Code Text'
+        <br>
+        %= text_field 'code'
+        %= submit_button
+      % end
+    </div>
+
+`form_for`나 `label_for`, `text_field`, `submit_button`은
+[Mojolicious의 TagHelper 플러그인][mojolicious-taghelper]의 기능입니다.
+`Mojolicious::Plugin::TagHelper` 플러그인은 기본 플러그인이므로 따로 설치할 필요는 없습니다.
+자세한 내용은 [공식 문서][mojolicious-taghelper]를 참고하세요.
+
+여기까지 작업한 내용을 웹으로 확인해볼까요?
+명령줄에서 다음 명령을 실행합니다.
+
+    #!bash
+    $ morbo barcode-generator-web.pl
+    [Sun Dec  1 13:55:49 2013] [info] Listening at "http://*:3000".
+    Server available at http://127.0.0.1:3000.
+
+이제 `http://localhost:3000/code93`으로 접속하면 바코드 예제와 함께
+원하는 문자열을 바코드로 변환하기 위한 텍스트 입력창이 있습니다.
+
+![CODE_93 바코드 생성기][img-1-resize]
+*그림 1.* CODE_93 바코드 생성기 ([원본][img-1])
+
+최근 대부분의 휴대폰은 바코드 읽기 기능을 기본적으로 지원하고 있습니다.
+생성한 바코드를 휴대폰으로 한번 읽어 볼까요?
+
+![휴대폰으로 CODE_93 바코드 판독][img-2-resize]
+*그림 2.* 휴대폰으로 CODE_93 바코드 판독 ([원본][img-2])
+
+
+나머지 코드
+------------
+
+내친 김에 남은 *CODE_128* 형식과 *QR_CODE* 형식까지 구현해보죠.
+전체 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    
+    use Mojolicious::Lite;
+    
+    use HTML::Barcode::Code93;
+    use HTML::Barcode::Code128;
+    use HTML::Barcode::QRCode;
+    
+    helper code93 => sub {
+        my ( $self, $text ) = @_;
+        my $code = HTML::Barcode::Code93->new( text => $text );
+        return $code->render;
+    };
+    
+    helper code128 => sub {
+        my ( $self, $text ) = @_;
+        my $code = HTML::Barcode::Code128->new( text => $text );
+        return $code->render;
+    };
+    
+    helper qrcode => sub {
+        my ( $self, $text ) = @_;
+        my $code = HTML::Barcode::QRCode->new( text => $text );
+        return $code->render;
+    };
+    
+    get '/' => 'index';
+    
+    get '/code93' => sub {
+        my $self = shift;
+        my $code = $self->param('code') || 'Enjoy Perl';
+        $self->stash( code => $self->code93($code) );
+    } => 'barcode';
+    
+    get '/code128' => sub {
+        my $self = shift;
+        my $code = $self->param('code') || 'use Perl;';
+        $self->stash( code => $self->code128($code) );
+    } => 'barcode';
+    
+    get '/qrcode' => sub {
+        my $self = shift;
+        my $code = $self->param('code') || 'http://advent.perl.kr';
+        $self->stash( code => $self->qrcode($code) );
+    } => 'barcode';
+    
+    app->start;
+    
+    __DATA__
+    
+    @@ index.html.ep
+    % layout 'default';
+    % title 'Barcode Generator';
+    %= link_to CODE_93  => '/code93'
+    <br />
+    %= link_to CODE_128 => '/code128'
+    <br />
+    %= link_to QR_CODE  => '/qrcode'
+    <br />
+    
+    @@ barcode.html.ep
+    % layout 'default';
+    % title 'Barcode Generator';
+    
+    <div class="center">
+      <%== $code %>
+    
+      %= form_for '' => begin
+        %= label_for code => 'Code Text'
+        <br>
+        %= text_field 'code'
+        %= submit_button
+      % end
+    </div>
+    
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title><%= title %></title>
+        <style type="text/css">
+          .center { text-align: center; }
+          .center table { margin-left: auto; margin-right: auto; }
+        </style>
+      </head>
+      <body>
+        <%= content %>
+      </body>
+    </html>
+
+*Mojolicious*에서 제공하는 `helper` 기능을 사용하고 `index` 컨트롤러를
+추가해서 `/` 주소, 즉 `http://localhost:3000`으로 접속했을때
+각각의 바코드 생성기 화면으로 이동할 수 있는 링크를 제공합니다.
+
+*겨우 90줄 미만의 코드*로 *웹 기반의 바코드 생성기*를 만들었습니다.
+우리의 바코드 생성기가 제대로 동작하는지 테스트해보죠.
+`http://localhost:3000/code128`로 접속해볼까요?
+
+![휴대폰으로 CODE_128 바코드 판독][img-3-resize]
+*그림 3.* 휴대폰으로 CODE_128 바코드 판독 ([원본][img-3])
+
+이번에는 `http://localhost:3000/qrcode`로 접속해보죠.
+
+![휴대폰으로 QR_CODE 바코드 판독][img-4-resize]
+*그림 4.* 휴대폰으로 QR_CODE 바코드 판독 ([원본][img-4])
+
+멋지군요! ;-)
+
+
+정리하며
+---------
+
+바코드는 굉장히 고전적인 부호 체계입니다.
+바코드는 인식 속도가 매우 빠르고 생산 단가가 거의 없다시피 하며,
+바코드 리더기가 저렴하기 때문에 지난 10년 사이에는 조그마한 소매점은 물론
+도서 대여점에서까지 소장하고 있는 품목을 전산화하는 용도로 널리 사용되고 있습니다.
+그럼에도 불구하고 바코드 리더기를 들고 다니지 않는 이상 사람이
+바코드만 보고 이해할 수 있는 내용은 거의 없기 때문에 사실 일반인들이
+바코드를 직접 사용할 기회는 거의 없었습니다.
+하지만 최근에는 고성능 스마트폰이 급속도로 보급화되면서
+개개인이 휴대폰의 카메라를 이용한 바코드 리더기를 소지하고 다니게 된 덕분에
+명함은 물론 이벤트 및 벽보 광고 등에서도 바코드와 QR코드를 활용하는 사례가 늘고 있습니다.
+
+펄을 이용하면 손쉽게 다양한 종류의 바코드를 생성할 수 있습니다.
+더불어 웹에서 필요에 따라 적절한 바코드를 표현하는 것도 어렵지 않습니다.
+여러분은 바코드를 어디에 활용해보고 싶나요? :)
+
+Enjoy Your Perl... and R.I.P. [@am0c][twitter-am0c]! ;-)
+
+![EOT][img-5]
+
+_EOT_
+
+
+[img-1]:          2013-12-01-1.png
+[img-2]:          2013-12-01-2.png
+[img-3]:          2013-12-01-3.png
+[img-4]:          2013-12-01-4.png
+[img-5]:          2013-12-01-5.png style="margin: 0"
+
+[img-1-resize]:   2013-12-01-1_r.png
+[img-2-resize]:   2013-12-01-2_r.png
+[img-3-resize]:   2013-12-01-3_r.png
+[img-4-resize]:   2013-12-01-4_r.png
+[img-5-resize]:   2013-12-01-5_r.png
+
+[cpan-html-barcode-code128]:    https://metacpan.org/module/HTML::Barcode::Code128
+[cpan-html-barcode-code93]:     https://metacpan.org/module/HTML::Barcode::Code93
+[cpan-html-barcode-qrcode]:     https://metacpan.org/module/HTML::Barcode::QRCode
+[cpan-html-barcode]:            https://metacpan.org/module/HTML::Barcode
+[cpan-mojolicious]:             https://metacpan.org/module/Mojolicious
+[cpan]:                         http://www.cpan.org/
+[github-libqrencode]:           https://github.com/fukuchi/libqrencode
+[home-dancer]:                  http://perldancer.org/
+[home-libqrencode]:             http://fukuchi.org/works/qrencode/
+[home-mojolicious]:             http://mojolicio.us/
+[home-perlbrew]:                http://perlbrew.pl/
+[mojolicious-taghelper]:        http://mojolicio.us/perldoc/Mojolicious/Plugin/TagHelpers
+[twitter-am0c]:                 http://twitter.com/#!/am0c
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-barcode]:                 http://en.wikipedia.org/wiki/Barcode
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208

@@ -2,7 +2,7 @@ Title:    Perl과 생명정보학
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   Won Cheol, Yim
+Author:   ascendo
 
 저자
 -----
@@ -10,7 +10,7 @@ Author:   Won Cheol, Yim
 [@ascendox][twitter-ascendox] -
 현재 동국대학교 식물생명공학과 박사 과정으로
 분자유전학실험실 유전육종학을 전공하고 있다.
-[프로필][google-ascendo]
+Won Cheol, Yim, [프로필][google-ascendo]
 
 
 

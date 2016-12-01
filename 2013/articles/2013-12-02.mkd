@@ -1,0 +1,323 @@
+Title:    유니코드 인코딩/디코딩
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
+
+저자
+-----
+
+[@newbcode][twitter-newbcode] - 사랑스러운 딸 바보 도치파파.
+[리눅스의 모든것][yes24-11040637] 공동저자.
+
+
+시작하며
+---------
+
+[위키백과][wiki-ko-encoding]를 따르면 인코딩(encoding)은 정보의 형태나 형식을
+표준화, 보안, 처리 속도 향상, 저장 공간 절약 등을 위해서 다른 형태나 형식으로
+변환하는 처리 혹은 그 처리 방식을 말한다고 합니다.
+인코딩/디코딩은 다루는 자료의 종류에 따라 의미하는 바가 조금씩 다르지만
+지금은 유니코드 인코딩/디코딩으로 한정합니다.
+
+    #!plain
+    I/O 스트림
+    +--------+              +-------------+              +------+
+    |        |  표준 입력   |             |  표준 출력   |      |
+    | 키보드 +------------->| 펄 프로그램 |+------------>| 화면 |
+    |        |              |             |              |      |
+    +--------+              +-------------+              +------+
+
+앞의 그림은 가장 일반적인 입출력 스트림(input/output stream)을 보여줍니다.
+입출력 스트림은 *바이트 스트림(byte stream)*과 *문자 스트림(character stream)* 두 종류로 나눌 수 있습니다.
+입력 스트림을 통해 전달되는 자료는 프로그램, 즉 펄 프로그램을 만나기 전까지는 바이트 스트림으로 존재합니다.
+펄 프로그램에서 바이트 스트림을 어떻게 처리하느냐가 펄에서의 인코딩/디코딩의 핵심입니다.
+실제 웹 상에 있는 HTML 문서를 이용해서 직접 인코딩/디코딩을 살펴봅니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Encode 모듈][cpan-encode]
+- [CPAN의 HTTP::Tiny 모듈][cpan-http-tiny]
+- [CPAN의 Data::Printer 모듈][cpan-data-printer]
+
+`Encode` 모듈의 경우 펄 코어 모듈이므로 별도로 설치할 필요는 없습니다.
+`HTTP::Tiny`의 경우 펄 5.14 이후 버전(정확히는 v5.13.9)의 경우
+코어 모듈로 지정되었으므로 역시 별도로 설치할 필요는 없습니다.
+하지만 `HTTP::Tiny`는 지속적으로 버전이 갱신되고 있으므로 가능하면 최신 버전으로 설치하도록 합니다.
+`Data::Printer` 모듈은 디버깅의 편의를 위해 필요한 모듈입니다.
+`print`나 `say`로도 충분하지만 이런 도구를 잘 활용한다면 자료를 시각적으로
+확인할 수 있기 때문에 문제가 생겼을때 빠른 시간에 문제를 해결할 수 있도록 도와줍니다.
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan HTTP::Tiny Data::Printer
+
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan HTTP::Tiny Data::Printer
+
+
+오늘의 날씨
+------------
+
+현실 세계의 인코딩/디코딩 문제를 다뤄보기 위해 웹상의 문서를 예로 들어보죠.
+[대한민국 기상청][kma]에서는 시시각각 변하는 기상 정보를 홈페이지에서 제공합니다.
+대한민국 곳곳의 날씨는 [도시별 현재 날씨][kma-weather] 페이지에서 확인할 수 있습니다.
+
+![대한민국 기상청 도시별 현재 날씨][img-1-resize]
+*그림 1.* 대한민국 기상청 도시별 현재 날씨 ([원본][img-1])
+
+도시별 현재 날씨 페이지를 다운로드 받는 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
+
+    use strict;
+    use warnings;
+
+    use HTTP::Tiny;
+
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
+
+    print $res->{content};
+
+
+웹 상의 HTML 문서를 내려받기 위해 `HTTP::Tiny`를 이용합니다.
+`HTTP::Tiny` 객체는 GET/POST/PUT/DELETE 등의 HTTP 1.1 프로토콜은 완벽하게 지원하며
+특히 요청후 반환 받은 해시는 다음과 같은 항목을 포함하고 있습니다.
+
+- `protocol`
+- `reason`
+- `status`
+- `success`
+- `headers`
+- `content`
+
+자세한 내용은 [공식 문서][cpan-http-tiny]를 참조하세요.
+
+
+한글이 깨져요!
+---------------
+
+앞의 코드를 실행하면 내려 받은 도시별 현재 날씨 페이지의 HTML을 터미널에 출력합니다.
+그런데 자세히 보면 브라우저에서 정상적으로 보이던 한글이 모두 깨져 보입니다.
+
+    #!bash
+    $ perl weather.pl
+    ...
+    <option value=''>17û-----------------</option>
+    <option value="http://www.nts.go.kr/">����û</option>
+    <option value="http://www.customs.go.kr/">����û</option>
+    <option value="http://www.pps.go.kr/">����û</option>
+    <option value="http://kostat.go.kr/">����û</option>
+    ...
+
+한글이 정상적으로 보이지 않을 경우에는 항상 문자 인코딩을 확인해야 합니다.
+코드를 약간 수정해서 기상청 페이지의 문자 인코딩을 확인해보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
+
+    use strict;
+    use warnings;
+
+    use DDP;
+    use HTTP::Tiny;
+
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
+
+    p $res->{headers};
+
+`DDP` 모듈(`Data::Printer`가 제공하는 단축 모듈)을 적재하는 부분이 추가되고
+`$res->{content}`를 출력하던 부분 대신 `DDP` 모듈이 제공하는 `p` 함수를 이용해서
+`$res->{headers}`를 출력하는 부분으로 변경되었습니다.
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ perl weather.pl 
+    \ {
+        connection          "close",
+        content-type        "text/html;charset=euc-kr",
+        date                "Mon, 02 Dec 2013 05:32:37 GMT",
+        server              "Jeus WebContainer/JEUS 5.0 (fix #16)",
+        set-cookie          "JSESSIONID=cJDvjEKVIp7F8AEd0aTJbEERec727KIZUeHXSFnHBt7GQGCk2aFJF6qq5GEkZ2Mv;Path=/",
+        transfer-encoding   "chunked"
+    }
+
+실제로 터미널에서 보면 색을 입혀 꽤나 알록달록하게 보이기 때문에 디버깅할때 큰 도움이 됩니다.
+응답 헤더의 `content-type`가 `"text/html;charset=euc-kr"`임을 알 수 있습니다.
+자료가 펄 프로그램을 만나기 전까지는 `EUC-KR`로 인코딩 되어 있는데
+펄 프로그램 내부로 들어오게 될 때 적절하게 디코딩을 해주지 않으면
+`EUC-KR` 자료를 `UTF-8`로 해석하려하기 때문에 깨져보이는 문자가 생깁니다.
+즉 기상청이 제공하는 페이지의 문자 인코딩은 `EUC-KR`이며, 펄의 기본 인코딩은
+`UTF-8`이기 때문에 한글이 정상적으로 보이지 않았던 것입니다.
+
+    #!plain
+    +---------------+     +-----------------+     +-----------+
+    | html 문서     | --> | 펄 프로그램     | --> | 터미널    |
+    | EUC-KR 인코딩 |     | 디코딩하지 않음 |     | 문자 깨짐 |
+    +---------------+     +-----------------+     +-----------+
+
+그러면 인코딩으로 인해 문자가 깨지는 현상을 방지하려면 어떻게 해야할까요?
+
+    #!plain
+    +---------------+     +-----------------+     +-----------+
+    | html 문서     | --> | 펄 프로그램     | --> | 터미널    |
+    | EUC-KR 인코딩 |     | 디코딩          |     | 정상 출력 |
+    +---------------+     +-----------------+     +-----------+
+
+즉 펄 프로그램 내부에서 사용하기 직전에 `EUC-KR` 인코딩을 펄 내부 인코딩에 맞도록 디코딩 과정을 거쳐야 합니다.
+디코딩을 수행하기 위해 `Encode` 모듈의 `decode` 함수를 사용합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
+
+    use strict;
+    use warnings;
+
+    use Encode qw( decode );
+    use HTTP::Tiny;
+
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
+
+    print decode( 'euc-kr', $res->{content} );
+
+이제는 실행해보면 한글이 정상적으로 보이는 것을 확인할 수 있습니다.
+
+    #!bash
+    $ perl weather.pl
+    ...
+    <option value=''>17청-----------------</option>
+    <option value="http://www.nts.go.kr/">국세청</option>
+    <option value="http://www.customs.go.kr/">관세청</option>
+    <option value="http://www.pps.go.kr/">조달청</option>
+    <option value="http://kostat.go.kr/">통계청</option>\
+    ...
+
+
+Wide character in print at.
+-----------------------------
+
+사실 출력이 길어서 눈치채치 못했을 수도 있지만 사실 프로그램은 계속 경고를 출력하고 있었습니다.
+
+    #!bash
+    $ perl weather.pl > /dev/null
+    Wide character in print at weather.pl line 14.
+    $
+
+펄로 한글을 비롯 영어가 아닌 문자를 출력하다보면 `Wide character ...` 경고를 종종 볼 수 있습니다.
+이 경고는 인코딩을 하지 않았을때 펄이 친절하게(?) 경고해주는 것입니다.
+펄의 내부 형식으로 존재하는 바이트를 그대로 보내게(출력을 한다던가) 되었을 때 발생합니다.
+물론 펄의 내부 형식은 'UTF-8'이지만 이 내부 형식에 의존해서 출력하면(내보내면) 안됩니다.
+펄은 이런 경우를 최대한 감지해서 사용자에게 `Wide character ...` 경고를 보여줍니다.
+입력 받은 자료에 대해서 디코딩을 하듯 출력할 자료에 대해서도 인코딩을 명시적으로 해야 한다는 뜻입니다.
+지금까지 보았던 그림을 더 정확하게 표현해보죠.
+
+    #!plain
+    +---------------+     +------------------------------+     +----------------+
+    | html 문서     |     | 펄 프로그램                  |     | 터미널         |
+    +---------------+     +------------------------------+     +----------------+
+    |               | --> |     (디코딩)                 | --> |                |
+    | EUC-KR 인코딩 |     | EUC-KR -> 내부 형식          |     |                |
+    |               |     |           내부 형식 -> UTF-8 |     | UTF-8 (리눅스) |
+    |               |     |                  (인코딩)    |     |                |
+    +---------------+     +------------------------------+     +----------------+
+
+그림에서 *내부 형식*이라고 표기했지만 이 펄의 *내부 형식*은 언급했듯이 *UTF-8*입니다.
+그럼에도 불구하고 *명시적*으로 *UTF-8*로 인코딩함을 유의하세요.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    #
+    # FILE: weather.pl
+    #
+
+    use strict;
+    use warnings;
+
+    use Encode qw( decode encode );
+    use HTTP::Tiny;
+
+    my $url = 'http://www.kma.go.kr/weather/observation/currentweather.jsp';
+
+    my $res = HTTP::Tiny->new->get($url);
+    die "Failed!: $res->{status} - $res->{reason}\n" unless $res->{success};
+
+    print encode( 'utf-8', decode( 'euc-kr', $res->{content} ) );
+
+이제는 `Wide character ...` 경고도 나타나지 않으며 한글 출력에도 전혀 문제가 없습니다. :-)
+
+
+정리하며
+---------
+
+인코딩/디코딩에 익숙하지 않다면 문자 인코딩 때문에 한 두번쯤은 골머리를 싸매게되곤 합니다.
+이 문자열 인코딩의 문제는 비단 펄에서만의 이슈가 아니라 어떤 프로그래밍 언어를 사용하든
+입출력 스트림에서 제공하거나 요구하는 형식에 따라 항상 발생하는 문제입니다.
+하지만 펄은 이런 인코딩 문제를 코어 모듈을 이용해서 간단하게 해결 할 수 있는 방법을 제공합니다.
+이것은 펄이 내부적으로 유니코드 기반으로 동작하기 때문이며 이런 이슈에 대해
+세심하게 고려한 덕분(Thanks, Larry Wall! :)이기도 합니다.
+
+
+참고문서
+---------
+
+- [Unicode in Perl][unicode-in-perl] - [@aer0][twitter-aer0]
+- [Perl과 한글][perl-and-hangul] - [@gypark][twitter-gypark]
+- [perldoc perlunicode][perldoc-perlunicode]
+- [perldoc perlunifaq][perldoc-perlunifaq]
+- [perldoc utf8][perldoc-utf8]
+
+
+[img-1]:          2013-12-02-1.png
+[img-1-resize]:   2013-12-02-1_r.png
+
+
+[cpan-data-printer]:      http://metacpan.org/module/Data::Printer
+[cpan-encode]:            http://metacpan.org/module/Encode
+[cpan-http-tiny]:         http://metacpan.org/module/HTTP::Tiny
+[cpan]:                   http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[kma-weather]:            http://www.kma.go.kr/weather/observation/currentweather.jsp
+[kma]:                    http://www.kma.go.kr
+[perl-and-hangul]:        http://gypark.pe.kr/wiki/Perl/%ED%95%9C%EA%B8%80
+[perldoc-perlunicode]:    http://perldoc.perl.org/perlunicode.html
+[perldoc-perlunifaq]:     http://perldoc.perl.org/perlunifaq.html
+[perldoc-utf8]:           http://perldoc.perl.org/utf8.html
+[twitter-aer0]:           https://twitter.com/aer0
+[twitter-gypark]:         http://twitter.com/gypark
+[twitter-newbcode]:       http://twitter.com/newbcode
+[unicode-in-perl]:        https://github.com/aero/perl_docs/wiki/Unicode-in-Perl
+[wiki-ko-encoding]:       http://ko.wikipedia.org/wiki/%EB%B6%80%ED%98%B8%ED%99%94
+[yes24-11040637]:         http://www.yes24.com/24/goods/11040637

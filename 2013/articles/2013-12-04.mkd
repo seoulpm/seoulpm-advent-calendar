@@ -1,0 +1,127 @@
+Title:    Emacs에서의 Perl 개발 환경
+Package:  Seoul.pm
+Category: perl
+Category: Emacs
+Category: Seoul.pm
+Author:   aanoaa
+
+저자
+----
+
+[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
+
+
+시작하며
+---------
+
+[Emacs][home-emacs]에 펄 개발 환경을 설정하면 문서를 보기에도 좋고, 코딩하기에도 편리합니다.
+Emacs를 사용해서 펄로 개발할때 생산성을 높여주는 몇 가지 유용한 팁을 소개합니다.
+
+
+perlbrew / plenv
+-----------------
+
+[perlbrew][home-perlbrew], [plenv][home-plenv] 등의 펄 설치 및 바이너리
+관리 도구(Perl installation/binary management tool)을 사용한다면 자신의
+쉘 설정과 Emacs의 환경 변수를 맞춰주어야 합니다.
+
+- [perlbrew-mini.el][emacs-perlbrew-mini]
+- [plenv.el][emacs-plenv]
+
+*plenv*를 사용한다면 다음 코드가 도움이 될 것입니다.
+
+    #!lisp
+    ; in your .emacs
+    (setenv "PATH" (concat (getenv "HOME") "/.plenv/shims:" (getenv "HOME") "/.plenv/bin:" (getenv "PATH")))
+    (setq exec-path (cons (concat (getenv "HOME") "/.plenv/shims") (cons (concat (getenv "HOME") "/.plenv/bin") exec-path)))
+    (require 'plenv)
+    (plenv-global "5.18.1")
+
+
+`PERL5LIB` 환경 변수
+----------------------
+
+보통 작업을 하다보면 현재 디렉터리에 존재하는 `lib` 디렉터리에 펄 모듈을 둘 때가 많습니다.
+`PERL5LIB` 환경 변수에 `./lib`을 추가하면 실행시 마다 `-I` 옵션을 주거나 환경 변수를
+재정의해야 할 필요가 없기 때문에 유용합니다.
+
+    #!lisp
+    (setenv "PERL5LIB" (concat "./lib:" (getenv "PERL5LIB")))
+
+
+`cperl-mode`
+-------------
+
+`perl-mode` 대신에 항상 `cperl-mode` 를 사용합니다.
+Emacs가 파일 확장자에 따라 알아서 `cperl-mode`로 동작하도록 설정하면 편리합니다.
+
+    #!lisp
+    (defalias 'perl-mode 'cperl-mode)
+    (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\||psgi\\|t\\)\\'" . cperl-mode))
+
+`<C-j>`(newline-and-indent)로 개행을 하는 습관을 가지면 줄바꿈 후에 적절한 들여쓰기가 됩니다.
+
+`<M-x> cperl-perldoc`을 사용하면 펄의 내장 함수부터 확장 모듈의 문서까지 손쉽게 볼 수 있습니다.
+화면을 분할해서 문서를 띄워놓고 작업할때 매우 유용합니다.
+저는 자주 사용하는 기능이기 때문에 단축키 `<C-h P>`로 맵핑해 사용하고 있습니다.
+
+
+flymake 문법 검사
+------------------
+
+[flymake][home-flymake]는 Emacs의 문법 검사기입니다.
+버퍼에 구문 오류가 있다면 해당 부분을 강조해주므로 오타와 같은 오류를 줄일 수 있습니다.
+
+![perldoc과 flymake][img-1-resize]
+*그림 1.* perldoc과 flymake ([원본][img-1])
+
+*perlbrew* 사용자라면 [CPAN의 Project::Libs 모듈][cpan-project-libs]이 추가로 필요합니다.
+
+    #!lisp
+    (add-hook 'cperl-mode-hook (lambda () (flymake-mode t)))
+
+    ;; for plenv user
+    (defun flymake-perl-init ()
+      (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-with-folder-structure))
+             (local-file (file-relative-name
+                          temp-file
+                          (file-name-directory buffer-file-name))))
+        (list (guess-plenv-perl-path) (list "-wc" local-file))))
+
+    ;; for perlbrew user
+    (defun flymake-perl-init ()
+      (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                         'flymake-create-temp-inplace))
+             (local-file (file-relative-name
+                          temp-file
+                          (file-name-directory buffer-file-name))))
+        (list (perlbrew-mini-get-current-perl-path)
+              (list "-MProject::Libs" "-wc" local-file))))
+
+정리하며
+---------
+
+`cperl-mode`와 [flymake][home-flymake], `perldoc` 정도의
+도움만 받아도 꽤나 편리한 환경에서 펄 프로그램을 개발할 수 있습니다.
+그 밖에 편리한 Emacs 팁이 있다면 공유해주세요.
+(고수는 노트패드만 있어도 코딩한다던데... :)
+
+[@am0c][twitter-am0c]군은 하늘에서도 여전히 Emacs로 코딩하고 있겠죠? :)
+
+'-']/
+
+
+[img-1]:          2013-12-04-1.png
+[img-1-resize]:   2013-12-04-1_r.png
+
+[cpan-project-libs]:    https://metacpan.org/module/Project::Libs
+[emacs-perlbrew-mini]:  https://github.com/dams/perlbrew-mini.el
+[emacs-plenv]:          https://github.com/karupanerura/plenv.el
+[github-aanoaa]:        https://github.com/aanoaa
+[home-emacs]:           http://www.gnu.org/software/emacs/
+[home-flymake]:         https://github.com/illusori/emacs-flymake
+[home-perlbrew]:        http://perlbrew.pl/
+[home-plenv]:           https://github.com/tokuhirom/plenv
+[twitter-aanoaa]:       http://twitter.com/#!/aanoaa
+[twitter-am0c]:         http://twitter.com/#!/am0c

@@ -1,0 +1,267 @@
+Title:    Excel 작업 자동화
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   corpus007
+
+저자
+-----
+
+[@corpus007][twitter-corpus007] - I like:
+Perl, Unix, History, Chocolate, Yiquan, Kimchi stew, Bread, Science Fiction, Korea Girl Group ^__^,
+[홈페이지][home-corpus007]
+
+
+시작하며
+---------
+
+본의 아니게 어떤(?) 시스템의 1년치 로그 파일을 받아 분석할 일이 있었습니다.
+월 단위로 전체 로그를 나눈 다음, 관심가는 특정 데이터 값만 뽑아,
+이를 그래프로 바꾸면 어떤 경향을 파악할 수 있으리라는 아이디어까지는 떠올랐죠.
+경험상 이 작업을 수작업으로 하는 것은 사람이 할 짓은 아니라는 느낌도 있었기도 하고,
+매 월별 데이터 셋과 이에 대한 차트 그래프를 워크 시트에 담은 Excel 파일을 만든다면,
+리포트 자료까지 만들어지는 셈이라 결국 Perl을 이용한 Excel 처리를 하기로 합니다.
+차후 Perl을 이용한 Excel 문서 작업을 시도해 보려는 분들의 첫걸음에 도움이 되길 바랍니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Excel::Writer::XLSX 모듈][cpan-excel-writer-xlsx]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Excel::Writer::XLSX
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Excel::Writer::XLSX
+
+
+
+가볍게 시작하기
+----------------
+
+모듈의 이름의 끝 부분을 보면 예전 Excel 파일 확장자인 `xls`가 아닌 `xlsx`죠?
+이건 그만큼 발전된 Excel의 기능을 쓸 수 있다는 것을 의미합니다.
+Excel 파일을 처리하는 내용에만 집중하기 위해 예제 데이터는 코드 내부에 넣어둡니다.
+더불어 오타나 오류를 손쉽게 발견하기 위해 `strict` 프라그마와 `warnings` 프라그마를 사용합니다.
+
+다음은 특정 시간에 관측한 특정 데이터의 값을 각각 시간 배열과 값 배열에 저장한 예제입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Excel::Writer::XLSX;
+    
+    #sample data
+    my @time_l = qw(
+        00:22:07    00:22:57    00:23:22    00:24:07
+        01:22:17    01:24:07    02:22:22    02:22:57
+        02:23:32    02:24:07    03:22:32    03:22:57
+        03:23:42    03:24:07    04:22:37    04:22:57
+        04:23:47    04:24:07    05:22:42
+    );
+    
+    my @val_l = qw(
+        53  46  54  48
+        54  45  54  71
+        66  45  56  72
+        66  46  54  71
+        66  47  55
+    );
+    
+    my $val_size = @val_l;
+
+
+Excel 파일 만들기
+------------------
+
+`Excel::Writer::XLSX` 모듈은 다루려는 Excel을 workbook이라는 객체에 담아서 처리합니다.
+아마도 Excel에 친숙하다면 이런 접근 방식이 더욱 친근하게 느껴질 것입니다.
+
+    #!perl
+    my $fname = "report.xlsx";
+    
+    #
+    # Create new xlsx file(workbook) with $fname
+    # 
+    my $workbook = Excel::Writer::XLSX->new($fname);
+    die "You got a problem to create new excel file: $!" unless defined $workbook;
+
+전체 스크립트의 수행이 끝나면 `report.xlsx`라는 파일이 만들어집니다.
+물론, 아무런 내용도 없는 파일이죠.
+안전한 종료를 위해 마지막에는 항상 `$workbook->close()`를 넣는 것을 권장합니다.
+
+
+워크시트에 데이터 집어넣기
+---------------------------
+
+`Example`이라는 이름으로 워크시트를 하나 만들고,
+그 안에는 미리 준비해 둔 시간과 값을 기록합니다.
+워크시트의 이름을 생략하면 실제 Excel에서 자동으로 생성하듯이
+`Sheet1` 따위의 이름으로 워크시트를 만듭니다.
+
+표의 제목 문자열은 굵게 보이도록 하고, A1 위치에서 시작하게 해보죠.
+
+    #!perl
+    #
+    # Add worksheet
+    #  
+    my $sheet_name = "Example";
+    my $worksheet = $workbook->add_worksheet($sheet_name);
+    
+    #
+    # Add worksheet
+    # Write data table on the worksheet
+    # -- Set head title for table
+    # 
+    my $headings = [ 'Time', 'Load' ];
+    
+    #
+    # -- Changed text format to bold type
+    # 
+    my $bold = $workbook->add_format( bold => 1 );
+    
+    #
+    # -- Write table into the Worksheet
+    # -- example is  $worksheet->write( $row, $col, $data, $format );
+    # 
+    my $data = [
+        \@time_l,
+        \@val_l,
+    ];
+    
+    $worksheet->write( 'A1', $headings, $bold );
+    $worksheet->write( 'A2', $data );
+
+`write()` 메소드를 이용하면 특정 셀에 원하는 값을 넣을 수 있습니다.
+`write()` 메소드에 들어가는 매개변수 `A1`, `A2` 등은 값이 쓰여질 셀의 위치를 의미합니다.
+각 데이터 열의 제목으로 `Time`과 `Load`를 넣고, 그 이후에는 미리 정의한 자료를 집어넣습니다.
+`write()` 메소드는 매개변수로 스칼라를 기대하기 때문에 배열을 다루려면 참조(reference)를 사용해야 합니다.
+예제의 `$data` 변수는 LoL(List of List) 구조입니다.
+물론, 예제에서는 두 줄 짜리 표를 표현했지만 여러 행과 열을 가진 표를 만드는 것도 당연히 가능합니다.
+레퍼런스와 관련해 더 자세한 내용은 [perlref 문서][perldoc-perlref]를 참고하세요.
+
+*그림 1*은 지금까지 작성 내용을 실행했을 때 생성한 Excel 파일을 보여줍니다.
+
+![generated excel file][img-1-resize]
+*그림 1.* 생성한 Excel 파일 ([원본][img-1])
+
+
+몇 가지 소소한 팁
+------------------
+
+`write_row()`와 `write_col()` 메소드도 있으니 [공식 문서][cpan-excel-writer-xlsx]를 확인한 후 필요에 따라 적당히 사용하세요!
+
+더불어, Excel 함수식을 사용하는 방법은 다음과 같습니다.
+
+    #!perl
+    $worksheet->write( 'D10', '=sum(D2:D9)' );
+
+
+차트 추가하기
+--------------
+
+워크시트에 그래프를 넣으려면 `add_chart()` 메소드를 사용합니다.
+매개변수로 차트의 종류와 내장 여부를 전달합니다.
+지원하는 차트의 종류로는 area, bar, column, line, pie, scatter, stock 등이 있고, 개별 타입에 대한 subtype이 있습니다.
+이때, 내장 여부를 의미하는 `embedded` 매개변수는 선택사항이라 생략이 가능하지만
+생략할 경우 경고를 발생시키므로 제 경우 가능하면 `embedded` 플래그는 설정하는 편입니다.
+
+`add_chart()` 메소드를 호출해 반환값으로 차트 객체를 생성한 후에는
+차트 객체 내에 실제 값의 계열(series)을 추가하기 위해 `add_series()` 메소드를 사용합니다.
+매개변수로 계열에 대한 주석 설명과 범주, 실제의 값을 전달합니다.
+차트의 이름을 생략하면 실제 Excel에서 자동으로 생성하듯이
+`Chart1` 따위의 이름으로 차트를 만듭니다.
+여러 개의 계열을 추가하려면 `add_series()` 메소드를 여러번 호출합니다.
+
+    #!perl
+    #
+    # Write chart
+    # -- Create a new chart object as embedded type.
+    # 
+    my $chart = $workbook->add_chart( type => 'line', embedded => 1 );
+    
+    #
+    # Set series name
+    # 
+    my $series_name =  'Stress score';
+    
+    #
+    # -- ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
+    #  
+    $chart->add_series(
+        name       => $series_name,
+        categories => [ $sheet_name, 1, $val_size+1, 0, 0 ],
+        values     => [ $sheet_name, 1, $val_size+1, 1, 1 ],
+    );
+
+`categories`와 `values`에 들어가야 할 값은 워크시트의 이름과
+참조할 값의 시작 및 끝 위치(행 시작, 행 끝, 열 시작, 열 끝)입니다.
+이 때, 참조할 위치는 실제 Excel에서 데이터가 들어있는 곳의 위치임을 주의합니다.
+예를 들면 A1 셀의 위치는 `( 0, 0 )`이고, B2 셀의 위치는 `( 1, 1 )` 입니다.
+
+마지막으로 그래프의 크기와 시작 위치, 제목, x축 및 y축에 대한 도움말 등을
+설정한 후 `insert_chart()` 메소드를 사용해 실제 워크시트에 넣습니다.
+
+    #!perl
+    $chart->set_title( name => 'Line Chart' );
+    $chart->set_x_axis( name => 'Captured Time' );
+    $chart->set_y_axis( name => 'load' );
+    
+    #
+    # Excel chart style
+    # 
+    $chart->set_style( 10 );
+    $chart->set_size( width => 840, height => 576 );
+    
+    #
+    # -- Insert chart onto the worksheet
+    # 
+    $worksheet->insert_chart( 'D2', $chart, 25, 10 );
+    
+    #
+    # Close Excel writing
+    # 
+    $workbook->close();
+
+
+*그림 2*는 마지막 완전한 결과물을 보여줍니다.
+
+![final result][img-2-resize]
+*그림 2.* 마지막 결과물 ([원본][img-2])
+
+
+정리하며
+--------
+
+이 외에도 엄청난(!) 양의 메소드와 매개변수가 있으므로
+꼭 [공식 문서][cpan-excel-writer-xlsx]를 확인하세요.
+여러 메소드를 이용해 도형(shape)을 추가하거나, 각 셀의 서식을 정밀히 제어할 수도 있으며,
+다양한 Excel 함수식을 활용할 수 도 있습니다.
+다만 [Excel::Writer::XLSX][cpan-excel-writer-xlsx] 모듈은 모듈 이름에서 보듯이
+엑셀 파일을 쓰는데(생성하는데) 특화되어 있기 때문에 기존 Excel 파일을 열어서
+수정하는 것에는 제약이 있으므로 이 점은 유의해야합니다.
+엄청난 양의 미가공 자료를 펄을 이용해 빠르게 가공한 후 미려한 Excel 파일로
+보고서를 만드는 것, 상상만해도 멋지지 않나요? :)
+
+
+[img-1]:          2014-12-04-1.png
+[img-2]:          2014-12-04-2.png
+[img-1-resize]:   2014-12-04-1_r.png
+[img-2-resize]:   2014-12-04-2_r.png
+
+[cpan-excel-writer-xlsx]:       https://metacpan.org/module/Excel::Writer::XLSX
+[cpan]:                         http://www.cpan.org/
+[home-corpus007]:               http://corpus.egloos.com/
+[home-perlbrew]:                http://perlbrew.pl/
+[perldoc-perlref]:              http://perldoc.perl.org/perlref.html
+[twitter-corpus007]:            https://twitter.com/corpus007

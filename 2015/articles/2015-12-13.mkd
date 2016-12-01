@@ -1,0 +1,132 @@
+Title:    간단한 기본 통계
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+수치 배열을 가지고 작업을 하다보면 꽤 많은 경우 누계나 평균은 물론이고,
+최댓값, 최솟값 등의 빈번하게 계산하기 마련입니다.
+이런 기본적인 통계값을 생각 날때마다 반복문을 돌리며 연산하는 것은 번거로운 일이죠.
+게으른 펄(Perl) 프로그래머에게 꼭 필요한 간단한 통계 모듈을 알아보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Statistics::Swoop 모듈][cpan-statistics-swoop]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Statistics::Swoop
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Statistics::Swoop
+
+
+사용법
+-------
+
+간단한 모듈이라고 소개는 했지만 `Statistics::Swoop` 모듈은 사용법도 정말 간단한데요.
+모듈 적재 후 객체 생성시 배열 레퍼런스를 전달하는 것이 전부입니다.
+코드를 살펴보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use v5.18; # say 사용
+    use strict;
+    use warnings;
+    use Statistics::Swoop;
+
+    my @list = 1 .. 100;
+    my $ss = Statistics::Swoop->new(\@list);
+
+아니, 이게 끝이라구요?  넵! 그렇습니다.
+객체 생성과 동시에 `Statistics::Swoop` 모듈은 다음과 같은 값을
+자동으로 계산한 후 내부 객체에 저장해둡니다.
+
+- 개수
+- 최댓값
+- 최솟값
+- 총합
+- 평균
+- 범위
+
+각각의 값을 접근하려면 메소드를 이용합니다.
+
+    #!perl
+    say $ss->count; # 100
+    say $ss->max;   # 100
+    say $ss->min;   # 1
+    say $ss->sum;   # 5050
+    say $ss->avg;   # 50.5
+    say $ss->range; # 99
+
+이 값들을 각각 구하는 것이 번거로울 분들을 위해 `result()` 메소드를 제공합니다.
+`result()` 메소드를 사용하면 6개의 값을 키-값 형태인 해시 참조로 값을 반환합니다.
+
+    #!perl
+    my $result = $ss->result;
+    say $result->{count}; # 100
+    say $result->{max};   # 100
+    say $result->{min};   # 1
+    say $result->{sum};   # 5050
+    say $result->{avg};   # 50.5
+    say $result->{range}; # 99
+
+
+정리하며
+---------
+
+총합 및 평균과 최댓값, 최솟값은 중학교 때면 배우는 매우 간단한 연산입니다.
+그만큼 쉽지만 일상적으로 구하는 연산이기도 하구요.
+더 복잡한 연산이 필요하면 모르겠지만 이정도 수준의 기본 통계값이 필요할 때
+[CPAN의 Statistics::Swoop 모듈][cpan-statistics-swoop]을 사용하면
+여러분의 손가락이 조금이나마 더 편해질 것입니다.
+게으름은 흘륭한 펄 프로그래머의 미덕이란 것 잊지 마세요!
+
+> There are three great virtues of a programmer;
+> 
+> Laziness, Impatience and Hubris. - Larry Wall
+
+Enjoy Your Perl! ;-)
+
+
+참고자료
+---------
+
+조금 더 복잡한 통계값이 필요하다면 다음 모듈 역시도 놓치지 말고 살펴보세요.
+
+- [CPAN의 Statistics::Basic 모듈][cpan-statistics-basic]
+- [CPAN의 Statistics::Lite 모듈][cpan-statistics-lite]
+- [CPAN의 Statistics::Descriptive 모듈][cpan-statistics-descriptive]
+
+
+_EOT_
+
+
+[cpan-statistics-basic]:        https://metacpan.org/pod/Statistics::Basic
+[cpan-statistics-descriptive]:  https://metacpan.org/pod/Statistics::Descriptive
+[cpan-statistics-lite]:         https://metacpan.org/pod/Statistics::Lite
+[cpan-statistics-swoop]:        https://metacpan.org/pod/Statistics::Swoop
+[cpan]:                         http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208

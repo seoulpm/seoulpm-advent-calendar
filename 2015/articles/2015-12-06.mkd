@@ -1,0 +1,149 @@
+Title:    터미널 제목 바꾸기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+여러분은 터미널용 유틸리티를 자주 만들곤 하나요?
+[유닉스의 철학 중 하나인 KISS][wiki-kiss-principle]답게 유틸리티를
+만들다보면 대부분은 한 가지 일을 잘 수행하는 간결하고 짧은 프로그램을
+작성하게 되지만 가끔씩은 많은 일을 아우를 수 있는 엄청난(?) 것을
+만들게 되기도 합니다.
+관리 도구라던가 사용자 명령을 기다리는 유틸리티들이 대표적인데요.
+이런 프로그램들은 사용자가 종료하기 전까지는 계속 대기 상태로 있죠.
+또는 간단한 프로그램이지만 처리 시간이 꽤 오래 걸리기 때문에
+실행된 상태로 종료될 때까지 오랜 시간 대기 하는 경우도 있습니다.
+이런 경우 현재 프로세스 상태를 터미널 제목에 표시한다면, 제법 유용할 것입니다.
+Perl을 이용해 터미널의 제목을 바꾸는 법을 알아보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Term::Title 모듈][cpan-term-title]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Term::Title
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Term::Title
+
+
+제목 바꾸기
+------------
+
+[xterm][wiki-xterm] 기반의 터미널일 경우 터미널의 제목을 바꾸려면
+[ANSI 제어 문자][wiki-ansi-escape-code]를 사용합니다.
+터미널 제목 수정시 시작하는 문자는 `"\033]2;"`이며 종료하는 문자는 `"\007"` 입니다.
+즉 실행하는 유틸리티가 터미널 제목을 바꾸려면 다음과 같은 코드를 실행해야 합니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    print STDOUT "\033]2;", '2015 Seoul.pm 펄 크리스마스 달력', "\007", "\n";
+    sleep 10;
+
+`sleep` 함수를 넣지 않을 경우 터미널 제목이 변경된 후 프로그램이 종료되고
+종료되자마자 원래의 터미널 제목으로 바뀌는 것이 순간의 찰나이기 때문에
+실행 결과를 확인하기가 어렵습니다.
+
+![example-1][img-1-resize]
+*그림 1.* 제목 변경 결과 ([원본][img-1])
+
+생각보다 간단하죠?
+1초마다 제목을 변경한다해도 특별히 다를 부분은 없습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use Time::Piece;
+
+    while (1) {
+        my $t = localtime;
+        print STDOUT "\033]2;", $t->hms, "\007", "\n";
+        sleep 1;
+    }
+
+
+바퀴의 재활용
+--------------
+
+**xterm**을 예로 들었는데, 터미널 종류가 [GNU Screen][wiki-gnu-screen]
+유파일 경우는 사용할 문자열이 조금 다릅니다.
+이 때 터미널 제목 수정시 시작하는 문자는 `"\ek"`이며 종료하는 문자는 `"\e\\"` 입니다.
+심지어 윈도우 콘솔의 경우 `windows.h`의 `SetConsoleTitle()` API를 이용해서 제목을 변경해야 하기도 하죠.
+사용하는 터미널의 종류를 확인하고 지원하지 않는 터미널일 경우 처리 및
+터미널에 적합한 ASCII 제어 문자열을 선택하고 사용하는 동작은 지루하고 번거로운 일입니다.
+이런 여러분을 위해 준비 된 것이 바로 [CPAN의 Term::Title 모듈][cpan-term-title]입니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use Term::Title qw( set_titlebar );
+
+    Term::Title::set_titlebar("2015 Seoul.pm 펄 크리스마스 달력");
+
+정말 간단하지 않나요?
+모듈을 적재한 후 `set_titlebar()` 함수를 사용해 원하는
+문자열을 넘겨주면 해당 문자열로 터미널의 제목이 바뀝니다.
+`Term::Title` 모듈은 윈도우, 맥, 리눅스 뿐만 아니라 비교적 많이 사용하는 터미널 모드를
+가려낸 후 가장 적합한 제어 문자열을 사용해서 터미널의 제목을 변경한답니다.
+윈도우의 경우 [Win32::Console 모듈][cpan-win32-console]을 이용하니
+해당 모듈의 설치가 필요한 점은 잊지 마세요.
+
+
+정리하며
+---------
+
+터미널의 제목 변경은 사실 대부분의 사람은 신경도 쓰지 않는 기능이지만,
+명령줄 유틸리티를 만드는 개발자라면 의외로 유용하게 쓰는 기능입니다.
+대용량 파일을 다운로드해서 후작업을 한다던가, 사용자의 입력을 받아
+오랜 시간이 걸리는 일을 처리한다던가 하는 등의 프로그램에서
+`Term::Titme` 모듈을 이용해 이 기능을 적절하게 활용한다면
+사용자 편의성을 더욱 높힐 수 있겠죠. :-)
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+
+[img-1]:          2015-12-06-1.png
+
+[img-1-resize]:   2015-12-06-1_r.png
+
+
+[cpan-term-title]:              https://metacpan.org/pod/Term::Title
+[cpan-win32-console]:           https://metacpan.org/pod/Win32::Console
+[cpan]:                         http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-ansi-escape-code]:        https://en.wikipedia.org/wiki/ANSI_escape_code
+[wiki-gnu-screen]:              https://en.wikipedia.org/wiki/GNU_Screen
+[wiki-kiss-principle]:          https://en.wikipedia.org/wiki/KISS_principle
+[wiki-xterm]:                   https://en.wikipedia.org/wiki/Xterm
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208

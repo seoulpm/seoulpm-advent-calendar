@@ -1,0 +1,251 @@
+Title:    Test::Mojo와 함께하는 보다 쉽고 편한 Web Application 테스트
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   JEEN_LEE
+
+
+저자
+-----
+
+[@JEEN_LEE][twitter-jeen_lee] - 좋은 아빠 워너비, [github:jeen][github-jeen]
+
+
+시작하며
+---------
+
+업계에 들어오고, 엉망진창인 테스트 코드를 쓰면서도 계속되는 고민은
+*어떻게 하면 테스트 코드를 잘 쓸 수 있을까?*였습니다.
+그렇다면 *잘 쓴 테스트 코드*는 과연 어떤 것일까요?
+물론 제가 그것을 알고 있다면 이런 기사를 쓰고 있지는 않겠죠.
+*좋은 테스트 도구를 만나면* 이전과는 다른 *보다 좋은 테스트를 쓸 수 있지 않을까*와 같은 나름의 결론을 내려보았습니다.
+바로 [Test::Mojo][cpan-test-mojo]를 사용하면서 말이죠.
+따라서 이 기사에서 다룰 테스트 어플리케이션은
+[Mojolicious][home-mojolicious]로 만들어졌다는 것을 전제로 합니다.
+
+
+예전의 테스트 코드
+-------------------
+
+그렇다면 *보다 좋게* 쓰기 이전의 테스트 코드는 어땠을까요?
+
+
+### 컨트롤러/모델 하나 하나의 컴파일 테스트
+
+컨트롤러 하나하나 마다 `.t` 파일을 만들어서 정상적으로 컴파일되는지에 대한 테스트를 확인했었습니다.
+
+    #!perl
+
+    # t/100-controller-user.t
+    use strict;
+    use warnings;
+    use Test::More;
+
+    use Catalyst::Test 'MyApp::Web';
+    use_ok "MyApp::Web::Controller::User";
+
+    done_testing();
+
+
+### 컨트롤러의 기능별 추가
+
+그리고 각 컨트롤러의 기능(API endpoint) 별로 요청을 보내고 응답을
+분석해서 *이런 값이 있어야 되겠지*하면서 한 줄, 한 줄 적어갔었습니다.
+
+    #!perl
+    # t/101-controller-user-get.t
+    use strict;
+    use warnings;
+    use Test::More;
+    use HTTP::Request::Common;
+
+    use Catalyst::Test 'MyApp::Web';
+    use JSON::XS;
+
+    my $res = request(
+        GET "/user/1",
+        "X-MyApp-Token" => "f9a077fae03cf63bc4b351344531bde91f0f26c9",
+    );
+
+    my $data = JSON::XS::decode_json($res->content);
+    ok($data->{user}, "Got User Data");
+    ok(defined $data->{user}->{rate}, "Got User-Rate");
+    ok(defined $data->{user}->{photo}, "Got-User-Photo");
+    ok(defined $data->{user}->{count}, "Got-User-Counts");
+    ok(defined $data->{isFriend}, "ok");
+    ok(defined $data->{user}->{count}, "Ok");
+    ok(defined $data->{me}, "OK");
+    done_testing();
+
+
+### 모듈/어플리케이션의 의존성관리
+
+가끔 테스트를 돌리려면 `Can't locate XXX/XXX.pm ....` 와 같은 아주 친숙한 오류가
+종종 발생하는데 이것은 바로 의존성 관리를 제대로 하지 못해서 발생하는 오류입니다.
+어플리케이션의 배포를 위해 `Makefile.PL`에 일일이 의존 모듈을 추가하고
+`cpanm --installdeps .` 명령을 사용해 의존 모듈을 매번 설치해야 했습니다.
+
+
+그렇다면 어떻게 바뀌었나?
+--------------------------
+
+### `lib` 디렉토리 아래 모듈 파일의 전체 컴파일 테스트
+
+프로젝트를 구성하는 모든 이름 공간의 모듈을 한번에 테스트하도록 합니다.
+이를 통해 컨트롤러 하나 하나, 모델 하나 하나에 들였던 불필요한 시간이 사라집니다.
+동시에 프로젝트에서 주로 사용하던 동적 클래스 적재로 호출되던 많은 모듈도 한번에 처리할 수 있습니다.
+
+    #!perl
+    # t/000-compile.t
+    use utf8;
+    use Test::Ika;
+    use Test::More;
+    use Path::Class::Rule;
+
+    BEGIN { binmode STDOUT, ":utf8" };
+
+    describe "Compile" => sub {
+        it "모든 패키지는 정상적으로 로딩되어야 한다" => sub {
+            my $rule = Path::Class::Rule->new;
+            $rule->file->name( qr/\.pm$/ );  # .pm 파일만 추출
+            $rule->file->size('>10');        # 이름 공간 선정을 위해 가끔 개발 도중에
+                                             # 0 byte 모듈 파일을 형식상 만들어두던 습관 때문에...
+            my $iter = $rule->iter('lib');   # lib 디렉토리 하위의 모든 파일들에 대해
+            while ( my $file = $iter->() ) {
+                my $pkg = $file;
+                $pkg =~ s!^lib/!!;
+                $pkg =~ s!\.pm$!!;
+                $pkg =~ s!/!::!g;
+                use_ok $pkg;
+            }
+        };
+    };
+
+
+### 각 테스트 단위의 서술
+
+[Ruby RSpec][home-rspec]의 표현식을 빌려 사용할 수 있는 [Test::Ika 모듈][cpan-test-ika]을
+통해서 앞에서 살펴본 테스트 예제 코드처럼 정의할 수 있습니다. 
+`Test::Ika` 모듈을 통해 기존 단순 명료했던 [TAP][wiki-tap]의 출력 결과와는 달리
+각 테스트 코드에서 서술된 표현들을 깔끔하게 표시해줍니다.
+
+![Test::Ika 모듈의 테스트 결과 출력][img-1-resize]
+*그림 1.* Test::Ika 모듈의 테스트 결과 출력 ([원본][img-1])
+
+예전의 테스트 코드에서는 [Test::More 모듈][cpan-test-more]의 `subtest`를 사용해서 이런 식의 서술을 했었지요.
+이처럼 테스트 단위의 서술을 기재함으로써 테스트 코드를 통해 문서화를 병용할 수 있다는 점이 장점입니다.
+테스트 코드에서 얻을 수 있는 부분과는 다른 문서를 별도로 쓰고 있긴 하지만,
+*나름 잘 구분해서 사용하면 효과적이지 않을까*라고 생각합니다.
+
+
+### `Test::Mojo`
+
+[Mojo::UserAgent][cpan-mojo-useragent]는 HTTP 클라이언트 중 정말 간결하게 사용할 수 있습니다.
+특히나 웹 API 서버가 주로 다루는 응답 결과인 JSON의 각 항목을 테스트하는데는 정말 이만한 모듈이 없습니다.
+물론 여기에서 사용하는 `Test::Mojo` 자체가 `Mojo::UserAgent`를 래핑하는 형태를 취하고 있죠.
+
+    #!perl
+    use Mojo::Base -strict;
+    use Test::Ika;
+    use Test::Mojo;
+
+    BEGIN { binmode STDOUT, ":utf8" };
+
+    my $t = Test::Mojo->new('MyApp::Web');
+
+    describe "Noop" => sub {
+
+        it "서버간의 연결확인 등의 목적으로 하는 무작업 응답이 필요함" => sub {
+            $t
+                ->get_ok('/noop')
+                ->status_is(200)
+                ->json_has('/noop')
+                ;
+        };
+
+        it "인증토큰을 가지지 않은 채로 무작업 응답 요청시에 400을 표시해야 함" => sub {
+            $t
+                ->get_ok('/noop/auth')
+                ->status_is(400)
+                ->json_has('/message')
+                ;
+        };
+
+        it "인증토큰을 가지고 있을 때는 무작업 응답 요청에 답해야 함" => sub {
+            $t->ua->on( start => sub {
+                my ($ua, $tx) = @_;
+                $tx->req->headers->header('X-MyApp-Token', 'xxxxxxxxxxxx');
+            });
+
+            $t
+                ->get_ok('/noop/auth')
+                ->status_is(200)
+                ->json_has('/noop')
+                ->json_has('/result/ok')
+                ->json_has('/devices/0/id')
+                ;
+        };
+    };
+
+앞의 테스트 코드처럼 HTTP 응답이 JSON일 경우 `json_has()` 메소드를 통해 반환되는 JSON 자료를
+Perl 자료 형태로 변환해서 `/devices/0/id`(`devices` 배열 항목의 첫번 째 요소의 `id` 키값)가
+있는지 여부 등을 확인할 수 있는 것입니다.
+이런 데이터 접근방식을 [JSON 포인터(RFC 6901)][rfc-6901]라고 부릅니다.
+
+예제에서 볼 수 있듯이 `Test::Mojo` 객체는 메소드 연쇄(method chaining)로 동작하므로
+나름 깔끔하게(또는 보통의 펄 코드같지 않게) 느껴지기도 합니다.
+ 
+
+### 프로젝트/모듈의 의존성 관리
+
+[Carton][cpan-carton]과 `cpanfile`을 사용합니다.
+기본적으로 앞에서 살펴본 `t/000-compile.t` 테스트 코드에서 모든 모듈의
+컴파일 테스트 시 반드시 의존 모듈의 누락 여부를 확인할 수 있기 때문에
+그때 그때 큰 죄의식없이 `cpanfile` 에 필요한 의존 모듈을 추가하면 됩니다.
+
+테스트를 수행하는 명령은 다음과 같습니다.
+
+    #!bash
+    $ carton install
+    $ carton exec prove t
+
+
+### 테스트 자동화
+
+배포되는 모듈/어플리케이션의 모든 테스트는 [Jenkins][home-jenkins] 상에서 *커밋 단위* 및 *일 단위*로 이뤄집니다.
+관련한 이야기는 [Korean Perl Workshop 2012][home-kpw2012]의 [발표 자료][kpw2012-perl-web-app-test]를 참고하세요.
+
+
+정리하며
+---------
+
+*A를 고쳤는데 B가 안된다*라는 식은 땀이 나는 상황은 언제 어디서고 일어나기 마련입니다.
+물론 이런 저런 테스트 코드를 쓰는 기법과 좋은 방법론이 세상에는 많지만
+저처럼 배움이 느린 사람에게 있어서는 어려운 이야기인지라
+좀 더 좋은 방법에 대해서 갈망하는 자세를 잊어서는 안되리라 생각합니다.
+
+> Machine should work, People should think
+
+어디에선가 주워들은 글귀입니다만,
+누가(기계가), 언제(커밋/특정시간), 어디서(개발서버), 무엇을(이런 저런 항목들을), 어떻게(요래조래), 왜(마음의 평화를 위해)...
+두 번 이상 반복될 것들은 기계에게 맡기며 다른 일에 눈을 돌리는 조바심내는 개발자가 되기를 바랍니다(제가).
+
+
+[img-1]:          2013-12-16-1.png
+[img-1-resize]:   2013-12-16-1_r.png
+
+
+[cpan-carton]:                https://metacpan.org/module/Carton
+[cpan-mojo-useragent]:        https://metacpan.org/pod/Mojo::UserAgent
+[cpan-test-ika]:              https://metacpan.org/module/Test::Ika
+[cpan-test-mojo]:             https://metacpan.org/module/Test::Mojo
+[cpan-test-more]:             https://metacpan.org/module/Test::More
+[github-jeen]:                https://github.com/jeen
+[home-jenkins]:               http://jenkins-ci.org/
+[home-kpw2012]:               http://event.perl.kr/kpw2012/
+[home-mojolicious]:           http://mojolicio.us/
+[home-rspec]:                 http://rspec.info/
+[kpw2012-perl-web-app-test]:  http://www.slideshare.net/JEEN/perl-web-app
+[rfc-6901]:                   http://tools.ietf.org/html/rfc6901
+[twitter-jeen_lee]:           http://twitter.com/#!/JEEN_LEE
+[wiki-tap]:                   http://en.wikipedia.org/wiki/Test_Anything_Protocol

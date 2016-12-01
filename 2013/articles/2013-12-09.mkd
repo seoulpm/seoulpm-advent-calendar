@@ -1,0 +1,83 @@
+Title:    plenv vs perlbrew
+Package:  Seoul.pm
+Category: perl
+Category: plenv
+Category: Seoul.pm
+Author:   aanoaa
+
+저자
+----
+
+[@aanoaa][twitter-aanoaa] - 홍형석, 사당동 펠프스, [github:aanoaa][github-aanoaa]
+
+
+시작하며
+---------
+
+[perlbrew][home-perlbrew]는 펄 커뮤니티 내에서 널리 사용되는 펄 설치 및 관리 도구입니다.
+[Seoul.pm 크리스마스 달력][advent]에서 여러번 다뤄지기도 했죠.
+
+- [2011 - 열세번째 날: How to Use CPAN, Actually][advent-2011-13]
+- [2011 - 열여섯번째 날: perlbrew, local::lib, smartcd 를 이용하여 Perl 환경 구축하기][advent-2011-13]
+- [2013 - 셋째 날: 좋은 모듈을 고르는 좋은 방법][advent-2011-13]
+
+*perlbrew* 릴리스 이후 거의 4년 만에 강력한 라이벌인 [plenv][home-plenv]가 나타났습니다.
+
+
+plenv vs perlbrew
+------------------
+
+[perlbrew][home-perlbrew]와 [plenv][home-plenv] 모두 홈 디렉토리에 펄을 설치하고,
+사용하는 쉘에서 마음대로 버전을 바꿔가며 사용할 수 있습니다.
+또 사용하는 펄에 따라 모듈 설치 경로가 바뀝니다.
+
+*plenv* 에는 *perlbrew* 와 차별화되는 두 가지 기능이 있습니다.
+
+
+### 경로별 펄 버전 지정
+
+*perlbrew*와는 달리 *plenv*는 특정 경로에서 사용할 펄을 강제로 지정할 수 있습니다.
+다음 명령은 `/path/to/.perl-version` 파일을 만듭니다.
+
+    #!bash
+    $ cd /path/to
+    $ plenv local 5.18.1
+
+`/path/to/.perl-version` 파일에는 사용할 펄의 버전 정보가 단순한 텍스트 형식으로 담겨집니다.
+
+    #!bash
+    $ cat /path/to/.perl-version
+    5.18.1
+
+`.perl-version` 파일이 있는 한 `/path/to` 디렉터리 및 그 하부 디렉터리까지 `5.18.1` 버전을 사용하게 됩니다.
+
+
+### 환경 변수로 펄 버전 지정
+
+`PLENV_VERSION` 환경 변수를 사용하면 영구적이 아니라
+환경 변수의 영향 아래서만 다른 버전의 펄을 사용할 수 있습니다.
+
+    #!bash
+    $ PLENV_VERSION=system perl a.pl
+
+
+정리하며
+---------
+
+4년 전 혜성처럼 등장한 [perlbrew][home-perlbrew] 덕분에 시스템의 펄과는 별개의 펄 환경을
+너무도 손쉽게 구축할 수 있게 되면서 펄 개발 환경은 무척 편리해졌었습니다.
+사실 *perlbrew*는 여전히 [CPAN의 최고 모듈 명단][home-metacpan-leaderboard]의 10위권 안에 들 정도로 여전히 인기있는 모듈입니다.
+앞서 언급하지 않았지만 *perlbrew*에는 `lib`, `upgrade-perl`, `self-upgrade` 등 *plenv*에는 없는 강력한 기능이 많습니다.
+마찬가지로 *plenv* 역시 *perlbrew*를 사용하면서 아쉬웠던 부분을 구석구석 긁어주는 기능이 많죠.
+필요에 따라 적절한 도구를 선택해서 사용하는 것은 여러분의 몫이겠죠? ;-)
+
+
+[advent-2011-13]:             http://advent.perl.kr/2011/2011-12-13.html
+[advent-2011-16]:             http://advent.perl.kr/2011/2011-12-16.html
+[advent-2013-03]:             http://advent.perl.kr/2013/2013-12-03.html
+[advent]:                     http://advent.perl.kr
+[github-aanoaa]:              https://github.com/aanoaa
+[home-metacpan-leaderboard]:  http://metacpan.org/favorite/leaderboard
+[home-perlbrew]:              http://perlbrew.pl/
+[home-plenv]:                 https://github.com/tokuhirom/plenv
+[twitter-aanoaa]:             http://twitter.com/aanoaa

@@ -1,0 +1,254 @@
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothiccoding.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);
+
+@font-face {
+    font-family: 'NanumMyeongjoExtraBoldWeb';
+    font-style: normal;
+    font-weight: 800;
+    src: url('NanumMyeongjoExtraBoldCompact.woff') format('woff');
+}
+@font-face {
+    font-family: 'NanumMyeongjoWeb';
+    font-style: normal;
+    font-weight: 400;
+    src: url('NanumMyeongjoCompact.woff') format('woff');
+}
+* {
+    margin: 0;
+    padding: 0;
+    font-family:'Nanum Gothic',나눔고딕,'Malgun Gothic',맑은고딕,UnDotum,Dotum,Arial,Sans;
+}
+.space-20 {
+    height: 20px;
+}
+body {
+    background: url("hr.png") repeat-x scroll -4px 0;
+}
+#wrap {
+    width: 690px;
+    margin: 0 auto;
+    min-height: 100px;
+    overflow: visible;
+}
+.nav {
+    margin-top: 0;
+    padding-top: 60px;
+}
+.nav menu, .nav ul.like {
+    list-style: none;
+    display: inline-block;
+    float: right;
+}
+.nav menu {
+    margin-top: 4px;
+}
+.nav menu a {
+    display: block;
+    height: 44px;
+}
+.nav menu li {
+    display: inline-block;
+    float: left;
+    background: url("nav.png");
+    background-repeat: no-repeat;
+    height: 44px;
+    margin-left: 4px;
+}
+.nav menu li.prev,
+.nav menu li.prev a {
+    background-position: 0 0;
+    width: 60px;
+}
+.nav menu li.twit,
+.nav menu li.twit a {
+    background-position: -60px 0;
+    width: 53px;
+}
+.nav menu li.feed,
+.nav menu li.feed a {
+    background-position: -113px 0;
+    width: 44px;
+}
+.nav menu li.chat,
+.nav menu li.chat a {
+    background-position: -157px 0;
+    width: 61px;
+}
+.nav menu li.next,
+.nav menu li.next a {
+    background-position: -218px 0;
+    width: 57px;
+}
+.nav ul.like {
+    margin-top: 2px;
+    margin-left: 24px;
+}
+.nav ul.like li {
+    display: inline-block;
+}
+.nav.bottom menu {
+    margin-bottom: 30px;
+}
+h1, h2, h3, h4 {
+    display: block;
+    font-family: 'NanumMyeongjoExtraBoldWeb';
+    line-height: 1.2em;
+}
+h1 {
+    font-size: 1.8em;
+    margin: 1em -2em 0 -1.4em;
+    display: inline-block;
+    background-color: #f4f4f4;
+    padding: 0.4em;
+}
+h2 {
+    font-size: 1.8em;
+    margin: 1.4em 0 0.5em -1em;
+}
+h3 {
+    font-size: 1.4em;
+    margin: 1.4em 0 0.5em -0.6em;
+}
+#cont p a, #cont ul a {
+    font-family: 'NanumMyeongjoWeb';
+    color: black;
+}
+#cont {
+    font-size: 18px;
+    line-height: 2em;
+}
+#cont p, #cont ul {
+    font-family: 'NanumMyeongjoWeb';
+    display: block;
+    margin-bottom: 1.6em;
+    text-align: justify;
+}
+#cont table {
+    margin: 0 auto 1.6em auto;
+    border: 1px solid #b4b4b4;
+    border-collapse: collapse;
+    padding: 0.2em;
+    font-family: 'NanumMyeongjoWeb';
+    width: 80%;
+}
+#cont table thead {
+    background-color: #e8e8e8;
+}
+#cont table caption {
+    font-size: 0.8em;
+}
+#cont table tbody {
+    font-family: 'NanumMyeongjoWeb';
+    font-size: 0.9em;
+}
+#cont table thead th,
+#cont table tbody td {
+    padding: 0.2em;
+    border: 1px solid #c5c5c5;
+}
+#cont ul {
+    margin-top: -0.6em;
+    margin-bottom: 1em;
+    list-style: none;
+}
+#cont li {
+    margin: 5px 0 5px 16px;
+    padding-left: 40px;
+    background: url("bullet.png") no-repeat scroll 4px 4px transparent;
+}
+#cont li ul {
+    margin-top: -0.4em;
+    margin-bottom: 1em;
+}
+#cont li li {
+    background: url("bullet2.png") no-repeat scroll 6px 6px transparent;
+    padding-left: 40px;
+}
+#cont em {
+    font-weight: bold;
+}
+.syntaxhighlighter .gutter .line,
+.syntaxhighlighter .code .line {
+    font-family: 'Nanum Gothic Coding',나눔고딕코딩,monospace !important;
+}
+#cont code {
+    font-family: 'Nanum Gothic Coding',나눔고딕코딩,monospace !important;
+    background-color: #f4f4f4;
+    padding: 4px;
+}
+#cont img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+#cont blockquote {
+    background-color: #f4f4f4;
+    margin-left: 1em;
+    margin-bottom: 1.6em;
+    padding: 6px;
+}
+#cont blockquote p {
+    margin-bottom: 0.6em;
+    margin-left: 0.4em;
+}
+.hidden {
+    width: 0;
+    height: 0;
+    display: inline-block;
+    overflow: hidden;
+}
+#cont .syntaxhighlighter {
+    margin-top: -1em !important;
+    font-size: 0.8em !important;
+}
+#foot {
+    position: relative;
+    width: 706px;
+    height: 548px;
+    margin-top: 60px;
+    margin-bottom: 16px;
+    background: url("foot-bg.png") no-repeat scroll 330px 0 transparent;
+}
+#foot .indent {
+    margin-left: 63px;
+}
+#foot #link ul {
+    line-height: 2em;
+    list-style: none;
+}
+#foot #link ul li {
+    margin-left: -36px;
+    padding-left: 36px;
+    background: url("bullet2.png") no-repeat 0 1px transparent;
+}
+#foot ul.icon {
+    margin-top: 30px;
+    list-style: none;
+    display: none;
+}
+#foot ul.icon li {
+    float: left;
+    margin-right: 10px;
+}
+#foot ul.like {
+    position: absolute;
+    display: block;
+    list-style: none;
+    top: 468px;
+    left: 400px;
+}
+#foot .copyright {
+    position: absolute;
+    font-size: 12px;
+    bottom: -12px;
+}
+#foot .copyright a {
+    text-decoration: none;
+}
+#foot .copyright a:hover {
+    text-decoration: underline;
+}
+#foot a {
+    color: #000;
+}
