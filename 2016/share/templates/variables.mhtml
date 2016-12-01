@@ -1,0 +1,185 @@
+<%init>
+return {
+    title          => 'Seoul.pm 펄 크리스마스 달력 #2016',
+    title_en       => 'Seoul.pm Perl Advent Calendar 2016',
+    css_article    => 'article.css',
+    css_calendar   => 'calendar.css',
+    articles_total => 24,
+    fb_token       => '100001798303989',
+    base_domain    => 'advent.perl.kr',
+    base_uri       => 'http://advent.perl.kr/2016/',
+    korean_day => sub {
+        my $day   = shift;
+        my %table = (
+            1  => '첫째',
+            2  => '둘째',
+            3  => '셋째',
+            4  => '넷째',
+            5  => '다섯째',
+            6  => '여섯째',
+            7  => '일곱째',
+            8  => '여덟째',
+            9  => '아홉째',
+            10 => '열번째',
+            11 => '열한번째',
+            12 => '열두번째',
+            13 => '열세번째',
+            14 => '열네번째',
+            15 => '열다섯번째',
+            16 => '열여섯번째',
+            17 => '열일곱번째',
+            18 => '열여덟번째',
+            19 => '열아홉번째',
+            20 => '스무번째',
+            21 => '스물한번째',
+            22 => '스물두번째',
+            23 => '스물세번째',
+            24 => '스물네번째',
+            25 => '스물다섯번째',
+            26 => '스물여섯번째',
+            27 => '스물일곱번째',
+            28 => '스물여덟번째',
+            29 => '스물아홉번째',
+            30 => '서른번째',
+            31 => '서른한번째',
+        );
+        return $table{$day};
+    },
+    profile_image => {
+        '1985xmas'     => 'profile_1985xmas.jpg',
+        'aanoaa'       => 'profile_aanoaa.jpg',
+        'aer0'         => 'profile_aer0_1.jpg',
+        'am0c'         => 'profile_am0c_1.jpg',
+        'ascendo'      => 'profile_ascendo.jpg',
+        'cheese_rulez' => 'profile_cheese_rulez.jpg',
+        'corund'       => 'profile_corund.jpg',
+        'dalinaum'     => 'profile_dalinaum.jpg',
+        'eeyees'       => 'profile_eeyees.jpg',
+        'empty'        => 'profile_empty.jpg',
+        'gypark'       => 'profile_gypark_1.jpg',
+        'hazzling'     => 'profile_hazzling.jpg',
+        'ja3ck'        => 'profile_ja3ck.jpg',
+        'laen0k'       => 'profile_laen0k.jpg',
+        'jaker'        => 'profile_jaker.jpg',
+        'JEEN_LEE'     => 'profile_JEEN_LEE.jpg',
+        'JellyPooo'    => 'profile_JellyPooo.jpg',
+        'John_Kang'    => 'profile_John_Kang.jpg',
+        'keedi'        => 'profile_keedi.jpg',
+        'luzluna'      => 'profile_luzluna.jpg',
+        'mintegrals'   => 'profile_mintegrals.jpg',
+        'newbcode'     => 'profile_newbcode.jpg',
+        'nving'        => 'profile_nving.jpg',
+        'owl0908'      => 'profile_owl0908.jpg',
+        'perlstudy'    => 'profile_perlstudy.jpg',
+        'pung96'       => 'profile_pung96.jpg',
+        'rumidier'     => 'profile_rumidier.jpg',
+        'saillinux'    => 'profile_saillinux.jpg',
+        'skyloader'    => 'profile_skyloader_small.jpg',
+        'studioego'    => 'profile_studioego.jpg',
+        'sng2c'        => 'profile_sng2c.jpg',
+        'y0ngbin'      => 'profile_y0ngbin.jpg',
+        'Jeffrey Kegler' => 'profile_jeffreykegler.jpg',
+        'Yoshinori Matsunobu' => 'profile_yoshinori.jpg',
+      },
+    advent_links => [
+        {
+            title => '크리스마스 달력이란',
+            url   => '/2011#openbook',
+        },
+        {
+            title => '펄 크리스마스 달력 #2010',
+            url   => '/2010',
+        },
+        {
+            title => '펄 크리스마스 달력 #2011',
+            url   => '/2011',
+        },
+        {
+            title => '펄 크리스마스 달력 #2012',
+            url   => '/2012',
+        },
+        {
+            title => '펄 크리스마스 달력 #2013',
+            url   => '/2013',
+        },
+        {
+            title => '펄 크리스마스 달력 #2014',
+            url   => '/2014',
+        },
+        {
+            title => '펄 크리스마스 달력 #2015',
+            url   => '/2015',
+        },
+        {
+            title => 'Perl Advent Calendar',
+            url   => 'http://www.perladvent.org/2016/',
+        },
+        {
+            title => 'Perl 6 Advent Calendar',
+            url   => 'http://perl6advent.wordpress.com/',
+        },
+        #{
+        #    title => 'Perl Catalyst Advent Calendar',
+        #    url   => 'http://www.catalystframework.org/calendar/2015',
+        #},
+        #{
+        #    title => 'Perl Dancer Advent Calendar',
+        #    url   => 'http://advent.perldancer.org/2015',
+        #},
+        #{
+        #    title => 'Future Advent Calendar',
+        #    url   => 'http://leonerds-code.blogspot.co.uk/search/label/advent',
+        #},
+        {
+            title => '일본 Perl 입학식 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2016/perl-entrance',
+        },
+        {
+            title => '일본 Perl 5 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2016/perl5',
+        },
+        {
+            title => '일본 Perl 6 Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2016/perl6',
+        },
+        {
+            title => '일본 Mojolicious Advent Calendar',
+            url   => 'http://qiita.com/advent-calendar/2013/mojolicious',
+        },
+        {
+            title => 'Sysadmin Advent Calendar',
+            url   => 'http://sysadvent.blogspot.kr/',
+        },
+        {
+            title => '한국 루비 크리스마스 달력',
+            url   => 'https://ruby-korea.github.io/advent-calendar/',
+        },
+        {
+            title => '이상한 모임 크리스마스 달력',
+            url   => 'http://1225.weirdx.io/',
+        },
+    ],
+    links => [
+        {
+            title => '펄.kr',
+            url   => 'http://perl.kr',
+        },
+        #{
+        #  title => 'Seoul.pm',
+        #  url   => 'http://seoul.pm.org',
+        #},
+        {
+            title => '네이버 펄 카페',
+            url   => 'http://cafe.naver.com/perlstudy.cafe',
+        },
+        {
+            title => 'IRC #perl-kr 채팅',
+            url   => 'http://webchat.freenode.net/?channels=perl-kr',
+        },
+        {
+            title => '한국펄워크샵 2012',
+            url   => 'http://event.perl.kr/kpw2012/',
+        },
+    ],
+};
+</%init>

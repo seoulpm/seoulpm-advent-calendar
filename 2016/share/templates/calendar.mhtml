@@ -1,0 +1,139 @@
+<& header.mhtml, global => $global, article => undef, year => $year &>
+<body><& xfbml.mhtml &>
+<div id="popup"><div class="inner">
+  <div id="popup_text">
+    <strong class="title"></strong>
+    <p class="author"></p>
+  </div>
+</div></div>
+<div id="preload">
+  <img src="gift.png"  width="1px" height="1px" alt="&nbsp;" />
+  <img src="popup.png" width="1px" height="1px" alt="&nbsp;" />
+</div>
+<div id="wrap">
+  <div id="head">
+    <h1 class="hidden"><img src="logo_fb.gif" alt="Seoul.pm"/><% $global->{title} . " | " . $global->{title_en} %></h1>
+    <pre>
+                    __________________________________________________________________________________  
+            __..--/".'                                                                                '.
+    __..--""      | |                                                             Seoul Perl Mongers   |
+   /              | |    ___________________________________________________________________________   |
+  /               | |   :__________________________________________________________________________/:  |
+ ;                | |   |<span>                           .                                             </span>'.|  |
+ |                | |   |<span>                      ...:::::...                                        </span> ||  |
+ |                | |   |<span>                 ..::::::  =  :::::::...                                 </span> ||  |
+ |                | |   |<span>             ..::::::::   ===   ::::::::....                             </span> ||  |
+ |                | |   |<span>         ..::::::::    ===========   :::::::...                          </span> ||  |
+ |                | |   |<span>        ..:::::::   ================    ::::::..                         </span> ||  |
+ |                | |   |<span>       ..::::::::  ======= . =========   ::::::...                       </span> ||  |
+ |                | |   |<span>     ..::::::::  ========  |\  ========  :::::::...                      </span> ||  |
+ |                | |   |<span>     ..::::::::  ========  |#\ ========  :::::::...                      </span> ||  |
+ |                | |   |<span>     .::::::::  ========  /%#|  =======   :::::::..                      </span> ||  |
+ |                | |   |<span>     .::::::::  =======  /#%#|  =======   :::::::..                      </span> ||  |
+ |                | |   |<span>     .::::::::  ======  |#%#/  ========  :::::::..                       </span> ||  |
+ |                | |   |<span>     ..:::::::  ======   \%/  ========  :::::::..                        </span> ||  |
+ |                | |   |<span>      ..:::::::   ======  %  =======  ::::::::..                         </span> ||  |
+ |                | |   |<span>       ..:::::::    ===___%____===   ::::::::..                          </span> ||  |
+ |                | |   |<span>        ..::::::::    |  .::.  |   ::loam::...                           </span> ||  |
+ |                | |   |<span>            $o$o$$o$$$o$$o$$o$$o$$$o$o$o$                                </span> ||  |
+ |                | |   |<span>            $$$ ___  $$$$$$$$$$$unknown$$                                </span> ||  |
+ |                | |   |<span>            "$$| _ \_ _ __ _ _  _  $$$$$"                                </span> ||  |
+ |                | |   |<span>            "$$|  _/ '_/ _` | || | $$$$$"   HAPPY CHRISTMAS              </span> ||  |
+ |                | |   |<span>            '$$|_|_|_| \__,_|\_, | $$$$$'                                </span> ||  |
+ |                | |   |<span>            '$$| __|__ _ _   |__/  $$$$$'     WITH <span class="perl">______         _ </span>     </span> ||  |
+ |                | |   |<span>             $$| _/ _ \ '_| $$$$$$$$$$$$           <span class="perl">| ___ \       | |</span>     </span> ||  |
+ |                | |   |<span>             $$|_|\___/_|   $$$$$$$$$$$$           <span class="perl">| |_/ /__ _ __| |</span>     </span> ||  |
+ |                | |   |<span>             "$| |/ /___ _ _ ___ __ _ $"           <span class="perl">|  __/ _ \ '__| |</span>     </span> ||  |
+ |                | |   |<span>             "$| ' &lt;/ _ \ '_/ -_) _` |$"           <span class="perl">| | |  __/ |  | |</span>     </span> ||  |
+ |                | |   |<span>             '$|_|\_\___/_| \___\__,_|$'           <span class="perl">\_|  \___|_|  |_|</span>     </span> ||  |
+ |                | |   |<span>             '$$$$$$$$$$$$$$$$$$$$$$$$$'                                 </span> ||  |
+ |                | |   |<span>   ___________________________________________________________________   </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">         ___ __  _  __   ___               _                     </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">        |_  )  \/ |/ /  / __| ___ ___ _  _| |  _ __ _ __         </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">         / / () | / _ \ \__ \/ -_) _ \ || | |_| '_ \ '  \        </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">        /___\__/|_\___/ |___/\___\___/\_,_|_(_) .__/_|_|_|       </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">   _      _             _      ___      _     |_|     _          </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">  /_\  __| |_ _____ _ _| |_   / __|__ _| |___ _ _  __| |__ _ _ _ </span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm"> / _ \/ _` \ V / -_) ' \  _| | (__/ _` | / -_) ' \/ _` / _` | '_|</span>    </span> ||  |
+ |                | |   |<span>    <span class="seoulpm">/_/ \_\__,_|\_/\___|_||_\__|  \___\__,_|_\___|_||_\__,_\__,_|_|  </span>    </span> ||  |
+ |                | |   |<span>                                                                         </span> ||  |
+ |                | |   |<span> Last login: Wed Dec 24 16:46:47 2015 from 192.168.0.111                 </span> ||  |
+ |                | |   |<span> [<span class="host">llama@perl</span> <span class="dir">~</span>]$ _                                                       </span> ||  |
+ ;                | |   |<span>                                                                         </span> ||  |
+ |                | |   |_________________________...........................---------------------"\|  |
+ |                | |   |___________________________...........................--------------------"   |
+ |                | |                                                                                 .'
+ '._            |\|_|              ___________________...........................------------------.|"  
+    "._         | | |""""""""""""""                                                                 |   
+       "-._.....| |             ___________________________________________________________...---"""'   
+           "-._.| | ___...---"""                                                                        
+               """""             grp                                                                    
+    </pre>
+  </div>
+  <div class="cont">
+    <ul id="gifts">
+% for my $week ( @$calendar ) {
+%   for my $day ( @$week ) {
+%     if ( $day && $day <= $global->{articles_total} ) {
+%       my $key = sprintf("%4d-%02d-%02d", $year, $month->{1}->month, $day);
+%       my $article = $articles->{$key};
+%       if ( $article ) {
+%         if (     $today->year  == $year
+%               && $today->month == $month->{1}->month
+%               && $today->day   == $day ) {
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날.
+                 <span class="title"><% $article->title %></span> - by <span class="author"><% $article->author %></span>
+            </span></a></li>
+%         }
+%         else {
+            <li class="gift_<% $day %> on bold"><a href="<% $article->atom_id %>"><span class="hidden">
+              <% $global->{korean_day}->($day) %> 날.
+                 <span class="title"><% $article->title %></span> - by <span class="author"><% $article->author %></span>
+            </span></a></li>
+%         }
+%       }
+%       else {
+          <li class="gift_<% $day %>"><a href="#"><span class="hidden">
+            <% $global->{korean_day}->($day) %> 날.
+          </span></a></li>
+%       }
+%     }
+%   }
+% }
+    </ul>
+    <script>
+      $("#gifts li.on").hover(function() {
+        var offset = $(this).offset();
+        var popup  = $("#popup");
+        popup.css("left", offset.left - (230 / 2) + 60);
+        popup.css("top", offset.top - 168 + 6);
+        $("#popup_text .title").text($(".title", this).text());
+        $("#popup_text .author").text($(".author", this).text());
+
+        if ( $(".title", this).text().length > 25 ) {
+          $("#popup_text .title").addClass("title_small");
+        }
+        else {
+          $("#popup_text .title").removeClass("title_small");
+        }
+
+        popup.css("display", "block");
+      }, function() {
+        $("#popup").css("display", "none");
+      });
+    </script>
+  </div>
+<& footer.mhtml, global => $global, article => undef &>
+<%init>
+  my $global = $m->comp('variables.mhtml');
+  $global->{location} = '';
+</%init>
+
+<%args>
+  $today
+  $year
+  $month
+  $calendar
+  $articles
+</%args>
