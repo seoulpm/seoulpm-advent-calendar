@@ -155,7 +155,9 @@ h3 {
     background: url("bullet2.png") no-repeat scroll 6px 6px transparent;
     padding-left: 40px;
 }
-#cont em {
+#cont em,
+#cont strong {
+    font-family: 'Nanum Myeongjo';
     font-weight: bold;
 }
 .syntaxhighlighter .gutter .line,
