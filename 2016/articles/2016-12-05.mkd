@@ -163,7 +163,10 @@ OpenShift 애플리케이션에 Dancer2 환경 설정
     $ git commit -a -m 'Thank you, Sangyong Gwak'
     $ git push
 
-웹 브라우저로 웹 사이트에 방문해보세요.
+짠~ 이제 웹 브라우저로 웹 사이트에 방문해보세요. ;-)
+
+![PaaS에 올린 Dancer2 웹 응용][img-1-resize]
+*그림 1.* PaaS에 올린 Dancer2 웹 응용 ([원본][img-1])
 
 웹 서비스를 종료할 때와 시작할 때는 다음의 명령을 이용합니다.
 
@@ -185,8 +188,6 @@ OpenShift 애플리케이션에 Dancer2 환경 설정
 
     #!bash
     $ rhc alias add APPNAME yourdomainname.youre.space
-
-맙소사! 추출이 모두 끝났습니다. ;-)
 
 
 나머지
@@ -219,6 +220,11 @@ DIY 카트리지 말고 **Plack** 카트리지가 있는데, 잘 동작하지 �
 **Plack** 수정이 끝나면 새 글로 소개하겠습니다. :-)
 
 _EOT_
+
+
+[img-1]:                    2016-12-05-1.png
+
+[img-1-resize]:             2016-12-05-1_r.png
 
 
 [cpan-dancer2]:                     https://metacpan.org/pod/Dancer2
