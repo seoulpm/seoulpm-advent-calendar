@@ -1,4 +1,4 @@
-Title:    Dancer2 웹 애플리케이션을 무료 PaaS에서 실행하기 
+Title:    Dancer2 웹 애플리케이션을 무료 PaaS에서 실행하기
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -13,8 +13,8 @@ Author:   Sangyong Gwak
 시작하며
 ---------
 
-클라우드 서비스 중에 PaaS(Platform as a Service)는, 소프트웨어 개발자에게 "인프라나 프레임워크 등에 신경 쓰지 말고 코드만 올려라"라는 가치를 준다고 생각하고 있습니다. PaaS 솔루션 중에 여러가지가 있는데 이번엔 OpenShift를 이야기 해보겠습니다. 그리고 OpenShift를 기반으로 한 PaaS 중에 무료인 것도 소개하겠습니다. 
-그리고 그 PaaS위에 Dancer2로 만든 웹 사이트를 만들겠습니다. [Dancer2][cpan-dancer2]는 Perl로 만들어진 가벼운 웹 애플리케이션 프레임워크입니다. 
+클라우드 서비스 중에 PaaS(Platform as a Service)는, 소프트웨어 개발자에게 "인프라나 프레임워크 등에 신경 쓰지 말고 코드만 올려라"라는 가치를 준다고 생각하고 있습니다. PaaS 솔루션 중에 여러가지가 있는데 이번엔 OpenShift를 이야기 해보겠습니다. 그리고 OpenShift를 기반으로 한 PaaS 중에 무료인 것도 소개하겠습니다.
+그리고 그 PaaS위에 Dancer2로 만든 웹 사이트를 만들겠습니다. [Dancer2][cpan-dancer2]는 Perl로 만들어진 가벼운 웹 애플리케이션 프레임워크입니다.
 
 이 글을 차근차근 따라하면 무료로 웹 사이트 하나가 딱 나옵니다.
 
@@ -54,20 +54,20 @@ OpenShift 애플리케이션 생성
 OpenShift 애플리케이션은 Open PaaS 웹 사이트에서도 만들 수 있습니다만, rhc 명령을 이용하겠습니다.
 우리는 DIY(Do It Yourself) 카트리지를 선택할 겁니다. DIY 카트리지로 OpenShift 애플리케이션을 만들고 그 안에 수작업으로 Dancer2 환경을 만들겁니다.
 
-    $ rhc setup 
+    $ rhc setup
     OpenShift Client Tools (RHC) Setup Wizard
     This wizard will help you upload your SSH keys, set your application namespace, and check that other programs like Git are properly installed.
     If you have your own OpenShift server, you can specify it now. Just hit enter to use:
 
 여기에 broker.cloud.or.kr를 입력합니다. broker.cloudsc.kr 넣으면 안 됩니다.
-아이디와 비밀번호는 Open PaaS 웹 사이트 가입 시 사용한 정보를 이용합니다. 
+아이디와 비밀번호는 Open PaaS 웹 사이트 가입 시 사용한 정보를 이용합니다.
 
 
 OpenShift 애플리케이션에 Dancer2 환경 설정
 ----------------
 
 아래 명령으로 앱을 생성합니다.
-    $ rhc create-app -a APPNAME diy 
+    $ rhc create-app -a APPNAME diy
 
 아래 명령으로 OpenShift 애플리케이션에 ssh로 접속합니다.
     $ rhc ssh -a APPNAME
@@ -106,7 +106,7 @@ OpenShift 애플리케이션의 git repository 주소와 웹 사이트 URL을 �
     dancer2 @ http://dancer2-imyaman.cloud.or.kr/
     ... 생략 ...
     Git URL:    ssh://5d@dancer2-imyaman.cloud.or.kr/~/git/dancer2.git/
-    
+
     $ git clone ssh://5d@dancer2-imyaman.cloud.or.kr/~/git/dancer2.git
 
 
