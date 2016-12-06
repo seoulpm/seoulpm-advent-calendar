@@ -256,3 +256,4 @@ _EOT_
 [twitter-keedi]:                    http://twitter.com/#!/keedi
 [wiki-lat]:                         https://ko.wikipedia.org/wiki/%EC%9C%84%EB%8F%84
 [wiki-lng]:                         https://ko.wikipedia.org/wiki/%EA%B2%BD%EB%8F%84
+[yes24-4433208]:                    http://www.yes24.com/24/goods/4433208
