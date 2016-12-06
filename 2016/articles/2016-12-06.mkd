@@ -1,0 +1,258 @@
+Title:    너무 간단한 지도 그리기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+홈페이지를 만들거나 누군가에게 위치를 알려준다던가 해야 할 일이 있다보면
+지도를 화면에 띄우고 싶을 때가 꽤 많습니다.
+아주 오래전과는 달리 요즘은 [구글][home-google-map]을 비롯해,
+[오픈스트리트맵][home-openstreetmap], [네이버][home-naver-map],
+[카카오(다음)][home-daum-map] 등 공개 지도 서비스가 무척 잘되어 있기 때문에
+컴퓨터에서 지도를 보여주는 일은 무척 쉬워졌지요.
+대부분의 지도는 웹브라우저 위에 HTML 형식으로 보여주며,
+자바스크립트를 이용해 제어하기 때문에 간단한 웹 지식만
+있으면 누구나 금방 지도 화면을 다룰 수 있죠.
+이미 충분히 간단하기는 하지만, 그럼에도 불구하고 Perl을 이용하면
+지도를 그릴 때 필요한 번거로운 기본 작업을 더욱 더 줄여주기 때문에
+정말 간단하게 지도를 표현할 수 있답니다.
+펄을 이용해 가장 널리 사용하는 [구글맵][home-google-map]을 사용하는 법을 알아보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 HTML::GoogleMaps::V3 모듈][cpan-html-googlemaps-v3]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan HTML::GoogleMaps::V3
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan HTML::GoogleMaps::V3
+
+
+Google Maps API 키
+-------------------
+
+구글 지도를 화면에 보여주기 위해서는 [Google Maps API 키][home-google-maps-api]가 필요합니다.
+정확히는 구글 지도가 제공하는 표준 API를 사용하기 위한 표준 API 키를 발급 받아야 합니다.
+API 키는 무료 API인 표준 API와 유료 API인 프리미엄 플랜이 있는데 관련해서는 구글의 API 관련 정책을 참고하세요.
+우선 키를 발급 받기 위해 [Google Maps API 키][home-google-maps-api] 페이지에 접속해서
+**GET A KEY** 버튼을 누릅니다.
+
+![API 키 취득 1단계: GET A KEY!!][img-1-resize]
+*그림 1.* API 키 취득 1단계: GET A KEY!! ([원본][img-1])
+
+구글 지도 자바스크립트 API 키 활성화 팝업 창이 뜨면, **API Project**와
+라이센스 정책을 동의한 다음 **ENABLE API** 버튼을 눌러 API를 활성화 시킵니다.
+
+![API 키 취득 2단계: ENABLE API!!][img-2-resize]
+*그림 2.* API 키 취득 2단계: ENABLE API!! ([원본][img-2])
+
+짜잔! 여기까지 문제가 없었다면 드디어 구글 지도를 사용하기 위한 API 키를 취득 했습니다. ;-)
+
+![API 키 취득 3단계: ENABLE API!!][img-3-resize]
+*그림 3.* API 키 취득 2단계: ENABLE API!! ([원본][img-3])
+
+발급받은 API 키는 무한정 사용할 수 있는 것이 아니라 자신의 계정에 귀속되어
+사용할 수 있는 한도가 정해져 있으니 함부로 유출되지 않도록 주의합니다.
+필요하다면 언제든지 변경이나 재발급이 가능하므로 관련해서는
+[구글 지도 공식 문서][dev-google-maps]를 확인하세요.
+
+
+화면에 지도를 뿌리자
+---------------------
+
+자, 이제 모든 준비가 끌났습니다.
+화면에 지도를 뿌려 볼까요?
+우선 모듈을 적재하고 `HTML::GoogleMaps::V3` 객체를 생성해야겠죠.
+이 때 `api_key` 속성을 이용해 발급 받았던 API 키를 넣어줍니다.
+
+    #!perl
+    use utf8;
+    use strict;
+    use warnings;
+
+    use HTML::GoogleMaps::V3;
+
+    binmode STDOUT, ":utf8";
+     
+    my $map = HTML::GoogleMaps::V3->new(
+        api_key => "AIzABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHkY",
+    );
+
+이제 보여주고 싶은 지점을 콕 찍어볼까요?
+
+    #!perl
+    $map->center("서울 종로구 세종로 1");
+
+이제 `$map` 객체에서 결과물을 뽑아내보죠.
+
+    #!perl
+    my ( $head, $map_div ) = $map->onload_render;
+
+`onload_render()` 메소드를 호출하면 `$head`에는 자바스크립트 코드가,
+`$map_div`에는 지도 영역 HTML이 반환됩니다.
+어떤 웹 페이지에서라도 쉽게 붙여 넣을 수 있게 두 가지가 분리된 코드를 반환하는 것이죠.
+하지만 이것만으로는 화면에 띄우기 위한 완전한 HTML이 아니므로
+약간의 HTML을 덧붙여봅시다.
+
+    #!perl
+    print <<"END_HTML";
+    <!doctype html>
+    <html>
+    <head>
+    <meta charset="utf-8" />
+    END_HTML
+
+    print $head . "\n";
+
+    print <<"END_HTML";
+    </head>
+    <body onload="html_googlemaps_initialize()">
+    END_HTML
+
+    print $map_div . "\n";
+
+    print <<"END_HTML";
+    </body>
+    </html>
+    END_HTML
+
+끝났습니다.
+이 스크립트를 실행하면 구글 지도를 포함한 HTML을 화면에 뿌려줍니다.
+이를 재지향해서 HTML로 저장한 다음 웹브라우저로 열어보죠.
+
+    #!bash
+    $ google-maps.pl > map.html
+    $ firefox map.html
+
+호오!
+이곳이 2016년 요즘 그렇게도 핫한 곳이라고 하더군요. :-)
+
+![2016 대한민국 핫 플레이스][img-4-resize]
+*그림 4.* 2016 대한민국 핫 플레이스 ([원본][img-4])
+
+
+위도? 경도?
+------------
+
+[위도(씨줄. 緯度, latitude)][wiki-lat]는 지구상에서 적도를 기준으로 북쪽 또는 남쪽으로 얼마나 떨어져 있는지 나타내는 위치로,
+단위는 도(°), 북극점을 나타내는 90° N(북위 90도)부터 남극점을 나타내는 90° S(남위 90도)까지의 범위 안에 있습니다.
+[경도(날줄. 經度, longitude)][wiki-lng]는 지구상에서 본초 자오선을 기준으로 동쪽 또는 서쪽으로 얼마나 떨어져 있는지 나타내는 위치로,
+역시 단위는 도(°), 180° E(동경 180도)부터 180° W(서경 180도)까지의 범위 안에 있습니다.
+간단히 말하면 위도는 세로 위치, 경도는 가로 위치를 의미하죠.
+따라서 지구상의 모든 위치는 위도와 경도의 조합으로 표현할 수 있죠.
+
+**"서울 종로구 세종로 1"** 주소의 경우 위도와 경도의 조합으로 나타내면 다음과 같습니다.
+
+    #!plain
+    37°35'11.9"N 126°58'36.4"E
+
+주소를 이용해서 표현해야 할 때도 있지만 GPS 자료를 처리한다던가 등의 경우
+이런 자료는 대부분 위도와 경도로 이루어진 문자열 자료기 때문에
+위도와 경도를 기준으로 지도에 표히사는 방법이 필요할 때도 많습니다.
+이 때는 배열 레퍼런스를 사용합니다.
+
+    #!perl
+    $map->center( [ 126.9767701, 37.586652 ] ); # 서울 종로구 세종로 1
+
+실제 웹브라우저의 구글 지도에서 입력하거나, 평상시 읽을 때는 위도와 경도 순으로 나열하지만,
+모듈을 사용할 때는 경도와 위도 순으로 입력해야 함을 주의하세요.
+
+
+점 찍고 풍선 달기
+------------------
+
+지도에 특정 위치를 지정하기 위해서는 `add_marker()` 메소드를 사용합니다.
+`point` 속성을 이용해서 위도와 경도를 지정하는데 이 때 `center()` 메소드와
+마찬가지로 경도와 위도 순으로 입력해야 함을 주의하세요.
+`html` 속성을 이용해서 핀 모양의 아이콘을 클릭했을 때 보여줄 문자열을 HTML 형태로 넣을 수 있습니다.
+
+    #!perl
+    $map->add_marker(
+        point => [ 126.9767701, 37.586652 ], # 서울 종로구 세종로 1
+        html  => qq{<div class="map"><span> 범죄자를<br/>구속하라! </span></div>},
+    );
+
+이 HTML을 미려하게 보여주고 싶다면 CSS를 활용하면 됩니다.
+기존 `<head>` 영역에 CSS를 추가해보죠.
+
+    #!perl
+    print <<"END_HTML";
+    <!doctype html>
+    <html>
+    <head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+    .map {
+        background:  red;
+        color:       white;
+        font-family: "NanumMyeongjoExtraBold";
+        font-size:   28px;
+        font-weight: bold;
+        text-align:  center;
+    }
+    </style>
+    END_HTML
+
+이제 브라우저에서 확인해볼까요? :)
+
+![형 지금 진지하다][img-5-resize]
+*그림 5.* 형 지금 진지하다 ([원본][img-5])
+
+
+정리하며
+---------
+
+스마트폰 세상이 열리면서 지도를 활용하는 풍경을 보는 것은 너무 흔한 일입니다.
+예전과 달리 한국에서 역시 구글 지도는 너무도 널리 사용되기 때문에
+이미 그 인터페이스는 많은 사용자들에게 익숙하기도 하구요.
+지도가 필요할 때 언제든지 주저하지 말고 펄을 이용해서
+간단히 구글 지도를 사용한다면 여러분의 삶이나 서비스가 더욱 윤택해지겠죠? ;-)
+
+_EOT_
+
+
+[img-1]:                    2016-12-06-1.png
+[img-2]:                    2016-12-06-2.png
+[img-3]:                    2016-12-06-3.png
+[img-4]:                    2016-12-06-4.png
+[img-5]:                    2016-12-06-5.png
+
+[img-1-resize]:             2016-12-06-1_r.png
+[img-2-resize]:             2016-12-06-2_r.png
+[img-3-resize]:             2016-12-06-3_r.png
+[img-4-resize]:             2016-12-06-4_r.png
+[img-5-resize]:             2016-12-06-5_r.png
+
+[cpan-html-googlemaps-v3]:          https://metacpan.org/pod/HTML::GoogleMaps::V3
+[cpan]:                             http://www.cpan.org/
+[dev-google-maps]:                  https://developers.google.com/maps/
+[home-daum-map]:                    http://map.daum.net/?
+[home-google-map]:                  https://www.google.co.kr/maps/@37.5651,126.98955,11z?hl=en
+[home-google-maps-api]:             https://developers.google.com/maps/documentation/javascript/get-api-key
+[home-naver-map]:                   http://map.naver.com/?
+[home-openstreetmap]:               http://www.openstreetmap.org
+[home-perlbrew]:                    http://perlbrew.pl/
+[twitter-keedi]:                    http://twitter.com/#!/keedi
+[wiki-lat]:                         https://ko.wikipedia.org/wiki/%EC%9C%84%EB%8F%84
+[wiki-lng]:                         https://ko.wikipedia.org/wiki/%EA%B2%BD%EB%8F%84
