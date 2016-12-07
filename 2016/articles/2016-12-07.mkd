@@ -144,15 +144,15 @@ Perl의 강력한 문자 처리 기능을 이용한 프로그램 및 사이트�
 
 대만(중화민국) 행정원의 무임소정무위원(장관급)으로 발탁이 된 천재 해커, 오드리 탕(Audrey Tang, 唐鳳)이 활동하는
 대만의 유명한 시빅 해커그룹 g0v에서 만든 한자 사전 MoeDict(萌典)의 경우,
-중화민국 교육부(Ministry Of Education, Republic of China[Taiwan],中華民國 教育部,) 사이트에 공개된 사전자료를
+중화민국 교육부(Ministry Of Education, Republic of China[Taiwan], 中華民國 教育部) 사이트에 공개된 사전자료를
 Perl을 이용하여 처리 후 홈페이지 및 안드로이드 앱, 아이폰 앱을 만들어서 공개했습니다.
-GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-guthub-data-csld]도 존재합니다.
+GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data-csld]도 존재합니다.
 다음은 MoeDict 관련 링크입니다.
 
 - [MoeDict 홈페이지][moedict]
 - [MoeDict 안드로이드 앱][moedict-android]
 - [MoeDict iOS 앱][moedict-ios]
-- [MoeDict Twitter][moedict-tiwtter]
+- [MoeDict Twitter][moedict-twitter]
 - [MoeDict Facebook][moedict-facebook]
 - [MoeDict GitHub][moedict-github]
 - [Static API serving for moedict][moedict-github-moedict.tw]
@@ -181,7 +181,7 @@ GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-guthub-data
 ----------
 
 - 용어 정리 - 출처: Ken Lunde, CJKV Information Processing, 2nd Edition
-- Moe - Ministry of Education. Written 教育部(jiàoyùbù) in Chinese, 文部省(monbushō) in Japanese, and 교육부/教育部(gyoyukbu) in Korean.
+- Moe - Ministry of Education. Written 教育部(jiàoyùb) in Chinese, 文部省(monbush) in Japanese, and 교육부/教育部(gyoyukbu) in Korean.
 - Moe - Ministry of Education의 약칭. 중국어로 `教育部`로 쓰고 `jiàoyùb`로 발음한다.
   일본어로 `文部省`로 쓰고 `monbush`로 발음한다.
   한국어로는 `교육부`로 쓰고 한자는 `教育部`이며 `gyoyukbu`로 발음한다.
