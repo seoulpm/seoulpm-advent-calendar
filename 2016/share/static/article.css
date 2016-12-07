@@ -143,6 +143,7 @@ h3 {
     list-style: none;
 }
 #cont li {
+    font-family: 'Nanum Myeongjo';
     margin: 5px 0 5px 16px;
     padding-left: 40px;
     background: url("bullet.png") no-repeat scroll 4px 4px transparent;
