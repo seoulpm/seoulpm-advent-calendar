@@ -23,7 +23,7 @@ sungdh86+git _at_ gmail.com
 [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
 그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다.
-저는 리눅스 배포판에 탑재된 GNOME gucharmap, KDE kcharselect와 같은 문자표 프로그램을 좋아합니다.
+저는 리눅스 배포판에 탑재된 [GNOME gucharmap][gucharmap], [KDE kcharselect][kcharselect]와 같은 문자표 프로그램을 좋아합니다.
 
 ![GNOME gucharmap(그놈 문자표)][img-1-resize]
 *그림 1.* GNOME gucharmap(그놈 문자표) ([원본][img-1])
