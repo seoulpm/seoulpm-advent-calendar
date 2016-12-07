@@ -2,7 +2,7 @@ Title:    Perl로 유니코드(Unicode) 코드 포인트(code point)에 해당�
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
-Author:   keedi
+Author:   studioego
 
 저자
 -----
