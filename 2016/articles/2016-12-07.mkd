@@ -30,8 +30,8 @@ sungdh86+git _at_ gmail.com
 
 그리고 Mac을 사용하고 있다보니 Unicode Checker같은 프로그램도 좋아합니다.
 
-![맥용 Unicode Checker][img-1-resize]
-*그림 2.* 맥용 Unicode Checker ([원본][img-1])
+![맥용 Unicode Checker][img-2-resize]
+*그림 2.* 맥용 Unicode Checker ([원본][img-2])
 
 **GNOME gucharmap**이나 **Unicode Checker** 프로그램을 사용하면 유니코드를
 이름으로 검색할 수 있고, 코드 포인트로 검색할 수 있으며, 문자를 붙여놓을 수 있습니다.
@@ -143,7 +143,7 @@ Perl의 강력한 문자 처리 기능을 이용한 프로그램 및 사이트�
 *그림 3.* MoeDict ([원본][img-3])
 
 대만(중화민국) 행정원의 무임소정무위원(장관급)으로 발탁이 된 천재 해커, 오드리 탕(Audrey Tang, 唐鳳)이 활동하는
-대만의 유명한 시빅 해커그룹 g0v에서 만든 한자 사전 MoeDict(萌典)의 경우,
+대만의 유명한 시빅 해커그룹 [g0v零時政府][g0v]에서 만든 한자 사전 MoeDict(萌典)의 경우,
 중화민국 교육부(Ministry Of Education, Republic of China[Taiwan], 中華民國 教育部) 사이트에 공개된 사전자료를
 Perl을 이용하여 처리 후 홈페이지 및 안드로이드 앱, 아이폰 앱을 만들어서 공개했습니다.
 GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data-csld]도 존재합니다.
@@ -181,9 +181,9 @@ GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data
 ----------
 
 - 용어 정리 - 출처: Ken Lunde, CJKV Information Processing, 2nd Edition
-- Moe - Ministry of Education. Written 教育部(jiàoyùb) in Chinese, 文部省(monbush) in Japanese, and 교육부/教育部(gyoyukbu) in Korean.
-- Moe - Ministry of Education의 약칭. 중국어로 `教育部`로 쓰고 `jiàoyùb`로 발음한다.
-  일본어로 `文部省`로 쓰고 `monbush`로 발음한다.
+- Moe - Ministry of Education. Written 教育部(jiàoyùbù) in Chinese, 文部省(monbushō) in Japanese, and 교육부/教育部(gyoyukbu) in Korean.
+- Moe - Ministry of Education의 약칭. 중국어로 `教育部`로 쓰고 `jiàoyùbù`로 발음한다.
+  일본어로 `文部省`로 쓰고 `monbushō`로 발음한다.
   한국어로는 `교육부`로 쓰고 한자는 `教育部`이며 `gyoyukbu`로 발음한다.
 
 
@@ -197,6 +197,7 @@ GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data
 
 [chise-perl]:                   http://www.chise.org/perl/index.html
 [chise]:                        http://www.chise.org/
+[g0v]:                          http://g0v.tw/en-US/
 [glyphwiki-u97d3]:              http://ko.glyphwiki.org/wiki/u97d3
 [glyphwiki]:                    http://ko.glyphwiki.org
 [gucharmap-patch-bug]:          https://bugzilla.gnome.org/show_bug.cgi?id=773380
