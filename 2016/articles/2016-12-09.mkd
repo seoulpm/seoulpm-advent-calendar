@@ -1,0 +1,305 @@
+Title:    Perl 스크립트 의존 모듈을 독립된 공간에 자동 설치해서 실행시키기
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   aer0
+
+저자
+-----
+
+[@aer0][twitter-aer0] -
+Seoul.pm, #perl-kr의 정신적 지주,
+Perl에 대한 근원적이면서 깊은 부분까지 놓치지 않고 다루는 [홈페이지 및 블로그][home-aer0]를 운영하고 있다.
+aero라는 닉을 사용하기도 한다.
+
+
+시작하며
+---------
+
+Perl로 어떤 스크립트를 만들어서 누구에게 주고 사용해보라고 하거나,
+어디서 예제 Perl 스크립트 가져와서 실행시킬 때면 늘 추가로 모듈을 설치해야 할 때가 있습니다.
+이럴 때면 늘 '필요한 모듈은 어떻게 설치하고 실행시켜라고 가르쳐 주지?'라던가
+'테스트로 돌려보고 싶은데 한 번 쓰고 말 모듈 같은 것을 설치해서 나중에 필요 없으면 찾아 지우기도 귀찮고 싫은데 어쩌지?'
+등의 고민을 하곤 합니다.
+뭐 `cpan`, `cpanm` 같은 모듈 설치 유틸리티와 `local::lib` 같은
+모듈 설치 위치를 임의로 바꿀 수 있는 모듈을 잘 숙지하고 있다면 상관 없지만
+이런 것을 시시콜콜 따지자니 귀찮기도 하고,
+누군가에게 알려주자니 골치가 아픈게 사실입니다.
+그래서 이런 상세한 내용을 몰라도, 실행하면 스크립트가 위치한 디렉터리에
+로컬 모듈 설치 디렉터리를 만들고, 필요한 모듈들을 자동설치하고 실행시키며,
+나중에 필요가 없을때는 스크립트와 로컬 모듈 설치 디렉터리만 날리면
+깔끔하게 청소가 되는 형태의 스크립트를 만들어 볼까 합니다.
+
+
+준비물
+-------
+
+펄은 설치와 함께 `cpan`이라는 모듈을 설치할 수 있는 기본 명령을 제공합니다.
+하지만 루트 사용자가 아니라 시스템 디렉터리에 쓰기 권한이 없으면
+자신의 계정에 설치하게 설정을 해줘야 하므로, 첫 실행 시 다소 번거롭습니다.
+그래서 간편하게 모듈을 설치 할 수 있도록 나온 것이 `cpanm` (cpanminus) 명령입니다.
+`cpanm`은 다음 명령만으로도 간단히 설치가 가능합니다.
+
+    #!bash
+    $ cd ~/bin
+    $ curl -L https://cpanmin.us/ -o cpanm
+    $ chmod +x cpanm
+
+이후 `PATH` 환경 변수에 설치한 경로인 `~/bin`을 추가하면 바로 `cpanm`을 사용할 수 있습니다.
+아니면 다음 명령처럼 인터넷으로 받은 `cpanm` 스크립트를
+`perl`로 바로 보내서 실행시키면서 설치 모듈명을 인자로 넘겨주어 설치도 가능합니다.
+
+    #!bash
+    $ curl -L https://cpanmin.us | perl - 설치모듈명
+
+하지만 이 방법도 `curl` 같은 외부 유틸리티에 의존적입니다.
+이제 `curl`과 `perl` 명령을 파이프로 조합한 두 번째 방법의 아이디어를 사용하되
+`curl`이나 `wget` 등 다른 유틸리티에 의존하지 않고,
+순전히 펄이 기본 설치가 되어 코어 모듈들만 있는 상태에서
+펄 자체 만으로 소켓을 통해 `cpanm` 스크립트를 전송 받은 후 실행하는 형태로 구현을 합니다.
+즉 펄의 소켓을 이용해 `curl`이나 `wget` 유틸리티를 대체한다는 의미죠.
+
+펄 모듈이 제대로 설치되려면 펄 배포본 기본 설치 이외에도
+`gcc` 같은 컴파일러와 `make` 같은 개발 도구가 필요합니다.
+데비안 및 우분투 계열이라면 `perl` 패키지(주의: `perl-base` 패키지는 기본 Perl 배포본에 코어 모듈이 일부만 들어간 것)를 설치하고
+`apt-get install build-essential` 명령으로 개발 관련 패키지도 설치해야 합니다.
+레드햇 및 CentOS 계열이면 `perl-core` 패키지(주의: `perl` 패키지는 기본 Perl 배포본에 Core모듈이 일부만 들어간 것)를 설치하고
+`yum groupinstall 'Development Tools'` 명령으로 개발 관련 패키지도 설치해야 합니다.
+윈도우면 [Strawberry Perl][home-strawberry-perl]에 필요한 개발 도구가 기본으로 다 포함되어 있습니다.
+
+
+의존을 피하자!
+---------------
+
+우선 구현을 완료한 [전체 코드][github-gist-aero-b31df2de]를 살펴 본 다음 하나하나 짚어가며 설명을 하죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    BEGIN {
+        require FindBin;
+        require lib;
+
+        my $locallib_path = "$FindBin::RealBin/locallib/$^V";
+        lib->import("$locallib_path/lib/perl5");
+
+        my $cpanm;
+        my $get_cpanm = sub {
+            return $cpanm if defined $cpanm;
+            require IO::Socket;
+            my $s = IO::Socket::INET->new( PeerAddr => 'cpanmin.us:80' ) or die $!;
+            print {$s} "GET / HTTP/1.1\r\nHost: cpanmin.us\r\n\r\n";
+            my $content;
+            while (<$s>) { last if m/^\r\n$/; }
+            while (<$s>) { $content .= $_; last if m/^__END__$/; }
+            close $s;
+            return $content;
+        };
+        push @INC, sub {
+            my $file   = $_[1];
+            my $module = $file;
+            return if grep { $file eq $_ } qw{
+                Encode/ConfigLocal.pm
+                Devel/StackTraceFrame.pm
+                Log/Agent.pm
+                }; # from lib::xi module
+            print "Oops: There was an error looking for $module\n";
+            $module =~ s/\.pm \z//xms;
+            $module =~ s{/}{::}xmsg;
+            $cpanm = $get_cpanm->();
+            open my $fh, '|-', "$^X - -v -n -l$locallib_path $module";
+            print {$fh} $cpanm;
+            close $fh;
+
+            lib->import("$locallib_path/lib/perl5");
+            require Config;
+            Config->import;
+            my @myinc = (
+                "$locallib_path/lib/perl5",
+                "$locallib_path/lib/perl5/$Config::Config{archname}",
+            );
+            for my $lib ( grep { defined } @myinc ) {
+                if ( open my $inh, '<', "$lib/$file" ) {
+                    $INC{$file} = "$lib/$file";
+                    return $inh;
+                }
+            }
+            return;
+        };
+    }
+
+    use strict;
+    use warnings;
+
+    use Mojolicious;
+    use Text::CSV_XS;
+
+    print "$^V\n";
+    print "$_\n" for @INC;
+
+일반적인 펄 스크립트와 다른 점은 `BEGIN { … }` 영역입니다.
+즉, 여러분의 펄 스크립트의 의존 모듈을 독립된 공간에 자동 설치해서 실행시키기는 기능을
+추가하기 위해 해야할 일은 스크립트 앞 부분에 예제와 마찬가지로 `BEGIN { … }` 영역을
+복사해서 붙여넣는 일 뿐입니다.
+
+    #!perl
+    BEGIN {
+        require FindBin;
+        require lib;
+
+        my $locallib_path = "$FindBin::RealBin/locallib/$^V";
+        lib->import("$locallib_path/lib/perl5");
+        ...
+    }
+
+`BEGIN` 블럭은 스크립트가 실행될 때 제일 먼저 실행됩니다.
+`BEGIN` 블럭 안의 코드의 동작 방식은 다음과 같습니다.
+처음에 스크립트가 존재하는 위치를 기준으로 `./locallib/펄버전스트링`을
+로컬 모듈 설치 디렉터리경로로 지정한 후 해당 디렉터리를 모듈 `INC` 경로로 추가하는 `lib` 모듈을 통해 추가합니다.
+
+    #!perl
+    BEGIN {
+        ...
+        my $cpanm;
+        my $get_cpanm = sub {
+            ...
+            return $cpanm if defined $cpanm;
+            require IO::Socket;
+            my $s = IO::Socket::INET->new( PeerAddr => 'cpanmin.us:80' ) or die $!;
+            print {$s} "GET / HTTP/1.1\r\nHost: cpanmin.us\r\n\r\n";
+            my $content;
+            while (<$s>) { last if m/^\r\n$/; }
+            while (<$s>) { $content .= $_; last if m/^__END__$/; }
+            close $s;
+            return $content;
+        };
+        ...
+    }
+
+그리고 `IO::Socket` 코어 모듈을 통해 `cpanmin.us`에 HTTP 프로토콜로 접속해서
+응답을 받아 응답 헤더를 제외한 컨텐츠(`cpanm` 스크립트)를 `$cpanm` 변수에 저장하는
+`$get_cpanm` 코드 레퍼런스를 정의합니다.
+이때 `$get_cpanm`을 호출했을 때 이미 받아왔으면 다시 요청하는 것은 낭비이므로
+받아왔는지 여부를 확인해 `$cpanm`에 내용이 있으면 바로 그 내용을 반환합니다.
+
+    #!perl
+    push @INC, sub {
+        my $file   = $_[1];
+        my $module = $file;
+        ...
+    };
+
+그 다음은 보면 Perl 모듈 디렉터리경로 리스트를 저장하고 있는 배열인 `@INC`에
+생뚱맞게 코드 참조(reference)를 집어 넣습니다.
+이 기법을 사용하면 스크립트에서 `use 모듈명` 형식으로 모듈을 적재(loading)할 때
+적재하고자 하는 모듈이 존재하지 않을 경우 코드 참조가 호출됩니다.
+따라서 모듈이 존재하지 않을때 이 코드 참조에서 모듈을 자동 설치도록 구현하면
+우리가 원하는 목적을 달성할 수 있게 됩니다. :)
+해당 코드 참조가 호출될 때 인자로 코드 참조 자신과 모듈 경로명(예를 들면, `My/Module.pm`)이 들어옵니다.
+이 모듈 경로명을 기준으로 [CPAN][cpan]에 없는 모듈이면 제외하고 설치합니다.
+
+    #!perl
+    open my $fh, '|-', "$^X - -v -n -l$locallib_path $module";
+    print {$fh} $cpanm;
+
+`open`과 `print` 구문을 통해 실제적으로 `cat cpanm | perl - -v -n -l$locallib_path $module` 같은 효과를 냅니다.
+`-v`는 **verbose** 옵션이며 `-n`은 테스트는 하지 않는 옵션,
+`-l`은 로컬에 모듈을 설치할 경로를 지정하는 옵션입니다.
+`-l` 옵션 말고는 취향에 따라 적절하게 선택하거나 바꾸면 됩니다.
+
+    #!perl
+    lib->import("$locallib_path/lib/perl5");
+    require Config;
+    Config->import;
+    my @myinc = (
+        "$locallib_path/lib/perl5",
+        "$locallib_path/lib/perl5/$Config::Config{archname}",
+    );
+    for my $lib ( grep { defined } @myinc ) {
+        if ( open my $inh, '<', "$lib/$file" ) {
+            $INC{$file} = "$lib/$file";
+            return $inh;
+        }
+    }
+
+이후 모듈이 설치되고 나면, 모듈이 존재하는 위치를 찾습니다.
+찾은 경로를 `%INC` 해쉬에 넣고, 모듈의 파일 핸들을 반환해서 모듈을 제대로 적재하게 합니다.
+
+`push @INC, sub { … }` 부분은 모듈을 `cpanm` 명령으로 자동 설치하는
+[CPAN의 lib::xi 모듈][cpan-lib-xi]의 코드를 많이 참고 했습니다.
+궁금하신 부분은 해당 모듈의 코드를 살펴보세요. :)
+
+
+보너스: 원하는 모듈만 설치
+---------------------------
+
+필요 모듈이 자동으로 설치 되지 않고, 원하는 모듈만 딱 찝어서 설치되게 하려면 어떻게 해야 할까요?
+설치하고 싶은 모듈명을 명시해서 설치하는 방식으로 처리하면 되겠죠.
+이전과 마찬가지로 `BEGIN { … }` 부분을 자신의 코드에 복사해서 넣고,
+`@REQ_MODULES` 배열 변수에 설치할 모듈 목록을 적어주면 됩니다. :-)
+구현을 완료한 [전체 코드][github-gist-aero-e308b4c1]를 살펴보죠.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    BEGIN {
+        my @REQ_MODULES = qw/
+            Mojolicious
+            Text::CSV_XS
+            /;
+
+        require FindBin;
+        require lib;
+
+        my $locallib_path = "$FindBin::RealBin/locallib/$^V";
+        lib->import("$locallib_path/lib/perl5");
+
+        my @MISSING;
+        for my $module (@REQ_MODULES) {
+            unless ( eval "require $module" ) {
+                push @MISSING, $module;
+            }
+        }
+
+        if (@MISSING) {
+            require IO::Socket;
+            my $s = IO::Socket::INET->new( PeerAddr => 'cpanmin.us:80' ) or die $!;
+            print {$s} "GET / HTTP/1.1\r\nHost: cpanmin.us\r\n\r\n";
+            my $content;
+            while (<$s>) { last if m/^\r\n$/; }
+            while (<$s>) { $content .= $_; last if m/^__END__$/; }
+            close $s;
+            open my $fh, '|-', "$^X - -v -n -l$locallib_path @MISSING";
+            print {$fh} $content;
+            close $fh;
+            lib->import("$locallib_path/lib/perl5");
+        }
+    }
+
+    use strict;
+    use warnings;
+
+    use Mojolicious;
+    use Text::CSV_XS;
+
+    print "$^V\n";
+    print "$_\n" for @INC;
+
+
+정리하며
+---------
+
+이제 펄 스크립트를 실행할 때 모듈 설치 과정의 귀차니즘으로 부터 해방되었습니다.
+여러분의 펄 스크립트 상단에 `BEGIN { … }` 블럭만 추가해서 실행하면 됩니다.
+단순히 설치 뿐만 아니라 나중에 해당 모듈이 필요 없을 때 깔끔하게 지우는 것 역시 굉장히 쉬워졌죠.
+스크립트 실행 후 해당 디렉터리에 생성된 `./locallib` 디렉터리만 지우면 되니까요! :)
+
+
+[cpan-lib-xi]:                  https://metacpan.org/pod/lib::xi
+[cpan]:                         http://www.cpan.org/
+[github-gist-aero-b31df2de]:    https://gist.github.com/aero/b31df2de10c47c7c99ee0d4f4cd5ec7a
+[github-gist-aero-e308b4c1]:    https://gist.github.com/aero/e308b4c18b70e9cf2b02e7c74db2ade4
+[home-aer0]:                    http://aero.sarang.net/
+[home-perlbrew]:                http://perlbrew.pl/
+[home-strawberry-perl]:         http://strawberryperl.com/
+[twitter-aer0]:                 http://twitter.com/#!/aer0
