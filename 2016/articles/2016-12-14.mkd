@@ -20,18 +20,10 @@ sungdh86+git _at_ gmail.com
 ---------
 
 이 글은 O’Reilly의 Learning Perl 책의 저자인 brian d foy씨가 운영하는 Learning Perl 6 블로그의
-[Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
+[Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
-그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다.
-저는 리눅스 배포판에 탑재된 [GNOME gucharmap][gucharmap], [KDE kcharselect][kcharselect]와 같은 문자표 프로그램을 좋아합니다.
+그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 한자처리에 관심을 가지게 되니 한글처리에도 관심을 가지게 되었습니다.
 
-![GNOME gucharmap(그놈 문자표)][img-1-resize]
-*그림 1.* GNOME gucharmap(그놈 문자표) ([원본][img-1])
-
-그리고 Mac을 사용하고 있다보니 Unicode Checker같은 프로그램도 좋아합니다.
-
-![맥용 Unicode Checker][img-2-resize]
-*그림 2.* 맥용 Unicode Checker ([원본][img-2])
 
 **GNOME gucharmap**이나 **Unicode Checker** 프로그램을 사용하면 유니코드를
 이름으로 검색할 수 있고, 코드 포인트로 검색할 수 있으며, 문자를 붙여놓을 수 있습니다.
@@ -78,8 +70,10 @@ Perl 6를 설치합니다.
 [한국학자료센터의 고문서 서체 용례 사전][kostma-segment]도 코드 포인트를 이용하여 한자에 대한 정보를 보여줍니다.
 `韓`을 [한국학자료센터 URL][kostma-segment-u97d3]에서는 `97D3`으로 표기합니다.
 
+한글의
 
-유니코드의 범위를 확인해보자
+
+유니코드의 각 문자집합의 범위
 -------------------------------------
 
 이제 Perl 6로 **GNOME gucharmap**이나 **Unicode Checker**같은 나만의 프로그램을 작성할 수 있습니다.
@@ -118,52 +112,23 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 문자 사전을 만들게 된다면 문자에 할당된 코드 포인트를 이용하여 만들면 쉽게 정리할 수 있을 것 같네요.
 
 
-뱀다리
--------
 
-Perl의 강력한 문자 처리 기능을 이용한 프로그램 및 사이트를 몇가지 소개합니다.
-그 중 하나는 기사에서도 언급한 **GNOME gucharmap** (**GNOME 문자표**) 프로그램입니다.
-**GNOME gucharmap**의 한자 자료는 유니코드 컨소시엄(Unicode Consortium)에서
-공개한 문자 자료(Unihan database)를 Perl로 처리를 한후, 문자표 화면에 내용을 공개하고 있습니다.
-다른 하나는 일본의 언어관련 연구자들이 만든 [CHISE(CHaracter Information Service Environment) Project][chise]에서
-구현한 [Perl을 이용한 한자 데이터베이스 모듈][chise-perl]이 있습니다.
-마지막 자료는 대만의 [MoeDict(萌典)][moedict]입니다.
 
-![MoeDict][img-3-resize]
-*그림 3.* MoeDict ([원본][img-3])
-
-대만(중화민국) 행정원의 무임소정무위원(장관급)으로 발탁이 된 천재 해커, 오드리 탕(Audrey Tang, 唐鳳)이 활동하는
-대만의 유명한 시빅 해커그룹 [g0v零時政府][g0v]에서 만든 한자 사전 MoeDict(萌典)의 경우,
-중화민국 교육부(Ministry Of Education, Republic of China[Taiwan], 中華民國 教育部) 사이트에 공개된 사전자료를
-Perl을 이용하여 처리 후 홈페이지 및 안드로이드 앱, 아이폰 앱을 만들어서 공개했습니다.
-GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data-csld]도 존재합니다.
-다음은 MoeDict 관련 링크입니다.
-
-- [MoeDict 홈페이지][moedict]
-- [MoeDict 안드로이드 앱][moedict-android]
-- [MoeDict iOS 앱][moedict-ios]
-- [MoeDict Twitter][moedict-twitter]
-- [MoeDict Facebook][moedict-facebook]
-- [MoeDict GitHub][moedict-github]
-- [Static API serving for moedict][moedict-github-moedict.tw]
-- [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data-csld]
-- [MoeDict - A dictionary including all the languages that Taiwan people speaks.][moedict-youtube]
-- [MoeDict 전자책][moedict-github-epub]
 
 
 참고자료
 ---------
 
-- [Learning Perl 6 블로그의 Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]
-- [GNOME gucharmap][gucharmap]
-- [KDE kcharselect][kcharselect]
-- [Unicode Checker][unicode-checker]
+- [Learning Perl 6 블로그의 Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1]
 - [Unicode Consortium][unicode]
 - [Unicode 9.0 전체 코드 차트][unicode-charts]
+- [Unicode Character Database Block정의][unicode-blocks]
 - [Unicode Unihan Database][unicode-tr38]
+- [Unicode Character Database][unicode-tr44]
 - [Unicode Unihan Lookup][unicode-charts-unihan]
 - [Announcing The Unicode® Standard, Version 9.0][unicode-blog-unicode-90]
-- [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][naver-helloworld-unicode]
+- [한글 인코딩의 이해 1편: 한글 인코딩의 역사와 유니코드][naver-helloworld-unicode1]
+- [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][naver-helloworld-unicode2]
 - [Perl 6 Advent Calendar 2013 Day 15 - Numbers and ways of writing them][perl6-advent-2013-12-15]
 
 
@@ -180,30 +145,20 @@ GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data
 [gucharmap-patch-bug]:          https://bugzilla.gnome.org/show_bug.cgi?id=773380
 [gucharmap-patch-source]:       https://github.com/GNOME/gucharmap/commit/b3614d114bc2158f8e5c4b98797019f3a71d0ba7
 [gucharmap]:                    https://wiki.gnome.org/action/show/Apps/Gucharmap
-[home-lp6-quicktip-12]:         https://www.learningperl6.com/2016/11/16/quick-tip-1-user-defined-infinite-sequences/
+[home-lp6-quicktip-1]:          https://www.learningperl6.com/2016/11/16/quick-tip-1-user-defined-infinite-sequences/
+[home-lp6-quicktip-12]:         https://www.learningperl6.com/2016/11/27/quick-tip-12-unicode-helper-apps/
 [home-lp6]:                     https://www.learningperl6.com/
 [home-perlbrew]:                http://perlbrew.pl/
-[kcharselect]:                  https://utils.kde.org/projects/kcharselect/
-[kostma-segment-u97d3]:         http://www.kostma.net/segment/segmentList.aspx?unicode=97D3
-[kostma-segment]:               http://www.kostma.net/segment/segmentList.aspx
-[moedict-android]:              https://goo.gl/MOJVjg
-[moedict-facebook]:             https://www.facebook.com/MoeDict/
-[moedict-github-data-csld]:     https://github.com/g0v/moedict-data-csld
-[moedict-github-epub]:          https://github.com/g0v/moedict-epub
-[moedict-github-moedict.tw]:    https://github.com/g0v/moedict.tw
-[moedict-github]:               https://github.com/g0v
-[moedict-ios]:                  https://goo.gl/rvK7D
-[moedict-twitter]:              https://twitter.com/moedict
-[moedict-youtube]:              https://www.youtube.com/watch?v=FZTWuMrE4Dg
-[moedict]:                      https://moedict.tw/
-[naver-helloworld-unicode]:     http://d2.naver.com/helloworld/76650
+[naver-helloworld-unicode1]:    http://d2.naver.com/helloworld/19187
+[naver-helloworld-unicode2]:    http://d2.naver.com/helloworld/76650
 [twitter-studioego]:            http://twitter.com/#!/studioego
 [unicode-adoption]:             http://www.unicode.org/consortium/adopted-characters.html#b5FB7
 [unicode-blog-unicode-90]:      http://blog.unicode.org/2016/06/announcing-unicode-standard-version-90.html
 [unicode-charts-unihan]:        http://www.unicode.org/charts/unihan.html
 [unicode-charts]:               http://www.unicode.org/charts/
-[unicode-checker]:              https://earthlingsoft.net/UnicodeChecker/
 [unicode-tr38]:                 http://www.unicode.org/reports/tr38/
+[unicode-tr44]:                 http://www.unicode.org/reports/tr44/
+[unicode-blocks]:                ftp://ftp.unicode.org/Public/UNIDATA/Blocks.txt
 [unicode-u97d3]:                http://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=97D3
 [unicode-ver-1.0.0]:            http://www.unicode.org/versions/Unicode1.0.0/
 [unicode-ver-2.0.0]:            http://www.unicode.org/versions/Unicode2.0.0/
@@ -216,5 +171,3 @@ GitHub에 [Perl로 구현된 한자 처리 관련 저장소][moedict-github-data
 [wiki-unicode-plane-ssp]:       https://en.wikipedia.org/wiki/Plane_(Unicode)#Supplementary_Special-purpose_Plane
 [wiki-unicode-plane]:           https://en.wikipedia.org/wiki/Plane_(Unicode)
 [wiki-unicode]:                 https://en.wikipedia.org/wiki/Unicode
-[zdic-u97d3]:                   http://www.zdic.net/z/27/js/97D3.htm
-[zdic]:                         http://www.zdic.net/
