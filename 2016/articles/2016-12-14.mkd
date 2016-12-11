@@ -132,8 +132,6 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 - [Perl 6 Advent Calendar 2013 Day 15 - Numbers and ways of writing them][perl6-advent-2013-12-15]
 
 
-용어 정리
-----------
 
 
 
@@ -149,6 +147,8 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 [home-lp6-quicktip-12]:         https://www.learningperl6.com/2016/11/27/quick-tip-12-unicode-helper-apps/
 [home-lp6]:                     https://www.learningperl6.com/
 [home-perlbrew]:                http://perlbrew.pl/
+[kostma-segment-u97d3]:         http://www.kostma.net/segment/segmentList.aspx?unicode=97D3
+[kostma-segment]:               http://www.kostma.net/segment/segmentList.aspx
 [naver-helloworld-unicode1]:    http://d2.naver.com/helloworld/19187
 [naver-helloworld-unicode2]:    http://d2.naver.com/helloworld/76650
 [twitter-studioego]:            http://twitter.com/#!/studioego
