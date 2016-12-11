@@ -137,7 +137,7 @@ Perl의 강력한 문자 처리 기능을 이용한 프로그램 및 사이트�
 공개한 문자 자료(Unihan database)를 Perl로 처리를 한후, 문자표 화면에 내용을 공개하고 있습니다.
 다른 하나는 일본의 언어관련 연구자들이 만든 [CHISE(CHaracter Information Service Environment) Project][chise]에서
 구현한 [Perl을 이용한 한자 데이터베이스 모듈][chise-perl]이 있습니다.
-마지막 차료는 대만의 [MoeDict(萌典)][moedict]입니다.
+마지막 자료는 대만의 [MoeDict(萌典)][moedict]입니다.
 
 ![MoeDict][img-3-resize]
 *그림 3.* MoeDict ([원본][img-3])
