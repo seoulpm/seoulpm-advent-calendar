@@ -171,3 +171,4 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 [wiki-unicode-plane-ssp]:       https://en.wikipedia.org/wiki/Plane_(Unicode)#Supplementary_Special-purpose_Plane
 [wiki-unicode-plane]:           https://en.wikipedia.org/wiki/Plane_(Unicode)
 [wiki-unicode]:                 https://en.wikipedia.org/wiki/Unicode
+[perl6-advent-2013-12-15]:      https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
