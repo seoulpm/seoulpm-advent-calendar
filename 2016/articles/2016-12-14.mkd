@@ -20,7 +20,7 @@ sungdh86+git _at_ gmail.com
 ---------
 
 이 글은 O’Reilly의 Learning Perl 책의 저자인 brian d foy씨가 운영하는 Learning Perl 6 블로그의
-[Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1]의 내용을 참고하여 만들었습니다.
+[Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]과 [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
 그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 한자처리에 관심을 가지게 되니 한글처리에도 관심을 가지게 되었습니다.
 
@@ -76,7 +76,46 @@ Perl 6를 설치합니다.
 유니코드의 각 문자집합의 범위
 -------------------------------------
 
-이제 Perl 6로 **GNOME gucharmap**이나 **Unicode Checker**같은 나만의 프로그램을 작성할 수 있습니다.
+유니코드 문자집합의 범위는 txt확장자로 저장한 [유니코드 블록정의 파일][unicode-blocks]에 정의되었습니다. 
+
+    # Blocks-9.0.0.txt
+    # Date: 2016-02-05, 23:48:00 GMT [KW]
+    # © 2016 Unicode®, Inc.
+    # For terms of use, see http://www.unicode.org/terms_of_use.html
+    #
+    # Unicode Character Database
+    # For documentation, see http://www.unicode.org/reports/tr44/
+    #
+    # Format:
+    # Start Code..End Code; Block Name
+    
+    (생략)
+    
+    0000..007F; Basic Latin
+    0080..00FF; Latin-1 Supplement
+    0100..017F; Latin Extended-A
+    0180..024F; Latin Extended-B
+    0250..02AF; IPA Extensions
+    02B0..02FF; Spacing Modifier Letters
+    0300..036F; Combining Diacritical Marks
+    
+    (생략)
+    
+    20000..2A6DF; CJK Unified Ideographs Extension B
+    2A700..2B73F; CJK Unified Ideographs Extension C
+    2B740..2B81F; CJK Unified Ideographs Extension D
+    2B820..2CEAF; CJK Unified Ideographs Extension E
+    2F800..2FA1F; CJK Compatibility Ideographs Supplement
+    E0000..E007F; Tags
+    E0100..E01EF; Variation Selectors Supplement
+    F0000..FFFFF; Supplementary Private Use Area-A
+    100000..10FFFF; Supplementary Private Use Area-B
+
+    # EOF
+
+이제 Perl 6로 **한글**의 전체글자를 출력해봅시다.
+
+
 코드 포인트를 받아서 문자를 표시하는 방법은 다음과 같습니다.
 이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
 
@@ -87,7 +126,9 @@ Perl 6를 설치합니다.
     AC00..D7AF; Hangul Syllables (한글)
     D7B0..D7FF; Hangul Jamo Extended-B (한글 자모 확장-B)
 
-    #!bash
+
+Hangul Syllables 를 출력해봅시다.
+    
     my %hash;
     %hash<hangulSyllables> := :16('AC00') ... :16('D7AF');
     for %hash<hangulSyllables> {
@@ -101,7 +142,7 @@ Perl 6를 설치합니다.
 ---------
 
 Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하여 확인하다보니
-[Learning Perl 6 블로그][home-lp6]의 [Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1]이 눈에 띄더군요.
+[Learning Perl 6 블로그][home-lp6]의 [Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1], [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]이 눈에 띄더군요.
 글을 읽고 정리하며 유니코드 개념과 코드 포인트개념을 정리하게 되었습니다.
 Perl 6에서는 Perl 5와 다르게 2진수 부터 36진수 사이의 진법의 문자열 인수를 `:[진법 숫자]()`로 붙여서 변환 할 수 있습니다.
 Perl 6는 Perl 5와 다르게 문자열 타입에 대하여 기본으로 유니코드(UTF-8 인코딩)를 지원하기 때문에
@@ -119,7 +160,8 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 참고자료
 ---------
 
-- [Learning Perl 6 블로그의 Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1]
+- [Learning Perl 6 블로그의 Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]
+- [Learning Perl 6 블로그의 Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]
 - [Unicode Consortium][unicode]
 - [Unicode 9.0 전체 코드 차트][unicode-charts]
 - [Unicode Character Database Block정의][unicode-blocks]
