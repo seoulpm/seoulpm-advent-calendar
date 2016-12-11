@@ -158,7 +158,7 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 [unicode-charts]:               http://www.unicode.org/charts/
 [unicode-tr38]:                 http://www.unicode.org/reports/tr38/
 [unicode-tr44]:                 http://www.unicode.org/reports/tr44/
-[unicode-blocks]:                ftp://ftp.unicode.org/Public/UNIDATA/Blocks.txt
+[unicode-blocks]:               ftp://ftp.unicode.org/Public/UNIDATA/Blocks.txt
 [unicode-u97d3]:                http://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=97D3
 [unicode-ver-1.0.0]:            http://www.unicode.org/versions/Unicode1.0.0/
 [unicode-ver-2.0.0]:            http://www.unicode.org/versions/Unicode2.0.0/
