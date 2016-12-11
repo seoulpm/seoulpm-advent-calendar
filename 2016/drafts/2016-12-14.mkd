@@ -1,4 +1,4 @@
-Title:    Perl6로 한글의 모든 글자를 출력해보자.
+Title:    Perl로 한글의 모든 글자를 출력해보자.
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -12,7 +12,7 @@ Author:   studioego
 한자(漢字, 汉字, Chinese Character)에 대하여 관심이 많으며, 동아시아 언어 처리에 관심이 많음.
 취미로 일본어와 중국어를 열심히 공부하고 있습니다.
 Unicode의 한자관련 내용에 흥미가 있어 유니코드 컨소시엄의 후원 문자(Adopted Characters)에 [후원][unicode-adoption]을 하기도 한 사람입니다.
-그리고 GNOME gucharmap 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를 추가한 오픈소스 기여자, 컨트리뷰터(Contributer), 자유 소프트웨어 개발자입니다.
+그리고 GNOME gucharmap 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를 추가한 오픈소스 기여자 ([버그질라][gucharmap-patch-bug], [소스 코드][gucharmap-patch-source]), 컨트리뷰터(Contributer), 자유 소프트웨어 개발자입니다.
 sungdh86+git _at_ gmail.com
 
 
@@ -22,22 +22,26 @@ sungdh86+git _at_ gmail.com
 이 글은 O’Reilly의 Learning Perl 책의 저자인 brian d foy씨가 운영하는 Learning Perl 6 블로그의
 [Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]과 [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
-그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 한자처리에 관심을 가지게 되니 한글처리에도 관심을 가지게 되었습니다.
+그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 
+한자처리에 관심을 가지게 되니 한글처리에도 관심을 가지게 되었습니다.
+
+동아시아 언어 연구가이자 총책임자
+- [Combining Jamo Test #1—Please Ignore][combining-jamo-test-1]
+- [Combining Jamo Test #2—Please Ignore][combining-jamo-test-2]
+- [Combining Jamo Test #3][combining-jamo-test-3]
+- [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
+
+이번에는 한글의 모든 문자를 출력하는 방법에 대하여 확인해볼까요? 
 
 
-**GNOME gucharmap**이나 **Unicode Checker** 프로그램을 사용하면 유니코드를
-이름으로 검색할 수 있고, 코드 포인트로 검색할 수 있으며, 문자를 붙여놓을 수 있습니다.
-문자표의 기능에 대하여 관심이 많다보니, 2016년 11월에 GNOME 문자표(gucharmap) 9.0.2버전에
-C언어와 Perl코드로 **한자(漢字/汉字)**의 한국어 한글 표기와 베트남어 표기 기능을
-추가([버그질라][gucharmap-patch-bug], [소스 코드][gucharmap-patch-source])했습니다.
-**GNOME gucharmap**이나 **Unicode Checker** 프로그램으로 알아낸
-16진수로 구성된 코드 포인트를 이용해 Perl로 문자를 표시해볼까요?
+
 
 
 준비물
 -------
 
-Perl 6를 설치합니다.
+Perl 6를 설치합니다. Perl5도 있으면 금상첨화입니다!
+
 
 
 유니코드와 코드 포인트
@@ -58,7 +62,10 @@ Perl 6를 설치합니다.
 [SIP(상형 문자 보충 평면)][wiki-unicode-plane-sip], [SSP(특수 목적 보충 평면)][wiki-unicode-plane-ssp],
 [PUA(사용자 정의 영역)][wiki-unicode-plane-pua]등이 정의되어 있습니다.
 
-여러 한자를 다루는 관련 사이트에서는 한자에 해당하는 유니코드(Unicode)의 코드 포인트(code point)로 한자를 표현합니다.
+한글의 경우 한글 음절, 한글 자모로 구성되어 있으며 자모(초성, 중성, 종성)와 음절 모두 등록되어 있음을 확인할 수 있습니다.
+
+
+여담으로, 여러 한자를 다루는 관련 사이트에서는 한자에 해당하는 유니코드(Unicode)의 코드 포인트(code point)로 한자를 표현합니다.
 예를 들면 유니코드 `韓`의 코드 포인트는 `U+97D3`입니다.
 한자의 자형(字形)을 모은 [GlyphWiki(글리프위키)][glyphwiki]의 경우,
 한자에 해당하는 코드 포인트 값을 이용하여 중국어 번체, 간체, 일본어, 한국어, 베트남어의 한자 자형을 보여주고 있습니다
@@ -70,7 +77,6 @@ Perl 6를 설치합니다.
 [한국학자료센터의 고문서 서체 용례 사전][kostma-segment]도 코드 포인트를 이용하여 한자에 대한 정보를 보여줍니다.
 `韓`을 [한국학자료센터 URL][kostma-segment-u97d3]에서는 `97D3`으로 표기합니다.
 
-한글의
 
 
 유니코드의 각 문자집합의 범위
@@ -116,23 +122,26 @@ Perl 6를 설치합니다.
     # EOF
 ```
 
-
-이제 Perl 6로 **한글**의 전체글자를 출력해봅시다.
-
-
-코드 포인트를 받아서 문자를 표시하는 방법은 다음과 같습니다.
-이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
-
-```txt
-    Unicode Hangul Range(유니코드 한글 범위)
-    1100..11FF; Hangul Jamo(한글 자모)
-    3130..318F; Hangul Compatibility Jamo(한글 호환 자모)
-    A960..A97F; Hangul Jamo Extended-A (한글 자모 확장-A)
-    AC00..D7AF; Hangul Syllables (한글)
-    D7B0..D7FF; Hangul Jamo Extended-B (한글 자모 확장-B)
+유니코드의 한글집합범위
+---------------------------------------
+```
+    Unicode Hangul Range
+    1100..11FF; Hangul Jamo
+    3130..318F; Hangul Compatibility Jamo
+    A960..A97F; Hangul Jamo Extended-A
+    AC00..D7AF; Hangul Syllables
+    D7B0..D7FF; Hangul Jamo Extended-B
 ```
 
-Hangul Syllables 를 출력해봅시다.
+
+
+
+한글 음절 모두 출력해보자
+----------------------------------------
+
+Perl6로 **한글 음절(Hangul Syllables)**의 전체글자를 출력해봅시다.
+이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
+
 
 ```perl
     my %hash;
@@ -142,7 +151,60 @@ Hangul Syllables 를 출력해봅시다.
     }
 ```    
 
+참고로, Perl5의 경우에는 다음과 같이 출력할 수 있습니다.
 
+```perl
+#!/usr/bin/env perl
+use open ":std", ":encoding(UTF-8)";
+my @blocks = ( hex('AC00') ... hex('D7AF') );
+
+foreach  $item(0 .. $#blocks)  {
+    printf("U+%X %s\n", $blocks[$item], chr($blocks[$item]));
+}
+```    
+
+Perl5에서는 Perl6와 다르게 유니코드 설정을 명시적으로 해줘야 합니다. 
+```shell
+Wide character in printf at ./unicodeBlockHangul5.pl line 6.
+```  
+위와 같은 메세지를 만날 수 있습니다.
+이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
+
+
+결과
+```txt
+U+AC00 가
+U+AC01 각
+U+AC02 갂
+U+AC03 갃
+U+AC04 간
+U+AC05 갅
+(생략)
+U+D79E 힞
+U+D79F 힟
+U+D7A0 힠
+U+D7A1 힡
+U+D7A2 힢
+U+D7A3 힣
+U+D7A4 힤
+U+D7A5 힥
+U+D7A6 힦
+U+D7A7 힧
+U+D7A8 힨
+U+D7A9 힩
+U+D7AA 힪
+U+D7AB 힫
+U+D7AC 힬
+U+D7AD 힭
+U+D7AE 힮
+U+D7AF 힯
+```    
+
+위의 코드를 실행하면 "가~힣"까지한글 전체 음절이 나옴을 확인할 수 있습니다.
+여기서 유니코드에서 **한글 음절**에 대하여 11,172자를 할당했다는걸 확인할 수 있습니다.
+한글 음절 블럭의 코드포인트 U+D7A4 부터 U+D7AF까지의 12자는 **한글**의 '가~힣'까지 11,172자까지 지정하고 남은 구역이라는 것을 알 수 있습니다.
+모든 유니코드 블록 범위는 (cp MOD 16) = 0 인 값으로 시작하고 (cp MOD 16) = 15 인 값으로 끝납니다. 즉, 범위 시작의 마지막 16 진수는 ... 0이고 범위 끝의 마지막 16 진수 숫자는 ... F입니다.
+그래서 한글 음절 블록 범위에 할당되었으나, 한글 음절에 할당된 11,172자에서 남은 12자의 경우는 비워두었습니다. 
 
 정리하며
 ---------
@@ -150,15 +212,14 @@ Hangul Syllables 를 출력해봅시다.
 Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하여 확인하다보니
 [Learning Perl 6 블로그][home-lp6]의 [Quick Tip 1: User-defined infinite sequences][home-lp6-quicktip-1], [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]이 눈에 띄더군요.
 글을 읽고 정리하며 유니코드 개념과 코드 포인트개념을 정리하게 되었습니다.
+이후 유니코드 블록의 개념도 알게 되었습니다. 
+유니코드 블록을 이용하여 블록단위로 된 코드포인트에 할당된 글자를 모두 출력하는 방법을 알게 되었습니다.
 Perl 6에서는 Perl 5와 다르게 2진수 부터 36진수 사이의 진법의 문자열 인수를 `:[진법 숫자]()`로 붙여서 변환 할 수 있습니다.
 Perl 6는 Perl 5와 다르게 문자열 타입에 대하여 기본으로 유니코드(UTF-8 인코딩)를 지원하기 때문에
 유니코드를 사용한다고 지정을 하지 않아도 쓸 수 있습니다.
 그래서 명시적으로 UTF-8인코딩을 표시하지 않아도 그대로 사용 할 수 있는 것입니다.
 아직까지 Perl 5, Perl 6의 차이점에 대하여 완전하게 숙지를 하지 않았지만,
 Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 언어를 처리하는 것이 편해짐을 느낍니다.
-문자 사전을 만들게 된다면 문자에 할당된 코드 포인트를 이용하여 만들면 쉽게 정리할 수 있을 것 같네요.
-
-
 
 
 
@@ -178,7 +239,10 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 - [한글 인코딩의 이해 1편: 한글 인코딩의 역사와 유니코드][naver-helloworld-unicode1]
 - [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][naver-helloworld-unicode2]
 - [Perl 6 Advent Calendar 2013 Day 15 - Numbers and ways of writing them][perl6-advent-2013-12-15]
-
+- [Combining Jamo Test #1—Please Ignore][combining-jamo-test-1]
+- [Combining Jamo Test #2—Please Ignore][combining-jamo-test-2]
+- [Combining Jamo Test #3][combining-jamo-test-3]
+- [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
 
 
 
@@ -220,3 +284,7 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 [wiki-unicode-plane]:           https://en.wikipedia.org/wiki/Plane_(Unicode)
 [wiki-unicode]:                 https://en.wikipedia.org/wiki/Unicode
 [perl6-advent-2013-12-15]:      https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
+[combining-jamo-test-1]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
+[combining-jamo-test-2]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
+[combining-jamo-test-3]:        http://blogs.adobe.com/CCJKType/2016/12/combining-jamo-test-3.html
+[source-han-sans-development-archaic-hangul]: https://blogs.adobe.com/CCJKType/2014/12/shs-development-archaic-hangul.html
