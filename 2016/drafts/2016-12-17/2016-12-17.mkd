@@ -119,6 +119,7 @@ Ubuntu 14.04 LTS, 64-bit Intel CPU에서 실행한 결과는 다음과 같습니
     use Data::Dumper;
 
     my $test = { hello => world };
+    # 자기 참조
     $test->{world}{next} = $test;
 
     print Dumper($test);
@@ -138,7 +139,9 @@ Ubuntu 14.04 LTS, 64-bit Intel CPU에서 실행한 결과는 다음과 같습니
                          $A->{'world'} => \%B
                           $B->{'next'} => \%A
 
-`Cycle (1)`의 부분이 `find_cycle()`의 출력인데 어떤 부분이 참조 사이클이 되어 있는지
+`$test`는 `{world}{next}`가 다시 `$test`를 가리키고 있으므로 참조 사이클이 발생하고
+있음을 알 수 있습니다. 이 다음의 `Cycle (1)`로 시작하는 곳이
+`find_cycle()`의 출력인데 어떤 부분이 참조 사이클이 되어 있는지
 알 수 있습니다. 사이클이 없다면 아무것도 표시되지 않습니다.
 
 perl 변수의 내부 구조에 대해서 더 자세히 알고 싶다면 [Devel::Peek 모듈][cpan-devel-peek]을
