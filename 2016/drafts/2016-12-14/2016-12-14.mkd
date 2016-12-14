@@ -12,7 +12,7 @@ Author:   studioego
 한자(漢字, 汉字, Chinese Character)에 대하여 관심이 많으며, 동아시아 언어 처리에 관심이 많음.
 취미로 일본어와 중국어를 열심히 공부하고 있습니다.
 유니코드 한자관련 내용에 흥미가 있어 유니코드 컨소시엄의 후원 문자(Adopted Characters)에 [후원][unicode-adoption]을 하기도 했습니다.
-GNOME gucharmap 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를
+[GNOME gucharmap][gucharmap] 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를
 추가([버그질라][gucharmap-patch-bug], [소스 코드][gucharmap-patch-source])한
 오픈소스 기여자(contributer), 자유 소프트웨어 개발자입니다.
 sungdh86+git _at_ gmail.com
@@ -209,21 +209,16 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 - [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
 
 
-
 [advent-2016-12-07]:            http://advent.perl.kr/2016/2016-12-07.html
-[chise-perl]:                   http://www.chise.org/perl/index.html
-[chise]:                        http://www.chise.org/
 [combining-jamo-test-1]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
 [combining-jamo-test-2]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
 [combining-jamo-test-3]:        http://blogs.adobe.com/CCJKType/2016/12/combining-jamo-test-3.html
-[g0v]:                          http://g0v.tw/en-US/
 [gucharmap-patch-bug]:          https://bugzilla.gnome.org/show_bug.cgi?id=773380
 [gucharmap-patch-source]:       https://github.com/GNOME/gucharmap/commit/b3614d114bc2158f8e5c4b98797019f3a71d0ba7
 [gucharmap]:                    https://wiki.gnome.org/action/show/Apps/Gucharmap
 [home-lp6-quicktip-12]:         https://www.learningperl6.com/2016/11/27/quick-tip-12-unicode-helper-apps/
 [home-lp6-quicktip-1]:          https://www.learningperl6.com/2016/11/16/quick-tip-1-user-defined-infinite-sequences/
 [home-lp6]:                     https://www.learningperl6.com/
-[home-perlbrew]:                http://perlbrew.pl/
 [naver-helloworld-unicode1]:    http://d2.naver.com/helloworld/19187
 [naver-helloworld-unicode2]:    http://d2.naver.com/helloworld/76650
 [perl6-advent-2013-12-15]:      https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
