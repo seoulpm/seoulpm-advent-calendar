@@ -25,11 +25,11 @@ sungdh86+git _at_ gmail.com
 [Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]과
 [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
-그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 
+그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다.
 한자 처리에 관심을 가지게 되니 자연스럽게 한글 처리에도 관심을 가지게 되었습니다.
 [일곱째 날 기사][advent-2016-12-07]에서는 Perl 5와 Perl 6를 이용해서
 유니코드의 코드 포인트로 해당 유니코드 글자를 출력하는 법을 확인했습니다.
-이번에는 한글의 모든 문자를 출력하는 방법에 대하여 확인해볼까요? 
+이번에는 한글의 모든 문자를 출력하는 방법에 대하여 확인해볼까요?
 
 
 준비물
@@ -56,14 +56,10 @@ Perl 6를 설치합니다.
 이 때 분리한 초성 `ㄱ`의 코드 포인트는 `U+1100`,
 중성 `ㅏ`의 코드 포인트는 `U+1161`, 종성 `ㄱ`의 코드 포인트는 `U+11A8`입니다.
 
+[유니코드 블록 정의 파일][unicode-blocks]을 살펴보면 유니코드 문자 집합의 범위를 확인할 수 있습니다.
+파일의 내용을 일부만 살펴보면 다음과 같습니다.
 
-유니코드의 각 문자집합의 범위
--------------------------------------
-
-유니코드 문자집합의 범위는 txt확장자로 저장한 [유니코드 블록정의 파일][unicode-blocks]에 정의되었습니다. 
-
-
-```txt
+    $!plain
     # Blocks-9.0.0.txt
     # Date: 2016-02-05, 23:48:00 GMT [KW]
     # © 2016 Unicode®, Inc.
@@ -74,9 +70,9 @@ Perl 6를 설치합니다.
     #
     # Format:
     # Start Code..End Code; Block Name
-    
-    (생략)
-    
+    .
+    .(생략)
+    .
     0000..007F; Basic Latin
     0080..00FF; Latin-1 Supplement
     0100..017F; Latin Extended-A
@@ -84,9 +80,9 @@ Perl 6를 설치합니다.
     0250..02AF; IPA Extensions
     02B0..02FF; Spacing Modifier Letters
     0300..036F; Combining Diacritical Marks
-    
-    (생략)  
-    
+    .
+    .(생략)
+    .
     20000..2A6DF; CJK Unified Ideographs Extension B
     2A700..2B73F; CJK Unified Ideographs Extension C
     2B740..2B81F; CJK Unified Ideographs Extension D
@@ -98,20 +94,17 @@ Perl 6를 설치합니다.
     100000..10FFFF; Supplementary Private Use Area-B
 
     # EOF
-```
 
-유니코드의 한글집합범위
----------------------------------------
-```txt
-    Unicode Hangul Range
+유니코드 전체 코드 중 한글 집합의 범위만 확인하고 싶다면 다음 명령을 실행해보세요.
+
+    #!bash
+    $ curl http://ftp.unicode.org/Public/UNIDATA/Blocks.txt 2>/dev/null | grep Hangul
     1100..11FF; Hangul Jamo
     3130..318F; Hangul Compatibility Jamo
     A960..A97F; Hangul Jamo Extended-A
     AC00..D7AF; Hangul Syllables
     D7B0..D7FF; Hangul Jamo Extended-B
-```
-
-
+    $
 
 
 한글 음절 모두 출력해보자
