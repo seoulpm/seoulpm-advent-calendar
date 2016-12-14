@@ -209,6 +209,11 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 - [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
 
 
+[img-1]:                    2016-12-14-1.png
+
+[img-1-resize]:             2016-12-14-1_r.png
+
+
 [advent-2016-12-07]:            http://advent.perl.kr/2016/2016-12-07.html
 [combining-jamo-test-1]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
 [combining-jamo-test-2]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
