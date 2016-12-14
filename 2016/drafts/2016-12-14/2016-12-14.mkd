@@ -209,32 +209,32 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 - [Adobe 블로그의 Source Han Sans Development: Archaic Hangul][adobe-blog-archaic-hangul]
 
 
-[img-1]:                    2016-12-14-1.png
+[img-1]:                            2016-12-14-1.png
 
-[img-1-resize]:             2016-12-14-1_r.png
+[img-1-resize]:                     2016-12-14-1_r.png
 
 
-[advent-2016-12-07]:            http://advent.perl.kr/2016/2016-12-07.html
+[advent-2016-12-07]:                http://advent.perl.kr/2016/2016-12-07.html
 [adobe-blog-combining-jamo-test-1]: https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
 [adobe-blog-combining-jamo-test-2]: https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
 [adobe-blog-combining-jamo-test-3]: https://blogs.adobe.com/CCJKType/2016/12/combining-jamo-test-3.html
-[gucharmap-patch-bug]:          https://bugzilla.gnome.org/show_bug.cgi?id=773380
-[gucharmap-patch-source]:       https://github.com/GNOME/gucharmap/commit/b3614d114bc2158f8e5c4b98797019f3a71d0ba7
-[gucharmap]:                    https://wiki.gnome.org/action/show/Apps/Gucharmap
-[home-lp6-quicktip-12]:         https://www.learningperl6.com/2016/11/27/quick-tip-12-unicode-helper-apps/
-[home-lp6-quicktip-1]:          https://www.learningperl6.com/2016/11/16/quick-tip-1-user-defined-infinite-sequences/
-[home-lp6]:                     https://www.learningperl6.com/
-[naver-helloworld-unicode1]:    http://d2.naver.com/helloworld/19187
-[naver-helloworld-unicode2]:    http://d2.naver.com/helloworld/76650
-[perl6-advent-2013-12-15]:      https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
-[adobe-blog-archaic-hangul]:    https://blogs.adobe.com/CCJKType/2014/12/shs-development-archaic-hangul.html
-[twitter-studioego]:            http://twitter.com/#!/studioego
-[unicode-adoption]:             http://www.unicode.org/consortium/adopted-characters.html#b5FB7
-[unicode-blocks]:               http://ftp.unicode.org/Public/UNIDATA/Blocks.txt
-[unicode-blog-unicode-90]:      http://blog.unicode.org/2016/06/announcing-unicode-standard-version-90.html
-[unicode-charts-unihan]:        http://www.unicode.org/charts/unihan.html
-[unicode-charts]:               http://www.unicode.org/charts/
-[unicode-tr38]:                 http://www.unicode.org/reports/tr38/
-[unicode-tr44]:                 http://www.unicode.org/reports/tr44/
-[unicode]:                      http://www.unicode.org
-[wiki-unicode]:                 https://en.wikipedia.org/wiki/Unicode
+[gucharmap-patch-bug]:              https://bugzilla.gnome.org/show_bug.cgi?id=773380
+[gucharmap-patch-source]:           https://github.com/GNOME/gucharmap/commit/b3614d114bc2158f8e5c4b98797019f3a71d0ba7
+[gucharmap]:                        https://wiki.gnome.org/action/show/Apps/Gucharmap
+[home-lp6-quicktip-12]:             https://www.learningperl6.com/2016/11/27/quick-tip-12-unicode-helper-apps/
+[home-lp6-quicktip-1]:              https://www.learningperl6.com/2016/11/16/quick-tip-1-user-defined-infinite-sequences/
+[home-lp6]:                         https://www.learningperl6.com/
+[naver-helloworld-unicode1]:        http://d2.naver.com/helloworld/19187
+[naver-helloworld-unicode2]:        http://d2.naver.com/helloworld/76650
+[perl6-advent-2013-12-15]:          https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
+[adobe-blog-archaic-hangul]:        https://blogs.adobe.com/CCJKType/2014/12/shs-development-archaic-hangul.html
+[twitter-studioego]:                http://twitter.com/#!/studioego
+[unicode-adoption]:                 http://www.unicode.org/consortium/adopted-characters.html#b5FB7
+[unicode-blocks]:                   http://ftp.unicode.org/Public/UNIDATA/Blocks.txt
+[unicode-blog-unicode-90]:          http://blog.unicode.org/2016/06/announcing-unicode-standard-version-90.html
+[unicode-charts-unihan]:            http://www.unicode.org/charts/unihan.html
+[unicode-charts]:                   http://www.unicode.org/charts/
+[unicode-tr38]:                     http://www.unicode.org/reports/tr38/
+[unicode-tr44]:                     http://www.unicode.org/reports/tr44/
+[unicode]:                          http://www.unicode.org
+[wiki-unicode]:                     https://en.wikipedia.org/wiki/Unicode
