@@ -200,13 +200,13 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 - [Unicode Character Database][unicode-tr44]
 - [Unicode Unihan Lookup][unicode-charts-unihan]
 - [Announcing The Unicode® Standard, Version 9.0][unicode-blog-unicode-90]
-- [한글 인코딩의 이해 1편: 한글 인코딩의 역사와 유니코드][naver-helloworld-unicode1]
-- [한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][naver-helloworld-unicode2]
+- [네이버 Hello world의 한글 인코딩의 이해 1편: 한글 인코딩의 역사와 유니코드][naver-helloworld-unicode1]
+- [네이버 Hello world의 한글 인코딩의 이해 2편: 유니코드와 Java를 이용한 한글 처리][naver-helloworld-unicode2]
 - [Perl 6 Advent Calendar 2013 Day 15 - Numbers and ways of writing them][perl6-advent-2013-12-15]
-- [Combining Jamo Test #1—Please Ignore][combining-jamo-test-1]
-- [Combining Jamo Test #2—Please Ignore][combining-jamo-test-2]
-- [Combining Jamo Test #3][combining-jamo-test-3]
-- [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
+- [Adobe 블로그의 Combining Jamo Test #1 - Please Ignore][adobe-blog-combining-jamo-test-1]
+- [Adobe 블로그의 Combining Jamo Test #2 - Please Ignore][adobe-blog-combining-jamo-test-2]
+- [Adobe 블로그의 Combining Jamo Test #3][adobe-blog-combining-jamo-test-3]
+- [Adobe 블로그의 Source Han Sans Development: Archaic Hangul][adobe-blog-archaic-hangul]
 
 
 [img-1]:                    2016-12-14-1.png
@@ -215,9 +215,9 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 
 
 [advent-2016-12-07]:            http://advent.perl.kr/2016/2016-12-07.html
-[combining-jamo-test-1]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
-[combining-jamo-test-2]:        https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
-[combining-jamo-test-3]:        http://blogs.adobe.com/CCJKType/2016/12/combining-jamo-test-3.html
+[adobe-blog-combining-jamo-test-1]: https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-1-please-ignore.html
+[adobe-blog-combining-jamo-test-2]: https://blogs.adobe.com/CCJKType/2016/11/combining-jamo-test-2-please-ignore.html
+[adobe-blog-combining-jamo-test-3]: https://blogs.adobe.com/CCJKType/2016/12/combining-jamo-test-3.html
 [gucharmap-patch-bug]:          https://bugzilla.gnome.org/show_bug.cgi?id=773380
 [gucharmap-patch-source]:       https://github.com/GNOME/gucharmap/commit/b3614d114bc2158f8e5c4b98797019f3a71d0ba7
 [gucharmap]:                    https://wiki.gnome.org/action/show/Apps/Gucharmap
@@ -227,7 +227,7 @@ Perl 6가 새로 나오는 것을 보면서 Perl 5와 Perl 6의 차이에 대하
 [naver-helloworld-unicode1]:    http://d2.naver.com/helloworld/19187
 [naver-helloworld-unicode2]:    http://d2.naver.com/helloworld/76650
 [perl6-advent-2013-12-15]:      https://perl6advent.wordpress.com/2013/12/15/day-15-numbers-and-ways-of-writing-them/
-[source-han-sans-development-archaic-hangul]: https://blogs.adobe.com/CCJKType/2014/12/shs-development-archaic-hangul.html
+[adobe-blog-archaic-hangul]:    https://blogs.adobe.com/CCJKType/2014/12/shs-development-archaic-hangul.html
 [twitter-studioego]:            http://twitter.com/#!/studioego
 [unicode-adoption]:             http://www.unicode.org/consortium/adopted-characters.html#b5FB7
 [unicode-blocks]:               http://ftp.unicode.org/Public/UNIDATA/Blocks.txt
