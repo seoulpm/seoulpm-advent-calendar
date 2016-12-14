@@ -1,4 +1,4 @@
-Title:    Perl로 한글의 모든 글자를 출력해보자.
+Title:    Perl로 한글의 모든 글자를 출력해보자
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
