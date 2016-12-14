@@ -11,8 +11,10 @@ Author:   studioego
 어릴 때 남들은 영어를 배울 때, 혼자서 한자를 배웠던 사람.
 한자(漢字, 汉字, Chinese Character)에 대하여 관심이 많으며, 동아시아 언어 처리에 관심이 많음.
 취미로 일본어와 중국어를 열심히 공부하고 있습니다.
-Unicode의 한자관련 내용에 흥미가 있어 유니코드 컨소시엄의 후원 문자(Adopted Characters)에 [후원][unicode-adoption]을 하기도 한 사람입니다.
-그리고 GNOME gucharmap 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를 추가한 오픈소스 기여자 ([버그질라][gucharmap-patch-bug], [소스 코드][gucharmap-patch-source]), 컨트리뷰터(Contributer), 자유 소프트웨어 개발자입니다.
+유니코드 한자관련 내용에 흥미가 있어 유니코드 컨소시엄의 후원 문자(Adopted Characters)에 [후원][unicode-adoption]을 하기도 했습니다.
+GNOME gucharmap 9.0.2버전부터 한자에 대한 한글표기와 베트남어 표기를
+추가([버그질라][gucharmap-patch-bug], [소스 코드][gucharmap-patch-source])한
+오픈소스 기여자(contributer), 자유 소프트웨어 개발자입니다.
 sungdh86+git _at_ gmail.com
 
 
