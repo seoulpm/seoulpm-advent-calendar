@@ -22,28 +22,21 @@ sungdh86+git _at_ gmail.com
 ---------
 
 이 글은 O’Reilly의 Learning Perl 책의 저자인 brian d foy씨가 운영하는 Learning Perl 6 블로그의
-[Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]과 [Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
+[Quick Tip #1: User-defined infinite sequences][home-lp6-quicktip-1]과
+[Quick Tip #12: Unicode Helper Apps][home-lp6-quicktip-12]의 내용을 참고하여 만들었습니다.
 저는 문자 특히 한자(漢字/汉字)에 대하여 관심이 많은 사람입니다.
 그래서 한자 처리에 대한 내용을 찾다보니 Perl이란 언어에 대하여 관심을 가지게 되었습니다. 
-한자처리에 관심을 가지게 되니 한글처리에도 관심을 가지게 되었습니다.
-
-동아시아 언어의 전문가이면서 Noto Sans 총책임자
-- [Combining Jamo Test #1—Please Ignore][combining-jamo-test-1]
-- [Combining Jamo Test #2—Please Ignore][combining-jamo-test-2]
-- [Combining Jamo Test #3][combining-jamo-test-3]
-- [Source Han Sans Development: Archaic Hangul][source-han-sans-development-archaic-hangul]
-
+한자 처리에 관심을 가지게 되니 자연스럽게 한글 처리에도 관심을 가지게 되었습니다.
+[일곱째 날 기사][advent-2016-12-07]에서는 Perl 5와 Perl 6를 이용해서
+유니코드의 코드 포인트로 해당 유니코드 글자를 출력하는 법을 확인했습니다.
 이번에는 한글의 모든 문자를 출력하는 방법에 대하여 확인해볼까요? 
-
-
-
 
 
 준비물
 -------
 
-Perl 6를 설치합니다. Perl5도 있으면 금상첨화입니다!
-
+Perl 6를 설치합니다.
+그리고 Perl 5도 있으면 Perl 6와 어떤 차이가 있는지 비교할 수 있으니 금상첨화겠죠?
 
 
 유니코드와 코드 포인트
@@ -252,6 +245,7 @@ Perl 6가 UTF-8 인코딩을 기본 지원하는 것을 보니, 유니코드로 
 
 
 
+[advent-2016-12-07]:            http://advent.perl.kr/2016/2016-12-07.html
 
 [chise-perl]:                   http://www.chise.org/perl/index.html
 [chise]:                        http://www.chise.org/
