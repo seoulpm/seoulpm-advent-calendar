@@ -59,7 +59,7 @@ Perl 6를 설치합니다.
 [유니코드 블록 정의 파일][unicode-blocks]을 살펴보면 유니코드 문자 집합의 범위를 확인할 수 있습니다.
 파일의 내용을 일부만 살펴보면 다음과 같습니다.
 
-    $!plain
+    #!plain
     # Blocks-9.0.0.txt
     # Date: 2016-02-05, 23:48:00 GMT [KW]
     # © 2016 Unicode®, Inc.
@@ -70,9 +70,9 @@ Perl 6를 설치합니다.
     #
     # Format:
     # Start Code..End Code; Block Name
-    .
-    .(생략)
-    .
+
+    (생략)
+
     0000..007F; Basic Latin
     0080..00FF; Latin-1 Supplement
     0100..017F; Latin Extended-A
@@ -80,9 +80,9 @@ Perl 6를 설치합니다.
     0250..02AF; IPA Extensions
     02B0..02FF; Spacing Modifier Letters
     0300..036F; Combining Diacritical Marks
-    .
-    .(생략)
-    .
+
+    (생략)
+
     20000..2A6DF; CJK Unified Ideographs Extension B
     2A700..2B73F; CJK Unified Ideographs Extension C
     2B740..2B81F; CJK Unified Ideographs Extension D
@@ -123,7 +123,6 @@ Perl 6로 **한글 음절**(**Hangul Syllables**) 전체를 출력해봅시다.
 Perl 5의 경우 코드는 다음과 같습니다.
 이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
 
-```perl
     #!perl
     use open ":std", ":encoding(UTF-8)";
 
@@ -131,7 +130,6 @@ Perl 5의 경우 코드는 다음과 같습니다.
     for my $block (@blocks) {
         printf "U+%X %s\n", $block, chr($block);
     }
-```
 
 `use open ...` 구문을 빼먹는다면 `Wide character in printf at ...`과 같은 경고가 발생하므로
 Perl 5에서는 Perl 6와 다르게 유니코드 설정을 명시적으로 해줘야 합니다.
