@@ -151,6 +151,10 @@ return {
             url   => 'http://sysadvent.blogspot.kr/',
         },
         {
+            title => 'Web Design & Devlopment Advent Calendar',
+            url   => 'https://24ways.org/2016',
+        },
+        {
             title => '한국 루비 크리스마스 달력',
             url   => 'https://ruby-korea.github.io/advent-calendar/',
         },
