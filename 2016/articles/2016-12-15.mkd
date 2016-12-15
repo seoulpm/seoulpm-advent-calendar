@@ -1,0 +1,221 @@
+Title:    Perl의 메모리 관리
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   junhochoi
+
+저자
+-----
+
+[@junhochoi][twitter-junhochoi] - Neumob Inc., 전 FreeBSD 커미터(cjh _at_ freebsd.org), junho.choi _at_ gmail.com
+Perl은 4.0시절부터 텍스트 처리, 시스템 관리, 네트워크 서버, API 서버등 다양한 분야에서
+사용하고 있습니다.
+
+
+시작하며
+---------
+
+Perl은 보통 스크립트나 웹 서버의 페이지 작성 등 다양한 용도로 사용됩니다만,
+사용하기에 따라서는 간단한 웹 서버라든가 데몬(daemon) 형태로도 띄우게 됩니다.
+Perl이 장시간 실행이 되는 경우 부딪치게 되는 문제 중 하나가 메모리 관리입니다.
+Perl의 메모리 관리에 대해서 간단히 알아보고 장기간 실행되는 Perl 스크립트의 경우
+발생할 수 있는 [메모리 누수(memory leak)][wiki-memory-leak]를 줄이기 위한 방법을 알아봅니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Devel::Cycle 모듈][cpan-devel-cycle]
+- [CPAN의 Memory::Usage 모듈][cpan-memory-usage]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Devel::Cycle \
+        Memory::Usage
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Devel::Cycle \
+        Memory::Usage
+
+
+Perl의 메모리 관리
+-------------------
+
+기본적으로 Perl을 배우는 과정에서 메모리 할당/해제의 경우는 거의 신경쓰지 않고 배우는 것이 보통입니다.
+사실 그런 것들을 신경쓰지 않으려고 Perl 같은 스크립트 언어를 배우는 것이기도 하구요.
+많은 스크립트 언어들이 그렇듯이 사용자의 편의를 위해서 메모리 관리를 자동화 한 것이 Perl의
+특징이기도 합니다만, 메모리 관리를 신경써야 하는 장시간 돌아가는 스크립트의 경우
+이러한 편리함은 반대로 문제로 다가옵니다.
+
+대부분의 운영체제에서 실행되는 프로그램은 동적인 메모리 할당으로 [힙(heap)][wiki-memory-management-heap]을 사용합니다.
+Perl도 자동으로 할당되는 메모리를 이 힙 영역에 할당하고,
+[참조 횟수 계산 방식(reference counting)][wiki-reference-counting] 기반으로 메모리를 관리합니다.
+해시나 배열에 새로운 값을 넣거나, 객체를 만들거나 하면 메모리가 할당(`malloc()` 함수를 생각하면 됩니다) 됩니다.
+다시 말하면 할당된 메모리를 가리키는 변수의 갯수를 세고 있고,
+이 갯수 값이 0이 되면 메모리가 해제 *가능*한 상태가 됩니다.
+해제 가능한 상태가 되면 바로 메모리가 해제(free()를 생각하면 됩니다)되는 것이 아니라
+내부적으로 재사용 가능한 상태가 되고, 나중에 메모리를 필요한 경우가 생기면
+새로 힙에서 할당하는 것이 아니라 재사용 가능한 메모리 영역을 먼저 사용 합니다.
+따라서 Perl의 메모리 이용을 관찰해 보면 일단 *항상 증가하는 것 처럼* 보이게 됩니다.
+
+
+메모리 할당의 관찰
+-------------------
+
+여러가지 도구가 있습니다만 간단하게는 [Memory::Usage 모듈][cpan-memory-usage]를
+사용하면 간단한 메모리 할당량을 추적할 수 있습니다.
+이 모듈은 `/proc/$pid/statm` 파일을 읽기 때문에 Linux에서만 정상 실행된다는 점에 주의하세요.
+
+    #!perl
+    use strict;
+    use Memory::Usage;
+
+    my $m = Memory::Usage->new();
+
+    $m->record("start");
+
+    $m->record("start");
+
+    my $size = 1000000; # 1m
+    my @a = 1 .. $size;
+    $m->record("new array");
+
+    @a = 1 .. 10000;
+    $m->record("reinit array");
+
+    undef @a;
+    $m->record("undef array");
+
+    @a = ($size+1) .. ($size*1.5);
+    $m->record("reinit array");
+
+    $m->dump();
+
+Ubuntu 14.04 LTS, 64-bit Intel CPU에서 실행한 결과는 다음과 같습니다.
+
+    #!bash
+    $ perl memory.pl
+      time    vsz (  diff)    rss (  diff) shared (  diff)   code (  diff)   data (  diff)
+         0  20364 ( 20364)   3060 (  3060)   1784 (  1784)      8 (     8)   1764 (  1764) start
+         0  90608 ( 70244)  73544 ( 70484)   1832 (    48)      8 (     0)  72008 ( 70244) new array
+         0  90608 (     0)  73544 (     0)   1832 (     0)      8 (     0)  72008 (     0) reinit array
+         0  82792 ( -7816)  65744 ( -7800)   1832 (     0)      8 (     0)  64192 ( -7816) undef array
+         1  86776 (  3984)  69640 (  3888)   1836 (     0)      8 (     0)  68176 (  3984) reinit array
+
+처음에 `@a`를 1,000,000개 원소의 배열로 초기화 하면 메모리가 70244Kbytes (data의 diff를 보면 됩니다)
+늘어난 것을 확인할 수 있습니다. 대략 원소당 70 바이트 정도 되는군요.
+
+두번째로 다시 10,000개 원소의 배열을 할당하면, 늘어난 크기가 0이므로
+줄어든 메모리도 없지만 늘어난 메모리도 없음을 알 수 있습니다.
+10,000개의 원소는 새로 할당한 것이 아니라 기존에 참조가 없어진
+백만 원소의 배열 안에서 재사용되었음을 짐작할 수 있습니다.
+
+그나마 할당된 메모리를 해제할 수 있는 방법이 `undef`입니다만, 이마저도 완전히 보장해 주지는 못합니다.
+세번째로 `undef`를 사용한 경우 `@a`는 `undef`로 초기화 됩니다만, 돌아온 메모리는 7816 Kbytes에 불과 하므로
+여전히 약 64 Mbytes를 사용하고 있는 것을 알 수 있습니다.
+이는 두번째의 할당을 제외하고 실행 해도 마찬가지 결과를 얻습니다.
+
+네번째로 다시 50만개의 원소를 (겹치지 않는 숫자로) 할당해 보면, 3984 Kbytes만 추가되는 것으로
+보아 기존에 힙에 할당되어 있던 메모리가 대부분 재사용된 것을 알 수 있습니다.
+
+
+메모리 누수도 발생 하나요?
+---------------------------
+
+가능 합니다. 사용된 메모리를 가리키는 변수(해시, 배열 등 포함)을 관리하고 있는데,
+여기서 메모리 참조에 순환(cycle)이 발생하면 이 경우 나중에 해제될 기회를 갖지 못하게 됩니다.
+이런 순환 구조를 찾는 것은 동적으로 많은 데이터가 할당되는 경우 쉽게 알기 힘들 수 있지만,
+[Devel::Cycle 모듈][cpan-devel-cycle]을 사용하면 힌트를 얻을 수 있습니다.
+예제는 다음과 같습니다.
+
+    #!perl
+    use strict;
+    use Devel::Cycle;
+    use Data::Dumper;
+
+    my $test = { hello => world };
+    # 자기 참조
+    $test->{world}{next} = $test;
+
+    print Dumper($test);
+    find_cycle($test);
+
+`find_cycle()`함수에 찾아보고자 하는 변수를 넣어 주면
+순환 참조 오류(reference cycle)가 발생하는 경우를 알려 줍니다.
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $VAR1 = {
+              'world' => {
+                           'next' => $VAR1
+                         },
+              'hello' => 'world'
+            };
+    Cycle (1):
+                         $A->{'world'} => \%B
+                          $B->{'next'} => \%A
+
+`$test`는 `{world}{next}`가 다시 `$test`를 가리키고 있으므로 참조 사이클이 발생하고 있음을 알 수 있습니다.
+이 다음의 `Cycle (1)`로 시작하는 곳이 `find_cycle()`의 출력인데 어떤 부분이 참조 사이클이 되어 있는지 알 수 있습니다.
+사이클이 없다면 아무것도 표시되지 않습니다.
+
+Perl 변수의 내부 구조에 대해서 더 자세히 알고 싶다면 [CPAN의 Devel::Peek 모듈][cpan-devel-peek]을
+사용하면 됩니다만, 내부 구조 자체에 관심이 없다면 `Data::Dumper`로 충분하지 않을까 합니다.
+
+
+메모리 사용량이 신경 쓰여요!
+-----------------------------
+
+대부분의 Perl 스크립트는 단기간 실행되는 것이 대부분이라 메모리 사용량에 대해서 크게 신경쓰지 않습니다.
+하지만 많은 데이터를 처리해야 하거나 네트워크 서버 형태로 오래 실행되어야 하는 경우
+메모리 할당으로 점유하는 메모리 용량이 계속 커지는 현상을 볼 수 있습니다.
+이런 경우를 방지할 수 있는 몇 가지 팁을 생각해 보면 다음과 같습니다.
+
+- 파일을 읽어 들어야 하는 경우 통째로 읽기보다 행 단위로 읽거나 버퍼의 크기를 정해서 읽음.
+  [File::Slurp 모듈][cpan-file-slurp] 같은 경우 사용하기 쉬운 만큼 남용하기도 쉬움.
+- 사용하지 않는 경우 `undef`로 최대한 메모리를 해제(단 100% 보장은 못합니다)
+- 메모리 참조 사이클이 발생하지 않도록 해시나 참조(reference) 구조를 만듬.
+- 많은 메모리 사용이 예상되는 경우 별도 프로세스로 분리해서 실행합니다.
+- 프로세스 자체의 메모리를 감시하다가 사용자에게 경고를 주거나 스스로 종료.
+  [`mod_perl`의 경우 프로세스를 자체 감시하는 기능][modperl-apache2-resource]이 그 예.
+
+이런 것들이 쉬운 일은 아닙니다만, 어느정도 메모리 사용을 염두에 두고 프로그램을 작성하고
+내부적으로 메모리 사용을 관찰할 수 있다면 경우에 맞는 대처가 가능할 것이라 생각합니다.
+또한 할당된 힙 메모리는 재사용이 되고 있으므로, 어느정도 반복적으로 사용이 되면
+메모리 사용량이 더 증가하지 않으므로, 일정 시간 동안 관찰하는 것이 꼭 필요 합니다.
+초반에 메모리 사용이 늘어나는 것은 당연할 수 있지만, 지속적으로 늘어나기만 한다면
+그건 어딘가에서 메모리 누수가 발생하고 있다는 의미겠지요.
+
+
+정리하며
+---------
+
+Perl로 프로그램을 작성하면서 메모리 관리까지 신경써야 경우가 얼마나 있을까라는
+생각이 들지도 모릅니다만, 몇 가지 경험과 기존의 자료를 바탕으로 이야기해 보았습니다.
+C로 작성하는 것 만큼 정밀한 제어는 불가능하겠지만,
+문제가 발생하는 경우하면 이 글이 좋은 시작점이 될 것이라 생각합니다.
+더 관심이 있다면 [스택오버 플로우의 How can I find memory leaks in long-running Perl program?][stackoverflow-perl-memory-leak] 글타래를 살펴보세요.
+기사에서 소개한 모듈 이외의 고급 모듈을 더 찾아볼 수 있습니다. :)
+
+
+[cpan-devel-cycle]:                 https://metacpan.org/pod/Devel::Cycle
+[cpan-devel-peek]:                  https://metacpan.org/pod/Devel::Peek
+[cpan-file-slurp]:                  https://metacpan.org/pod/File::Slurp
+[cpan-memory-usage]:                https://metacpan.org/pod/Memory::Usage
+[cpan]:                             http://www.cpan.org/
+[home-perlbrew]:                    http://perlbrew.pl/
+[modperl-apache2-resource]:         https://perl.apache.org/docs/2.0/api/Apache2/Resource.html
+[stackoverflow-perl-memory-leak]:   http://stackoverflow.com/questions/429254/how-can-i-find-memory-leaks-in-long-running-perl-program
+[twitter-junhochoi]:                http://twitter.com/#!/junhochoi
+[wiki-memory-leak]:                 https://en.wikipedia.org/wiki/Memory_leak
+[wiki-memory-management-heap]:      https://en.wikipedia.org/wiki/Memory_management#HEAP
+[wiki-reference-counting]:          https://en.wikipedia.org/wiki/Reference_counting
