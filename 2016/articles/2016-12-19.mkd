@@ -1,0 +1,357 @@
+Title:    내가 언제 어디 쯤 있었더라?
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+자전거를 즐겨 타거나, 달리기를 즐겨 하는 사람들의 경우 GPS 트래커를 이용해
+자신이 움직이는 궤적을 기록하는 행위를 즐기곤합니다.
+마찬가지로 꼭 운동이 아니더라도 여행을 다닌다던가, 걷는 것을 즐기는 경우에도
+지도 상에서 다녔던 곳을 확인하기 위해 GPS 좌표를 기록하는 경우가 많죠.
+이런 GPS 좌표 파일은 보통 GPX, FIT, TCX, KML 등의 파일 확장자를 가지며,
+표준화 되어 있기 때문에 쉽게 원하는 정보를 추출할 수 있습니다.
+이 GPS 좌표 파일 중 가장 널리 쓰이는 [GPX 파일][wiki-gpx]을 이용해
+몇 시 몇 분 쯤 어디에 있었는지 확인하는 방법을 알아보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Geo::Gpx 모듈][cpan-geo-gpx]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Geo::Gpx
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Geo::Gpx
+
+
+Record Your Activity!
+----------------------
+
+자신의 GPS 트래커 기기를 이용하거나 스마트폰의 GPS 레코딩 앱을 이용해 야외 활동 경로를 기록합니다.
+이후 저장 방식을 GPX로 지정하거나 또는 GPX로 내보내기 기능을 이용해 필요한 파일을 확보합니다.
+
+![GPX로 내보내기][img-1-resize]
+*그림 1.* GPX로 내보내기 ([원본][img-1])
+
+[GPX][wiki-gpx]는 **GPS Exchange Format**이며 비교적 굉장히 단순한 구조를 가지고 있습니다.
+저장 형식으로 표준 XML을 사용하기 때문에 직접 편집기를 이용해 열어
+내용을 확인하거나 수정하기에도 크게 어렵지는 않습니다.
+GPX 파일을 살펴 보면 다음과 같은 형식을 가집니다.
+
+    #!xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <gpx creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" ...>
+     <metadata>
+      <time>2016-12-17T05:23:20Z</time>
+     </metadata>
+     <trk>
+      <name>Afternoon Ride</name>
+      <trkseg>
+       <trkpt lat="37.5509440" lon="127.0918020">
+        <ele>29.6</ele>
+        <time>2016-12-17T05:24:50Z</time>
+        <extensions>
+         <gpxtpx:TrackPointExtension>
+          <gpxtpx:atemp>18</gpxtpx:atemp>
+          <gpxtpx:hr>118</gpxtpx:hr>
+          <gpxtpx:cad>0</gpxtpx:cad>
+         </gpxtpx:TrackPointExtension>
+        </extensions>
+       </trkpt>
+       <trkpt>
+        ...
+       </trkpt>
+       ...
+       <trkpt lat="37.5735420" lon="127.0380430">
+        <ele>9.0</ele>
+        <time>2016-12-17T05:38:31Z</time>
+        <extensions>
+         <gpxtpx:TrackPointExtension>
+          <gpxtpx:atemp>7</gpxtpx:atemp>
+          <gpxtpx:hr>148</gpxtpx:hr>
+          <gpxtpx:cad>81</gpxtpx:cad>
+         </gpxtpx:TrackPointExtension>
+        </extensions>
+       </trkpt>
+       ...
+       <trkpt>
+        ...
+       </trkpt>
+      </trkseg>
+     </trk>
+    </gpx>
+
+샘플 파일은 가민 트래커를 이용해서 기록한 뒤 스트라바라는 웹서비스에
+업로드 한 후 GPX로 변환 다운로드 받은 파일입니다.
+크게 웨이포인트(waypoint)와 트랙(track), 라우트(route)로 구성되는데,
+우리가 관심 있는 실제 나의 궤적 자체는 트랙 요소(`trk`) 아래의 트랙 포인트 요소(`trkpt`)로 저장됩니다.
+정확히는 트랙 요소 아래, 트랙 세그먼트 요소(`trkseg`) 아래에 위치합니다만, 크게 중요하지는 않습니다. :)
+트랙 포인트 요소의 `lat` 속성과 `lon` 속성이 바로 우리가 필요로 하는 [위도][wiki-lat], [경도][wiki-lng] 좌표입니다.
+
+
+GPX 파일 읽기
+--------------
+
+XML 파일이니 만큼 Perl에서 즐겨 쓰는 XML 파싱 모듈을 사용해도 되나,
+굳이 바퀴를 재발명할 필요는 없겠죠?
+[CPAN의 Geo::Gpx 모듈][cpan-geo-gpx]을 이용하면, 번거롭게 XML 파싱 작업없이
+바로 원하는 트랙 정보를 추출할 수 있습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use feature qw( say );
+
+    use Geo::Gpx;
+
+    my $gpx_file = "2016-12-17.gpx";
+
+    open my $fh, "<", $gpx_file
+        or die "cannot open $gpx_file file: $!\n";
+
+    my $gpx = Geo::Gpx->new(
+        input => $fh,
+    ) or die "cannot load gpx from $gpx_file file\n";
+
+    close $fh;
+
+`Geo::Gpx` 모듈은 객체지향 모듈이며, 개체 생성 시 GPX 문자열 정보,
+즉 XML 문자열을 읽어들여 내부 자료 구조에 적재합니다.
+다만 파일 이름을 인자로 지원하지 않기 때문에, XML 문자열 자체를
+넘겨주거나, 또는 해당 파일의 파일 핸들을 넘겨주어야 합니다.
+특별히 문제가 없다면 파일 읽기가 끝나버렸습니다.
+좀 싱겁죠? :)
+
+이제 gpx 내의 트랙 포인트를 읽어들여 봅시다.
+
+    #!perl
+    ...
+    use utf8;
+    use strict;
+    use warnings;
+
+    use feature qw( say );
+
+    use Geo::Gpx;
+    ...
+    close $fh;
+
+    my $iter = $gpx->iterate_points;
+    while ( my $pt = $iter->() ) {
+        my $time = $pt->{time};
+        my $lat  = $pt->{lat};
+        my $lon  = $pt->{lon};
+        my $ele  = $pt->{ele};
+
+        say "$time,$lat,$lon";
+    }
+
+GPX 파일의 트랙 요소 아래에는 수 많은 트랙 포인트 요소가 저장되어 있습니다.
+`iterate_points()` 메소드를 사용하면 이 트랙 요소를 순회할 수 있습니다.
+각각의 트랙 포인트 요소는 `time`, `lat`, `lon`, `ele` 등의 해시 참조로 구성되어 있습니다.
+시간 정보와 위도, 경도 정보만 출력한 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./gpx.pl
+    1481952502,37.5573480,127.0796410
+    1481952503,37.5573730,127.0795700
+    1481952504,37.5573960,127.0794930
+    1481952505,37.5574230,127.0794140
+    1481952506,37.5574490,127.0793400
+    ...
+    $
+
+제법 원하는 결과물에 다가가고 있습니다.
+그런데 제일 앞의 시간 정보가 [에포크 시간][wiki-unix-time]이군요.
+막상 자료 처리할 때는 에포크 형식이 더 명확하고 편하기는 하지만,
+결과물로써 눈으로 확인하기에는 감이 오지 않는 단점이 있습니다.
+우리에게 익숙한 년월일 및 시분초 형식으로 바꿔보죠.
+`Geo::Gpx` 모듈은 [CPAN의 DateTime 모듈][cpan-datetime] 형식을 지원하므로,
+객체 생성시 `use_datetime` 속성을 참으로 설정해보죠.
+
+    #!perl
+    my $gpx = Geo::Gpx->new(
+        input        => $fh,
+        use_datetime => 1,
+    ) or die "cannot load gpx from $gpx_file file\n";
+
+이제 실행 결과를 살펴볼까요?
+
+    #!bash
+    $ ./gpx.pl
+    2016-12-17T05:28:22,37.5573480,127.0796410
+    2016-12-17T05:28:23,37.5573730,127.0795700
+    2016-12-17T05:28:24,37.5573960,127.0794930
+    2016-12-17T05:28:25,37.5574230,127.0794140
+    2016-12-17T05:28:26,37.5574490,127.0793400
+    ...
+    $
+
+꽤 익숙한 형식입니다.
+어이쿠! 그런데 새벽 다섯시라뇨... 저는 토요일 같은 주말에는
+절대 해가 중천에 뜨기 전에는 일어나지 않는데 어찌 된 것일까요?
+당시 제가 움직였던 시간은 대충 오후 2시 쯤이었는데 말이죠.
+아하! 일정하게 9시간 차이가 나는 것을 보니 시간대 문제겠군요.
+`DateTime` 모듈의 `set_time_zone()` 메소드를 사용해서 시간대를 설정하면 간단히 해결됩니다.
+
+    #!perl
+    my $iter = $gpx->iterate_points;
+    while ( my $pt = $iter->() ) {
+        my $time = $pt->{time};
+        my $lat  = $pt->{lat};
+        my $lon  = $pt->{lon};
+        my $ele  = $pt->{ele};
+
+        $time->set_time_zone("Asia/Seoul");
+        say "$time,$lat,$lon";
+    }
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./gpx.pl
+    2016-12-17T14:28:22,37.5573480,127.0796410
+    2016-12-17T14:28:23,37.5573730,127.0795700
+    2016-12-17T14:28:24,37.5573960,127.0794930
+    2016-12-17T14:28:25,37.5574230,127.0794140
+    2016-12-17T14:28:26,37.5574490,127.0793400
+    ...
+    $
+
+이제 제대로 된 값이 나오는군요. :)
+
+
+시간, 좌표 해시
+----------------
+
+우리가 원하는 최종 결과물은 특정 시간대에 나의 위치를 알고 싶은 것이므로
+트랙 포인트를 순회하는 반복문을 조금 수정해서
+시간을 키로, 좌표를 값으로 가지는 해시를 생성해보죠.
+
+    #!perl
+    my %whereami;
+    my $iter = $gpx->iterate_points;
+    while ( my $pt = $iter->() ) {
+        my $time = $pt->{time};
+        my $lat  = $pt->{lat};
+        my $lon  = $pt->{lon};
+        my $ele  = $pt->{ele};
+
+        $time->set_time_zone("Asia/Seoul");
+
+        my $key = $time->strftime("%Y%m%d-%H%M%S");
+        $whereami{$key} = {
+            lat => $lat,
+            lon => $lon,
+        };
+    }
+
+`%whereami` 해시에 `20161217-142825`와 같은 형식의 시간 정보를 키로,
+위도와 경도 좌표를 값으로 가지는 자료가 저장됩니다.
+이제는 이 해시를 이용해서 원하는 시각의 좌표를 추출하면 됩니다.
+프로그램이 명령줄 인자를 받아서 처리하도록 하죠.
+
+    #!perl
+    ...
+    use Geo::Gpx;
+
+    my $ymd_hms = shift;
+    die "Usage: $0 <YYYYmmdd-HHMMSS>\n"
+        unless $ymd_hms && $ymd_hms =~ m/^\d{8}-\d{6}$/;
+
+    my $gpx_file = "2016-12-17.gpx";
+    ...
+
+반복문을 통해 `%whereami` 해시가 생성된 뒤에는 명령줄에서 입력받은
+`$ymd_hms` 값을 이용해서 해당 좌표를 화면에 출력합니다.
+
+    #!perl
+    ...
+    my %whereami;
+    my $iter = $gpx->iterate_points;
+    while ( my $pt = $iter->() ) {
+        ...
+    }
+
+    die "cannot find GPS information\n" unless exists $whereami{$ymd_hms};
+
+    my $lat = $whereami{$ymd_hms}{lat};
+    my $lon = $whereami{$ymd_hms}{lon};
+
+    say "$lat,$lon";
+    say "https://www.google.co.kr/maps/place/\@$lat,$lon,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d$lat!4d$lon";
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./gpx.pl 20161217-154105
+    37.5746630,126.9781280
+    https://www.google.co.kr/maps/place/@37.5746630,126.9781280,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d37.5746630!4d126.9781280
+    $
+
+짜잔! ;-)
+
+![Where Were I?][img-2-resize]
+*그림 2.* Where Were I? ([원본][img-2])
+
+
+정리하며
+---------
+
+생각보다 간단히 단 몇 줄의 코드로 GPX 파일을 파싱하고 원하는 시각의 위치 정보를 추려보았습니다.
+모듈의 특성 상 실행할 때마다 매번 GPX 파일을 읽고 적재하기 때문에 추출한 해시 결과값을
+별도의 캐시 등에 저장한다면 여러번 질의를 할 때 더욱 빠른 속도로 처리할 수 있습니다.
+또는 단순 캐시가 아닌 데이터베이스에 영구적으로 저장한다면 활용도가 더 다양해지겠죠.
+또한 GPX 파일은 기록을 저장하는 방식에 따라 1초에도 여러 포인트를 기록하기도 하고
+또는 수십초에 한 번의 포인트를 저장하기도 합니다.
+따라서 내가 특정 시각의 위치를 요청했을 때 그 위도와 경도 값이
+GPX 파일에는 저장되어 있지 않을 수 있습니다.
+이런 경우 단순히 자료가 없다고 할 것인지, 가장 가까운 시각 정보를 보여줄 것인지,
+또는 중간 지점을 추측할 것인지 등의 처리가 필요하기도 합니다.
+이후 작업은 여러분의 숙제로 남겨두죠.
+지리 정보 처리도 펄과 함께라면 어렵지만은 않다는 것 잊지마세요! ;-)
+
+_EOT_
+
+
+[img-1]:                    2016-12-19-1.png
+[img-2]:                    2016-12-19-2.png
+
+[img-1-resize]:             2016-12-19-1_r.png
+[img-2-resize]:             2016-12-19-2_r.png
+
+
+[cpan-datetime]:                    https://metacpan.org/pod/DateTime
+[cpan-geo-gpx]:                     https://metacpan.org/pod/Geo::Gpx
+[cpan]:                             http://www.cpan.org/
+[home-perlbrew]:                    http://perlbrew.pl/
+[twitter-keedi]:                    http://twitter.com/#!/keedi
+[wiki-gpx]:                         https://en.wikipedia.org/wiki/GPS_Exchange_Format
+[wiki-lat]:                         https://ko.wikipedia.org/wiki/%EC%9C%84%EB%8F%84
+[wiki-lng]:                         https://ko.wikipedia.org/wiki/%EA%B2%BD%EB%8F%84
+[wiki-unix-time]:                   https://en.wikipedia.org/wiki/Unix_time
+[yes24-4433208]:                    http://www.yes24.com/24/goods/4433208
