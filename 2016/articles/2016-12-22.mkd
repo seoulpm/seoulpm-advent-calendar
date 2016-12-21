@@ -192,7 +192,7 @@ ID가 정규 표현식 기준 `\W`에 해당하는 문자가 있으면 적절하
 따라서 더 향상된 성능으로 서비스하려면,
 [PSGI/Plack][home-psgi-plack] [hypnotoad][cpan-mojo-server-hypnotoad] 등의 기법을 사용해야 합니다.
 더불어 기본적으로는 인증을 지원하지 않으므로, 허가된 사용자만 접근하기를 원한다면,
-웹서버와 리버스 프록시로 연결한 후 기본 인증(Basic Auth)을 붙인다던가,
+웹서버와 리버스 프록시로 연결한 후 [기본 인증(Basic Auth)][wiki-basic-auth]을 붙인다던가,
 Plack으로 인증, 또는 Mojolicious로 인증을 붙인다던가 등의 작업이 필요합니다.
 또한, 웹 응용이 지속적으로 동작하도록 보장하기 위해 사활 관리도 필요하겠죠.
 `mojopaste`를 잘 활용하면, 단순히 pastebin 서비스를 뛰어넘어
@@ -218,6 +218,7 @@ _EOT_
 [home-perlbrew]:                http://perlbrew.pl/
 [home-psgi-plack]:              http://plackperl.org/
 [twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-basic-auth]:              https://en.wikipedia.org/wiki/Basic_access_authentication
 [wiki-irc]:                     https://en.wikipedia.org/wiki/Internet_Relay_Chat
 [wiki-pastebin]:                https://en.wikipedia.org/wiki/Pastebin
 [yes24-4433208]:                http://www.yes24.com/24/goods/4433208
