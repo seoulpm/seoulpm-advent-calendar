@@ -1,0 +1,222 @@
+Title:    나만의 pastebin
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+[pastebin][wiki-pastebin]이란 일반 문자열(평문, plain text)을 저장하는 웹 응용을 통칭합니다.
+pastebin 서비스는 [IRC][wiki-irc]에서 널리 사용되었습니다.
+보통 IRC 사용자들은 채팅창에 긴 문자열을 붙여 넣는 것을 비매너로 간주하기 때문에,
+사용자들 끼리 소스 코드 검토하거나, 긴 문자열을 서로 공유하는 용도로 많이 써왔죠.
+이런 pastebin 서비스 중 가장 오래되고 유명한 것이 [pastebin.com][home-pastebin]이며,
+[GitHub의 Gist][github-gist] 역시 최근 널리 쓰이고 있습니다.
+꼭 IRC에서 사용하기 위해서는 아니더라도, 사람들하고 공유할 소스 코드라던가
+또는 기사 거리라던가 심지어 메모용으로라도 pastebin을 사용하면 꽤 편리합니다.
+Perl과 함께라면 여러분의 컴퓨터 위에서 pastebin 서비스도 독자적으로 구축할 수 있답니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 App::mojopaste 모듈][cpan-app-mojopaste]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan App::mojopaste
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan App::mojopaste
+
+
+서버 실행
+----------
+
+`App::mojopaste` 모듈은 실행 파일 `mojopaste`를 제공하므로,
+설치 후 명령줄에서 `mojopaste` 명령을 이용해 바로 웹 응용을 실행할 수 있습니다.
+
+    #!bash
+    $ mojopaste daemon
+    [Wed Dec 21 17:45:41 2016] [info] Listening at "http://*:3000"
+    Server available at http://127.0.0.1:3000
+    ...
+
+서비스를 종료하려면 명령줄에서 `Control + C`를 입력하면 됩니다.
+아무런 포트 지정없이 실행하면 기본 포트 `3000`번을 사용합니다.
+브라우저로 접속해볼까요?
+
+![mojopaste!][img-1-resize]
+*그림 1.* mojopaste! ([원본][img-1])
+
+`App::mojopaste`는 Perl의 웹 응용 프레임워크인 [Mojolicious][home-mojolicious]를
+이용해서 제작된 웹 응용이니 만큼 `morbo` 명령의 명령줄 옵션을 모두 사용할 수 있습니다.
+예를 들어 별도의 포트로 실행하려면 `-l` 또는 `--listen` 옵션을 이용해 리슨 포트를 지정합니다.
+다음은 `8080` 포트로 웹 응용을 실행시키는 방법입니다.
+
+    #!bash
+    $ mojopaste daemon -l http://*:8080
+    [Wed Dec 21 17:52:19 2016] [info] Listening at "http://*:8080"
+    Server available at http://127.0.0.1:8080
+    ...
+
+특별히 설정하지 않고 기본 값으로 동작시키면 `mojopaste`는 서버를 실행시킨
+현재 디렉터리의 하부에 `paste` 디렉터리를 생성한 다음 파일을 저장합니다.
+웹 응용을 통해 평문을 파일로 저장할 디렉터리를 지정하려면 `PASTE_DIR` 환경 변수를 이용합니다.
+
+    #!bash
+    $ PASTE_DIR=/tmp/askdna/paste mojopaste daemon -l http://*:8080
+    [Wed Dec 21 18:53:16 2016] [info] Listening at "http://*:8080"
+    Server available at http://127.0.0.1:8080
+    ...
+
+
+CSV와 그래프
+-------------
+
+`App::mojopaste` 모듈은 CSV 자료를 저장할 경우 [morris.js][home-morrisjs]
+라이브러리와 연동해 선 그래프로 보여주는 기능을 제공합니다.
+사실 원래는 JSON 형식의 자료를 그래프로 보여주는 기능도 지원했기 때문에
+더욱 다양하게 [morris.js][home-morrisjs] 라이브러리의 기능을 쓸 수 있었지만,
+0.22 버전 부터는 CSV에 한해서 그래프로 변환하도록 다운그레이드 되었습니다.
+아마도 보안 문제나, 예외 처리와 관련한 이슈 때문이 아닌가 싶지만 아쉬운 부분입니다.
+그래프 기능은 기본으로 비활성화되어 있으므로 활성화시키기 위해
+실행 시점에 `PASTE_ENABLE_CHARTS` 환경 변수를 사용합니다.
+
+    #!bash
+    $ PASTE_ENABLE_CHARTS=1 mojopaste daemon -l http://*:8080
+    [Wed Dec 21 18:53:16 2016] [info] Listening at "http://*:8080"
+    Server available at http://127.0.0.1:8080
+    ...
+
+그래프가 정말 되는지 확인해보기 위해 다음과 같은 CSV 형태 자료를 저장해보죠.
+
+    #!plain
+    # 대통령 직무 수행 평가 - 2016년 최근 20주 (한국갤럽)
+    "100분률","잘하고 있다(직무 긍정률, %)","잘못하고 있다(직무 부정률, %)"
+    "2016 W28",32,54
+    "2016 W29",32,55
+    "2016 W30",31,55
+    "2016 W31",33,52
+    "2016 W32",33,53
+    "2016 W33",33,54
+    "2016 W34",30,57
+    "2016 W35",30,55
+    "2016 W36",33,56
+    "2016 W37",31,56
+    "2016 W38",30,56
+    "2016 W39",29,57
+    "2016 W40",26,59
+    "2016 W41",25,64
+    "2016 W42",17,74
+    "2016 W43",5,89
+    "2016 W44",5,90
+    "2016 W45",5,90
+    "2016 W46",4,93
+    "2016 W47",4,91
+
+CSV 형태의 문자열을 저장한 뒤 **Graph** 메뉴를 클릭하면
+해당 CSV 자료를 그래프로 표현해줍니다.
+
+![CSV 자료의 그래프화][img-2-resize]
+*그림 2.* CSV 자료의 그래프화 ([원본][img-2])
+
+짜잔! :-)
+
+
+설정 파일
+----------
+
+`mojopaste`는 [Mojolicious][home-mojolicious] 기반 웹 응용이기 때문에 설정 파일을 지원합니다.
+`mojopaste`는 저장 위치와 그래프 사용 여부 두 가지 항목만 설정할 수 있기 때문에
+설정 파일 형식은 매우 간단합니다.
+다음은 설정 파일의 한 예입니다.
+
+    #!bash
+    $ cat mojopaste.conf
+    {
+        paste_dir     => '/path/to/paste/dir',
+        enable_charts => 1, # default is 0
+    }
+
+
+크리스마스 선물
+----------------
+
+`mojopaste`는 업로드하는 평문을 각각 파일로 저장합니다.
+이 때 12자리의 임의의 문자열을 생성해서 파일의 이름을 결정합니다.
+이름을 생성하는 부분의 내부 코드를 살펴보면 다음과 같습니다.
+
+    #!perl
+    my $id = substr Mojo::Util::md5_sum($$ . time . $ID++), 0, 12;
+
+코드를 간단히 설명하면, `mojopaste` 웹 응용을 실행하고 있는 프로세스 번호와
+현재 시간, 그리고 해당 프로세스가 생성한 문서 개수를 합친 문자열의
+MD5 해시합을 구한 다음 이 문자열의 앞 12자리를 추출해서 파일 이름으로 사용하는 것입니다.
+즉 `4fee8f76edf4`와 같은 식의 파일이 생성되는 것이죠.
+더불어 `mojopaste`가 각각의 문서를 접근할 때 파일 이름에 해당하는 ID를 점검하는 코드는 다음과 같습니다.
+
+    #!perl
+    if (!$id or $id =~ m!\W!) {
+        return $c->$cb("Hacking attempt! paste_id=($id)", "");
+    }
+
+ID가 정규 표현식 기준 `\W`에 해당하는 문자가 있으면 적절하지 않은 ID로 판단한다는 의미입니다.
+다시말해 ID가 `\w`로만 이루어져 있다면, 어떤 형식이든 아무 문제가 없다는 것이겠죠.
+즉, `mojopaste`의 경우 `paste_dir` 디렉터리 하부에 `HelloWorld`라는 파일명을 가진
+텍스트 파일을 저장하면 `http://.../HelloWorld`와 같은 식으로 접근이 가능합니다.
+내부 구현과 관련되어 업데이트에 영향을 받을 수는 있는 모르는 사람이 많은 기능입니다만,
+적절하게 활용한다면 꽤 유용할 것 같지 않나요?
+
+
+정리하며
+---------
+
+`daemon` 명령을 이용해 기본으로 띄운 서버는 [Mojolicious][home-mojolicious]의 개발 테스트용 서버입니다.
+따라서 더 향상된 성능으로 서비스하려면,
+[PSGI/Plack][home-psgi-plack] [hypnotoad][cpan-mojo-server-hypnotoad] 등의 기법을 사용해야 합니다.
+더불어 기본적으로는 인증을 지원하지 않으므로, 허가된 사용자만 접근하기를 원한다면,
+웹서버와 리버스 프록시로 연결한 후 기본 인증(Basic Auth)을 붙인다던가,
+Plack으로 인증, 또는 Mojolicious로 인증을 붙인다던가 등의 작업이 필요합니다.
+또한, 웹 응용이 지속적으로 동작하도록 보장하기 위해 사활 관리도 필요하겠죠.
+`mojopaste`를 잘 활용하면, 단순히 pastebin 서비스를 뛰어넘어
+자신의 간단한 메모장 뿐만 아니라 다양한 용도로도 충분히 활용 가능하겠죠? ;-)
+
+_EOT_
+
+
+[img-1]:                        2016-12-22-1.png
+[img-2]:                        2016-12-22-2.png
+
+[img-1-resize]:                 2016-12-22-1_r.png
+[img-2-resize]:                 2016-12-22-2_r.png
+
+
+[cpan-app-mojopaste]:           https://metacpan.org/pod/App::mojopaste
+[cpan-mojo-server-hypnotoad]:   https://metacpan.org/pod/Mojo::Server::Hypnotoad
+[cpan]:                         http://www.cpan.org/
+[github-gist]:                  https://gist.github.com/
+[home-mojolicious]:             http://mojolicious.org/
+[home-morrisjs]:                http://morrisjs.github.io/morris.js/
+[home-pastebin]:                http://pastebin.com
+[home-perlbrew]:                http://perlbrew.pl/
+[home-psgi-plack]:              http://plackperl.org/
+[twitter-keedi]:                http://twitter.com/#!/keedi
+[wiki-irc]:                     https://en.wikipedia.org/wiki/Internet_Relay_Chat
+[wiki-pastebin]:                https://en.wikipedia.org/wiki/Pastebin
+[yes24-4433208]:                http://www.yes24.com/24/goods/4433208
