@@ -422,7 +422,6 @@ Mojolicious의 기본 정적 파일 처리 기능을 적극 활용해서 문제�
     <pre class="prettyprint linenums"><%= $error %></pre>
     % }
     % else {
-    <link itemprop="stylesheet" type="text/css" media="all" href="//fonts.googleapis.com/earlyaccess/notosanskr.css" />
     %   use Text::MultiMarkdown;
     %   my $markdown = Text::MultiMarkdown::markdown($paste);
     %   #$markdown =~ s/<pre><code>/<pre class="prettyprint linenums"><code>/gms;
