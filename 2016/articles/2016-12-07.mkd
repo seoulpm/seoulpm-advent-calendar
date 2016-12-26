@@ -90,7 +90,7 @@ Perl 6를 설치합니다.
 이 때 터미널 인코딩은 **UTF-8**로 설정했다고 가정합니다.
 
     #!bash
-    $ perl6 -e 'for @*ARGS { say chr(:16($_)) }’ 97D3 570B
+    $ perl6 -e 'for @*ARGS { say chr(:16($_)) }' 97D3 570B
     韓
     國
 
