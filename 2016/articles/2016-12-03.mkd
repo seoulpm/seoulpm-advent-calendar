@@ -1,0 +1,252 @@
+Title:    Perl 6 설치 어렵지 않아요!
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+2015년 12월 24일이 Perl 6의 공식 안정 릴리스였으니 벌써 발표된지 1년이 흘렀습니다.
+Perl의 다양성은 Perl 6에도 그대로 적용이 되는데 **Perl 6**라는 명칭은 언어 명세 그 자체를 의미하며,
+이를 구현한 구현체, 즉 컴파일러 또는 인터프리터가 얼마든지 존재할 수 있는 것이죠. 
+더욱 흥미로운 것은 이런 다양한 구현체들과 이 구현체가 실행되는 공간을 분리했다는 것입니다.
+즉, 이 구현체는 가상 머신(VM) 위에서 돌아가는데, 2000년도 초창기에는 [Parrot][home-parrot] 하나였지만,
+현재는 JVM과 [.NET][home-niecza] 등 다양한 가상 머신 개발이 진행되고 있습니다.
+조금 서론이 복잡했는데, 이제는 슬슬 Perl 6를 자신의 장비에 설치해서
+이것저것 만져보며 Perl 6를 탐험해보는 것도 재미있을 것 같네요.
+
+
+준비물
+-------
+
+리눅스 기준 필요한 명령은 다음과 같습니다.
+
+- `perl`
+- `git`
+- 컴파일 툴체인
+
+데비안 계열의 리눅스를 사용하고 있다면 다음 명령을 이용해서 패키지를 설치합니다.
+perl 패키지는 보통 기본으로 설치되어 있으므로 따로 설치할 필요는 없습니다.
+
+    #!bash
+    $ sudo apt-get install perl git build-essential
+
+
+rakudobrew 설치
+----------------
+
+앞에서 이것 저것 복잡하게 설명했습니다만 간단히 정리하면,
+Perl 6는 명세로써 `v6.c`가 현재 안정 버전입니다.
+더불어 2016년 현재 가장 완성도가 높은 구현체는 [Rakudo][home-rakudo],
+VM은 [MoarVM][home-moarvm]이니 우리에게 필요한 것은 Rakudo + MoarVM 입니다. :-)
+가장 손쉽게 Rakudo를 설치하는 방법은 [rakudobrew][home-rakudobrew]를 사용하는 것입니다.
+rakudobrew를 설치하는 명령은 다음과 같습니다.
+
+    #!bash
+    $ git clone https://github.com/tadzik/rakudobrew ~/.rakudobrew
+    '/home/askdna/.rakudobrew'에 복제합니다...
+    remote: Counting objects: 742, done.
+    remote: Total 742 (delta 0), reused 0 (delta 0), pack-reused 742
+    오브젝트를 받는 중: 100% (742/742), 158.76 KiB | 158.00 KiB/s, 완료.
+    델타를 알아내는 중: 100% (327/327), 완료.
+    $
+
+설치 후에는 rakudobrew 설치 경로를 PATH에 등록합니다.
+
+    #!bash
+    $ export PATH=~/.rakudobrew/bin:$PATH
+
+필요하다면 사용하는 쉘의 환경 설정 파일에 PATH 설정 내역을 영구적으로 추가하도록 합니다.
+Bash쉘을 사용한다면 다음 명령을 실행해서 `.bashrc` 파일에 등록하세요.
+
+    #!bash
+    $ echo 'export PATH=~/.rakudobrew/bin:$PATH' >> ~/.bashrc
+
+설치에 문제가 없었다면 명령줄에서 `rakudobrew`를 실행해보세요.
+
+    #!bash
+    $ rakudobrew
+    Usage:
+    rakudobrew current
+    rakudobrew list-available
+    rakudobrew build jvm|moar|moar-blead|all [tag|branch|sha-1] [--configure-opts=]
+    rakudobrew build panda [panda-ver]
+    rakudobrew build zef
+    rakudobrew triple [rakudo-ver [nqp-ver [moar-ver]]]
+    rakudobrew rehash
+    rakudobrew switch jvm|moar|moar-blead
+    rakudobrew nuke jvm|moar|moar-blead
+    rakudobrew self-upgrade
+    rakudobrew test [jvm|moar|moar-blead|all]
+    rakudobrew exec <command> [command-args]
+    rakudobrew init
+    rakudobrew shell [--unset|version]
+    rakudobrew local [version]
+    rakudobrew global [version]
+    rakudobrew version
+    rakudobrew versions # or rakudobrew list
+    rakudobrew which <command>
+    rakudobrew whence [--path] <command>
+    $
+
+Perl 6를 설치할 모든 준비가 끝났습니다!
+
+
+Rakudo + MoarVM = Perl 6
+-------------------------
+
+설치한 `rakudobrew`는 Perl 6의 여러 구현체 중 Rakudo를 목표(target)로 하므로,
+이제 Rakudo가 지원하는 VM 종류만 선택하면 됩니다.
+현재 `rakudobrew`는 JVM과 [MoarVM][home-moarvm]을 선택해서 빌드할 수 있습니다.
+오래 전 마지막으로 Perl 6를 기억하던 몽거스라면,
+"엇 아니! Perl 6는 [Parrot][home-parrot]을 쓰는 것 아니야?"라고 떠올릴텐데요.
+기술적으로 복잡한 사정이 있는데, 기존 Rakudo가 사용하던 Parrot의 경우
+2015년 기준으로 Rakudo 측에서는 지원을 중단했으며,
+MoarVM을 기본으로 사용하는 것으로 바뀌었습니다.
+MoarVM은 "Metamodel On A Runtime"의 약자로 기존 Parrot의 위치를 담당한다고 보면 됩니다.
+JVM도 지원하니 어느 쪽을 선택할지는 여러분의 몫입니다만,
+아마 대부분의 경우는 가벼운 MoarVM을 사용할 것으로 보입니다.
+자, 이제 Rakudo와 MoarVM을 더하는 연금술을 시전해 Perl 6를 만들어볼까요?
+
+    #!bash
+    $ rakudobrew build moar
+    Update git reference: rakudo
+    'rakudo'에 복제합니다...
+    ...
+    Update git reference: nqp
+    'nqp'에 복제합니다...
+    ...
+    Update git reference: MoarVM
+    'MoarVM'에 복제합니다...
+    ...
+    'moar-nom'에 복제합니다...
+    ...
+    Building NQP ...
+    /usr/bin/perl Configure.pl --prefix=/home/askdna/.rakudobrew/moar-nom/install --backends=moar --make-install --git-protocol=https --git-reference=/home/askdna/.rakudobrew/bin/../git_reference --gen-moar
+    ...
+    'MoarVM'에 복제합니다...
+    ...
+    Configuring and building MoarVM ...
+    /usr/bin/perl Configure.pl --optimize --prefix=/home/askdna/.rakudobrew/moar-nom/install --make-install
+    Welcome to MoarVM!
+    ...
+    NQP has been built and installed.
+    Using /home/askdna/.rakudobrew/moar-nom/install/bin/nqp-m (version 2016.12-13-gd0b13814 / MoarVM 2016.12-6-g65acd555).
+    Cleaning up ...
+    ...
+    cp -- /home/askdna/.rakudobrew/moar-nom/install/bin/perl6-m /home/askdna/.rakudobrew/moar-nom/install/bin/perl6
+    chmod -- 755 /home/askdna/.rakudobrew/moar-nom/install/bin/perl6
+
+    Rakudo has been built and installed.
+    Updating shims
+    Switching to moar-nom
+    Done, moar-nom built
+    $
+
+명령줄에서 실행하고 나면 약간의 메시지를 출력한 다음 가장 최신의 Perl 6 설치가 완료됩니다.
+`perl6` 실행 파일의 경로를 찾는데 문제가 없다면 성공적으로 설치한 것입니다.
+
+    #!bash
+    $ which perl6
+    /home/askdna/.rakudobrew/bin/perl6
+    $
+
+`rakudobrew` 명령을 이용해서 설치된 상태를 확인할 수도 있습니다.
+
+    #!bash
+    $ rakudobrew list
+    * moar-nom
+    $
+
+특정 버전의 Rakudo 버전을 설치하려면 `triple` 명령을 사용합니다.
+이 때는 Rakudo 버전과 NQP (Not Quite Perl) 버전, MoarVM 버전까지 모두 명시할 수 있습니다.
+보통 매달 릴리스되고 있으므로 2016년 12월 버전으로 설치한다면
+다음 명령을 입력합니다.
+
+    #!bash
+    # rakudobrew triple [rakudo-ver [nqp-ver [moar-ver]]]
+    $ rakudobrew triple 2016.12 2016.12 2016.12
+    ...
+    $ rakudobrew list
+      moar-2016.12-2016.12-2016.12
+      * moar-nom
+    $ rakudobrew switch moar-2016.12-2016.12-2016.12
+    Switching to moar-2016.12-2016.12-2016.12
+    $ rakudobrew list
+    * moar-2016.12-2016.12-2016.12
+      moar-nom
+    $
+
+아직까지 특별한 목적없이 Perl 6를 체험해보려는 단계의
+대부분의 경우라면 `rakudobrew build moar` 명령으로 충분할 것입니다. :-)
+
+
+설치 팁 #1
+-----------
+
+[VirtualBox][home-virtualbox]와 같은 가상 환경에서 직접 **Perl 6 / Rakudo / MoarVM**을 빌드하는 경우
+메모리가 부족하면 빌드 및 설치 단계에서 실패할 수 있으므로 메모리를 1.5GB 이상 확보해야 합니다.
+
+    #!bash
+    ...
+    /home/askdna/.rakudobrew/moar-nom/install/bin/moar --libpath="/home/askdna/.rakudobrew/moar-nom/install/share/nqp/lib" --libpath="/home/askdna/.rakudobrew/moar-nom/install/share/nqp/lib" perl6.moarvm --nqp-lib=blib --setting=NULL --ll-exception --optimize=3 --target=mbc --stagestats --output=CORE.setting.moarvm gen/moar/CORE.setting
+    Stage start      :   0.000
+    Stage parse      :  68.303
+    Stage syntaxcheck:   0.000
+    Stage ast        :   0.000
+    Stage optimize   :   8.730
+    Stage mast       :  (메모리 부족으로 실패)
+
+간단히 메모리를 1.5GB 이상으로 높여주면 문제를 해결할 수 있습니다.
+물론 이미 빌드한 바이너리를 실행하는 경우라면 이 정도의 메모리가 필요하지는 않습니다. :)
+
+
+설치 팁 #2
+-----------
+
+빌드한 Rakudo를 이용해 Perl 6를 마음껏 가지고 놀다보면, 상태를 처음으로 되돌리고 싶을 때도 있습니다.
+이 때는 간단히 설치한 디렉터리를 제거하고 새롭게 설치하면 됩니다.
+
+    #!bash
+    $ rm -rf ~/.rakudobrew/moar-nom
+    $
+
+하지만 매번 동일한 빌드 작업을 수행한다는 것은 번거로운 일이죠.
+최초 설치 후 `~/.rakudobrew` 디렉터리 또는 `~/.rakudobrew/moar-nom` 디렉터리를
+압축해서 백업한 뒤 보관한다면 간단히 Perl 6의 상태를 보존할 수 있답니다.
+
+    #!bash
+    $ tar cvzf rakudobrew.tar.gz ~/.rakudobrew
+    $
+
+
+정리하며
+---------
+
+Perl 6를 설치하는 일은 생각보다 어렵지 않습니다.
+무엇보다 시스템 관리자 권한 없이 간단히 빌드가 가능하기 때문에
+시스템을 더럽(?)힐 걱정 없이 마음껏 Perl 6를 설치하고 가지고 놀 수 있습니다.
+아직 갈 길이 많이 남은 Perl 6긴 하지만, 안정 버전이 나온지 벌써 1년이 되가고,
+매 달 발빠르게 업데이트가 되고 있는 만큼, 부담없이 설치해서 Perl 6를 느껴보면 어떨까요?
+
+Enjoy Your Perl 6! ;-)
+
+_EOT_
+
+
+[home-moarvm]:          http://www.moarvm.org/
+[home-niecza]:          https://github.com/sorear/niecza
+[home-parrot]:          http://www.parrot.org/
+[home-rakudo]:          http://rakudo.org/
+[home-rakudobrew]:      https://github.com/tadzik/rakudobrew
+[home-virtualbox]:      https://www.virtualbox.org/
+[twitter-keedi]:        http://twitter.com/#!/keedi
+[yes24-4433208]:        http://www.yes24.com/24/goods/4433208
