@@ -471,6 +471,11 @@ Mojolicious의 기본 정적 파일 처리 기능을 적극 활용해서 문제�
           .css('font-size', '0.9em')
           .css('margin', '0 80px')
           .css('padding', '10px')
+          .css('white-space', 'pre-wrap')       /* Since CSS 2.1 */
+          .css('white-space', '-moz-pre-wrap')  /* Mozilla, since 1999 */
+          .css('white-space', '-pre-wrap')      /* Opera 4-6 */
+          .css('white-space', '-o-pre-wrap')    /* Opera 7 */
+          .css('word-wrap', 'break-word')       /* Internet Explorer 5.5+ */
           ;
         $('article pre.prettyprint li')
           .css('font-family', 'Monospace')
