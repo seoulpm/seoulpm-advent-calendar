@@ -16,9 +16,9 @@ Author:   newbcode
 많은 개발자들은 각자의 개발 장비 뿐만 아니라 실제 운영 중인 장비를 관리하기도 합니다.
 개발 장비는 보통 한 대지만, 실제 운영 장비는 여러 대인 경우가 많습니다.
 이런 장비가 100대, 아니 10대 이상만 되더라도
-'어떻게 쉽게 운영 장비에 배포를 할 수 있을까?',
-'어떻게 빠르게 원격으로 명령을 한 번에 실행 할 수 있을까?',
-'로그를 쉽게 남기고 확인할 수는 없을까?' 등 고민 거리는 늘어만 갑니다.
+**'어떻게 쉽게 운영 장비에 배포를 할 수 있을까?'**,
+**'어떻게 빠르게 원격으로 명령을 한 번에 실행 할 수 있을까?'**,
+**'로그를 쉽게 남기고 확인할 수는 없을까?'** 등 고민 거리는 늘어만 갑니다.
 이럴 때 펄의 [Net::OpenSSH::Parallel 모듈][cpan-net-openssh-parallel]은
 많은 문제를 효율적으로 해결할 수 있는 단초를 제공합니다.
 
@@ -49,7 +49,7 @@ Author:   newbcode
 
 
 리모트 커맨드 환경설정
-----------
+-----------------------
 
 ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 서버에 셋팅되어야 합니다.
 마스터서버(원격 커맨드를 날리는 머신)에서 private 키를 생성 하고 원격지 서버에 public 키를 복사 하면 준비작업은 끝입니다.
@@ -61,6 +61,7 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
 
 스크립트 파일을 실행했을시 옵션을 값을 설정할 수 있게하는 모듈입니다.
 
+    #!perl
     use Getopt::Long::Descriptive;
     # command option
     my ($opt, $usage) = describe_options(
@@ -75,7 +76,6 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
             );
 
     print($usage->text), exit if $opt->help;
-
 
     병렬 SSH 객체 생성
     # server list default path
@@ -107,6 +107,7 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
 
 실제 파일 배포가 일어나는 부분 입니다.
 
+    #!perl
     # copy to servers
     if ( defined $opt->srvlist && defined $opt->srcfile && defined $opt->srcfile) {
         my $host = $opt->srvlist;
@@ -122,10 +123,13 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
         }
     }
 
+
 배포함수
 ----------------
+
 호스트와 배포할파일 배포할위치를 받아 pssh객체로 반환을 해주는 함수 입니다.
 
+    #!perl
     sub deploy_task {
         my ($host, $sfile, $dfile) = @_;
 
@@ -145,17 +149,20 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
 
 실행 커맨드
 ----------------
+
 핵심 모듈만 사용하여 구현한 코드를 실행 하면 아래와 같습니다.
 
 
-    ./pssh -f ‘서버리스트파일’ -s ‘복사할파일’ -d ‘복사할 파일위치’
+    #!bash
+    $ ./pssh -f ‘서버리스트파일’ -s ‘복사할파일’ -d ‘복사할 파일위치’
 
 
 원격 커맨드
 ----------------
+
 이제는 원격 서버에 커맨드를 날리는 부분을 살펴 보겠습니다.
 
-
+    #!perl
     if ( defined $opt->srvlist && defined $opt->cmd ) {
         my $host = $opt->srvlist;
         my $cmd = $opt->cmd;
@@ -175,8 +182,10 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
 
 원격 커맨드 함수
 ----------------
+
 커맨드를 날리는 함수 입니다.
 
+    #!perl
     sub cmd_task {
 
         my ($host, $cmd) = @_;
@@ -197,6 +206,7 @@ ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 
 
 원격 커맨드의 결과를 ssh->capture를 사용해서 로그로 남기는  함수 입니다.
 
+    #!perl
     sub do_ssh_task {
         my ($host, $ssh, $cmd) = @_;
 
@@ -242,6 +252,7 @@ Term::ProgressBar와 Text::ASCIITable모듈을 사용하여 정리된 로그를 
 퍼센트 옵션은 전체서버리스트(100개)에서의 배포할 퍼센트를 의미 합니다.
 (참고 : 2011년 달력의 키디님 기사에 자세한 설명이 되어 있습니다.  http://advent.perl.kr/2011/2011-12-01.html)
 
+    #!perl
     # build result table
     sub de_table_task {
         my ($sfile, $info, $mode, $percent) = @_;
@@ -286,6 +297,7 @@ Term::ProgressBar와 Text::ASCIITable모듈을 사용하여 정리된 로그를 
 크리스마스 선물 - 프로그래스바 사용하기
 -----------------
 
+    #!perl
     sub progress {
         my $cnt = shift;
 
@@ -297,17 +309,17 @@ Term::ProgressBar와 Text::ASCIITable모듈을 사용하여 정리된 로그를 
     }
 
 
-결과
-Start the [/tmp/testfile -> SERVER_LISTS] deployment!
-Distributing: 100% [=================================================================]D 0h00m00s
+    #!plain
+    결과
+    Start the [/tmp/testfile -> SERVER_LISTS] deployment!
+    Distributing: 100% [=================================================================]D 0h00m00s
 
 
 크리스마스 선물 - 결과
 -----------------
+
 ./pssh -f 서버리스트 -s 배포할파일-d 배포할경로 -p 10(전체 중에 퍼센트)
 [로그테이블 결과][img-1]
-
-
 
 
 정리하며
