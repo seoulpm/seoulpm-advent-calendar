@@ -1,4 +1,4 @@
-Title:    OpenSSH::Parallel
+Title:    Net::OpenSSH::Parallel을 이용한 여러 대의 서버 관리
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
