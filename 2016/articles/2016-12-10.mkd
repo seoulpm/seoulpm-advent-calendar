@@ -246,7 +246,7 @@ Author:   newbcode
 [CPAN의 Term::ProgressBar 모듈][cpan-term-progressbar]을 사용해
 호스트별 진행 사항을 프로그레스바로 표시한다던가 하면 더욱 사용성이 높아지겠죠.
 
-![Text::ASCIITable을 이용해 결과 꾸미기][img-1]
+![Text::ASCIITable을 이용해 결과 꾸미기][img-1-resize]
 *그림 1.* Text::ASCIITable을 이용해 결과 꾸미기 ([원본][img-1])
 
 제 경우 사내 기존 레거시 코드에서 RCP를 사용했는데 포트가 꽉 차버리면,
@@ -261,7 +261,7 @@ _EOT_
 
 [img-1]:                        2016-12-10-1.png
 
-[img-1-resize]:                 2016-12-10-1_r.jpg
+[img-1-resize]:                 2016-12-10-1_r.png
 
 
 [advent-2011-12-01]:            http://advent.perl.kr/2011/2011-12-01.html
