@@ -1,0 +1,273 @@
+Title:    Net::OpenSSH::Parallel을 이용한 여러 대의 서버 관리
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
+
+저자
+-----
+
+[@newbcode][twitter-newbcode] -  사랑스런 딸바보, 도치파파, 리눅스의 모든 것 공동 저자
+
+
+시작하며
+---------
+
+많은 개발자들은 각자의 개발 장비 뿐만 아니라 실제 운영 중인 장비를 관리하기도 합니다.
+개발 장비는 보통 한 대지만, 실제 운영 장비는 여러 대인 경우가 많습니다.
+이런 장비가 100대, 아니 10대 이상만 되더라도
+**'어떻게 쉽게 운영 장비에 배포를 할 수 있을까?'**,
+**'어떻게 빠르게 원격으로 명령을 한 번에 실행 할 수 있을까?'**,
+**'로그를 쉽게 남기고 확인할 수는 없을까?'** 등 고민 거리는 늘어만 갑니다.
+이럴 때 펄의 [Net::OpenSSH::Parallel 모듈][cpan-net-openssh-parallel]은
+많은 문제를 효율적으로 해결할 수 있는 단초를 제공합니다.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Net::OpenSSH::Parallel 모듈][cpan-net-openssh-parallel]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Net::OpenSSH::Parallel
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Net::OpenSSH::Parallel
+
+
+원격 서버에 명령을 날리기
+--------------------------
+
+기본적으로 SSH를 이용해서 원격 서버에 명령을 실행합니다.
+물론 `N::O::P` (`Net::OpenSSH::Parallel`) 모듈은 비밀번호를 이용하는 방법을 지원하며,
+인증 문제를 해결하는 여러가지 방법이 있으며, 공개키/비밀키 인증 또는
+키 포워딩 등의 설정을 통해 SSH 접속 및 로그인에 문제가 없는 설정을 전제로 합니다.
+우선 `N::O::P` 객체를 생성해볼까요?
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+
+    use Net::OpenSSH::Parallel;
+
+    my $pssh = Net::OpenSSH::Parallel->new(
+        workers       => 4,
+        connections   => 8,
+        reconnections => 2,
+    );
+
+객체 생성 시 인자로 넘겨주는 속성 중 `workers`는 동시에 SSH 관련 작업을 처리할 최대 워커 수를,
+`connections`은 실제로 연결을 유지 할 SSH 연결 커넥션 수를, `reconnections`은 접속 실패 등의
+사유로 재접속 시도 횟수를 의미합니다.
+이 때 `connections` 값은 `workers` 값보다 커야 한다는 점을 유의하세요.
+객체 생성이 끝나면 어떤 서버에 접속해서 일을 처리할지 알려주어야 겠죠.
+`add_host()` 메소드를 이용해서 접속할 호스트를 등록합니다.
+
+    #!perl
+    my @hosts = qw(
+        alpha.myhost.com
+        beta.myhost.com
+        gamma.myhost.com
+        delta.myhost.com
+        epsilon.myhost.com
+    );
+
+    $pssh->add_host($_) for @hosts;
+
+기본적인 준비는 모두 끝났습니다.
+이제 명령을 날려볼 시간입니다.
+서버의 호스트명과 상태를 확인할 수 있는 `uname` 명령을 호출하고 그 결과를 살펴보죠.
+
+    #!perl
+    $pssh->push( "*", "command", "uname", "-a" );
+    $pssh->run;
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./pssh.pl
+    Linux beta.myhost.com 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt7-1 (2015-03-01) x86_64 GNU/Linux
+    Linux epsilon.myhost.com 4.8.0-2-amd64 #1 SMP Debian 4.8.11-1 (2016-12-02) x86_64 GNU/Linux
+    Linux alpha.myhost.com 3.2.0-4-amd64 #1 SMP Debian 3.2.68-1+deb7u6 x86_64 GNU/Linux
+    Linux delta.myhost.com 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt7-1 (2015-03-01) x86_64 GNU/Linux
+    Linux gamma.myhost.com 3.2.0-4-686-pae #1 SMP Debian 3.2.78-1 i686 GNU/Linux
+    $
+
+동시에 여러 개의 프로세스를 띄워 원격지에 명령을 날리기 때문에
+호스트를 등록한 순서와는 별개로 네트워크 환경이나 접속 환경에 따라
+보이는 결과의 순서가 달라진다는 점을 명심하세요.
+간단히 원격지에 실행한 명령의 결과를 확인할 수 있습니다.
+`push()` 메소드의 인자 중 첫 번째 인자는 등록한 호스트를 선택하는 구문입니다.
+`"alpha.myhost.com"`을 첫 번째 인자로 넘긴다면 **alpha.myhost.com** 호스트에만 액션을 수행하라는 의미입니다.
+`"*"`는 모든 등록한 호스트를 의미하며 이 경우 단축 표현인 `all()` 메소드를 사용할 수 있습니다.
+이렇게 말이죠.
+
+    #!perl
+    $pssh->all( "command", "uname", "-a" );
+    $pssh->run;
+
+또한 두 번째 인자는 `N::O::P`에서 지원하는 액션(action)을 의미합니다.
+현재 지원하는 액션의 종류는 다음과 같습니다.
+
+- `command`
+- `scp_get`
+- `scp_put`
+- `rsync_get`
+- `rsync_put`
+- `sub`
+- `parsub`
+- `join`
+- `here`
+- `goto`
+- `stop`
+- `connect`
+
+액션의 종류가 꽤 많죠? 각 해당 액션의 자세한 설명은 [공식 문서][cpan-net-openssh-parallel]를 참조하세요. :)
+`command` 액션의 경우 단축 표현 `cmd`를 지원하므로 역시 이렇게 줄여 쓸 수 있습니다.
+
+    #!perl
+    $pssh->all( "cmd", "uname", "-a" );
+
+마지막으로 펄의 **뚱뚱한 쉼표**(**fat comma**)를 사용하면
+왼쪽의 따옴표를 제거할 수 있으므로 이런 식으로 표현하는 것 까지 가능합니다.
+
+    #!perl
+    $pssh->all( cmd => "uname", "-a" );
+
+특별히 다른 옵션 없이 `command` 액션을 실행할 경우 기본으로 현재 스크립트를 실행한
+프로세스의 표준 출력이 그 실행 결과를 보여줍니다.
+다른 별도의 파일에 결과를 저장하고 싶다면 쉘의 재지향(redirection)을 활용하거나
+또는 `command` 액션에 별도의 옵션을 넘겨주면 됩니다.
+
+    #!perl
+    open my $fh, ">", "result.txt"
+        or die "cannot open file: $!\n";
+
+    $pssh->all(
+        "command",
+        {
+            stdout_fh        => $fh,
+            stderr_to_stdout => 1,
+        },
+        "hostname",
+    );
+    $pssh->run;
+
+    close $fh;
+
+프로그램 내부에서 적절한 파일 명을 생성한 다음 이 파일의 핸들을
+`stdout_fh`로 넘겨주면 `N::O::P`은 표준 출력에 결과를 뿌려주는 대신
+입력 받은 파일 핸들에 결과를 저장합니다.
+음, 그런데 반드시 파일 핸들만 넘길 수 있는 것일까요?
+그렇진 않습니다.  관련 옵션은 [CPAN의 Net::OpenSSH 모듈][cpan-net-openssh]이 지원하는 옵션이므로
+더 자세한 내용이 궁금하다면 [해당 모듈 문서][cpan-net-openssh]를 참고하세요. :)
+그러고 보면, 파일 핸들을 넘길 경우 이미 파일 명은 명령을 실행하기 전에 결정이 되어있죠.
+호스트 별로 결과 파일을 따로 지정하고 싶다면 `stdout_fh` 보다는
+`stdout_file` 옵션을 사용하는 것이 더 간편합니다.
+
+    #!perl
+    $pssh->all(
+        "command",
+        {
+            stdout_file      => "result-%LABEL%",
+            stderr_to_stdout => 1,
+        },
+        "hostname",
+    );
+    $pssh->run;
+
+`stdout_fh` 대신 `stdout_file` 속성을 사용했다는 점을 유의하세요.
+이 때 `"result-%LABEL%"`이라는 파일 명을 지정했는데, 여기에 있는 `%LABEL%`은
+`N::O::P` 모듈이 미리 정의한 변수입니다.
+특별히 설정하지 않을 경우 기본적으로 `HOST`, `USER`, `PORT`, `LABEL`
+4가지를 정의하며 문자열 안에서 `%...%`로 감싸 보간(interpolation)합니다.
+`add_host()` 메소드 호출 시점에 따로 호스트와 라벨을 명시하지 않는다면,
+호스트와 라벨 값은 동일하게 설정됩니다.
+
+    #!bash
+    $ ls -l result-*
+    -rw-r--r-- 1 askdna askdna  6 12월  3 13:46 result-alpha.myhost.com
+    -rw-r--r-- 1 askdna askdna 18 12월  3 13:46 result-beta.myhost.com
+    -rw-r--r-- 1 askdna askdna 13 12월  3 13:46 result-gamma.myhost.com
+    -rw-r--r-- 1 askdna askdna  8 12월  3 13:46 result-delta.myhost.com
+    -rw-r--r-- 1 askdna askdna 21 12월  3 13:46 result-epsilon.myhost.com
+    $
+
+실행 결과를 살펴보면 `result-호스트명`으로 결과를 저장한 파일이 생성되었음을 알 수 있습니다.
+
+
+파일 주고 받기
+---------------
+
+여기까지 따라왔다면 파일 주고 받기는 상대적으로 무척 간단합니다.
+로컬 장비의 파일을 원격지에 업로드하려면 `scp_put` 액션을 사용합니다.
+
+    #!perl
+    $pssh->all( scp_put => "release-tarball.tar.gz", "/tmp/release/LATEST.tar.gz" );
+
+`scp_put` 액션은 줄여서 `put`이라고 사용할 수 있으므로 다음처럼 실행해도 됩니다.
+
+    #!perl
+    $pssh->all( put => "release-tarball.tar.gz", "/tmp/release/LATEST.tar.gz" );
+
+반대로 원격 서버의 파일을 다운로드하려면 `scp_get` 액션을 사용합니다.
+
+    #!perl
+    $pssh->all( scp_get => "/var/log/foo/today.log", "logs/%LABEL%-today.log" );
+
+마찬가지로 `scp_get` 액션은 줄여서 `get`이라고 사용할 수 있으므로 다음처럼 실행해도 됩니다.
+
+    #!perl
+    $pssh->all( get => "/var/log/foo/today.log", "logs/%LABEL%-today.log" );
+
+`scp_put`과 `scp_get` 명령 실행시 재귀라던가, 쉘 확장 등을 사용할 수도 있는데
+관련해서는 [Net::OpenSSH 모듈 공식 문서][cpan-net-openssh]를 확인하세요.
+
+
+정리하며
+---------
+
+`Net::OpenSSH::Parallel` 모듈의 기본적인 사용법을 알아보았습니다.
+가장 간단한 원격 명령 실행과 파일 주고 받기만 살펴보았는데,
+아마도 이것만 알고 나면 대부분의 원격 서버 관련 작업을 처리할 수 있을 것입니다.
+[2011년 달력, 첫째 날: 네모 반듯한 표 그리고 한글][advent-2011-12-01]을 참고해
+호스트 별 실행 결과를 테이블로 이쁘게 담는다거나
+[CPAN의 Term::ProgressBar 모듈][cpan-term-progressbar]을 사용해
+호스트별 진행 사항을 프로그레스바로 표시한다던가 하면 더욱 사용성이 높아지겠죠.
+
+![Text::ASCIITable을 이용해 결과 꾸미기][img-1-resize]
+*그림 1.* Text::ASCIITable을 이용해 결과 꾸미기 ([원본][img-1])
+
+제 경우 사내 기존 레거시 코드에서 RCP를 사용했는데 포트가 꽉 차버리면,
+배포가 안되거나 결과 피드백을 받기 힘들어진 한계가 있었죠.
+이런 문제를 해결하기 위해 병렬 SSH 모듈을 사용했으며,
+물론 scp의 한계로 인해 병렬 SSH의 한계도 존재하겠지만,
+서버가 늘어날 수록 비례해서 빨라지는 등 아직까지는 결과가 무척 만족스럽습니다.
+이 기사가 10 ~ 100대 이상의 서버를 관리하는 개발자 분들에게 도움이 되었으면 합니다. ;)
+
+_EOT_
+
+
+[img-1]:                        2016-12-10-1.png
+
+[img-1-resize]:                 2016-12-10-1_r.png
+
+
+[advent-2011-12-01]:            http://advent.perl.kr/2011/2011-12-01.html
+[cpan-net-openssh-parallel]:    https://metacpan.org/pod/Net::OpenSSH::Parallel
+[cpan-net-openssh]:             https://metacpan.org/pod/Net::OpenSSH
+[cpan-term-progressbar]:        https://metacpan.org/pod/Term::Progressbar
+[cpan]:                         http://www.cpan.org/
+[home-perlbrew]:                http://perlbrew.pl/
+[twitter-newbcode]:             http://twitter.com/#!/newbcode
