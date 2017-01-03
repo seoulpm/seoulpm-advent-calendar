@@ -28,311 +28,233 @@ Author:   newbcode
 
 필요한 모듈은 다음과 같습니다.
 
-- [CPAN의 Getopt::Long::Descriptive 모듈][cpan-getopt-long-descriptive]
-- [CPAN의 Net::OpenSSH::Paralle 모듈][cpan-net-openssh-parallel]
+- [CPAN의 Net::OpenSSH::Parallel 모듈][cpan-net-openssh-parallel]
 
 직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ sudo cpan \
-        Getopt::Long::Descriptive \
-        Net::OpenSSH::Parallel
+    $ sudo cpan Net::OpenSSH::Parallel
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
 다음 명령을 이용해서 모듈을 설치합니다.
 
     #!bash
-    $ cpan \
-        Getopt::Long::Descriptive \
-        Net::OpenSSH::Parallel
+    $ cpan Net::OpenSSH::Parallel
 
 
-리모트 커맨드 환경설정
------------------------
+원격 서버에 명령을 날리기
+--------------------------
 
-ssh로 원격 커맨드를 사용하기 위해서는 아래와 같은 설정이 서버에 셋팅되어야 합니다.
-마스터서버(원격 커맨드를 날리는 머신)에서 private 키를 생성 하고 원격지 서버에 public 키를 복사 하면 준비작업은 끝입니다.
-(public 키 내용을 ~/.ssh/authorized_keys 에 복사해 넣으면 됩니다)
-
-
-명령어 옵션
------------------
-
-스크립트 파일을 실행했을시 옵션을 값을 설정할 수 있게하는 모듈입니다.
+기본적으로 SSH를 이용해서 원격 서버에 명령을 실행합니다.
+물론 `N::O::P` (`Net::OpenSSH::Parallel`) 모듈은 비밀번호를 이용하는 방법을 지원하며,
+인증 문제를 해결하는 여러가지 방법이 있으며, 공개키/비밀키 인증 또는
+키 포워딩 등의 설정을 통해 SSH 접속 및 로그인에 문제가 없는 설정을 전제로 합니다.
+우선 `N::O::P` 객체를 생성해볼까요?
 
     #!perl
-    use Getopt::Long::Descriptive;
-    # command option
-    my ($opt, $usage) = describe_options(
-            'topgun %o <some-arg>',
-            [ 'srvlist|f=s', "server list file (ex: / 서버리스트를 받는 부분 입니다.)” ],
-            [ 'srcfile|s=s', "source path (배포할 파일 경로와 파일 이름을 받는 부분입니다.)” ],
-            [ 'dstfile|d=s', "destination path (파일을 배포할 경로 입니다.)” ],
-            [],
-            [ 'maxcon|m=s', "ssh maxconnections(ssh 동시 커넥션 갯수를 설정 부분 입니다.)”, { default => 40 } ],
-            [ 'cmd|c=s', "remote command (ex: \”실제 명령어가 들어가는 부분입니다.“)” ],
-            [ 'help',       "usage (https://github.daumkakao.com/perl-kang/topgun)" ],
-            );
+    #!/usr/bin/env perl
 
-    print($usage->text), exit if $opt->help;
+    use utf8;
+    use strict;
+    use warnings;
 
-    병렬 SSH 객체 생성
-    # server list default path
-    my $srvlist = $opt->srvlist;
-    my $path = '/hanmail/hansys';
-    my $srvfile = "$path/"."$srvlist";
+    use Net::OpenSSH::Parallel;
 
-    # error code
-    my @errors=(OSSH_ON_ERROR_IGNORE,OSSH_ON_ERROR_RETRY,OSSH_ON_ERROR_DONE,
-            OSSH_ON_ERROR_ABORT,OSSH_ON_ERROR_ABORT_ALL,OSSH_JOIN_FAILED,
-            OSSH_ABORTED,OSSH_GOTO_FAILED);
-
-    #option value
-    my $max_con = $opt->maxcon;  #최대 SSH커넥션 입니다.
-    my $max_recon = 2;  # 재접속 횟수 입니다.
-    my $max_workers = 20; # 최대 워커의 수 입니다.
-
-    # ssh option set ( 병렬 SSH 객체를 생성합니다.)
     my $pssh = Net::OpenSSH::Parallel->new(
-            workers => $max_workers,
-            connections => $max_con,
-            reconnections => $max_recon,
-        );
+        workers       => 4,
+        connections   => 8,
+        reconnections => 2,
+    );
 
-
-
-파일 배포
----------------
-
-실제 파일 배포가 일어나는 부분 입니다.
-
-    #!perl
-    # copy to servers
-    if ( defined $opt->srvlist && defined $opt->srcfile && defined $opt->srcfile) {
-        my $host = $opt->srvlist;
-        if ( -e $opt->srvlist ) {
-            my $sfile = $opt->srcfile;
-            my $dfile = $opt->dstfile;
-            my $mode = 'de_list';
-            my $dep_pssh = deploy_task($host, $sfile, $dfile,);
-            $dep_pssh->run or die "RUN FAILED\n";
-        }
-        else {
-            warn_print("Not Found $host");
-        }
-    }
-
-
-배포함수
-----------------
-
-호스트와 배포할파일 배포할위치를 받아 pssh객체로 반환을 해주는 함수 입니다.
+객체 생성 시 인자로 넘겨주는 속성 중 `workers`는 동시에 SSH 관련 작업을 처리할 최대 워커 수를,
+`connections`은 실제로 연결을 유지 할 SSH 연결 커넥션 수를, `reconnections`은 접속 실패 등의
+사유로 재접속 시도 횟수를 의미합니다.
+이 때 `connections` 값은 `workers` 값보다 커야 한다는 점을 유의하세요.
+객체 생성이 끝나면 어떤 서버에 접속해서 일을 처리할지 알려주어야 겠죠.
+`add_host()` 메소드를 이용해서 접속할 호스트를 등록합니다.
 
     #!perl
-    sub deploy_task {
-        my ($host, $sfile, $dfile) = @_;
+    my @hosts = qw(
+        alpha.myhost.com
+        beta.myhost.com
+        gamma.myhost.com
+        delta.myhost.com
+        epsilon.myhost.com
+    );
 
-        my @hosts = read_list($host); #서버리스트를 배열로 담습니다.
+    $pssh->add_host($_) for @hosts;
 
-            # 호스트 배열을 돌면서 add method를 사용하여 객체 리스트를 만들어 줍니다.
-            foreach my $srv ( @hosts ) {
-                $pssh->add_host($srv);
-                $pssh->push($srv, scp_put => {recursive => 1, glob => 1}, $sfile, $dfile);
+기본적인 준비는 모두 끝났습니다.
+이제 명령을 날려볼 시간입니다.
+서버의 호스트명과 상태를 확인할 수 있는 `uname` 명령을 호출하고 그 결과를 살펴보죠.
 
-            }
+    #!perl
+    $pssh->push( "*", "command", "uname", "-a" );
+    $pssh->run;
 
-        # 객체 리스트가 만들어진 pssh를 리턴 합니다.
-        return $pssh;
-    }
-
-
-실행 커맨드
-----------------
-
-핵심 모듈만 사용하여 구현한 코드를 실행 하면 아래와 같습니다.
-
+실행 결과는 다음과 같습니다.
 
     #!bash
-    $ ./pssh -f ‘서버리스트파일’ -s ‘복사할파일’ -d ‘복사할 파일위치’
+    $ ./pssh.pl
+    Linux beta.myhost.com 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt7-1 (2015-03-01) x86_64 GNU/Linux
+    Linux epsilon.myhost.com 4.8.0-2-amd64 #1 SMP Debian 4.8.11-1 (2016-12-02) x86_64 GNU/Linux
+    Linux alpha.myhost.com 3.2.0-4-amd64 #1 SMP Debian 3.2.68-1+deb7u6 x86_64 GNU/Linux
+    Linux delta.myhost.com 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt7-1 (2015-03-01) x86_64 GNU/Linux
+    Linux gamma.myhost.com 3.2.0-4-686-pae #1 SMP Debian 3.2.78-1 i686 GNU/Linux
+    $
 
-
-원격 커맨드
-----------------
-
-이제는 원격 서버에 커맨드를 날리는 부분을 살펴 보겠습니다.
-
-    #!perl
-    if ( defined $opt->srvlist && defined $opt->cmd ) {
-        my $host = $opt->srvlist;
-        my $cmd = $opt->cmd;
-        my $mode = 'cmd_list';
-        my @hosts = read_list($host);
-
-        # 호스트명에서 뒤에 숫자로 정렬 호스트명이 숫자로 되어있을경우 소팅
-        my @sorted_hosts = sort { ($a =~ /(\d+)/)[0] <=> ($b =~ /(\d+)/)[0] } @hosts;
-
-        # 병렬모드 사용
-        my $cmd_pssh;
-        $cmd_pssh = cmd_task($host, $cmd);
-        $cmd_pssh->run or die "RUN FAILED\n";
-
-    }
-
-
-원격 커맨드 함수
-----------------
-
-커맨드를 날리는 함수 입니다.
+동시에 여러 개의 프로세스를 띄워 원격지에 명령을 날리기 때문에
+호스트를 등록한 순서와는 별개로 네트워크 환경이나 접속 환경에 따라
+보이는 결과의 순서가 달라진다는 점을 명심하세요.
+간단히 원격지에 실행한 명령의 결과를 확인할 수 있습니다.
+`push()` 메소드의 인자 중 첫 번째 인자는 등록한 호스트를 선택하는 구문입니다.
+`"alpha.myhost.com"`을 첫 번째 인자로 넘긴다면 **alpha.myhost.com** 호스트에만 액션을 수행하라는 의미입니다.
+`"*"`는 모든 등록한 호스트를 의미하며 이 경우 단축 표현인 `all()` 메소드를 사용할 수 있습니다.
+이렇게 말이죠.
 
     #!perl
-    sub cmd_task {
+    $pssh->all( "command", "uname", "-a" );
+    $pssh->run;
 
-        my ($host, $cmd) = @_;
-        my @hosts = read_list($host);
+또한 두 번째 인자는 `N::O::P`에서 지원하는 액션(action)을 의미합니다.
+현재 지원하는 액션의 종류는 다음과 같습니다.
 
-        # 호스트명에서 뒤에 숫자로 정렬
-        my @sorted_hosts = sort { ($a =~ /(\d+)/)[0] <=> ($b =~ /(\d+)/)[0] } @hosts;
-        $pssh->add_host($_) for ( @sorted_hosts );
+- `command`
+- `scp_get`
+- `scp_put`
+- `rsync_get`
+- `rsync_put`
+- `sub`
+- `parsub`
+- `join`
+- `here`
+- `goto`
+- `stop`
+- `connect`
 
-        # 실행 커맨드 리스트를 가진 pssh객체를 만듭니다.
-        $pssh->all(parsub => \&do_ssh_task);
-        return $pssh;
-    }
-
-
-로그를 남기는 함수
---------------------
-
-원격 커맨드의 결과를 ssh->capture를 사용해서 로그로 남기는  함수 입니다.
-
-    #!perl
-    sub do_ssh_task {
-        my ($host, $ssh, $cmd) = @_;
-
-        my $sshlog = '/tmp/sshlog.log';
-        if ( $verbose ) {
-            my ($rout, $pid) = $ssh->pipe_out($cmd) or die "pipe_in method failed: " . $ssh->error;
-            while (<$rout>) {
-                print;
-            }
-
-            close $rout;
-
-        }
-        elsif ( defined($opt->{savefile}) ) {
-            print $fh $ssh->capture($cmd);
-
-        }
-        else {
-            open my $fh, '>>', $sshlog;
-            print $fh $ssh->capture($cmd);
-
-        }
-
-    }
-
-    #실행 커맨드
-    ./pssh -f ‘서버리스트파일’  -c “커맨드(ls -al)”
-
-
-
-크리스마스 선물
------------------
-
-많은 서버에게 파일을 배포하게되면 로그가 이쁘지(?)않게 또는 정리가 안되어서 보여지게 되는되요.  배포후 로그를
-Term::ProgressBar와 Text::ASCIITable모듈을 사용하여 정리된 로그를 남기는 함수를 추가합니다.
-
-
-
-크리스마스 선물 - 테이블 그리기
------------------
-
-퍼센트와 배포할 파일이름을 인자로 받아 아래 함수를 사용해서 이쁘게 로그를 그릴수 있습니다 :-)
-퍼센트 옵션은 전체서버리스트(100개)에서의 배포할 퍼센트를 의미 합니다.
-(참고 : 2011년 달력의 키디님 기사에 자세한 설명이 되어 있습니다.  http://advent.perl.kr/2011/2011-12-01.html)
+액션의 종류가 꽤 많죠? 각 해당 액션의 자세한 설명은 [공식 문서][cpan-net-openssh-parallel]를 참조하세요. :)
+`command` 액션의 경우 단축 표현 `cmd`를 지원하므로 역시 이렇게 줄여 쓸 수 있습니다.
 
     #!perl
-    # build result table
-    sub de_table_task {
-        my ($sfile, $info, $mode, $percent) = @_;
+    $pssh->all( "cmd", "uname", "-a" );
 
-        my $num_cnt = 1;
-        my $h_text = "Deploy Result ***[ $percent % ]***";
-
-        my $table = Text::ASCIITable->new({
-                    headingText => $h_text,
-                });
-
-        $table->setCols(qw/ Num SourceSrv Direction TargetSrv File Status /);
-        my @before_sorted_hosts;
-
-        foreach my $srv ( sort keys %{$info->{hosts}} ) {
-            push ( @before_sorted_hosts, $info->{hosts}->{$srv}->{label} );
-        }
-
-
-        # 호스트명에서 뒤에 숫자로 정렬
-        my @sorted_hosts = sort { ($a =~ /(\d+)/)[0] <=> ($b =~ /(\d+)/)[0] } @before_sorted_hosts;
-
-        foreach my $srv ( @sorted_hosts ) {
-            my $status = $info->{hosts}->{$srv}->{error} || $info->{hosts}->{$srv}->{state};
-
-            $table->addRow(
-                    $num_cnt,
-                    $hostname,
-                    "------->",
-                    $info->{hosts}->{$srv}->{label},
-                    $sfile,
-                    $status,
-                );
-
-            $num_cnt++;
-        }
-        return $table;
-    }
-
-
-
-크리스마스 선물 - 프로그래스바 사용하기
------------------
+마지막으로 펄의 **뚱뚱한 쉼표**(**fat comma**)를 사용하면
+왼쪽의 따옴표를 제거할 수 있으므로 이런 식으로 표현하는 것 까지 가능합니다.
 
     #!perl
-    sub progress {
-        my $cnt = shift;
+    $pssh->all( cmd => "uname", "-a" );
 
-        my $progress = Term::ProgressBar->new ({count => $cnt ,name => 'Distributing',ETA=>'linear'});
-        for (1..$cnt) {
-            $progress->update($_);
-            #$progress->message("\rDistributed $_ of $cnt");
-        }
-    }
+특별히 다른 옵션 없이 `command` 액션을 실행할 경우 기본으로 현재 스크립트를 실행한
+프로세스의 표준 출력이 그 실행 결과를 보여줍니다.
+다른 별도의 파일에 결과를 저장하고 싶다면 쉘의 재지향(redirection)을 활용하거나
+또는 `command` 액션에 별도의 옵션을 넘겨주면 됩니다.
+
+    #!perl
+    open my $fh, ">", "result.txt"
+        or die "cannot open file: $!\n";
+
+    $pssh->all(
+        "command",
+        {
+            stdout_fh        => $fh,
+            stderr_to_stdout => 1,
+        },
+        "hostname",
+    );
+    $pssh->run;
+
+    close $fh;
+
+프로그램 내부에서 적절한 파일 명을 생성한 다음 이 파일의 핸들을
+`stdout_fh`로 넘겨주면 `N::O::P`은 표준 출력에 결과를 뿌려주는 대신
+입력 받은 파일 핸들에 결과를 저장합니다.
+음, 그런데 반드시 파일 핸들만 넘길 수 있는 것일까요?
+그렇진 않습니다.  관련 옵션은 [CPAN의 Net::OpenSSH 모듈][cpan-net-openssh]이 지원하는 옵션이므로
+더 자세한 내용이 궁금하다면 [해당 모듈 문서][cpan-net-openssh]를 참고하세요. :)
+그러고 보면, 파일 핸들을 넘길 경우 이미 파일 명은 명령을 실행하기 전에 결정이 되어있죠.
+호스트 별로 결과 파일을 따로 지정하고 싶다면 `stdout_fh` 보다는
+`stdout_file` 옵션을 사용하는 것이 더 간편합니다.
+
+    #!perl
+    $pssh->all(
+        "command",
+        {
+            stdout_file      => "result-%LABEL%",
+            stderr_to_stdout => 1,
+        },
+        "hostname",
+    );
+    $pssh->run;
+
+`stdout_fh` 대신 `stdout_file` 속성을 사용했다는 점을 유의하세요.
+이 때 `"result-%LABEL%"`이라는 파일 명을 지정했는데, 여기에 있는 `%LABEL%`은
+`N::O::P` 모듈이 미리 정의한 변수입니다.
+특별히 설정하지 않을 경우 기본적으로 `HOST`, `USER`, `PORT`, `LABEL`
+4가지를 정의하며 문자열 안에서 `%...%`로 감싸 보간(interpolation)합니다.
+`add_host()` 메소드 호출 시점에 따로 호스트와 라벨을 명시하지 않는다면,
+호스트와 라벨 값은 동일하게 설정됩니다.
+
+    #!bash
+    $ ls -l result-*
+    -rw-r--r-- 1 askdna askdna  6 12월  3 13:46 result-alpha.myhost.com
+    -rw-r--r-- 1 askdna askdna 18 12월  3 13:46 result-beta.myhost.com
+    -rw-r--r-- 1 askdna askdna 13 12월  3 13:46 result-gamma.myhost.com
+    -rw-r--r-- 1 askdna askdna  8 12월  3 13:46 result-delta.myhost.com
+    -rw-r--r-- 1 askdna askdna 21 12월  3 13:46 result-epsilon.myhost.com
+    $
+
+실행 결과를 살펴보면 `result-호스트명`으로 결과를 저장한 파일이 생성되었음을 알 수 있습니다.
 
 
-    #!plain
-    결과
-    Start the [/tmp/testfile -> SERVER_LISTS] deployment!
-    Distributing: 100% [=================================================================]D 0h00m00s
+파일 주고 받기
+---------------
 
+여기까지 따라왔다면 파일 주고 받기는 상대적으로 무척 간단합니다.
+로컬 장비의 파일을 원격지에 업로드하려면 `scp_put` 액션을 사용합니다.
 
-크리스마스 선물 - 결과
------------------
+    #!perl
+    $pssh->all( scp_put => "release-tarball.tar.gz", "/tmp/release/LATEST.tar.gz" );
 
-./pssh -f 서버리스트 -s 배포할파일-d 배포할경로 -p 10(전체 중에 퍼센트)
-[로그테이블 결과][img-1]
+`scp_put` 액션은 줄여서 `put`이라고 사용할 수 있으므로 다음처럼 실행해도 됩니다.
+
+    #!perl
+    $pssh->all( put => "release-tarball.tar.gz", "/tmp/release/LATEST.tar.gz" );
+
+반대로 원격 서버의 파일을 다운로드하려면 `scp_get` 액션을 사용합니다.
+
+    #!perl
+    $pssh->all( scp_get => "/var/log/foo/today.log", "logs/%LABEL%-today.log" );
+
+마찬가지로 `scp_get` 액션은 줄여서 `get`이라고 사용할 수 있으므로 다음처럼 실행해도 됩니다.
+
+    #!perl
+    $pssh->all( get => "/var/log/foo/today.log", "logs/%LABEL%-today.log" );
+
+`scp_put`과 `scp_get` 명령 실행시 재귀라던가, 쉘 확장 등을 사용할 수도 있는데
+관련해서는 [Net::OpenSSH 모듈 공식 문서][cpan-net-openssh]를 확인하세요.
 
 
 정리하며
 ---------
 
-해당코드가 전체 코드가 아니며 중간중간에 함수들이 빠져 있습니다. ( 펄 덕후님들을 위해 ㅎㅎㅎ)
-핵심 코드는 다 들어가 있으며 함수들이 빠져 있는 부분들은 한번 구현 해보는것은 어떨까요 ?
-병렬SSH기반을 사용한 이유는 기존에 레거시에서 사용하는 RCP의 방법의 한계 때문이 었습니다.
-물론 병렬SSH의 한계도 존재 합니다만(scp의 한계…)
-RCP의 한계는 포트가 꽉차게 되면 배포가 안되고 피드백을 받는게 힘들어서 였습니다…
-또한 병렬SSH는 서버가 늘어날수록 비례해서 빨라지는 장점이 있습니다.
-100대 이상을 관리하시는 개발자님들에게 도움이 되셨으면 좋겠습니다.
+`Net::OpenSSH::Parallel` 모듈의 기본적인 사용법을 알아보았습니다.
+가장 간단한 원격 명령 실행과 파일 주고 받기만 살펴보았는데,
+아마도 이것만 알고 나면 대부분의 원격 서버 관련 작업을 처리할 수 있을 것입니다.
+[2011년 달력, 첫째 날: 네모 반듯한 표 그리고 한글][advent-2011-12-01]을 참고해
+호스트 별 실행 결과를 테이블로 이쁘게 담는다거나
+[CPAN의 Term::ProgressBar 모듈][cpan-term-progressbar]을 사용해
+호스트별 진행 사항을 프로그레스바로 표시한다던가 하면 더욱 사용성이 높아지겠죠.
 
+![Text::ASCIITable을 이용해 결과 꾸미기][img-1]
+*그림 1.* Text::ASCIITable을 이용해 결과 꾸미기 ([원본][img-1])
+
+제 경우 사내 기존 레거시 코드에서 RCP를 사용했는데 포트가 꽉 차버리면,
+배포가 안되거나 결과 피드백을 받기 힘들어진 한계가 있었죠.
+이런 문제를 해결하기 위해 병렬 SSH 모듈을 사용했으며,
+물론 scp의 한계로 인해 병렬 SSH의 한계도 존재하겠지만,
+서버가 늘어날 수록 비례해서 빨라지는 등 아직까지는 결과가 무척 만족스럽습니다.
+이 기사가 10 ~ 100대 이상의 서버를 관리하는 개발자 분들에게 도움이 되었으면 합니다. ;)
 
 _EOT_
 
@@ -342,8 +264,10 @@ _EOT_
 [img-1-resize]:                 2016-12-10-1_r.jpg
 
 
-[cpan-getopt-long-descriptive]: https://metacpan.org/pod/Getopt::Long::Descriptive
+[advent-2011-12-01]:            http://advent.perl.kr/2011/2011-12-01.html
 [cpan-net-openssh-parallel]:    https://metacpan.org/pod/Net::OpenSSH::Parallel
+[cpan-net-openssh]:             https://metacpan.org/pod/Net::OpenSSH
+[cpan-term-progressbar]:        https://metacpan.org/pod/Term::Progressbar
 [cpan]:                         http://www.cpan.org/
 [home-perlbrew]:                http://perlbrew.pl/
 [twitter-newbcode]:             http://twitter.com/#!/newbcode
