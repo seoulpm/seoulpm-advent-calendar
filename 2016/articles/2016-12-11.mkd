@@ -1,4 +1,4 @@
-Title:    쿠폰 코드 발행
+Title:    Coupon Code
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
