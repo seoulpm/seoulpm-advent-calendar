@@ -179,6 +179,6 @@ Author:   aanoaa
 _EOT_
 
 
-[github-aanoaa]: https://github.com/aanoaa
-[cpan-date-holidays-kr]: https://metacpan.org/pod/Date::Holidays::KR
-[cpan-date-korean]: https://metacpan.org/release/Date-Korean
+[cpan-date-holidays-kr]:    https://metacpan.org/pod/Date::Holidays::KR
+[cpan-date-korean]:         https://metacpan.org/pod/Date::Korean
+[github-aanoaa]:            https://github.com/aanoaa
