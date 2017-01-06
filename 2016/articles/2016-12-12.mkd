@@ -7,33 +7,71 @@ Author:   aanoaa
 저자
 -----
 
-[@aanoaa][github-aanoaa] - Seoul.pm 멤버
+[@aanoaa][github-aanoaa] - Seoul.pm 멤버, 사당동 펠프스
+
 
 시작하며
 ---------
 
-서비스를 만들고 운영하다보면 공휴일과 관련한 이슈를 접하게 됩니다.
-공휴일을 제외하고 무언가를 한다거나, 공휴일에 이벤트를 한다거나 등등...
+프로그램을 만들거나 서비스를 만들고 운영하다보면 공휴일과 관련한 이슈를 자주 접합니다.
+보통 공휴일에는 업무를 쉬는 경우가 많으니 공휴일을 제와하고 무엇인가를 한다던가,
+또는 반대로 공휴일에는 사람들이 더 많이 이용할 가능성이 있으니 이벤트를 한다던가 등이죠.
+달력을 꺼내서 뒤적뒤적 찾아보면 쉬는 날을 확인하는 대신
+프로그램 내부에서 공휴일을 확인할 수 있다면 편리하겠죠?
+Perl로 2017년의 공휴일을 확인하는 방법을 알아보죠.
 
-달력을 보지않고 프로그램을 만들어서 2017년의 공휴일을 알아보겠습니다.
 
 준비물
 -------
 
-- [Date::Holidays::KR 모듈][cpan-date-holidays-kr]
+필요한 모듈은 다음과 같습니다.
 
-설치하는 방법은 넘어가도록 하겠습니다.
+- [CPAN의 Config::INI::Reader 모듈][cpan-config-ini-reader]
+- [CPAN의 Date::Holidays::KR 모듈][cpan-date-holidays-kr]
+- [CPAN의 Date::Korean 모듈][cpan-date-korean]
+- [CPAN의 Encode 모듈][cpan-encode]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan \
+        Config::INI::Reader \
+        Date::Holidays::KR \
+        Date::Korean \
+        Encode
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan \
+        Config::INI::Reader \
+        Date::Holidays::KR \
+        Date::Korean \
+        Encode
+
 
 2017년도의 공휴일
--------
+------------------
+
+이미 CPAN에는 대한민국의 공휴일을 계산하는 `Date::Holidays::KR` 모듈이 존재합니다.
+모듈이 제공하는 `holidays()` 함수를 사용하면 공휴일의 날짜와 해당 공휴일의 이름을 반환합니다.
+2017년도의 공휴일을 알아보는 코드는 다음과 같습니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
     use strict;
     use warnings;
+    use feature qw( say );
+
     use Date::Holidays::KR ();
+
     my $holidays = Date::Holidays::KR::holidays(2017);
     for my $date ( sort keys %$holidays ) {
-        print "$date: $holidays->{$date}\n";
+        say "$date: $holidays->{$date}";
     }
 
 실행결과는 다음과 같습니다.
@@ -54,11 +92,14 @@ Author:   aanoaa
     1005: 추석뒷날
     1009: 한글날
     1225: 크리스마스
+    $
 
-공휴일 목록
----------------
 
-우리나라의 공휴일은 양력으로는
+음력 공휴일의 양력으로 계산
+----------------------------
+
+우리나라의 공휴일은 크게 양력 공휴일과 음력 공휴일로 나눌 수 있습니다.
+양력 공휴일의 목록은 다음과 같습니다.
 
 - 1월 1일
 - 3월 1일
@@ -69,7 +110,7 @@ Author:   aanoaa
 - 10월 9일
 - 12월 25일
 
-음력으로는
+음력 공휴일의 목록은 다음과 같습니다.
 
 - 12월 29일
 - 12월 30일
@@ -80,105 +121,154 @@ Author:   aanoaa
 - 8월 15일
 - 8월 16일
 
-이 있습니다.
-
-
-음력 공휴일의 양력 계산
----------------
-
-2017년도의 음력 공휴일인 설날(1월 1일)의 양력날짜는 어떻게 알 수 있을까요?
-
-[cpan-date-korean][cpan-date-korean] 모듈에는 2050년까지의 음력 <-> 양력에 대응하는 표를
-만들어두고 음력을 양력으로, 양력을 음력으로 변환하는 함수를 제공하고 있습니다.
+대한민국은 양력을 사용하므로, 양력 공휴일은 언제나 일정합니다만,
+음력 공휴일은 매년 대응 양력 날짜가 변하기 마련입니다.
+이런 음력 공휴일을 양력 날짜로 변환하려면 어떻게 해야할까요?
+[CAPN의 Date::Korean 모듈][cpan-date-korean]은 2050년까지의 음력과 양력 날짜 대응 표를
+내장하고 있으며 음력을 양력으로 변환하는 `lun2sol()` 함수와
+양력을 음력으로 변환할 수 있는 `sol2lun()` 함수를 제공합니다.
+2017년의 음력 1월 1일, 즉 설날에 대응하는 양력 날짜를 알아보는 코드는 다음과 같습니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
     use strict;
     use warnings;
-    use Date::Korean;
-    printf( "%04d-%02d-%02d\n", lun2sol( 2017, 01, 01, 0 ) );
 
-실행결과는 다음과 같습니다.
+    use Date::Korean ();
+
+    printf( "%04d-%02d-%02d\n", Date::Korean::lun2sol( 2017, 1, 1, 0 ) );
+
+실행 결과는 다음과 같습니다.
 
     #!bash
     $ perl lun2sol.pl
     2017-01-28
+    $
+
+2017년의 음력 1월 1일은 양력 1월 28일이군요.
+앞서 확인했던 공휴일 날짜와도 동일한 것을 확인할 수 있습니다.
+더불어 `Date::Korea` 모듈은 해당 연도의 간지(干支)를
+확인할 수 있는 `get_ganzi()`, `get_ganzi_ko()` 함수도 제공하니
+앞으로 육십갑자 계산하느라고 낑낑댈 필요가 없겠죠?
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+    use feature qw( say );
+
+    use Date::Korean ();
+
+    my ( $saecha, $wolgun, $iljin ) = Date::Korean::get_ganzi( 2017, 1, 1, 0 );
+    my ( $saecha_ko, $wolgun_ko, $iljin_ko ) = Date::Korean::get_ganzi_ko( 2017, 1, 1, 0 );
+
+    binmode STDOUT, ":utf8";
+    say "$saecha $saecha_ko";
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ perl yooksipgapja.pl
+    丁酉 정유
+    $
 
 
-임시공휴일
----------------
+임시 공휴일
+-------------
 
-대체공휴일이나 선거일과 같은 임시공휴일은 모듈의 도움을 받을 수 없습니다.
+하지만 세상 일이라는 것이 그렇게 녹녹치만은 않죠.
+대한민국의 공휴일은 꽤나 예측이 힘든 구조의 공휴일인데다가,
+대체 휴일 제도나, 선거일과 같은 임시 공휴일까지 계산 하려면
+모듈의 도움만으로는 역부족입니다.
+이런 경우 모듈과 더불어 임시 공휴일을 별도의 파일로 만들어서 관리하면 어떨까요?
+널리 사용되어 익숙한 INI 형태의 파일로 임시 공휴일을 지정해보죠.
 
     #!ini
     [2017]
-    0401 = 선거일    # 예를 들자면..
+    0130 = 설날 대체공휴일
+    1006 = 추석 대체공휴일
     ...
 
-임시공휴일을 파일로 만들어서 관리하면
+공휴일 설정 파일을 `extra-holidays.ini`라고 하고 이 설정 파일의
+내용도 반영한 최종 공휴일 결과를 확인하는 코드는 다음과 같습니다.
 
     #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
     use strict;
     use warnings;
+    use feature qw( say );
+
     use Config::INI::Reader;
     use Date::Holidays::KR ();
+    use Encode;
     
-    my $extra_holidays = Config::INI::Reader->read_file('extra-holidays.ini');
+    my $extra_holidays = Config::INI::Reader->read_file("extra-holidays.ini");
     
-    my @holidays = holidays(2017);
-    for my $holiday (@holidays) {
-        print "$holiday\n";
-    }
-    
-    sub holidays {
-        my $year = shift;
-        return [] unless $year;
-    
-        my @holidays;
-        my $holidays = Date::Holidays::KR::holidays($year);
-        for my $mmdd ( keys %{ $holidays || {} } ) {
-            my $mm = substr $mmdd, 0, 2;
-            my $dd = substr $mmdd, 2;
-            push @holidays, "$year-$mm-$dd";
-        }
-    
-        for my $mmdd ( keys %{ $extra_holidays->{$year} || {} } ) {
-            my $mm = substr $mmdd, 0, 2;
-            my $dd = substr $mmdd, 2;
-            push @holidays, "$year-$mm-$dd";
-        }
-    
-        return sort @holidays;
+    my $holidays = custom_holidays(2017);
+    for my $date ( sort keys %$holidays ) {
+        say "$date: $holidays->{$date}";
     }
 
-아래와 같은 임시공휴일을 포함한 모든 공휴일을 볼 수 있습니다.
+    sub custom_holidays {
+        my $year = shift;
+
+        return unless $year;
+    
+        my $holidays = Date::Holidays::KR::holidays($year);
+        return unless $holidays;
+
+        for my $mmdd ( keys %{ $extra_holidays->{$year} || {} } ) {
+            $holidays->{$mmdd} = Encode::encode_utf8( $extra_holidays->{$year}{$mmdd} );
+        }
+
+        return $holidays;
+    }
+
+우선적으로 `Date::Holidays::KR` 모듈이 제공하는 공휴일을 구한 다음
+설정 파일에 추가로 지정한 공휴일을 읽어들인 후 덧씌우는 방식입니다.
+실행 결과는 다음과 같습니다.
 
     #!bash
-    $ perl holidays.pl
-    2017-01-01
-    2017-01-27
-    2017-01-28
-    2017-01-29
-    2017-03-01
-    2017-04-01
-    2017-05-03
-    2017-05-05
-    2017-06-06
-    2017-08-15
-    2017-10-03
-    2017-10-04
-    2017-10-05
-    2017-10-09
-    2017-12-25
+    $ perl extra-holidays.pl
+    0101: 신정
+    0127: 설앞날
+    0128: 설날
+    0129: 설뒷날
+    0130: 설날 대체공휴일
+    0301: 삼일절
+    0503: 부처님오신날
+    0505: 어린이날
+    0606: 현충일
+    0815: 광복절
+    1003: 추석앞날
+    1004: 추석
+    1005: 추석뒷날
+    1006: 추석 대체공휴일
+    1009: 한글날
+    1225: 크리스마스
+    $
 
 
 정리하며
 ---------
 
-2017년에는 공휴일이 많아서 참 좋습니다.
+설정 파일만 잘 관리하면 꼭 국가 공휴일 뿐만 아니더라도 소속한 단체의 쉬는 날이나,
+휴가 기간 등을 추가해서 관리하는 등 다양하게 활용할 수 있습니다.
+어찌되었든 2017년에는 공휴일이 많아서 참 좋습니다. :-)
 
 _EOT_
 
 
+[cpan-config-ini-reader]:   https://metacpan.org/pod/Config::INI::Reader
 [cpan-date-holidays-kr]:    https://metacpan.org/pod/Date::Holidays::KR
 [cpan-date-korean]:         https://metacpan.org/pod/Date::Korean
+[cpan-encode]:              https://metacpan.org/pod/Encode
+[cpan]:                     http://www.cpan.org/
 [github-aanoaa]:            https://github.com/aanoaa
+[home-perlbrew]:            http://perlbrew.pl/
