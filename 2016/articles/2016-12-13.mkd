@@ -47,6 +47,7 @@ Author:   newbcode
 
 `한국.kr`이라는 도메인을 변환하는 코드는 다음과 같습니다.
 
+    #!perl
     #!/usr/bin/env perl
 
     use utf8;
@@ -98,6 +99,7 @@ Author:   newbcode
 반대로 퓨니코드를 원래의 유니코드 문자열로 변환하려면 `puny_dec()` 함수를 사용합니다.
 코드는 다음과 같습니다.
 
+    #!perl
     #!/usr/bin/env perl
 
     use utf8;
