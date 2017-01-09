@@ -1,4 +1,4 @@
-Title:    Puny Code
+Title:    Punycode
 Package:  Seoul.pm
 Category: perl
 Category: Seoul.pm
@@ -12,12 +12,14 @@ Author:   newbcode
 
 시작하며
 ---------
-위키백과에 퓨니코드(Punycode)는 유니코드 문자열을 호스트이름에서 허용된 문자만으로 인코딩하는 방법으로 RFC3492에 잘 기술되어 있습니다.
-퓨니코드는 결국 유니코드가 지원하는 모든 언어로 국제화 도메인을 쓸수 있게한 IDNA의 일부입니다.
-퓨니코드를 갑자기(?) 애기를 드리는 이유는 요즘 한국.kr처럼 한글도메인을 많이 사용하고 전세계적으로 각 나라의 언어로 도메인을 설정하는 경우가 많아졌기 때문에
-한번 살펴볼까 합니다.
 
-그리고 퓨니코드는 피싱 도메인으로도 많이 사용 하기 때문에 퓨니코드를 제대로 유니코드로 디코딩하여 도메인을 뽑아내느것도 중요하기 때문에 한번 살펴 보겠습니다.
+[퓨니코드(Punycode)][wiki-punycode]는 [IETF RFC3492 문서][rfc-3492]에 정의된 인코딩으로
+유니코드 문자열을 호스트 이름에서 허용된 문자만으로 인코딩하는 방법입니다.
+퓨니코드는 결국 유니코드가 지원하는 모든 언어로 국제화 도메인을 쓸 수 있게 한 IDNA의 일부입니다.
+근래는 전세계적으로 각 나라의 언어로 도메인을 설정하는 경우가 많아졌는데
+한국의 경우 **한국.kr**처럼 한글 도메인을 사용하는 만큼 퓨니코드에 대해 한번 알아보기로 하죠.
+그리고 퓨니코드를 피싱 도메인으로도 많이 사용 하기 때문에 이런 도메인을
+유니코드로 디코딩하여 도메인을 뽑아내는 방법을 알아두는 것도 유용하죠.
 
 
 준비물
@@ -122,4 +124,6 @@ _EOT_
 [cpan-uri-utf8-punycode]:   https://metacpan.org/pod/URI::UTF8::Punycode
 [cpan]:                     http://www.cpan.org/
 [home-perlbrew]:            http://perlbrew.pl/
+[rfc-3492]:                 https://tools.ietf.org/html/rfc3492
 [twitter-newbcode]:         http://twitter.com/#!/newbcode
+[wiki-punycode]:            https://en.wikipedia.org/wiki/Punycode
