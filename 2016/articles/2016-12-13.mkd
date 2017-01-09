@@ -32,7 +32,7 @@ Author:   newbcode
 
     #!bash
     $ sudo cpan \
-		URI::UTF8::Punycode
+        URI::UTF8::Punycode
 
 사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
 [perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
@@ -40,7 +40,7 @@ Author:   newbcode
 
     #!bash
     $ cpan \
-		URI::UTF8::Punycode
+        URI::UTF8::Punycode
 
 
 퓨니코드 도메인
@@ -48,19 +48,19 @@ Author:   newbcode
 
 한국.kr이라는 도메인을 변환하는 코드는 아래와 같습니다.
 
-	#!/usr/bin/env perl
+    #!/usr/bin/env perl
 
-	use strict;
-	use warnings;
+    use strict;
+    use warnings;
 
-	use utf8;
-	use URI::UTF8::Punycode;
-	use Data::Printer;
+    use utf8;
+    use URI::UTF8::Punycode;
+    use Data::Printer;
 
-	my $domain= '한국.net';
+    my $domain= '한국.net';
 
-	my $puny_domain = puny_enc($domain);
-	print "Domain: $puny_domain\n";
+    my $puny_domain = puny_enc($domain);
+    print "Domain: $puny_domain\n";
 
 
 위에코드로 결과를 찍으면
@@ -73,40 +73,40 @@ Domain: xn--3e0b707e.xn--net- 이런 결과를 얻을수 있는데요
 my @domains = split /\./, $domain;
 
 Dumper
-	[
-	  [0] "한국",
-	  [1] "net"
-	]
+    [
+      [0] "한국",
+      [1] "net"
+    ]
 
 분리한 후에 한가지 할일이 더 있는데요 아스키가 아닌 도메인에 대해서만 퓨니코드 변환을 해주면 됩니다.
 (uri 스키마는 기본적으로 아스키로 되어있기 때문입니다)
 
 
-	my $domain= '한국.net';
-	if($domain =~ m/[^[:ascii:]]/) {
-	  my @domains = split /\./, $domain;
-	  my $puny_domain = puny_enc($domains[0]);
-	  print "domain: $puny_domain\n";
-	}
+    my $domain= '한국.net';
+    if($domain =~ m/[^[:ascii:]]/) {
+      my @domains = split /\./, $domain;
+      my $puny_domain = puny_enc($domains[0]);
+      print "domain: $puny_domain\n";
+    }
 
 
 결과
-	domain: xn--3e0b707e
+    domain: xn--3e0b707e
 
 한국이라는 호스트를 퓨니코드로 변환을 완료했지만 해당 문자열로는 브라우져에서 접속할 수 없습니다.
 접속하려면 스키마를 다시 합쳐줘야 합니다.
 그래서 전체 코드는 아래와 같습니다.
 
-	if($domain =~ m/[^[:ascii:]]/) {
-	  my @domains = split /\./, $domain;
-	  my $puny_domain = puny_enc($domains[0]);
-	  $puny_domain .= '.'.$domains[1];
-	  print "domain: $puny_domain\n";
-	}
+    if($domain =~ m/[^[:ascii:]]/) {
+      my @domains = split /\./, $domain;
+      my $puny_domain = puny_enc($domains[0]);
+      $puny_domain .= '.'.$domains[1];
+      print "domain: $puny_domain\n";
+    }
 
 
 결과
-	domain: xn--3e0b707e.net
+    domain: xn--3e0b707e.net
 
 
 해당결과를 브라우져에서 붙여넣으시면 접속이 잘됩니다!
@@ -122,6 +122,6 @@ Dumper
 _EOT_
 
 
-[cpan-uri-utf8-punycode]:           	https://metacpan.org/pod/URI::UTF8::Punycode
-[cpan]:                         			http://www.cpan.org/
-[twitter-newbcode]:             http://twitter.com/#!/newbcode
+[cpan-uri-utf8-punycode]:   https://metacpan.org/pod/URI::UTF8::Punycode
+[cpan]:                     http://www.cpan.org/
+[twitter-newbcode]:         http://twitter.com/#!/newbcode
