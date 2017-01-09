@@ -6,7 +6,8 @@ Author:   newbcode
 
 저자
 -----
-@newbcode 사랑스런 딸바보 도치파파 리눅스의 모든것 공동저자
+
+[@newbcode][twitter-newbcode] -  사랑스런 딸바보, 도치파파, 리눅스의 모든 것 공동 저자
 
 
 시작하며
@@ -120,5 +121,7 @@ Dumper
 
 _EOT_
 
+
 [cpan-uri-utf8-punycode]:           	https://metacpan.org/pod/URI::UTF8::Punycode
 [cpan]:                         			http://www.cpan.org/
+[twitter-newbcode]:             http://twitter.com/#!/newbcode
