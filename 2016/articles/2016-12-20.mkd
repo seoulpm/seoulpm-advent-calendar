@@ -1,0 +1,352 @@
+Title:    Perl on Heroku
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   keedi
+
+저자
+-----
+
+[@keedi][twitter-keedi] - Seoul.pm 리더, Perl덕후,
+[거침없이 배우는 펄][yes24-4433208]의 공동 역자, keedi.k _at_ gmail.com
+
+
+시작하며
+---------
+
+[Heroku][home-heroku]는 시작된 클라우드 PaaS(Platform-as-a-Service) 중 하나 입니다.
+기본적으로 Ruby on Rails 웹 응용을 지원하는 서비스였지만, 현재는 Java와, Node.js,
+Scala, Clojure, Python, PHP, Go 등의 언어를 공식적으로 지원하고 있습니다.
+하지만 기본적으로 생성하는 인스턴스는 리눅스인 만큼, 공식적으로 지원하지 않는다고 해서
+다른 언어나 웹 프레임워크를 사용하는 것이 딱히 불가능하지는 않습니다.
+공식 채널을 통해 문의를 할 수 없다던가, 조금 번거로울 뿐이죠. :)
+2007년에 시작된 서비스인 만큼 PaaS 서비스가 넘쳐나는 2016년인 지금 특별히 새로울 것은 없습니다만
+계속 변화하고 있는 서비스인만큼 공식 CLI 도구라던가, 사용법이 조금은 바뀐 부분이 있는데,
+Perl과 [Mojolicious][home-mojolicious] 기반의 웹 응용을 Heroku에서 사용하는 법을 간단히 짚고 넘어가보죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Mojolicious 모듈][cpan-mojolicious]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan Mojolicious
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan Mojolicious
+
+
+Heroku CLI
+-----------
+
+당연한 이야기지만 Heroku 계정이 있어야 합니다.
+[공식 홈페이지의 회원 가입][home-heroku-signup] 양식을 사용해서 무료 계정을 생성합니다.
+따로 자신만의 도메인을 연결한다던가 등의 추가적인 작업을 할 예정이 없다면,
+신용카드 등록과 같은 부가적인 인증은 필요없습니다.
+약간의 제한은 있지만, PaaS에 Perl / Mojolicious 웹 응용을 올리는데에는 별 상관이 없습니다.
+
+계정 생성을 완료했다면 우선 [Heroku CLI 응용][home-heroku-cli]을 시스템에 설치해야 합니다.
+Heroku 역시 여느 PaaS 서비스와 마찬가지로 웹을 통해 필요한 모든 작업을 진행할 수 있지만,
+펄 몽거스 여러분들은 브라우저보단 터미널에서 편안함을 느끼시는 분들이니
+명령줄 도구를 이용해서 이후 작업을 수행합니다.
+회원 가입도 명령줄에서 진행이 가능했으면 좋았을 텐데 이건 조금 아쉽군요. :-P
+우부툰를 포함한 데비안 계열의 리눅스의 경우 Heroku CLI를 설치하기 위한 저장소를 등록해야 합니다.
+
+    #!bash
+    $ sudo add-apt-repository "deb https://cli-assets.heroku.com/branches/stable/apt ./"
+    $ curl -L https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+    $ sudo apt-get update
+    $ sudo apt-get install heroku
+
+저장소 추가 없이 설치할 경우는 직접 타르볼을 다운로드 받은 후 설치해야 합니다.
+설치 장소는 딱히 정해진 곳이 없으므로 입맛에 맞게 설치하면 됩니다.
+당연하지만 이렇게 수동으로 설치할 경우 해당 바이너리가 가장 최신 파일인지 여부를 점검하고,
+새로운 버전을 설치하는 등의 관리는 직접해야 합니다.
+64비트 리눅스의 경우 다음과 같은 명령을 실행해서 설치합니다.
+
+    #!bash
+    $ wget -q -O- https://cli-assets.heroku.com/branches/stable/heroku-linux-amd64.tar.gz | sudo tar xvzf - -C /usr/local/lib
+    $ sudo ln -s /usr/local/lib/heroku/bin/heroku /usr/local/bin/heroku
+
+설치가 완료되면 명령줄에서 `heroku` 명령을 사용할 수 있습니다.
+이후 명령줄에서 수행할 모든 작업에는 로그인이 우선적으로 필요합니다.
+앞서 생성한 Heroku 계정 정보를 이용해 로그인합니다.
+
+    #!bash
+    $ heroku login
+    Enter your Heroku credentials.
+    Email: myid@email.com
+    Password (typing will be hidden):
+    Logged in as myid@email.com
+    $
+
+로그인 정보는 `~/.netrc` 파일에 저장됩니다.
+따라서 해당 파일의 접근 권한을 잘 지정해 악용되지 않도록 조심합니다.
+Heroku 로그인 이후 `~/.netrc` 파일에 저장되는 내용은 다음과 같습니다.
+
+    #!bash
+    $ cat ~/.netrc
+    machine api.heroku.com
+      login myid@email.com
+      password 7ff9f7fe-efb9-4998-9a80-4cc63e2586d3
+    machine git.heroku.com
+      login myid@email.com
+      password 7ff9f7fe-efb9-4998-9a80-4cc63e2586d3
+    $ ls -l ~/.netrc
+    -rw------- 1 askdna askdna 194  1월  6 17:41 /home/askdna/.netrc
+    $
+
+
+인스턴스 생성
+--------------
+
+로그인을 완료했으면 Heroku 인스턴스를 생성합니다.
+기본적으로 git을 이용해서 인스턴스를 관리하므로 생성할 인스턴스를 위한 저장소를 만듭니다.
+
+    #!bash
+    $ mkdir -p ~/workspace/heroku/keedi-seoulpm
+    $ cd ~/workspace/heroku/keedi-seoulpm
+    $ git init
+    /home/askdna/workspace/heroku/keedi-seoulpm/.git/ 안의 빈 깃 저장소를 다시 초기화했습니다
+    $
+
+이제 `app:create` 명령을 이용해 인스턴스를 생성합니다.
+`keedi-seoulpm` 이라는 인스턴스를 `cedar-14` 스택으로 생성하는 명령은 다음과 같습니다.
+
+    #!bash
+    $ heroku apps:create --stack cedar-14 keedi-seoulpm
+    Creating ⬢ keedi-seoulpm... done, stack is cedar-14
+    https://keedi-seoulpm.herokuapp.com/ | https://git.heroku.com/keedi-seoulpm.git
+    $
+
+[Heroku에서 스택][home-heroku-stack]은 인스턴스를 구동하는 운영체제를 의미하며
+현재 Ubuntu 10.04 기반의 `cedar`와 Ubuntu 14.04 기반의 `cedar-14` 두 가지가 있는데,
+`cedar`은 지원이 종료되었으므로 현실적으로 `cedar-14`만 사용이 가능합니다.
+이렇게 인스턴스를 생성하는 중에 자동으로 git 저장소의 원격 저장소를 설정해줍니다.
+
+    #!bash
+    $ git remote -v
+    heroku  https://git.heroku.com/keedi-seoulpm.git (fetch)
+    heroku  https://git.heroku.com/keedi-seoulpm.git (push)
+    $
+
+인스턴스의 상태를 살펴보죠.
+
+    #!bash
+    $ heroku apps
+    === keedi.k@gmail.com Apps
+    keedi-seoulpm
+
+    $ heroku apps:info --app keedi-seoulpm
+    === keedi-seoulpm
+    Dynos:
+    Git URL:       https://git.heroku.com/keedi-seoulpm.git
+    Owner:         myid@email.com
+    Region:        us
+    Repo Size:     0 B
+    Slug Size:     0 B
+    Stack:         cedar-14
+    Web URL:       https://keedi-seoulpm.herokuapp.com/
+    $
+
+기본적으로 생성한 인스턴스 이름을 이용해 `<name>.herokuapp.com`이라는 도메인으로 연결됨을 확인할 수 있습니다.
+따로 웹 응용을 띄운 적은 없지만 브라우저로 접속하면
+제대로 인스턴스가 생성되었음을 확인할 수 있는 문서를 볼 수 있습니다.
+
+![Welcome to Heroku][img-1-resize]
+*그림 1.* Welcome to Heroku ([원본][img-1])
+
+
+Perl on Heroku!!
+-----------------
+
+`cedar-14` 스택으로 생성한 우리의 인스턴스는 Ubuntu 14.04 리눅스입니다.
+다음 작업을 진행하기 전에 장치의 정보를 확인해두죠.
+인스턴스에 원격의 명령을 보내려면 `run` 명령을 사용합니다.
+
+    #!bash
+    $ heroku run --app keedi-seoulpm 'lsb_release -a'
+    Running lsb_release -a on ⬢ keedi-seoulpm... up, run.4021 (Free)
+    No LSB modules are available.
+    Distributor ID: Ubuntu
+    Description:    Ubuntu 14.04.5 LTS
+    Release:        14.04
+    Codename:       trusty
+    $ heroku run --app keedi-seoulpm 'uname -a'
+    Running uname -a on ⬢ keedi-seoulpm... up, run.8674 (Free)
+    Linux 16734b13-5512-494e-99b9-994b63325fdc 3.13.0-105-generic #152-Ubuntu SMP Fri Dec 2 15:37:11 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+    $
+
+Ubuntu 14.04.5 LTS 리눅스이면서 커널은 3.13.0, 64비트 환경임을 확인할 수 있습니다.
+당연히 여느 리눅스와 마찬가지로 Perl은 기본으로 설치되어 있을 것입니다.
+역시 Perl의 정보도 확인해둘 필요가 있겠죠? :)
+
+    #!bash
+    $ heroku run --app keedi-seoulpm 'perl --version'
+    Running perl --version on ⬢ keedi-seoulpm... up, run.6668 (Free)
+
+    This is perl 5, version 18, subversion 2 (v5.18.2) built for x86_64-linux-gnu-thread-multi
+    (with 44 registered patches, see perl -V for more detail)
+
+    Copyright 1987-2013, Larry Wall
+
+    Perl may be copied only under the terms of either the Artistic License or the
+    GNU General Public License, which may be found in the Perl 5 source kit.
+
+    Complete documentation for Perl, including FAQ lists, should be found on
+    this system using "man perl" or "perldoc perl".  If you have access to the
+    Internet, point your browser at http://www.perl.org/, the Perl Home Page.
+
+    $
+
+Perl 버전은 5.18.2군요. 가장 최신의 Perl 버전이 5.24.0이니 조금 아쉬운 면은 없지 않으나
+큰 수고를 들이지 않고 Perl의 최신 기능을 사용하거나, 웹 응용을 만드는데 부족함은 없어보입니다.
+
+자, 이제 가장 간단한 기본 Mojolicious 웹 응용을 Heroku 위에서 돌려보죠.
+가장 먼저 Heroku는 [빌드팩(buildpack)][home-heroku-buildpack]이라는 시스템을 사용하는데,
+공식 지원하는 언어의 경우 Heroku가 공식 빌드팩을 제공합니다.
+Perl의 경우 기본 제공이 아니므로 직접 빌드팩을 만들거나,
+사람들이 만들어서 공개한 빌드팩을 사용하면 됩니다.
+이미 펄 몽거들이 만들어놓은 빌드팩이 많으나 우선은 Mojolicious를
+구동할 수 있도록 기사용으로 간단히 수정한 빌드팩으로 설정합니다.
+
+    #!bash
+    $ heroku buildpacks:add https://github.com/keedi/heroku-buildpack-perl.git#mojolicious --app keedi-seoulpm
+    Buildpack added. Next release on keedi-seoulpm will use https://github.com/keedi/heroku-buildpack-perl.git#mojolicious.
+    Run git push heroku master to create a new release using this buildpack.
+    $
+
+우선 아무것도 첨가하지 않은 Mojolicious 웹 응용 파일 `app.pl`을 생성합니다.
+
+    #!bash
+    $ mojo generate lite_app app.pl
+    [exist] /home/askdna/workspace/heroku/keedi-seoulpm
+    [write] /home/askdna/workspace/heroku/keedi-seoulpm/app.pl
+    [chmod] /home/askdna/workspace/heroku/keedi-seoulpm/app.pl 744
+    $
+
+당연히 우리의 장비에는 `Mojolicious` 모듈을 설치했으나,
+새로 생성한 인스턴스에는 `Mojolicious` 모듈이 없겠죠.
+앞서 지정한 빌드팩은 `cpanfile`을 지원하므로
+일일이 설치하는 수고를 덜기위해 `cpanfile`을 이용해 의존성을 정의합니다.
+
+    #!bash
+    $ echo 'requires "Mojolicious" => "7.14";' > cpanfile
+    $ cat cpanfile
+    requires "Mojolicious" => "7.14";
+    $
+
+마지막으로 지정한 빌드팩은 실행 가능한 `Perloku`라는 파일을
+프로젝트 루트 디렉터리에 두었다는 가정하에 동작합니다.
+따라서 `Perloku` 파일도 생성합니다.
+
+    #!bash
+    $ echo -e '#!/bin/sh\n./app.pl daemon --listen http://*:$PORT' > Perloku
+    $ chmod 755 Perloku
+    $ cat Perloku
+    #!/bin/sh
+    ./app.pl daemon --listen http://*:$PORT
+    $
+
+이제 생성한 세 파일을 로컬 git 저장소에 커밋합니다.
+
+    #!bash
+    $ git add .
+    $ git commit -m "Welcome to Heroku"
+    [master 8fb018e] Welcome to Heroku
+     Date: Tue Jan 10 16:15:40 2017 +0900
+     3 files changed, 30 insertions(+)
+     create mode 100755 Perloku
+     create mode 100755 app.pl
+     create mode 100644 cpanfile
+    $
+
+필요한 모든 준비가 끝났습니다.
+이제 Heroku의 원격 저장소로 쏴주는 일만 남았네요.
+
+    #!bash
+    $ git push heroku master
+    오브젝트 개수 세는 중: 5, 완료.
+    Delta compression using up to 4 threads.
+    오브젝트 압축하는 중: 100% (4/4), 완료.
+    오브젝트 쓰는 중: 100% (5/5), 741 bytes | 0 bytes/s, 완료.
+    Total 5 (delta 0), reused 0 (delta 0)
+    remote: Compressing source files... done.
+    remote: Building source:
+    remote:
+    remote: -----> Perloku app detected
+    remote: -----> Bootstrapping cpanm
+    remote:        Successfully installed App-cpanminus-1.7042
+    remote:        1 distribution installed
+    remote: -----> Installing dependencies
+    remote:        cpanm options: --quiet --notest -l /tmp/build_1941cc7e4730191aaf1b69eca4534e68/local
+    remote:        Successfully installed IO-Socket-IP-0.38
+    remote:        Successfully installed Mojolicious-7.14
+    remote:        2 distributions installed
+    remote: -----> Installing local::lib
+    remote:        Successfully installed ExtUtils-MakeMaker-7.24 (upgraded from 6.66)
+    remote:        Successfully installed local-lib-2.000019
+    remote:        2 distributions installed
+    remote: -----> Discovering process types
+    remote:        Procfile declares types     -> (none)
+    remote:        Default types for buildpack -> web
+    remote:
+    remote: -----> Compressing...
+    remote:        Done: 1.4M
+    remote: -----> Launching...
+    remote:        Released v4
+    remote:        https://keedi-seoulpm.herokuapp.com/ deployed to Heroku
+    remote:
+    remote: Verifying deploy... done.
+    To https://git.heroku.com/keedi-seoulpm.git
+     * [new branch]      master -> master
+    $
+
+`git push` 동작과 더불어 원격에서 빌드팩이 정의한 `compile`, `detect`, `release` 등의 작업이 수행됩니다.
+로그 상으로 특별히 문제가 없다면 자동으로 지정된 도메인에 Mojolicious 웹 응용이 구동됩니다.
+
+![Perl on Heroku][img-2-resize]
+*그림 2.* Perl on Heroku ([원본][img-2])
+
+
+정리하며
+---------
+
+클라우드 환경이 화두가 되던 시절을 지나 바야흐로 PaaS를 비롯해 IaaS, SaaS 등
+수 많은 가상 환경 기반의 서비스가 당연하단 듯이 사용되는 요즘입니다.
+Heroku는 이런 여러가지 서비스 중 클라우드 PaaS로 제법 널리 사용되고 있습니다.
+비록 수익성의 문제 때문인지 무료로 제공되는 계정의 사용 제한이 예전보다 빡빡해져서
+풀타임 웹서비스를 제공하는 것은 현실적으로 무리가 있긴 하지만,
+간단히 테스트 용이라던가, 개인 홈페이지 정도의 웹 응용을 제작하고 올려서 확인하는 용도로는 쓸만하답니다.
+자, 다들 지금 당장 클라우드 플랫폼에 여러분의 Perl 기반 웹 응용을 올려보세요! ;-)
+
+_EOT_
+
+
+[img-1]:                    2016-12-20-1.png
+[img-2]:                    2016-12-20-2.png
+
+[img-1-resize]:             2016-12-20-1_r.png
+[img-2-resize]:             2016-12-20-2_r.png
+
+
+[cpan-mojolicious]:         https://metacpan.org/pod/Mojolicious
+[cpan]:                     http://www.cpan.org/
+[home-heroku-buildpack]:    https://devcenter.heroku.com/articles/buildpacks
+[home-heroku-cli]:          https://devcenter.heroku.com/articles/heroku-cli
+[home-heroku-signup]:       https://signup.heroku.com/
+[home-heroku-stack]:        https://devcenter.heroku.com/articles/stack
+[home-heroku]:              https://www.heroku.com/home
+[home-mojolicious]:         http://mojolicious.org/
+[home-perlbrew]:            http://perlbrew.pl/
+[twitter-keedi]:            http://twitter.com/#!/keedi
+[yes24-4433208]:            http://www.yes24.com/24/goods/4433208
