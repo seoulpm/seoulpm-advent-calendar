@@ -14,7 +14,7 @@ Author:   keedi
 시작하며
 ---------
 
-[Heroku][home-heroku]는 시작된 클라우드 PaaS(Platform-as-a-Service) 중 하나 입니다.
+[Heroku][home-heroku]는 시작된 클라우드 [PaaS(Platform-as-a-Service)][wiki-paas] 중 하나 입니다.
 기본적으로 Ruby on Rails 웹 응용을 지원하는 서비스였지만, 현재는 Java와, Node.js,
 Scala, Clojure, Python, PHP, Go 등의 언어를 공식적으로 지원하고 있습니다.
 하지만 기본적으로 생성하는 인스턴스는 리눅스인 만큼, 공식적으로 지원하지 않는다고 해서
@@ -349,4 +349,5 @@ _EOT_
 [home-mojolicious]:         http://mojolicious.org/
 [home-perlbrew]:            http://perlbrew.pl/
 [twitter-keedi]:            http://twitter.com/#!/keedi
+[wiki-paas]:                https://en.wikipedia.org/wiki/Platform_as_a_service 
 [yes24-4433208]:            http://www.yes24.com/24/goods/4433208
