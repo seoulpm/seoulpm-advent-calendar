@@ -1,0 +1,155 @@
+Title:    Punycode
+Package:  Seoul.pm
+Category: perl
+Category: Seoul.pm
+Author:   newbcode
+
+저자
+-----
+
+[@newbcode][twitter-newbcode] -  사랑스런 딸바보, 도치파파, 리눅스의 모든 것 공동 저자
+
+
+시작하며
+---------
+
+[퓨니코드(Punycode)][wiki-punycode]는 [IETF RFC3492 문서][rfc-3492]에 정의된 인코딩으로
+유니코드 문자열을 호스트 이름에서 허용된 문자만으로 인코딩하는 방법입니다.
+퓨니코드는 결국 유니코드가 지원하는 모든 언어로 국제화 도메인을 쓸 수 있게 한 IDNA의 일부입니다.
+근래는 전세계적으로 각 나라의 언어로 도메인을 설정하는 경우가 많아졌는데
+한국의 경우 `한국.kr`처럼 한글 도메인을 사용하는 만큼 퓨니코드에 대해 한번 알아보기로 하죠.
+그리고 퓨니코드를 피싱 도메인으로도 많이 사용 하기 때문에 이런 도메인을
+유니코드로 디코딩하여 도메인을 뽑아내는 방법을 알아두는 것도 유용하죠.
+
+
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 URI::UTF8::Punycode 모듈][cpan-uri-utf8-punycode]
+
+직접 [CPAN][cpan]을 이용해서 설치한다면 다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ sudo cpan URI::UTF8::Punycode
+
+사용자 계정으로 모듈을 설치하는 방법을 정확하게 알고 있거나
+[perlbrew][home-perlbrew]를 이용해서 자신만의 Perl을 사용하고 있다면
+다음 명령을 이용해서 모듈을 설치합니다.
+
+    #!bash
+    $ cpan URI::UTF8::Punycode
+
+
+퓨니코드 도메인
+----------------
+
+`한국.kr`이라는 도메인을 변환하는 코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+    use feature qw( say );
+
+    use URI::UTF8::Punycode;
+
+    my $domain   = shift;
+    my $punycode = puny_enc($domain);
+
+    say $punycode;
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./puny_enc.pl 한국.net
+    xn--3e0b707e.xn--net-
+    $
+
+퓨니코드로 변환하면 문자열의 앞 부분에 `xn--` 접두어가 붙습니다.
+그런데 이렇게 될 경우 `.net` 부분까지 퓨니코드로 전환되기 때문에 실제로 사용할 수 없습니다.
+호스트 부분만을 변경해야 하므로 정규표현식으로 퓨니코드로 표현할 부분을 분리합니다.
+더불어 아스키로 되어있지 않은 도메인에 한해서 처리하고,
+변환 후 나머지 도메인을 다시 합쳐줍니다.
+
+    #!perl
+    my @labels;
+    for my $label ( split /\./, $domain ) {
+        if ( $label =~ m/[^[:ascii:]]/ ) {
+            push @labels, puny_enc($label);
+        }
+        else {
+            push @labels, $label;
+        }
+    }
+    my $punycode = join ".", @labels;
+    say $punycode;
+
+실행 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./puny_enc.pl 한국.net
+    xn--3e0b707e.net
+    $
+
+결과로 출력된 주소를 브라우저에서 붙여넣으시면 `한국.net`으로 문제없이 접속됨을 확인할 수 있습니다.
+반대로 퓨니코드를 원래의 유니코드 문자열로 변환하려면 `puny_dec()` 함수를 사용합니다.
+코드는 다음과 같습니다.
+
+    #!perl
+    #!/usr/bin/env perl
+
+    use utf8;
+    use strict;
+    use warnings;
+    use feature qw( say );
+
+    use URI::UTF8::Punycode;
+
+    while (<>) {
+        chomp;
+
+        my @labels;
+        for my $label ( split /\./ ) {
+            if ( $label =~ m/^xn--/ ) {
+                push @labels, puny_dec($label);
+            }
+            else {
+                push @labels, $label;
+            }
+        }
+        my $utf8str = join ".", @labels;
+        say $utf8str;
+    }
+
+이전 실행 결과와 조합한 결과는 다음과 같습니다.
+
+    #!bash
+    $ ./puny_enc.pl 한국.net
+    xn--3e0b707e.net
+    $ ./puny_enc.pl 한국.net | puny_dec.pl
+    한국.net
+    $
+
+
+정리하며
+---------
+
+비록 일부에서는 퓨니코드를 쓰지말자는 의견도 있습니다만,
+세계적으로 각나라의 도메인을 사용하는 경우가 증가하고 있습니다.
+도메인으로 리다이렉션을 확인해야 한다거나,
+도메인으로 레코드 조회가 필요할 때 퓨니코드와
+[CPAN의 URI::UTF8::Punycode 모듈][cpan-uri-utf8-punycode]를 알아둔다면 유용할 것입니다.
+
+_EOT_
+
+
+[cpan-uri-utf8-punycode]:   https://metacpan.org/pod/URI::UTF8::Punycode
+[cpan]:                     http://www.cpan.org/
+[home-perlbrew]:            http://perlbrew.pl/
+[rfc-3492]:                 https://tools.ietf.org/html/rfc3492
+[twitter-newbcode]:         http://twitter.com/#!/newbcode
+[wiki-punycode]:            https://en.wikipedia.org/wiki/Punycode
