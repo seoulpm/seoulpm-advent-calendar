@@ -32,7 +32,7 @@ X축과 Y축 단 두 개의 좌표만 있으면 아주 손쉽게 특정 위치�
 여기가 어디인지 파악하는 것은 현실적으로 불가능하죠.
 이 때는 대부분의 평범한 사람은 해당 위도와 경도 좌표가 해당하는
 주소를 보았을 때야 "아~ 여기였구나~"할 것입니다.
-이 때 필요한 것이 바로 [지오코딩(geocoding)][wiki-geocoding]과 역지오코딩(reverse geocoding) 입니다.
+이 때 필요한 것이 바로 [지오코딩(geocoding)][wiki-geocoding]과 역지오코딩(reverse geocoding)입니다.
 Perl을 이용해 가장 널리 사용하는 [구글맵][home-google-map]의 [지오코딩][home-google-map-geocoding]을 사용해보죠.
 
 

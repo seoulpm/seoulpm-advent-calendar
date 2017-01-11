@@ -46,7 +46,7 @@ rakudobrew 설치
 앞에서 이것 저것 복잡하게 설명했습니다만 간단히 정리하면,
 Perl 6는 명세로써 `v6.c`가 현재 안정 버전입니다.
 더불어 2016년 현재 가장 완성도가 높은 구현체는 [Rakudo][home-rakudo],
-VM은 [MoarVM][home-moarvm]이니 우리에게 필요한 것은 Rakudo + MoarVM 입니다. :-)
+VM은 [MoarVM][home-moarvm]이니 우리에게 필요한 것은 **Rakudo + MoarVM**입니다. :-)
 가장 손쉽게 Rakudo를 설치하는 방법은 [rakudobrew][home-rakudobrew]를 사용하는 것입니다.
 rakudobrew를 설치하는 명령은 다음과 같습니다.
 

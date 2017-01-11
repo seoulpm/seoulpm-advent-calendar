@@ -80,7 +80,7 @@ Author:   keedi
     __DATA__
     ...
 
-[summernote][home-summernote] 편집기는 [Bootstrap][home-bootstrap] 기반의 HTML 편집기 입니다.
+[summernote][home-summernote] 편집기는 [Bootstrap][home-bootstrap] 기반의 HTML 편집기입니다.
 따라서 사용하려면 우선적으로 [jQuery][home-jquery]와 [Bootstrap][home-bootstrap]을
 [Mojolicious][home-mojolicious] 웹 응용 측에서 사전 적재를 해야 합니다.
 편의를 위해 레이아웃 템플릿 쪽에서 필요한 라이브러리는 CDN 주소를 이용합니다.
