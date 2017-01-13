@@ -1,0 +1,31 @@
+digraph finite_state_machine {
+    rankdir=LR;
+    size="8,5";
+
+    node [shape = circle];
+
+    # S0
+    s0 -> s0 [ label = "35%" ];
+    s0 -> s1 [ label = "50%" ];
+    s0 -> s2 [ label = "14%" ];
+
+    # S1
+    s1 -> s0 [ label = "22%" ];
+    s1 -> s1 [ label = "51%" ];
+    s1 -> s2 [ label = "22%" ];
+    s1 -> s3 [ label = "4%"  ];
+
+    # S2
+    s2 -> s0 [ label = "10%" ];
+    s2 -> s1 [ label = "59%" ];
+    s2 -> s2 [ label = "20%" ];
+    s2 -> s3 [ label = "10%" ];
+
+    # S3
+    s3 -> s0 [ label = "50%" ];
+    s3 -> s1 [ label = "50%" ];
+
+    # S4
+    s4
+
+}
